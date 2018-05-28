@@ -559,7 +559,7 @@ CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 	this.Format = oReader.GetLong();
 
 	this.PStyle = oReader.GetString2();
-	if ("" === Lvl.PStyle)
+	if ("" === this.PStyle)
 		this.PStyle = undefined;
 
 	this.Start   = oReader.GetLong();

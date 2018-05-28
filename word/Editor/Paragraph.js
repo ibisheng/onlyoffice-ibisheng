@@ -449,6 +449,8 @@ Paragraph.prototype.GetContentBounds = function(CurPage)
 	if (!oPage || oPage.StartLine > oPage.EndLine)
 		return this.Get_PageBounds(CurPage).Copy();
 
+	var isJustify = (this.Get_CompiledPr2(false).ParaPr.Jc === AscCommon.align_Justify) && this.Lines.length > 1;
+
 	var oBounds = null;
 	for (var CurLine = oPage.StartLine; CurLine <= oPage.EndLine; ++CurLine)
 	{
@@ -465,8 +467,16 @@ Paragraph.prototype.GetContentBounds = function(CurPage)
 			if (null === Left || Left > oRange.XVisible)
 				Left = oRange.XVisible;
 
-			if (null === Right || Right < oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak)
-				Right = oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak;
+			if (isJustify)
+			{
+				if (null === Right || Right < oRange.XEnd)
+					Right = oRange.XEnd;
+			}
+			else
+			{
+				if (null === Right || Right < oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak)
+					Right = oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak;
+			}
 		}
 
 
