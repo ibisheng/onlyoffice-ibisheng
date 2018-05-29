@@ -2579,6 +2579,7 @@
 		prot["asc_getLockedObjectType"] = prot.asc_getLockedObjectType;
 		prot["asc_getSizeCCOrPt"] = prot.asc_getSizeCCOrPt;
 		prot["asc_getSizePx"] = prot.asc_getSizePx;
+		prot["asc_getFilter"] = prot.asc_getFilter;
 
 		window["Asc"]["asc_CHyperlink"] = window["Asc"].asc_CHyperlink = asc_CHyperlink;
 		prot = asc_CHyperlink.prototype;
