@@ -155,6 +155,14 @@
 		this.innerWidth = 0;
 	}
 
+	function CacheRow() {
+		this.top = 0;
+		this.height = 0;			// Высота с точностью до 1 px
+		this.heightReal = 0;		// Реальная высота из файла (может быть не кратна 1 px, в Excel можно выставить через меню строки)
+		this.descender = 0;
+		this.isCustomHeight = false;
+	}
+
     function CacheElement() {
         if (!(this instanceof CacheElement)) {
             return new CacheElement();
@@ -1383,7 +1391,7 @@
         var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
         var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, maxRowObjects);
         var defaultH = this.defaultRowHeightPx;
-        var i = 0, h, hR, isCustomHeight, hiddenH = 0;
+        var i = 0, r, h, hR, isCustomHeight, hiddenH = 0;
 
         if (AscCommonExcel.recalcType.full === type) {
             this.rows = [];
@@ -1415,14 +1423,13 @@
 				}
             });
             h = Asc.round((h < 0 ? (hR = defaultH) : h) * this.getZoom());
-            this.rows[i] = {
-                top: y,
-                height: h,												// Высота с точностью до 1 px
-                heightReal: hR,											// Реальная высота из файла (может быть не кратна 1 px, в Excel можно выставить через меню строки)
-                descender: this.defaultRowDescender,
-                isCustomHeight: isCustomHeight
-            };
-            y += this.rows[i].height;
+            r = this.rows[i] = new CacheRow();
+			r.top = y;
+			r.height = h;
+			r.heightReal = hR;
+			r.descender = this.defaultRowDescender;
+			r.isCustomHeight = isCustomHeight;
+            y += h;
         }
 
         this.nRowsCount = Math.min(Math.max(this.nRowsCount, i), gc_nMaxRow);
