@@ -12591,11 +12591,11 @@
 					tmp = i;
 					x1 = x - tmp;
 					x2 = x - tmp + 1;
-					y1 = y - tmp + heightArrow1;
+					y1 = y - tmp + heightArrow1 - 1;
 					ctx.lineHor(x1, y1, x2);
 					x1 = x + tmp;
 					x2 = x + tmp + 1;
-					y1 = y - tmp + heightArrow1;
+					y1 = y - tmp + heightArrow1 - 1;
 					ctx.lineHor(x1, y1, x2);
 				}
 			}
@@ -12650,14 +12650,6 @@
 		{
 			ctx.beginPath();
 
-			x = x + 1;
-			var diffY = (height / 2);
-			height = height * scaleIndex;
-			for(var i = 0; i < height; i++)
-			{
-				ctx.lineHor(x - (i + base) , y + (height - i) - diffY, x + i)
-			}
-
 			if(isMobileRetina)
 			{
 				ctx.setLineWidth(AscBrowser.retinaPixelRatio * 2);
@@ -12665,6 +12657,14 @@
 			else
 			{
 				ctx.setLineWidth(AscBrowser.retinaPixelRatio);
+			}
+
+			x = x + 1;
+			var diffY = (height / 2);
+			height = height * scaleIndex;
+			for(var i = 0; i < height; i++)
+			{
+				ctx.lineHor(x - (i + base) , y + (height - i) - diffY, x + i)
 			}
 
 			ctx.setStrokeStyle(m_oColor);
@@ -12683,25 +12683,25 @@
 
 			if(null !== isApplySortState && isApplyAutoFilter)
 			{
-				var heigthObj = Math.ceil(height / 2) + 1;
+				var heigthObj = Math.ceil(height / 2) + 2;
 				var marginTop = Math.floor((height - heigthObj) / 2);
 				centerY = upLeftYButton + heigthObj + marginTop;
 
 				_drawSortArrow(upLeftXButton + 4 * scaleIndex, upLeftYButton + 5 * scaleIndex, isApplySortState, 8);
-				_drawFilterMark(centerX + 2, centerY, heigthObj);
+				_drawFilterMark(centerX + 3, centerY, heigthObj);
 			}
 			else if(null !== isApplySortState)
 			{
 				_drawSortArrow(upLeftXButton + width - 5 * scaleIndex, upLeftYButton + 3 * scaleIndex, isApplySortState, 10);
-				_drawFilterDreieck(centerX - 4, centerY + 1, 3, 1);
+				_drawFilterDreieck(centerX - 3, centerY + 1, 3, 1);
 			}
 			else if (isApplyAutoFilter)
 			{
-				var heigthObj = Math.ceil(height / 2) + 1;
+				var heigthObj = Math.ceil(height / 2) + 2;
 				var marginTop = Math.floor((height - heigthObj) / 2);
 
 				centerY = upLeftYButton + heigthObj + marginTop;
-				_drawFilterMark(centerX, centerY, heigthObj);
+				_drawFilterMark(centerX + 1, centerY, heigthObj);
 			}
 			else
 			{
