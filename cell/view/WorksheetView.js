@@ -10776,7 +10776,7 @@
                     height = Math.max(height, ct.metrics.height + 1);
                 }
 
-                t.model.setRowBestFit(true, Math.min(height, t.maxRowHeightPx) * asc_getcvt(0, 1, this._getPPIY()), r, r);
+                t.model.setRowBestFit(true, Math.min(height, t.maxRowHeightPx) * asc_getcvt(0, 1, t._getPPIY()), r, r);
             }
 
             t.nRowsCount = 0;
