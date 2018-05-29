@@ -12951,6 +12951,8 @@
 
         var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
         var cellId = ws.autoFilters._rangeToId(rangeButton);
+        var cell = this.model.getRange3(rangeButton.r1, rangeButton.c1, rangeButton.r2, rangeButton.c2);
+        var columnName = cell.getValue();
 
         var cellCoord = this.getCellCoord(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
 
@@ -13030,6 +13032,7 @@
         autoFilterObject.asc_setAutomaticRowCount(automaticRowCount);
         autoFilterObject.asc_setDiplayName(displayName);
         autoFilterObject.asc_setSortColor(ascColor);
+		autoFilterObject.asc_setColumnName(columnName);
 
         var columnRange = Asc.Range(rangeButton.c1, autoFilter.Ref.r1 + 1, rangeButton.c1, autoFilter.Ref.r2);
 

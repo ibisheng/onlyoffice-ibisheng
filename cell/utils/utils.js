@@ -1818,7 +1818,8 @@
 			asc_getUserId: function () { return this.userId; },
 			asc_getLockedObjectType: function () { return this.lockedObjectType; },
 			asc_getSizeCCOrPt: function () { return this.sizeCCOrPt; },
-			asc_getSizePx: function () { return this.sizePx; }
+			asc_getSizePx: function () { return this.sizePx; },
+			asc_getFilter: function () { return this.filter; }
 		};
 
 		// Гиперссылка

@@ -1143,6 +1143,17 @@
 		  }));
       }
 
+		// проверяем фильтр
+		if (ct.target === c_oTargetType.FilterObject) {
+			var filterObj = ws.af_setDialogProp(ct.idFilter, true);
+				arrMouseMoveObjects.push(new asc_CMM({
+				type: c_oAscMouseMoveType.Filter,
+				x: AscCommon.AscBrowser.convertToRetinaValue(x),
+				y: AscCommon.AscBrowser.convertToRetinaValue(y),
+				filter: filterObj
+			}));
+		}
+
       /* Проверяем, может мы на никаком объекте (такая схема оказалась приемлимой
        * для отдела разработки приложений)
        */

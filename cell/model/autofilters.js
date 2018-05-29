@@ -174,16 +174,17 @@
 			this.Properties = g_oAutoFiltersOptionsProperties;
 
 			this.cellId  = null;
-            this.cellCoord  = null;
+			this.cellCoord  = null;
 			this.values  = null;
 			this.filter  = null;
 			this.sortVal = null;
 			this.automaticRowCount = null;
 			this.displayName  = null;
-            this.isTextFilter = null;
-            this.colorsFill = null;
-            this.colorsFont = null;
-            this.sortColor = null;
+			this.isTextFilter = null;
+			this.colorsFill = null;
+			this.colorsFont = null;
+			this.sortColor = null;
+			this.columnName = null;
 			
 			return this;
 		}
@@ -238,6 +239,7 @@
             asc_setColorsFill : function(val) { this.colorsFill = val; },
             asc_setColorsFont : function(val) { this.colorsFont = val; },
             asc_setSortColor : function(val) { this.sortColor = val; },
+			asc_setColumnName : function(val) { this.columnName = val; },
 			
 			asc_getCellId : function() { return this.cellId; },
             asc_getCellCoord : function() { return this.cellCoord; },
@@ -249,7 +251,8 @@
             asc_getIsTextFilter : function() { return this.isTextFilter; },
             asc_getColorsFill : function() { return this.colorsFill; },
             asc_getColorsFont : function() { return this.colorsFont; },
-            asc_getSortColor : function() { return this.sortColor; }
+            asc_getSortColor : function() { return this.sortColor; },
+			asc_getColumnName : function() { return this.columnName; }
 		};
 		
 		var g_oAdvancedTableInfoSettings = {
@@ -5171,6 +5174,7 @@
         prot["asc_getColorsFill"]				= prot.asc_getColorsFill;
         prot["asc_getColorsFont"]				= prot.asc_getColorsFont;
         prot["asc_getSortColor"]				= prot.asc_getSortColor;
+		prot["asc_getColumnName"]				= prot.asc_getColumnName;
 		prot["asc_setFilterObj"]				= prot.asc_setFilterObj;
 		
 		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
