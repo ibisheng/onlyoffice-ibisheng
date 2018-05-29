@@ -12531,9 +12531,7 @@
 		}
 
 		var widthBorder = 1;
-
 		var scaleIndex = 1;
-		var scaleFactor = ctx.scaleFactor;
 
 		var m_oColor = new CColor(120, 120, 120);
 
@@ -12551,7 +12549,8 @@
 
 		//стартовая позиция кнопки
 		var x1 = t.cols[col].left + t.cols[col].width - widthWithBorders - 0.5 - offsetX;
-		var y1 = t.rows[row].top + t.rows[row].height - heightWithBorders - 0.5 - offsetY;
+		//-1 смещение относительно нижней границы ячейки на 1px
+		var y1 = t.rows[row].top + t.rows[row].height - heightWithBorders - 0.5 - offsetY - 1;
 
 		var _drawButtonFrame = function(startX, startY, width, height)
 		{
@@ -12573,20 +12572,20 @@
 			var x = startX;
 			var y = startY;
 
-			var heightArrow1 = heightArrow * scaleIndex - 1/scaleFactor;
-			var height = 3 * scaleIndex * scaleFactor;
+			var heightArrow1 = heightArrow * scaleIndex;
+			var height = 3 * scaleIndex;
 			var x1, x2, y1;
 			if(isDescending)
 			{
 				for(var i = 0; i < height; i++)
 				{
-					tmp = i/scaleFactor;
+					tmp = i;
 					x1 = x - tmp;
-					x2 = x - tmp + 1/scaleFactor;
+					x2 = x - tmp + 1;
 					y1 = y - tmp + heightArrow1;
 					ctx.lineHor(x1, y1, x2);
 					x1 = x + tmp;
-					x2 = x + tmp + 1/scaleFactor;
+					x2 = x + tmp + 1;
 					y1 = y - tmp + heightArrow1;
 					ctx.lineHor(x1, y1, x2);
 				}
@@ -12595,13 +12594,13 @@
 			{
 				for(var i = 0; i < height; i++)
 				{
-				    tmp = i/scaleFactor;
+				    tmp = i;
 					x1 = x - tmp;
-					x2 = x - tmp + 1/scaleFactor;
+					x2 = x - tmp + 1;
 					y1 = y + tmp;
 					ctx.lineHor(x1, y1, x2);
 					x1 = x + tmp;
-					x2 = x + tmp + 1/scaleFactor;
+					x2 = x + tmp + 1;
 					y1 = y + tmp;
 					ctx.lineHor(x1, y1, x2);
 				}
@@ -12634,7 +12633,7 @@
 			ctx.stroke();
 
 			var heightTriangle = 4;
-			y = y - heightLine + 1 / scaleFactor;
+			y = y - heightLine + 1;
 			_drawFilterDreieck(x, y, heightTriangle, 2);
         };
 
@@ -12642,12 +12641,12 @@
 		{
 			ctx.beginPath();
 
-			x = x + 1/scaleFactor;
-			var diffY = (height / 2) * scaleFactor;
-			height = height * scaleIndex*scaleFactor;
+			x = x + 1;
+			var diffY = (height / 2);
+			height = height * scaleIndex;
 			for(var i = 0; i < height; i++)
 			{
-				ctx.lineHor(x - (i/scaleFactor + base/scaleFactor) , y + (height - i/scaleFactor) - diffY, x + i/scaleFactor)
+				ctx.lineHor(x - (i + base) , y + (height - i) - diffY, x + i)
 			}
 
 			if(isMobileRetina)
@@ -12701,6 +12700,7 @@
 			}
 		};
 
+		//TODO!!! некорректно рисуется кнопка при уменьшении масштаба и уменьшении размера строки
 		var diffX = 0;
 		var diffY = 0;
 		if ((colWidth - 2) < width && rowHeight < (height + 2))
