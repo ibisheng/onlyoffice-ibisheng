@@ -146,6 +146,8 @@
 
     var gridlineSize = 1;
 
+    var filterSizeButton = 17;
+
 	function CacheColumn() {
 	    this.isCustomWidth = false;
 	    this.left = 0;
@@ -12522,8 +12524,8 @@
 		var row = props.row;
         var col = props.col;
 
-		var widthButtonPx = 17;
-		var heightButtonPx = 17;
+		var widthButtonPx = filterSizeButton;
+		var heightButtonPx = filterSizeButton;
 		if (AscBrowser.isRetina)
 		{
 			widthButtonPx = AscCommon.AscBrowser.convertToRetinaValue(widthButtonPx, true);
@@ -12821,8 +12823,8 @@
 	WorksheetView.prototype._hitCursorFilterButton = function(x, y, col, row)
 	{
 		var ws = this;
-		var width = 13;
-		var height = 13;
+		var width = filterSizeButton;
+		var height = filterSizeButton;
 		var rowHeight = ws.rows[row].height;
 		if (rowHeight < height) {
 			width = width * (rowHeight / height);
@@ -12906,8 +12908,8 @@
         };
 
         if (isCellContainsAutoFilterButton(c, r)) {
-            var height = 11;
-            var width = 11;
+            var height = filterSizeButton;
+            var width = filterSizeButton;
             var rowHeight = ws.rows[r].height;
             var index = 1;
             if (rowHeight < height) {
