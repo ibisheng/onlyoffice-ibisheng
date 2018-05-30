@@ -1803,6 +1803,9 @@
 				// Для resize
 				this.sizeCCOrPt = obj.sizeCCOrPt;
 				this.sizePx = obj.sizePx;
+
+				//Filter
+				this.filter = obj.filter;
 			}
 
 			return this;
