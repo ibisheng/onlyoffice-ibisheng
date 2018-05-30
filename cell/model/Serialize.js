@@ -3953,7 +3953,7 @@
         this.nLastFilePos = 0;
         this.nRealTableCount = 0;
         this.bs = new BinaryCommonWriter(this.Memory);
-        this.Write = function(noBase64)
+        this.Write = function(noBase64, onlySaveBase64)
         {
             pptx_content_writer._Start();
 			if (noBase64) {
@@ -3962,7 +3962,10 @@
             this.WriteMainTable();
             pptx_content_writer._End();
 			if (noBase64) {
-				return this.Memory.GetData();
+			    if (onlySaveBase64)
+                    return this.Memory.GetBase64Memory();
+			    else
+			        return this.Memory.GetData();
 			} else {
 				return this.WriteFileHeader(this.Memory.GetCurPosition(), AscCommon.c_oSerFormat.Version) + this.Memory.GetBase64Memory();
 			}

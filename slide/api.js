@@ -5064,6 +5064,11 @@ background-repeat: no-repeat;\
 				{
 					if (this.isApplyChangesOnOpenEnabled)
 					{
+                        if (AscCommon.EncryptionWorker && !AscCommon.EncryptionWorker.isChangesHandled)
+                        {
+                            return AscCommon.EncryptionWorker.handleChanges(AscCommon.CollaborativeEditing.m_aChanges, this, this.OpenDocumentEndCallback);
+                        }
+                        
 						this.isApplyChangesOnOpenEnabled = false;
 						this.bNoSendComments             = true;
 						var OtherChanges                 = AscCommon.CollaborativeEditing.m_aChanges.length > 0;
@@ -7176,6 +7181,13 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.CalculateComments();
 		return writer.WriteDocument(this.WordControl.m_oLogicDocument);
 	};
+
+    window["asc_docs_api"].prototype.asc_nativeGetFile3 = function()
+    {
+        var writer = new AscCommon.CBinaryFileWriter();
+        this.WordControl.m_oLogicDocument.CalculateComments();
+        return { data: writer.WriteDocument3(this.WordControl.m_oLogicDocument, true), header: ("PPTY;v10;" + writer.pos + ";") };
+    };
 
 	window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 	{

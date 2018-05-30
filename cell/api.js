@@ -1461,6 +1461,11 @@ var editor;
 			return;
 		}
 
+        if (AscCommon.EncryptionWorker && !AscCommon.EncryptionWorker.isChangesHandled)
+        {
+            return AscCommon.EncryptionWorker.handleChanges(this.collaborativeEditing.m_arrChanges, this, this._openDocumentEndCallback);
+        }
+
 		if (0 === this.wbModel.getWorksheetCount()) {
 			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
 			return;
@@ -3203,6 +3208,12 @@ var editor;
   spreadsheet_api.prototype.asc_nativeGetFile = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
+  };
+  spreadsheet_api.prototype.asc_nativeGetFile3 = function()
+  {
+      var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
+      oBinaryFileWriter.Write(true, true);
+      return { data: oBinaryFileWriter.Write(true, true), header: oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition(), Asc.c_nVersionNoBase64) };
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);

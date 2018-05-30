@@ -141,6 +141,7 @@
 	var sDownloadServiceLocalUrl = "../../../../downloadas";
 	var sUploadServiceLocalUrl = "../../../../upload";
 	var sUploadServiceLocalUrlOld = "../../../../uploadold";
+	var sSaveFileLocalUrl = "../../../../savefile";
 	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
 	function getSockJs()
@@ -691,6 +692,19 @@
 								 fCallback(JSON.parse(httpRequest.responseText), true);
 							 }
 						 }
+		});
+	}
+
+	function sendSaveFile(docId, userId, title, jwt, data, fError, fsuccess)
+	{
+		var cmd = {'id': docId, "userid": userId, "jwt": jwt, 'outputpath': title};
+		asc_ajax({
+			type:        'POST',
+			url:         sSaveFileLocalUrl + '/' + docId + '?cmd=' + encodeURIComponent(JSON.stringify(cmd)),
+			data:        data,
+			contentType: "application/octet-stream",
+			error:       fError,
+			success:     fsuccess
 		});
 	}
 
@@ -3347,6 +3361,138 @@
 		};
 	}
 
+    /////////////////////////////////////////////////////////
+	///////////////       CRYPT      ////////////////////////
+	/////////////////////////////////////////////////////////
+    AscCommon.EncryptionMessageType = {
+        Encrypt : 0,
+        Decrypt : 1
+    };
+    function CEncryptionData()
+    {
+        this.arrData = [];
+        this.arrImages = [];
+
+        this.handleChangesCallback = null;
+        this.isChangesHandled = false;
+
+        this.isNeedCrypt = false;
+
+        this.isExistDecryptedChanges = false; // был ли хоть один запрос на расшифровку данных (были ли чужие изменения)
+
+        this.sendChanges = function(sender, data, type)
+        {
+            if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
+            {
+                if (AscCommon.EncryptionMessageType.Encrypt == type)
+                {
+                    sender._send(data, true);
+                }
+                else if (AscCommon.EncryptionMessageType.Decrypt == type)
+                {
+                    sender._onSaveChanges(data, true);
+                }
+                return;
+            }
+
+            if (undefined !== type)
+                this.arrData.push({ sender: sender, type: type, data: data });
+
+            if (this.arrData.length == 0)
+                return;
+
+            if (AscCommon.EncryptionMessageType.Encrypt == this.arrData[0].type)
+            {
+            	//console.log("encrypt: " + data["changes"]);
+                window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : JSON.parse(data["changes"]) });
+            }
+            else if (AscCommon.EncryptionMessageType.Decrypt == this.arrData[0].type)
+            {
+                //console.log("decrypt: " + data["changes"]);
+                window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : data["changes"] });
+            }
+        };
+
+        this.receiveChanges = function(data)
+        {
+        	if (this.handleChangesCallback)
+			{
+                this.isExistDecryptedChanges = true;
+				//console.log(data);
+				if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
+				{
+                    for (var i = data.length - 1; i >= 0; i--)
+                    {
+                        this.handleChangesCallback.changesBase[i] = data[i];
+                    }
+                }
+                else
+				{
+                    for (var i = data.length - 1; i >= 0; i--)
+                    {
+                        this.handleChangesCallback.changesBase[i].m_pData = data[i];
+                    }
+				}
+                this.isChangesHandled = true;
+				this.handleChangesCallback.callback.call(this.handleChangesCallback.sender);
+                this.isChangesHandled = false;
+				this.handleChangesCallback = null;
+
+                this.sendChanges(undefined, undefined);
+				return;
+			}
+
+        	var obj = this.arrData[0];
+        	this.arrData.splice(0, 1);
+
+            if (AscCommon.EncryptionMessageType.Encrypt == obj.type)
+            {
+            	obj.data["changes"] = JSON.stringify(data);
+                obj.sender._send(obj.data, true);
+            }
+            else if (AscCommon.EncryptionMessageType.Decrypt == obj.type)
+            {
+                this.isExistDecryptedChanges = true;
+                obj.data["changes"] = data;
+                obj.sender._onSaveChanges(obj.data, true);
+            }
+
+            this.sendChanges(undefined, undefined);
+        };
+
+        this.handleChanges = function(_array, _sender, _callback)
+		{
+            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length || !this.isNeedCrypt)
+			{
+				this.isChangesHandled = true;
+				_callback.call(_sender);
+                this.isChangesHandled = false;
+                return;
+			}
+
+			this.handleChangesCallback = { changesBase : _array, changes : [], sender : _sender, callback : _callback };
+
+            if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
+            {
+                for (var i = _array.length - 1; i >= 0; i--)
+                {
+                    this.handleChangesCallback.changes[i] = _array[i];
+                }
+            }
+            else
+			{
+                for (var i = _array.length - 1; i >= 0; i--)
+                {
+                    this.handleChangesCallback.changes[i] = _array[i].m_pData;
+                }
+			}
+
+            window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.handleChangesCallback.changes });
+		};
+    }
+
+    AscCommon.EncryptionWorker = new CEncryptionData();
+
 	/** @constructor */
 	function CTranslateManager()
 	{
@@ -3447,6 +3593,7 @@
 	window["AscCommon"].getImageFromChanges = getImageFromChanges;
 	window["AscCommon"].openFileCommand = openFileCommand;
 	window["AscCommon"].sendCommand = sendCommand;
+	window["AscCommon"].sendSaveFile = sendSaveFile;
 	window["AscCommon"].mapAscServerErrorToAscError = mapAscServerErrorToAscError;
 	window["AscCommon"].joinUrls = joinUrls;
 	window["AscCommon"].getFullImageSrc2 = getFullImageSrc2;
@@ -3515,3 +3662,256 @@
 
 	window["AscCommon"].translateManager = new CTranslateManager();
 })(window);
+
+// ONLYPASS
+window["asc_initAdvancedOptions"] = function(_code, _file_hash)
+{
+    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
+    {
+        window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash });
+        return;
+    }
+
+    _editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
+};
+window.openFileCryptCallback = function(_binary)
+{
+    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+    if (_binary == null)
+    {
+        this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
+        return;
+    }
+
+    if ("DOCY" == AscCommon.c_oSerFormat.Signature)
+	{
+		var isEditor = true;
+        if (_binary.length > 4)
+		{
+			var _signature = (String.fromCharCode(_binary[0]) + String.fromCharCode(_binary[1]) + String.fromCharCode(_binary[2]) + String.fromCharCode(_binary[3]));
+			if (_signature != AscCommon.c_oSerFormat.Signature)
+				isEditor = false;
+		}
+
+        if (!isEditor)
+            _editor.OpenDocument("", _binary);
+        else
+            _editor.OpenDocument2("", _binary);
+	}
+	else if ("PPTY" == AscCommon.c_oSerFormat.Signature)
+	{
+        _editor.OpenDocument2("", _binary);
+	}
+	else
+	{
+        _editor.openDocument(_binary);
+	}
+
+    _editor.sendEvent("asc_onDocumentPassword", ("" != _editor.currentPassword) ? true : false);
+};
+
+window["asc_IsNeedBuildCryptedFile"] = function()
+{
+    if (!window["AscDesktopEditor"])
+        return false;
+
+    var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+    var _returnValue = false;
+
+    var _users = null;
+    if (_api.CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi._participants)
+        _users = _api.CoAuthoringApi._CoAuthoringApi._participants;
+
+    var _usersCount = 0;
+    for (var _user in _users)
+    	_usersCount++;
+
+    var isOne = (1 >= _usersCount) ? true : false;
+
+    if (!isOne)
+    {
+    	//console.log("asc_IsNeedBuildCryptedFile: no one");
+    	_returnValue = false;
+    }
+    else if (null != AscCommon.History.SavedIndex && -1 != AscCommon.History.SavedIndex)
+    {
+        //console.log("asc_IsNeedBuildCryptedFile: one1");
+        _returnValue = true;
+    }
+    else
+    {
+        //console.log("asc_IsNeedBuildCryptedFile: one2");
+        if (_api.editorId == AscCommon.c_oEditorId.Spreadsheet)
+        {
+            if (AscCommon.EncryptionWorker.isExistDecryptedChanges)
+                _returnValue = true;
+        }
+        else
+        {
+            if (0 != AscCommon.CollaborativeEditing.m_aAllChanges.length)
+                _returnValue = true;
+        }
+    }
+
+    window["AscDesktopEditor"]["js_message"]("IsNeedBuildCryptedFile", "" + _returnValue);
+    return _returnValue;
+};
+
+window["UpdateSystemPlugins"] = function()
+{
+    var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+    _plugins[0]["url"] = _plugins[0]["url"].replace(" ", "%20");
+    _plugins[1]["url"] = _plugins[1]["url"].replace(" ", "%20");
+
+    for (var k = 0; k < 2; k++)
+    {
+        var _pluginsCur = _plugins[k];
+
+        var _len = _pluginsCur["pluginsData"].length;
+        for (var i = 0; i < _len; i++)
+		{
+			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
+
+			if (!window["AscDesktopEditor"]["IsLocalFile"]())
+			{
+                _pluginsCur["pluginsData"][i]["baseUrl"] = "ascdesktop://plugin_content/" + _pluginsCur["pluginsData"][i]["baseUrl"];
+            }
+        }
+    }
+
+    var _array = [];
+
+    for (var k = 0; k < 2; k++)
+    {
+        var _pluginsCur = _plugins[k];
+        var _len = _pluginsCur["pluginsData"].length;
+
+        for (var i = 0; i < _len; i++)
+        {
+            var _plugin = _pluginsCur["pluginsData"][i];
+            for (var j = 0; j < _plugin["variations"].length; j++)
+            {
+                var _variation = _plugin["variations"][j];
+                if (_variation["initDataType"] == "desktop")
+                {
+                    _array.push(_plugin);
+                    break;
+                }
+            }
+        }
+    }
+
+    var _arraySystem = [];
+    for (var i = 0; i < _array.length; i++)
+    {
+        var plugin = new Asc.CPlugin();
+        plugin["deserialize"](_array[i]);
+
+        _arraySystem.push(plugin);
+    }
+
+    window.g_asc_plugins.registerSystem("", _arraySystem);
+    window.g_asc_plugins.runAllSystem();
+};
+
+window["buildCryptoFile_Start"] = function()
+{
+    var _editor = window.Asc.editor ? window.Asc.editor : window.editor;
+    _editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
+
+    window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
+};
+
+window["buildCryptoFile_End"] = function(url, error, hash, password)
+{
+    var _editor = window.Asc.editor ? window.Asc.editor : window.editor;
+    _editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
+
+    if (0 != error)
+	{
+		_editor.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationSaveError, Asc.c_oAscError.Level.NoCritical);
+		return;
+    }
+
+    // send password
+    _editor._callbackPluginEndAction = function()
+	{
+		this._callbackPluginEndAction = null;
+
+        _editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
+
+		// file upload
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', "ascdesktop://fonts/" + url, true);
+		xhr.responseType = 'arraybuffer';
+
+		if (xhr.overrideMimeType)
+			xhr.overrideMimeType('text/plain; charset=x-user-defined');
+		else
+			xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+
+		xhr.onload = function()
+		{
+			if (this.status != 200)
+			{
+				// error
+				return;
+			}
+
+			var fileData = new Uint8Array(this.response);
+
+			var ext = ".docx";
+			switch (_editor.editorId)
+			{
+				case AscCommon.c_oEditorId.Presentation:
+					ext = ".pptx";
+					break;
+				case AscCommon.c_oEditorId.Spreadsheet:
+					ext = ".xlsx";
+					break;
+				default:
+					break;
+			}
+
+			AscCommon.sendSaveFile(_editor.documentId, _editor.documentUserId, "output" + ext, _editor.asc_getSessionToken(), fileData, function(err) {
+
+                _editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
+                _editor.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationOpenError, Asc.c_oAscError.Level.Critical);
+
+                window["AscDesktopEditor"]["buildCryptedEnd"](false);
+
+			}, function(httpRequest) {
+				//console.log(httpRequest.responseText);
+				try
+				{
+					var data = {
+						"accounts": httpRequest.responseText ? JSON.parse(httpRequest.responseText) : undefined,
+						"hash": hash,
+						"password" : password,
+						"type": "share"
+					};
+
+					window["AscDesktopEditor"]["sendSystemMessage"](data);
+					window["AscDesktopEditor"]["CallInAllWindows"]("function(){ if (window.DesktopUpdateFile) { window.DesktopUpdateFile(undefined); } }");
+
+                    _editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
+
+					setTimeout(function() {
+
+                        window["AscDesktopEditor"]["buildCryptedEnd"](true);
+
+					}, 1000);
+				}
+				catch (err)
+				{
+				}
+			});
+		};
+
+		xhr.send(null);
+	};
+    window.g_asc_plugins.sendToEncryption({"type": "setPasswordByFile", "hash": hash, "password": password});
+};
