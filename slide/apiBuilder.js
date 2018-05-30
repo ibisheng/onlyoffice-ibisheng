@@ -1635,7 +1635,22 @@
         else
             return (undefined !== bDefValue ? bDefValue : false);
     }
+    function private_Twips2MM(twips)
+    {
+        return 25.4 / 72.0 / 20 * twips;
+    }
+    function private_GetInt(nValue, nMin, nMax)
+    {
+        var nResult = nValue | 0;
 
+        if (undefined !== nMin && null !== nMin)
+            nResult = Math.max(nMin, nResult);
+
+        if (undefined !== nMax && null !== nMax)
+            nResult = Math.min(nMax, nResult);
+
+        return nResult;
+    }
     function private_GetTableMeasure(sType, nValue)
     {
         var nType = tblwidth_Auto;
