@@ -3919,7 +3919,7 @@
 
         var x1 = this.cols[col].left - offsetX - gridlineSize;
         var h = ctx.getHeight();
-        var width = (x - x1);
+        var width = Asc.round((x - x1) / this.getZoom());
         if ( 0 > width ) {
             width = 0;
         }
@@ -3951,7 +3951,7 @@
 
         var y1 = this.rows[row].top - offsetY - gridlineSize;
         var w = ctx.getWidth();
-        var height = (y - y1);
+        var height = Asc.round((y - y1) / this.getZoom());
         if ( 0 > height ) {
             height = 0;
         }
@@ -3964,7 +3964,7 @@
 
         return new asc_CMM( {
             type      : Asc.c_oAscMouseMoveType.ResizeRow,
-            sizeCCOrPt: height * asc_getcvt(0, 1, this._getPPIY()),
+            sizeCCOrPt: height * sizePxinPt,
             sizePx    : height,
             x         : this.cellsLeft,
             y         : y1 + this.rows[row].height
