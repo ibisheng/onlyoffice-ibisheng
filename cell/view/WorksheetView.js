@@ -144,6 +144,7 @@
     var kMaxAutoCompleteCellEdit = 20000;
 
     var gridlineSize = 1;
+    var sizePxinPt = 72 / 96;
 
     var filterSizeButton = 17;
 
@@ -1403,10 +1404,10 @@
                i < gc_nMaxRow; ++i) {
             this.model._getRowNoEmptyWithAll(i, function(row){
 				if (!row) {
-					h = -1; // Будет использоваться дефолтная высота строки
+					hR = -1; // Будет использоваться дефолтная высота строки
 					isCustomHeight = false;
 				} else if (row.getHidden()) {
-					hR = h = 0;  // Скрытая строка, высоту выставляем 0
+					hR = 0;  // Скрытая строка, высоту выставляем 0
 					isCustomHeight = true;
 					hiddenH += row.h > 0 ? row.h - 1 : defaultH;
 				} else {
@@ -1414,14 +1415,19 @@
 					// Берем высоту из модели, если она custom(баг 15618), либо дефолтную
 					if (row.h > 0 && (isCustomHeight || row.getCalcHeight())) {
 						hR = row.h;
-						h = hR / 0.75; // 0.75 - это размер 1px в pt (можно было 96/72)
-						h = h | h;
 					} else {
-						h = -1;
+						hR = -1;
 					}
 				}
             });
-            h = Asc.round((h < 0 ? (hR = defaultH) : h) * this.getZoom());
+            if (hR < 0) {
+                hR = AscCommonExcel.oDefaultMetrics.RowHeight;
+            }
+			// Convert pt to px
+			h = hR / sizePxinPt;
+			h = h | h;
+
+            h = Asc.round(h * this.getZoom());
             r = this.rows[i] = new CacheRow();
 			r.top = y;
 			r.height = h;
