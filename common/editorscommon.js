@@ -1460,7 +1460,7 @@
 	{
 		if (files.length > 0)
 		{
-			var url = sUploadServiceLocalUrl + '/' + btoa(window.docId) + '/' + g_oDocumentUrls.getMaxIndex();
+			var url = sUploadServiceLocalUrl + '/' + btoa(window['docId']) + '/' + g_oDocumentUrls.getMaxIndex();
 			if (jwt)
 			{
 				url += '?token=' + encodeURIComponent(jwt);
