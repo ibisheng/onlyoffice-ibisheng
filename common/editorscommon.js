@@ -139,7 +139,7 @@
 
 	var oZipImages = null;
 	var sDownloadServiceLocalUrl = "../../../../downloadas";
-	var sUploadServiceLocalUrl = "../../../../upload";
+	var sUploadServiceLocalUrl = "/upload/images";
 	var sUploadServiceLocalUrlOld = "../../../../uploadold";
 	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
@@ -1460,7 +1460,7 @@
 	{
 		if (files.length > 0)
 		{
-			var url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
+			var url = sUploadServiceLocalUrl + '/' + btoa(window.docId) + '/' + g_oDocumentUrls.getMaxIndex();
 			if (jwt)
 			{
 				url += '?token=' + encodeURIComponent(jwt);
@@ -1472,6 +1472,12 @@
 			}
             var file = aFiles.pop();
             var aResultUrls = [];
+
+            if (jwt) {
+                url += '&fileName=' + encodeURIComponent(file.name);
+            } else {
+                url += '?fileName=' + encodeURIComponent(file.name);
+            }
 
             var fOnReadyChnageState = function(){
                 if (4 == this.readyState){
@@ -1493,11 +1499,13 @@
                             file = aFiles.pop();
                             var xhr = new XMLHttpRequest();
 
-                            url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
+                            url = sUploadServiceLocalUrl + '/' + btoa(window.docId) + '/' + g_oDocumentUrls.getMaxIndex();
                             if (jwt)
                             {
                                 url += '/' + jwt;
                             }
+
+                            url += '?fileName=' + encodeURIComponent(file.name);
 
                             xhr.open('POST', url, true);
                             xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
