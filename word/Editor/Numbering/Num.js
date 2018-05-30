@@ -103,7 +103,7 @@ CNum.prototype.Copy = function()
  */
 CNum.prototype.GetLvl = function(nLvl)
 {
-	if (this.LvlOverride[nLvl] && this.LvlOverride[nLvl].GetLvl())
+	if (this.private_HaveLvlOverride(nLvl))
 		return this.LvlOverride[nLvl].GetLvl();
 
 	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
@@ -135,7 +135,7 @@ CNum.prototype.SetLvl = function(oNumberingLvl, nLvl)
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	if (this.LvlOverride[nLvl])
+	if (this.private_HaveLvlOverride(nLvl))
 	{
 		this.SetLvlOverride(oNumberingLvl, nLvl);
 	}
@@ -160,7 +160,7 @@ CNum.prototype.SetLvlByType = function(nLvl, nType, sText, oTextPr)
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	if (this.LvlOverride[nLvl])
+	if (this.private_HaveLvlOverride(nLvl))
 	{
 		var oNumberingLvl = new CNumberingLvl();
 		oNumberingLvl.SetByType(nType, nLvl, sText, oTextPr);
@@ -188,7 +188,7 @@ CNum.prototype.SetLvlByFormat = function(nLvl, nType, sFormatText, nAlign)
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	if (this.LvlOverride[nLvl])
+	if (this.private_HaveLvlOverride(nLvl))
 	{
 		var oNumberingLvl = new CNumberingLvl();
 		oNumberingLvl.SetByFormat(nLvl, nType, sFormatText, nAlign);
@@ -214,15 +214,12 @@ CNum.prototype.SetLvlRestart = function(nLvl, isRestart)
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	if (this.LvlOverride[nLvl])
+	if (this.private_HaveLvlOverride(nLvl))
 	{
-		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
-		if (oNumberingLvl)
-		{
-			var oNewNumberingLvl = oNumberingLvl.Copy();
-			oNewNumberingLvl.Restart = (isRestart ? -1 : 0);
-			this.SetLvlOverride(oNewNumberingLvl, nLvl);
-		}
+		var oNumberingLvl        = this.LvlOverride[nLvl].GetLvl();
+		var oNewNumberingLvl     = oNumberingLvl.Copy();
+		oNewNumberingLvl.Restart = (isRestart ? -1 : 0);
+		this.SetLvlOverride(oNewNumberingLvl, nLvl);
 	}
 	else
 	{
@@ -243,15 +240,12 @@ CNum.prototype.SetLvlStart = function(nLvl, nStart)
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	if (this.LvlOverride[nLvl])
+	if (this.private_HaveLvlOverride(nLvl))
 	{
-		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
-		if (oNumberingLvl)
-		{
-			var oNewNumberingLvl = oNumberingLvl.Copy();
-			oNewNumberingLvl.Start = nStart;
-			this.SetLvlOverride(oNewNumberingLvl, nLvl);
-		}
+		var oNumberingLvl      = this.LvlOverride[nLvl].GetLvl();
+		var oNewNumberingLvl   = oNumberingLvl.Copy();
+		oNewNumberingLvl.Start = nStart;
+		this.SetLvlOverride(oNewNumberingLvl, nLvl);
 	}
 	else
 	{
@@ -272,15 +266,12 @@ CNum.prototype.SetLvlSuff = function(nLvl, nSuff)
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	if (this.LvlOverride[nLvl])
+	if (this.private_HaveLvlOverride(nLvl))
 	{
-		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
-		if (oNumberingLvl)
-		{
-			var oNewNumberingLvl = oNumberingLvl.Copy();
-			oNewNumberingLvl.Suff = nSuff;
-			this.SetLvlOverride(oNewNumberingLvl, nLvl);
-		}
+		var oNumberingLvl     = this.LvlOverride[nLvl].GetLvl();
+		var oNewNumberingLvl  = oNumberingLvl.Copy();
+		oNewNumberingLvl.Suff = nSuff;
+		this.SetLvlOverride(oNewNumberingLvl, nLvl);
 	}
 	else
 	{
@@ -350,15 +341,12 @@ CNum.prototype.ApplyTextPr = function(nLvl, oTextPr)
 	if (nLvl < 0 || nLvl > 8)
 		return;
 
-	if (this.LvlOverride[nLvl])
+	if (this.private_HaveLvlOverride(nLvl))
 	{
 		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
-		if (oNumberingLvl)
-		{
-			var oNewNumberingLvl = oNumberingLvl.Copy();
-			oNewNumberingLvl.TextPr.Merge(oTextPr());
-			this.SetLvlOverride(oNewNumberingLvl, nLvl);
-		}
+		var oNewNumberingLvl = oNumberingLvl.Copy();
+		oNewNumberingLvl.TextPr.Merge(oTextPr());
+		this.SetLvlOverride(oNewNumberingLvl, nLvl);
 	}
 	else
 	{
@@ -740,6 +728,15 @@ CNum.prototype.Process_EndLoad = function(oData)
 {
 	if (undefined !== oData.Lvl)
 		this.RecalculateRelatedParagraphs(oData.Lvl);
+};
+/**
+ * Проверяем есть ли у нас LvlOverride с перезаписанным уровнем
+ * @param nLvl {number} 0..8
+ * @returns {boolean}
+ */
+CNum.prototype.private_HaveLvlOverride = function(nLvl)
+{
+	return !!(this.LvlOverride[nLvl] && this.LvlOverride[nLvl].GetLvl());
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования

@@ -4582,8 +4582,8 @@ CStyles.prototype =
 				{
 					var oNum = oNumbering.GetNum(Style.ParaPr.NumPr.NumId);
 					var nLvl = oNum.GetLvlByStyle(StyleId);
-					if (-1 != Lvl)
-						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, Lvl));
+					if (-1 != nLvl)
+						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, nLvl));
 					else
 						Pr.ParaPr.NumPr = undefined;
 				}
