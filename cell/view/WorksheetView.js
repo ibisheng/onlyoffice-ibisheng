@@ -833,17 +833,18 @@
         offsetY -= offsetFrozenY;
 
         var y1 = this.rows[row].top - offsetY - gridlineSize;
-        var newHeight = Math.min(this.maxRowHeightPx, Math.max(y2 - y1, 0));
+		var newHeight = Math.max(y2 - y1, 0);
         if (newHeight === this.rows[row].height) {
             return;
         }
+		newHeight = Math.min(this.maxRowHeightPx, Asc.round(newHeight / this.getZoom()));
 
         var onChangeHeightCallback = function (isSuccess) {
             if (false === isSuccess) {
                 return;
             }
 
-            t.model.setRowHeight(newHeight * asc_getcvt(0, 1, t._getPPIY()), row, row, true);
+            t.model.setRowHeight(AscCommonExcel.convertPxToPt(newHeight), row, row, true);
             t.model.autoFilters.reDrawFilter(null, row);
             t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
             t.changeWorksheet("update", {reinitRanges: true});
