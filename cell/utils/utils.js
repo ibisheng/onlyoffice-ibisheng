@@ -178,14 +178,14 @@
 			value = value / sizePxinPt;
 			value = value | value;
 			if (AscBrowser.isRetina) {
-				value = AscCommon.AscBrowser.convertToRetinaValue(value, true);
+				value = AscBrowser.convertToRetinaValue(value, true);
 			}
 			return value;
 		}
 		function convertPxToPt(value) {
 			value = value * sizePxinPt;
 			if (AscBrowser.isRetina) {
-				value = AscCommon.AscBrowser.convertToRetinaValue(value);
+				value = AscBrowser.convertToRetinaValue(value);
 			}
 			return value;
 		}
