@@ -790,6 +790,7 @@
         if (w === t.cols[col].width) {
             return;
         }
+		w = Asc.round(w / this.getZoom());
         var cc = Math.min(this.model.colWidthToCharCount(w), Asc.c_oAscMaxColumnWidth);
 
         var onChangeWidthCallback = function (isSuccess) {
