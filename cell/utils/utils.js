@@ -2555,6 +2555,7 @@
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].c_oAscShiftType = c_oAscShiftType;
 		window["AscCommonExcel"].recalcType = recalcType;
+		window["AscCommonExcel"].sizePxinPt = sizePxinPt;
 		window["AscCommonExcel"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;

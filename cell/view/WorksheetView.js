@@ -1679,12 +1679,10 @@
         } else {
             var pageWidthWithFields = pageWidth - pageLeftField - pageRightField;
             var pageHeightWithFields = pageHeight - pageTopField - pageBottomField;
-            // 1px offset for borders
-            var pxInPt = 0.75;
-            var leftFieldInPt = pageLeftField / vector_koef + pxInPt;
-            var topFieldInPt = pageTopField / vector_koef + pxInPt;
-            var rightFieldInPt = pageRightField / vector_koef + pxInPt;
-            var bottomFieldInPt = pageBottomField / vector_koef + pxInPt;
+            var leftFieldInPt = pageLeftField / vector_koef + AscCommonExcel.sizePxinPt;
+            var topFieldInPt = pageTopField / vector_koef + AscCommonExcel.sizePxinPt;
+            var rightFieldInPt = pageRightField / vector_koef + AscCommonExcel.sizePxinPt;
+            var bottomFieldInPt = pageBottomField / vector_koef + AscCommonExcel.sizePxinPt;
 
             if (pageHeadings) {
                 // Рисуем заголовки, нужно чуть сдвинуться
@@ -10221,8 +10219,8 @@
 			case "rowHeight":
 				functionModelAction = function () {
 					// Приводим к px (чтобы было ровно)
-					val = val / 0.75;
-					val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
+					val = val / AscCommonExcel.sizePxinPt;
+					val = (val | val) * AscCommonExcel.sizePxinPt;
 					t.model.setRowHeight(Math.min(val, Asc.c_oAscMaxRowHeight), checkRange.r1, checkRange.r2, true);
 					isUpdateRows = true;
 					oRecalcType = AscCommonExcel.recalcType.full;
