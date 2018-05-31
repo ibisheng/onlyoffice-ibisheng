@@ -42,7 +42,7 @@
 	var g_cGeneralFormat      = 'General';
 	var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 	var c_oAscMaxColumnWidth  = 255;
-	var c_oAscMaxRowHeight    = 409;
+	var c_oAscMaxRowHeight    = 409.5;
 	var c_nMaxConversionTime  = 900000;//depends on config
 	var c_nMaxDownloadTitleLen= 255;
 	var c_nVersionNoBase64 = 10;
