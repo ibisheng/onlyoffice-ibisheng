@@ -86,7 +86,7 @@
     this.header = {
       style: [// Header colors
         { // kHeaderDefault
-          background: new CColor(244, 244, 244), border: new CColor(213, 213, 213), color: new CColor(54, 54, 54)
+          background: new CColor(241, 241, 241), border: new CColor(213, 213, 213), color: new CColor(54, 54, 54)
         }, { // kHeaderActive
           background: new CColor(193, 193, 193), border: new CColor(146, 146, 146), color: new CColor(54, 54, 54)
         }, { // kHeaderHighlighted
@@ -97,7 +97,7 @@
     };
     this.cells = {
       defaultState: {
-        background: new CColor(255, 255, 255), border: new CColor(212, 212, 212)
+        background: new CColor(255, 255, 255), border: new CColor(202, 202, 202)
       }, padding: -1 /*px horizontal padding*/
     };
     this.activeCellBorderColor = new CColor(72, 121, 92);
