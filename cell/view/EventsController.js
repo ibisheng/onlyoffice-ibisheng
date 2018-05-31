@@ -1361,6 +1361,9 @@
 					} else if (t.targetInfo.target === c_oTargetType.FilterObject && 0 === event.button) {
 						t._autoFiltersClick(t.targetInfo.idFilter);
 						return;
+					} else if (t.targetInfo.target === c_oTargetType.FilterObject && 2 === event.button) {
+						this.handlers.trigger('onContextMenu', null);
+						return;
 					} else if (t.targetInfo.commentIndexes && this.canEdit()) {
 						t._commentCellClick(event);
 					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && this.canEdit()) {
