@@ -144,7 +144,6 @@
     var kMaxAutoCompleteCellEdit = 20000;
 
     var gridlineSize = 1;
-    var sizePxinPt = 72 / 96;
 
     var filterSizeButton = 17;
 
@@ -424,12 +423,11 @@
 		var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
 		this.headersHeightByFont = tm.height + 1;
 
-		this.maxRowHeightPx = Asc.ceil(Asc.c_oAscMaxRowHeight * asc_getcvt(1, 0, this._getPPIY()));
-		Asc.c_oAscMaxRowHeight = this.maxRowHeightPx * asc_getcvt(0, 1, this._getPPIY());
+		this.maxRowHeightPx = AscCommonExcel.convertPtToPx(Asc.c_oAscMaxRowHeight);
 		this.defaultRowDescender = this.stringRender.lines[0].d;
 		AscCommonExcel.oDefaultMetrics.RowHeight = Math.min(Asc.c_oAscMaxRowHeight,
-			this.model.getDefaultHeight() || (this.headersHeightByFont * asc_getcvt(0, 1, this._getPPIY())));
-		this.defaultRowHeightPx = AscCommonExcel.oDefaultMetrics.RowHeight * asc_getcvt(1, 0, this._getPPIY());
+			this.model.getDefaultHeight() || AscCommonExcel.convertPxToPt(this.headersHeightByFont));
+		this.defaultRowHeightPx = AscCommonExcel.convertPtToPx(AscCommonExcel.oDefaultMetrics.RowHeight);
 
 		// ToDo refactoring
 		this.model.setDefaultHeight(AscCommonExcel.oDefaultMetrics.RowHeight);
@@ -1423,11 +1421,7 @@
             if (hR < 0) {
                 hR = AscCommonExcel.oDefaultMetrics.RowHeight;
             }
-			// Convert pt to px
-			h = hR / sizePxinPt;
-			h = h | h;
-
-            h = Asc.round(h * this.getZoom());
+            h = Asc.round(AscCommonExcel.convertPtToPx(hR) * this.getZoom());
             r = this.rows[i] = new CacheRow();
 			r.top = y;
 			r.height = h;
@@ -3964,7 +3958,7 @@
 
         return new asc_CMM( {
             type      : Asc.c_oAscMouseMoveType.ResizeRow,
-            sizeCCOrPt: height * sizePxinPt,
+            sizeCCOrPt: AscCommonExcel.convertPxToPt(height),
             sizePx    : height,
             x         : this.cellsLeft,
             y         : y1 + this.rows[row].height
@@ -4419,7 +4413,7 @@
 				if (newHeight !== rowInfo.height) {
 					rowInfo.heightReal = rowInfo.height = newHeight;
 					History.TurnOff();
-                  this.model.setRowHeight(rowInfo.height * asc_getcvt(0, 1, this._getPPIY()), row, row, false);
+                  this.model.setRowHeight(AscCommonExcel.convertPxToPt(rowInfo.height), row, row, false);
 					History.TurnOn();
 
                   if (angle) {

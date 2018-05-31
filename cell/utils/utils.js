@@ -42,6 +42,7 @@
 		var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 		var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 		var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
+		var AscBrowser = AscCommon.AscBrowser;
 
 		var c_oAscSelectionType = Asc.c_oAscSelectionType;
 
@@ -76,6 +77,8 @@
 			newLines: 2  // пересчитываем новые строки
 
 		};
+
+		var sizePxinPt = 72 / 96;
 
 		function applyFunction(callback) {
 			if (kFunctionL === typeof callback) {
@@ -170,6 +173,23 @@
 		function calcDecades(num) {
 			return Math.abs(num) < 10 ? 1 : 1 + calcDecades(floor(num * 0.1));
 		}
+
+		function convertPtToPx(value) {
+			value = value / sizePxinPt;
+			value = value | value;
+			if (AscBrowser.isRetina) {
+				value = AscCommon.AscBrowser.convertToRetinaValue(value, true);
+			}
+			return value;
+		}
+		function convertPxToPt(value) {
+			value = value * sizePxinPt;
+			if (AscBrowser.isRetina) {
+				value = AscCommon.AscBrowser.convertToRetinaValue(value);
+			}
+			return value;
+		}
+
 
 		// Определяет времени работы функции
 		function profileTime(fn/*[, arguments]*/) {
@@ -2546,6 +2566,8 @@
 		window["Asc"].ceil = ceil;
 		window["Asc"].incDecFonSize = incDecFonSize;
 		window["AscCommonExcel"].calcDecades = calcDecades;
+		window["AscCommonExcel"].convertPtToPx = convertPtToPx;
+		window["AscCommonExcel"].convertPxToPt = convertPxToPt;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].profileTime = profileTime;
 		window["AscCommonExcel"].getMatchingBorder = getMatchingBorder;
