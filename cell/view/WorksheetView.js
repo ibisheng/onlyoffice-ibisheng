@@ -616,12 +616,17 @@
     };
 
     WorksheetView.prototype.getSelectedColumnWidthInSymbols = function () {
-        var c, res = null;
+        var i, c, charCount, res = null;
         var range = this.model.selectionRange.getLast();
-        for (c = range.c1; c <= range.c2 && c < this.cols.length; ++c) {
+        for (i = range.c1; i <= range.c2 && i < this.cols.length; ++i) {
+			c = this.model._getColNoEmptyWithAll(i);
+			charCount = c ? c.charCount : null;
+			if (null === charCount) {
+				charCount = this.defaultColWidthChars;
+            }
             if (null === res) {
-                res = this.cols[c].charCount;
-            } else if (res !== this.cols[c].charCount) {
+                res = charCount;
+            } else if (res !== charCount) {
                 return null;
             }
         }
@@ -1312,7 +1317,7 @@
 			isBestFit = false;
 			hiddenW = column.widthPx || this.defaultColWidthPx;
 		} else {
-			w = column.widthPx || this.defaultColWidthPx;
+			w = null === column.widthPx ? this.defaultColWidthPx : column.widthPx;
 			isBestFit = !!(column.BestFit || (null === column.BestFit && null === column.CustomWidth));
 		}
 
