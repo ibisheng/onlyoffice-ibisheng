@@ -860,7 +860,7 @@
       },
       handlers: {
         trigger: function() {
-          return true;
+          return false;
         }
       }
     });
