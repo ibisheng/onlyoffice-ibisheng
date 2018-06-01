@@ -3556,7 +3556,7 @@ Paragraph.prototype.Shift_NumberingLvl = function(bShift)
 	{
 		var NumId   = NumPr.NumId;
 		var Lvl     = NumPr.Lvl;
-		var NumInfo = this.Parent.Internal_GetNumInfo(this.Id, NumPr);
+		var NumInfo = this.Parent.CalculateNumberingValues(this, NumPr);
 
 		if (0 === Lvl && NumInfo[Lvl] <= 1)
 		{
@@ -12396,10 +12396,10 @@ Paragraph.prototype.IsTableBorder = function(X, Y, CurPage)
 };
 Paragraph.prototype.GetNumberingInfo = function(oNumberingEngine)
 {
-	if (!oNumberingEngine || oNumberingEngine.Is_Found())
+	if (!oNumberingEngine || oNumberingEngine.IsStop())
 		return;
 
-	oNumberingEngine.Check_Paragraph(this);
+	oNumberingEngine.CheckParagraph(this);
 };
 Paragraph.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {

@@ -327,19 +327,19 @@ CDocumentContentBase.prototype.StopSelection = function()
 	if (this.Content[this.Selection.StartPos])
 		this.Content[this.Selection.StartPos].StopSelection();
 };
-CDocumentContentBase.prototype.GetNumberingInfo = function(NumberingEngine, ParaId, NumPr)
+CDocumentContentBase.prototype.GetNumberingInfo = function(oNumberingEngine, oPara, oNumPr)
 {
-	if (undefined === NumberingEngine || null === NumberingEngine)
-		NumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+	if (undefined === oNumberingEngine || null === oNumberingEngine)
+		oNumberingEngine = new CDocumentNumberingInfoEngine(oPara, oNumPr, this.GetNumbering());
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		this.Content[nIndex].GetNumberingInfo(NumberingEngine);
-		if (true === NumberingEngine.Is_Found())
+		this.Content[nIndex].GetNumberingInfo(oNumberingEngine);
+		if (oNumberingEngine.IsStop())
 			break;
 	}
 
-	return NumberingEngine.Get_NumInfo();
+	return oNumberingEngine.GetNumInfo();
 };
 CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
@@ -1274,4 +1274,18 @@ CDocumentContentBase.prototype.RemoveNumberingSelection = function()
 {
 	if (this.IsNumberingSelection())
 		this.RemoveSelection();
+};
+/**
+ * Рассчитываем значение нумерованного списка для заданной нумерации
+ * @param oPara {Paragraph}
+ * @param oNumPr {CNumPr}
+ * @returns {number[]}
+ */
+CDocumentContent.prototype.CalculateNumberingValues = function(oPara, oNumPr)
+{
+	var oTopDocument = this.GetTopDocumentContent();
+	if (oTopDocument instanceof CFootEndnote)
+		return oTopDocument.Parent.GetNumberingInfo(oPara, oNumPr, oTopDocument);
+
+	return oTopDocument.GetNumberingInfo(null, oPara, oNumPr);
 };

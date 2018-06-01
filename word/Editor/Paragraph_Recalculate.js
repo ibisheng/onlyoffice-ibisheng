@@ -3016,7 +3016,7 @@ CParagraphRecalculateStateWrap.prototype =
 				var oNumLvl     = oNumbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
 				var nNumSuff    = oNumLvl.GetSuff();
 				var nNumJc      = oNumLvl.GetJc();
-				var oNumInfo    = Para.Parent.Internal_GetNumInfo(Para.Id, NumPr);
+				var oNumInfo    = Para.Parent.CalculateNumberingValues(Para, NumPr);
 				var oNumTextPr  = Para.Get_CompiledPr2(false).TextPr.Copy();
 				oNumTextPr.Merge(Para.TextPr.Value);
 				oNumTextPr.Merge(oNumLvl.GetTextPr());

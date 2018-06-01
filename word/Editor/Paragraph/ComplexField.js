@@ -531,7 +531,7 @@ CComplexField.prototype.private_UpdateTOC = function()
 			{
 				var oNumPr     = oSrcParagraph.GetNumPr();
 				var oNumbering = this.LogicDocument.GetNumbering();
-				var oNumInfo   = this.LogicDocument.Internal_GetNumInfo(oSrcParagraph.Id, oNumPr);
+				var oNumInfo   = this.LogicDocument.CalculateNumberingValues(oSrcParagraph, oNumPr);
 				var sText      = oNumbering.GetText(oNumPr.NumId, oNumPr.Lvl, oNumInfo);
 				var oNumTextPr = oSrcParagraph.GetNumberingCompiledPr();
 

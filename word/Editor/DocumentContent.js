@@ -358,14 +358,6 @@ CDocumentContent.prototype.GetNumbering = function()
 
 	return this.Get_Numbering();
 };
-CDocumentContent.prototype.Internal_GetNumInfo = function(ParaId, NumPr)
-{
-	var TopDocument = this.GetTopDocumentContent();
-	if (TopDocument instanceof CFootEndnote)
-		return TopDocument.Parent.GetNumberingInfo(ParaId, NumPr, TopDocument);
-
-	return TopDocument.GetNumberingInfo(null, ParaId, NumPr);
-};
 CDocumentContent.prototype.Get_Styles = function(lvl)
 {
 	if (this.Content[0] && this.Content[0].bFromDocument)

@@ -3348,7 +3348,7 @@
 				var documentContent = pasteData.content;
 				var t = this;
 				
-				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия Internal_GetNumInfo требует наличие этих параграфов в родителе. 
+				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия CalculateNumberingValues требует наличие этих параграфов в родителе.
 				var cDocument = documentContent && documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
 				if(cDocument && cDocument.Content && 1 === cDocument.Content.length)
 				{
@@ -4027,7 +4027,7 @@
 							}
 
 
-							var NumInfo = paragraph.Parent.Internal_GetNumInfo(paragraph.Id, NumPr);
+							var NumInfo = paragraph.Parent.CalculateNumberingValues(paragraph, NumPr);
 
 							return this._getNumberingText(NumPr.Lvl, NumInfo, NumTextPr, null, LvlPr);
 						}
@@ -4085,7 +4085,7 @@
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+										var T = "" + NumInfo[CurLvl];
 										for ( var Index2 = 0; Index2 < T.length; Index2++ )
 										{
 											Char += T.charAt(Index2);
@@ -4100,7 +4100,7 @@
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+										var T = "" + NumInfo[CurLvl];
 
 										if ( 1 === T.length )
 										{
@@ -4130,7 +4130,7 @@
 									if ( CurLvl < NumInfo.length )
 									{
 										// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-										var Num = LvlPr.Start - 1 + NumInfo[CurLvl] - 1;
+										var Num = NumInfo[CurLvl];
 
 										var Count = (Num - Num % 26) / 26;
 										var Ost   = Num % 26;
@@ -4161,7 +4161,7 @@
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var Num = LvlPr.Start - 1 + NumInfo[CurLvl];
+										var Num = NumInfo[CurLvl];
 
 										// Переводим число Num в римскую систему исчисления
 										var Rims;

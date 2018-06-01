@@ -543,15 +543,6 @@ CTableCell.prototype =
         return false;
     },
 
-	GetNumberingInfo : function(NumPr)
-    {
-        var Parent = this.Row.Table.Parent;
-        if (Parent && Parent.Internal_GetNumInfo)
-            return Parent.Internal_GetNumInfo(this.Row.Table.Get_Id(), NumPr);
-
-        return null;
-    },
-
     Get_PageContentStartPos : function(PageNum)
     {
         return this.Row.Table.Get_PageContentStartPos(PageNum + this.Content.StartPage, this.Row.Index, this.Index, true );

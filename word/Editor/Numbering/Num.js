@@ -293,7 +293,7 @@ CNum.prototype.SetLvlOverride = function(oNumberingLvl, nLvl, nStartOverride)
 	if (nLvl < 0 || nLvl > 8)
 		return;
 
-	if (!oNumberingLvl && !this.LvlOverride[nLvl])
+	if (!oNumberingLvl && !this.LvlOverride[nLvl] && (-1 === nStartOverride || undefined == nStartOverride))
 		return;
 
 	var oLvlOverrideOld = this.LvlOverride[nLvl];
@@ -435,13 +435,13 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 
 		case c_oAscNumberingFormat.Decimal:
 		{
-			sResult = "" + (oLvl.GetStart() - 1 + nNumShift);
+			sResult = "" + nNumShift;
 			break;
 		}
 
 		case c_oAscNumberingFormat.DecimalZero:
 		{
-			sResult = "" + (oLvl.GetStart() - 1 + nNumShift);
+			sResult = "" + nNumShift;
 
 			if (1 === T.length)
 				sResult = "0" + T;
@@ -452,7 +452,7 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 		case c_oAscNumberingFormat.UpperLetter:
 		{
 			// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-			var Num = oLvl.GetStart() - 1 + nNumShift - 1;
+			var Num = nNumShift - 1;
 
 			var Count = (Num - Num % 26) / 26;
 			var Ost   = Num % 26;
@@ -472,7 +472,7 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 		case c_oAscNumberingFormat.LowerRoman:
 		case c_oAscNumberingFormat.UpperRoman:
 		{
-			var Num = oLvl.GetStart() - 1 + nNumShift;
+			var Num = nNumShift;
 
 			// Переводим число Num в римскую систему исчисления
 			var Rims;
@@ -737,6 +737,33 @@ CNum.prototype.Process_EndLoad = function(oData)
 CNum.prototype.private_HaveLvlOverride = function(nLvl)
 {
 	return !!(this.LvlOverride[nLvl] && this.LvlOverride[nLvl].GetLvl());
+};
+/**
+ * Получаем связанную абстрактную нумерацию
+ * @returns {CAbstractNum}
+ */
+CNum.prototype.GetAbstractNum = function()
+{
+	return this.Numbering.GetAbstractNum(this.AbstractNumId);
+};
+/**
+ * Получаем параметр StartOverride для заданного уровня
+ * @param nLvl {number} 0..8
+ * @returns {number} возвращаем -1, если данный параметр не задан
+ */
+CNum.prototype.GetStartOverride = function(nLvl)
+{
+	var oLvlOverride = this.LvlOverride[nLvl];
+	if (!oLvlOverride)
+		return -1;
+
+	var nStartOverride = oLvlOverride.GetStartOverride();
+
+	var oLvl = oLvlOverride.GetLvl();
+	if (oLvl)
+		nStartOverride = oLvl.GetStart();
+
+	return nStartOverride;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования

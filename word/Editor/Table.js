@@ -12303,20 +12303,20 @@ CTable.prototype.Correct_BadTable = function()
     this.Internal_Check_TableRows(false);
 	this.CorrectBadGrid();
 };
-CTable.prototype.GetNumberingInfo = function(NumberingEngine)
+CTable.prototype.GetNumberingInfo = function(oNumberingEngine)
 {
-    if (NumberingEngine.Is_Found())
+    if (oNumberingEngine.IsStop())
         return;
 
-    for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; ++CurRow)
+    for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
     {
-        var Row = this.Get_Row(CurRow);
-        for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; ++CurCell)
+        var oRow = this.GetRow(nCurRow);
+        for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
         {
-            var Cell = Row.Get_Cell(CurCell);
-            Cell.Content.GetNumberingInfo(NumberingEngine);
+            var oCell = oRow.GetCell(nCurCell);
+            oCell.GetContent().GetNumberingInfo(oNumberingEngine);
 
-            if (NumberingEngine.Is_Found())
+            if (oNumberingEngine.IsStop())
                 return;
         }
     }

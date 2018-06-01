@@ -8409,11 +8409,6 @@ CDocument.prototype.GetNumbering = function()
 {
 	return this.Numbering;
 };
-CDocument.prototype.Internal_GetNumInfo = function(ParaId, NumPr)
-{
-	var TopDocument = this.GetTopDocumentContent();
-	return TopDocument.GetNumberingInfo(null, ParaId, NumPr);
-};
 CDocument.prototype.Get_Styles = function()
 {
 	return this.Styles;
@@ -17647,71 +17642,110 @@ function CDocumentPagePosition()
     this.Column = 0;
 }
 
-function CDocumentNumberingInfoEngine(ParaId, NumPr, Numbering)
+/**
+ * Класс для рассчета значение номера для нумерации заданного параграфа
+ * @param oPara {Paragraph}
+ * @param oNumPr {CNumPr}
+ * @param oNumbering {CNumbering}
+ * @constructor
+ */
+function CDocumentNumberingInfoEngine(oPara, oNumPr, oNumbering)
 {
-    this.ParaId    = ParaId;
-    this.NumId     = NumPr.NumId;
-    this.Lvl       = NumPr.Lvl;
-    this.Numbering = Numbering;
-    this.NumInfo   = new Array(this.Lvl + 1);
-    this.Restart   = [-1, -1, -1, -1, -1, -1, -1, -1, -1]; // Этот параметр контролирует уровень, начиная с которого делаем рестарт для текущего уровня
-    this.PrevLvl   = -1;
-    this.Found     = false;
+	this.Paragraph   = oPara;
+	this.NumId       = oNumPr.NumId;
+	this.Lvl         = oNumPr.Lvl;
+	this.Numbering   = oNumbering;
+	this.NumInfo     = new Array(this.Lvl + 1);
+	this.Restart     = [-1, -1, -1, -1, -1, -1, -1, -1, -1]; // Этот параметр контролирует уровень, начиная с которого делаем рестарт для текущего уровня
+	this.PrevLvl     = -1;
+	this.Found       = false;
+	this.AbstractNum = null;
+	this.Nums        = {}; // Список Num, которые использовались. Нужно для обработки startOverride
 
-    this.Init();
+	for (var nIndex = 0; nIndex < 9; ++nIndex)
+		this.NumInfo[nIndex] = undefined;
+
+	if (!this.Numbering)
+		return;
+
+	var oNum = this.Numbering.GetNum(this.NumId);
+	if (!oNum)
+		return;
+
+	var oAbstractNum = oNum.GetAbstractNum();
+	if (oAbstractNum)
+	{
+		for (var nLvl = 0; nLvl < 9; ++nLvl)
+			this.Restart[nLvl] = oAbstractNum.GetLvl(nLvl).GetRestart();
+	}
+
+	this.AbstractNum = oAbstractNum;
 }
 
-CDocumentNumberingInfoEngine.prototype.Init = function()
-{
-    for (var Index = 0; Index < this.NumInfo.length; ++Index)
-        this.NumInfo[Index] = 0;
-
-    var oNum = null;
-    if (undefined !== this.Numbering && null !== (oNum = this.Numbering.GetNum(this.NumId)))
-    {
-        for (var LvlIndex = 0; LvlIndex < 9; LvlIndex++)
-            this.Restart[LvlIndex] = oNum.GetLvl(LvlIndex).GetRestart();
-    }
-};
-CDocumentNumberingInfoEngine.prototype.Is_Found = function()
+/**
+ * Проверяем закончилось ли вычисление номера
+ * @returns {boolean}
+ * @constructor
+ */
+CDocumentNumberingInfoEngine.prototype.IsStop = function()
 {
     return this.Found;
 };
-CDocumentNumberingInfoEngine.prototype.Check_Paragraph = function(Para)
+/**
+ * Проверяем параграф
+ * @param oPara {Paragraph}
+ */
+CDocumentNumberingInfoEngine.prototype.CheckParagraph = function(oPara)
 {
-    var ParaNumPr = Para.GetNumPr();
-    if (undefined !== ParaNumPr && ParaNumPr.NumId === this.NumId && (undefined === Para.Get_SectionPr() || true !== Para.IsEmpty()))
-    {
-        // Делаем рестарты, если они нужны
-        if (-1 !== this.PrevLvl && this.PrevLvl < ParaNumPr.Lvl)
-        {
-            for ( var Index2 = this.PrevLvl + 1; Index2 < 9; ++Index2)
-            {
-                if (0 != this.Restart[Index2] && (-1 == this.Restart[Index2] || this.PrevLvl <= (this.Restart[Index2] - 1)))
-                    this.NumInfo[Index2] = 0;
-            }
-        }
+	if (!this.Numbering)
+		return;
 
-        if (undefined === this.NumInfo[ParaNumPr.Lvl])
-            this.NumInfo[ParaNumPr.Lvl] = 0;
+	var oParaNumPr = oPara.GetNumPr();
+	if (!oParaNumPr)
+		return;
+
+	var oNum         = this.Numbering.GetNum(oParaNumPr.NumId);
+	var oAbstractNum = oNum.GetAbstractNum();
+	var oLvl         = oNum.GetLvl(oParaNumPr.Lvl);
+
+	if (oAbstractNum === this.AbstractNum && (undefined === oPara.Get_SectionPr() || true !== oPara.IsEmpty()))
+	{
+        if (undefined === this.NumInfo[oParaNumPr.Lvl] || -1 === this.PrevLvl || (this.PrevLvl < oParaNumPr.Lvl && (0 !== this.Restart[oParaNumPr.Lvl] && (-1 === this.Restart[oParaNumPr.Lvl] || this.PrevLvl <= (this.Restart[oParaNumPr.Lvl] - 1)))))
+        	this.NumInfo[oParaNumPr.Lvl] = oLvl.GetStart();
         else
-            this.NumInfo[ParaNumPr.Lvl]++;
+            this.NumInfo[oParaNumPr.Lvl]++;
 
-        for (var Index2 = ParaNumPr.Lvl - 1; Index2 >= 0; --Index2)
+		if (this.private_CheckNum(oNum))
+		{
+			var nForceStart = oNum.GetStartOverride(oParaNumPr.Lvl);
+			if (-1 !== nForceStart)
+        		this.NumInfo[oParaNumPr.Lvl] = nForceStart;
+		}
+
+        for (var nIndex = oParaNumPr.Lvl - 1; nIndex >= 0; --nIndex)
         {
-            if (undefined === this.NumInfo[Index2] || 0 === this.NumInfo[Index2])
-                this.NumInfo[Index2] = 1;
+            if (undefined === this.NumInfo[nIndex] || 0 === this.NumInfo[nIndex])
+                this.NumInfo[nIndex] = 1;
         }
 
-        this.PrevLvl = ParaNumPr.Lvl;
+        this.PrevLvl = oParaNumPr.Lvl;
     }
 
-    if (this.ParaId === Para.Get_Id())
+    if (this.Paragraph === oPara)
         this.Found = true;
 };
-CDocumentNumberingInfoEngine.prototype.Get_NumInfo = function()
+CDocumentNumberingInfoEngine.prototype.GetNumInfo = function()
 {
     return this.NumInfo;
+};
+CDocumentNumberingInfoEngine.prototype.private_CheckNum = function(oNum)
+{
+	if (this.Nums[oNum.GetId()])
+		return false;
+
+	this.Nums[oNum.GetId()] = oNum;
+
+	return true;
 };
 
 function CDocumentFootnotesRangeEngine(bExtendedInfo)
