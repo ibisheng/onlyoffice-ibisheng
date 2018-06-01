@@ -3680,6 +3680,12 @@ window.openFileCryptCallback = function(_binary)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
+    if (!_editor.isLoadFullApi)
+	{
+		_editor.openFileCryptBinary = _binary;
+		return;
+	}
+
     if (_binary == null)
     {
         this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);

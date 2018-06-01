@@ -182,6 +182,8 @@
 
 		this.macros = null;
 
+        this.openFileCryptBinary = null;
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw =
 			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -1362,6 +1364,12 @@
 		this.pluginsManager     = Asc.createPluginsManager(this);
 
 		this.macros = new AscCommon.CDocumentMacros();
+
+		if (this.openFileCryptBinary)
+		{
+			window.openFileCryptCallback(this.openFileCryptBinary);
+			this.openFileCryptBinary = null;
+		}
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
