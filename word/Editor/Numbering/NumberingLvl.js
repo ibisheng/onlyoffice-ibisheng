@@ -48,6 +48,7 @@ function CNumberingLvl()
 	this.TextPr  = new CTextPr();
 	this.ParaPr  = new CParaPr();
 	this.LvlText = [];
+	this.Legacy  = undefined;
 }
 /**
  * Доступ к типу прилегания данного уровня
@@ -120,6 +121,36 @@ CNumberingLvl.prototype.GetParaPr = function()
 CNumberingLvl.prototype.GetLvlText = function()
 {
 	return this.LvlText;
+};
+/**
+ * Проверяем совместимость с устаревшей нумерацией
+ * @returns {boolean}
+ */
+CNumberingLvl.prototype.IsLegacy = function()
+{
+	return !!(this.Legacy instanceof CNumberingLvlLegacy && this.Legacy.Legacy);
+};
+/**
+ * Получаем расстояние между символом нумерации и текстом
+ * @return {twips}
+ */
+CNumberingLvl.prototype.GetLegacySpace = function()
+{
+	if (this.Legacy)
+		return this.Legacy.Space;
+
+	return 0;
+};
+/**
+ * Получаем расстояние выделенное под знак нумерации (вместе с расстоянием до текста)
+ * @return {twips}
+ */
+CNumberingLvl.prototype.GetLegacyIndent = function()
+{
+	if (this.Legacy)
+		return this.Legacy.Indent;
+
+	return 0;
 };
 /**
  * Выставляем значения по умолчанию для заданного уровня
@@ -440,6 +471,9 @@ CNumberingLvl.prototype.Copy = function()
 	oLvl.TextPr = this.TextPr.Copy();
 	oLvl.ParaPr = this.ParaPr.Copy();
 
+	if (this.Legacy)
+		oLvl.Legacy = this.Legacy.Copy();
+
 	return oLvl;
 };
 /**
@@ -713,6 +747,8 @@ CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 	// Variable           : ParaPr
 	// Long               : количество элементов в LvlText
 	// Array of variables : массив LvlText
+	// Bool               : true -> CNumberingLegacy
+	//                    : false -> Legacy = undefined
 
 	oWriter.WriteLong(this.Jc);
 	oWriter.WriteLong(this.Format);
@@ -731,6 +767,16 @@ CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 
 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
 		this.LvlText[nIndex].WriteToBinary(oWriter);
+
+	if (this.Legacy instanceof CNumberingLvlLegacy)
+	{
+		oWriter.WriteBool(true);
+		this.Legacy.WriteToBinary(oWriter);
+	}
+	else
+	{
+		oWriter.WriteBool(false);
+	}
 };
 CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 {
@@ -744,6 +790,9 @@ CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 	// Variable           : ParaPr
 	// Long               : количество элементов в LvlText
 	// Array of variables : массив LvlText
+	// Bool               : true -> CNumberingLegacy
+	//                    : false -> Legacy = undefined
+
 
 	this.Jc     = oReader.GetLong();
 	this.Format = oReader.GetLong();
@@ -768,6 +817,12 @@ CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 		var oElement = this.private_ReadLvlTextFromBinary(oReader);
 		if (oElement)
 			this.LvlText.push(oElement);
+	}
+
+	if (oReader.GetBool())
+	{
+		this.Legacy = new CNumberingLvlLegacy();
+		this.Legacy.ReadFromBinary(oReader);
 	}
 };
 CNumberingLvl.prototype.private_ReadLvlTextFromBinary = function(oReader)
@@ -835,4 +890,33 @@ CNumberingLvlTextNum.prototype.WriteToBinary = function(Writer)
 CNumberingLvlTextNum.prototype.ReadFromBinary = function(Reader)
 {
 	this.Value = Reader.GetLong();
+};
+
+function CNumberingLvlLegacy(isUse, twIndent, twSpace)
+{
+	this.Legacy = !!isUse;
+	this.Indent = twIndent ? twIndent : 0; // Значение в твипсах
+	this.Space  = twSpace ? twSpace : 0;   // Значение в твипсах
+}
+CNumberingLvlLegacy.prototype.Copy = function()
+{
+	return new CNumberingLvlLegacy(this.Legacy, this.Indent, this.Space);
+};
+CNumberingLvlLegacy.prototype.WriteToBinary = function(oWriter)
+{
+	// Bool : Legacy
+	// Long : Indent
+	// Long : Space
+	oWriter.WriteBool(this.Legacy);
+	oWriter.WriteLong(this.Indent);
+	oWriter.WriteLong(this.Space);
+};
+CNumberingLvlLegacy.prototype.ReadFromBinary = function(oReader)
+{
+	// Bool : Legacy
+	// Long : Indent
+	// Long : Space
+	this.Legacy = oReader.GetBool();
+	this.Indent = oReader.GetLong();
+	this.Space  = oReader.GetSpace();
 };
