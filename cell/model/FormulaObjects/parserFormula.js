@@ -1124,17 +1124,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				excludeHiddenRows = this.ws.isApplyFilterBySheet();
 			}
 			r._foreachNoEmpty(function (cell) {
-				var bIsFoundNestedStAg = false;
-				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
-					var outStack = cell.formulaParsed.outStack;
-					for(var i = 0; i < outStack.length; i++){
-						if(outStack[i] && (outStack[i].name === "AGGREGATE" || outStack[i].name === "SUBTOTAL")){
-							bIsFoundNestedStAg = true;
-							break;
-						}
-					}
-				}
-				if(!bIsFoundNestedStAg){
+				if(!(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.isFoundNestedStAg())){
 					var checkTypeVal = checkTypeCell(cell);
 					if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
 						val.push(checkTypeVal);
@@ -1244,18 +1234,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				arr[i - r1] = [];
 			}
 
-			var bIsFoundNestedStAg = false;
 			var resValue = new cEmpty();
-			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
-				var outStack = cell.formulaParsed.outStack;
-				for(var n = 0; n < outStack.length; n++){
-					if(outStack[n] instanceof AscCommonExcel.cAGGREGATE || outStack[n] instanceof AscCommonExcel.cSUBTOTAL){
-						bIsFoundNestedStAg = true;
-						break;
-					}
-				}
-			}
-			if(!bIsFoundNestedStAg){
+			if(!(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.isFoundNestedStAg())){
 				var checkTypeVal = checkTypeCell(cell);
 				if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
 					resValue = checkTypeVal;
@@ -1270,17 +1250,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var arr = [], r = this.getRange();
 
 		r._foreachNoEmpty(function (cell) {
-			var bIsFoundNestedStAg = false;
-			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
-				var outStack = cell.formulaParsed.outStack;
-				for(var i = 0; i < outStack.length; i++){
-					if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
-						bIsFoundNestedStAg = true;
-						break;
-					}
-				}
-			}
-			if(!bIsFoundNestedStAg){
+			if(!(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.isFoundNestedStAg())){
 				var checkTypeVal = checkTypeCell(cell);
 				if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
 					arr.push(checkTypeVal);
@@ -1387,17 +1357,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 
 			_r[i]._foreachNoEmpty(function (cell) {
-				var bIsFoundNestedStAg = false;
-				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
-					var outStack = cell.formulaParsed.outStack;
-					for(var i = 0; i < outStack.length; i++){
-						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
-							bIsFoundNestedStAg = true;
-							break;
-						}
-					}
-				}
-				if(!bIsFoundNestedStAg){
+				if(!(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.isFoundNestedStAg())){
 					var checkTypeVal = checkTypeCell(cell);
 					if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
 						_val.push(checkTypeVal);
@@ -6240,6 +6200,37 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 		}
 		return true;
+	};
+	parserFormula.prototype.transpose = function(bounds) {
+		for (var i = 0; i < this.outStack.length; i++) {
+			//TODO пересмотреть случаи, когда возвращается ошибка
+			var elem = this.outStack[i];
+			var range;
+			if (cElementType.cellsRange === elem.type || cElementType.cell === elem.type || cElementType.cell3D === elem.type) {
+				range = elem.range && elem.range.bbox ? elem.range.bbox : null;
+			} else if (cElementType.cellsRange3D === elem.type) {
+				range = elem.bbox ? elem.bbox : null;
+			}
+			if (range) {
+				var diffCol1 = range.c1 - bounds.c1;
+				var diffRow1 = range.r1 - bounds.r1;
+				var diffCol2 = range.c2 - bounds.c1;
+				var diffRow2 = range.r2 - bounds.r1;
+
+				range.c1 = bounds.c1 + diffRow1;
+				range.r1 = bounds.r1 + diffCol1;
+				range.c2 = bounds.c1 + diffRow2;
+				range.r2 = bounds.r1 + diffCol2;
+			}
+		}
+	};
+	parserFormula.prototype.isFoundNestedStAg = function() {
+		for (var i = 0; i < this.outStack.length; i++) {
+			if (this.outStack[i] && (this.outStack[i].name === "AGGREGATE" || this.outStack[i].name === "SUBTOTAL")) {
+				return true;
+			}
+		}
+		return false;
 	};
 
 	function CalcRecursion() {

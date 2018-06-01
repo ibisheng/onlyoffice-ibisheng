@@ -9491,32 +9491,6 @@
 			return res;
 		};
 
-		var transposeOutStack = function(outStack)
-		{
-			for(var i = 0; i < outStack.length; i++)
-			{
-				//TODO пересмотреть случаи, когда возвращается ошибка
-				var range;
-				if(elemType.cellsRange === outStack[i].type || elemType.cell === outStack[i].type || elemType.cell3D === outStack[i].type) {
-					range = outStack[i].range && outStack[i].range.bbox ? outStack[i].range.bbox : null;
-				} else if(elemType.cellsRange3D === outStack[i].type) {
-					range = outStack[i].bbox && outStack[i].bbox ? outStack[i].bbox : null;
-				}
-				if(range)
-				{
-					var diffCol1 = range.c1 - activeCellsPasteFragment.c1;
-					var diffRow1 = range.r1 - activeCellsPasteFragment.r1;
-					var diffCol2 = range.c2 - activeCellsPasteFragment.c1;
-					var diffRow2 = range.r2 - activeCellsPasteFragment.r1;
-
-					range.c1 = activeCellsPasteFragment.c1 + diffRow1;
-					range.r1 = activeCellsPasteFragment.r1 + diffCol1;
-					range.c2 = activeCellsPasteFragment.c1 + diffRow2;
-					range.r2 = activeCellsPasteFragment.r1 + diffCol2;
-				}
-			}
-		};
-		
 		//set formula - for paste from binary
 		var calculateValueAndBinaryFormula = function(newVal, firstRange, range)
 		{
@@ -9582,7 +9556,7 @@
 						if(specialPasteProps.transpose)
 						{
 							//для transpose необходимо перевернуть все дипазоны в формулах
-							transposeOutStack(_p_.outStack);
+							_p_.transpose(activeCellsPasteFragment);
 						}
 						
 						if(null !== tablesMap)
