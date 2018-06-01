@@ -1281,7 +1281,7 @@ CDocumentContentBase.prototype.RemoveNumberingSelection = function()
  * @param oNumPr {CNumPr}
  * @returns {number[]}
  */
-CDocumentContent.prototype.CalculateNumberingValues = function(oPara, oNumPr)
+CDocumentContentBase.prototype.CalculateNumberingValues = function(oPara, oNumPr)
 {
 	var oTopDocument = this.GetTopDocumentContent();
 	if (oTopDocument instanceof CFootEndnote)

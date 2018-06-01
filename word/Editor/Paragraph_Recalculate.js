@@ -3053,32 +3053,43 @@ CParagraphRecalculateStateWrap.prototype =
 
 				X += NumberingItem.WidthVisible;
 
-				switch (nNumSuff)
+				if (oNumLvl.IsLegacy())
 				{
-					case c_oAscNumberingSuff.None:
+					var nLegacySpace  = AscCommon.TwipsToMM(oNumLvl.GetLegacySpace());
+					var nLegacyIndent = AscCommon.TwipsToMM(oNumLvl.GetLegacyIndent());
+					var nNumWidth     = NumberingItem.WidthNum;
+
+					NumberingItem.WidthSuff = Math.max(nNumWidth, nLegacyIndent, nNumWidth + nLegacySpace) - nNumWidth;
+				}
+				else
+				{
+					switch (nNumSuff)
 					{
-						// Ничего не делаем
-						break;
-					}
-					case c_oAscNumberingSuff.Space:
-					{
-						var OldTextPr = g_oTextMeasurer.GetTextPr();
+						case c_oAscNumberingSuff.None:
+						{
+							// Ничего не делаем
+							break;
+						}
+						case c_oAscNumberingSuff.Space:
+						{
+							var OldTextPr = g_oTextMeasurer.GetTextPr();
 
 
-						var Theme = Para.Get_Theme();
-						g_oTextMeasurer.SetTextPr(oNumTextPr, Theme);
-						g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-						NumberingItem.WidthSuff = g_oTextMeasurer.Measure(" ").Width;
-						g_oTextMeasurer.SetTextPr(OldTextPr, Theme);
-						break;
-					}
-					case c_oAscNumberingSuff.Tab:
-					{
-						var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
+							var Theme = Para.Get_Theme();
+							g_oTextMeasurer.SetTextPr(oNumTextPr, Theme);
+							g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+							NumberingItem.WidthSuff = g_oTextMeasurer.Measure(" ").Width;
+							g_oTextMeasurer.SetTextPr(OldTextPr, Theme);
+							break;
+						}
+						case c_oAscNumberingSuff.Tab:
+						{
+							var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
 
-						NumberingItem.WidthSuff = NewX - X;
+							NumberingItem.WidthSuff = NewX - X;
 
-						break;
+							break;
+						}
 					}
 				}
 
