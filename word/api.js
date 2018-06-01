@@ -7500,6 +7500,12 @@ background-repeat: no-repeat;\
 
 		if (this.isOnlyReaderMode)
 			this.ImageLoader.bIsAsyncLoadDocumentImages = false;
+
+        if (this.openFileCryptBinary)
+        {
+            window.openFileCryptCallback(this.openFileCryptBinary);
+            this.openFileCryptBinary = null;
+        }
 	};
 
 	asc_docs_api.prototype.asc_Recalculate = function(bIsUpdateInterface)

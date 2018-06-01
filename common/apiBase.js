@@ -1364,12 +1364,6 @@
 		this.pluginsManager     = Asc.createPluginsManager(this);
 
 		this.macros = new AscCommon.CDocumentMacros();
-
-		if (this.openFileCryptBinary)
-		{
-			window.openFileCryptCallback(this.openFileCryptBinary);
-			this.openFileCryptBinary = null;
-		}
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()

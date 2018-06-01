@@ -3342,6 +3342,12 @@ var editor;
 		this.asc_setLocale(this.tmpLocale);
 		this.asc_setLocalization(this.tmpLocalization);
 		this.asc_setViewMode(this.isViewMode);
+
+        if (this.openFileCryptBinary)
+        {
+            window.openFileCryptCallback(this.openFileCryptBinary);
+            this.openFileCryptBinary = null;
+        }
 	};
 
 	spreadsheet_api.prototype.asc_OnShowContextMenu = function() {

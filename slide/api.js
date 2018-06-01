@@ -6880,6 +6880,12 @@ background-repeat: no-repeat;\
 			else
 				window.addEventListener('beforeunload', _onbeforeunload, false);
 		}
+
+        if (this.openFileCryptBinary)
+        {
+            window.openFileCryptCallback(this.openFileCryptBinary);
+            this.openFileCryptBinary = null;
+        }
 	};
 
 	asc_docs_api.prototype._downloadAs = function(filetype, actionType, options)
