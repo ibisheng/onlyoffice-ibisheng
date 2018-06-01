@@ -344,6 +344,11 @@ if(window.native){
         }
     };
 
+    window.native.Call_OnKeyboardEvent = function(e)
+    {
+        return window.editor.WordControl.m_oDrawingDocument.OnKeyboardEvent(e);
+    };
+
     window.native.Call_OnCheckMouseDown = function(e)
     {
         return window.editor.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);

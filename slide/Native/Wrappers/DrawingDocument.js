@@ -873,6 +873,43 @@ CDrawingDocument.prototype.CheckMouseDown2 = function (e) {
     return _isDrawings;
 };
 
+
+CDrawingDocument.prototype.OnKeyboardEvent = function(_params){
+    var _len = _params.length / 4;
+
+
+    for (var i = 0; i < _len; i++)
+    {
+        var _offset = i * 4;
+        switch (_params[_offset])
+        {
+            case 4: // down
+            {
+                this.IsKeyDownButNoPress = true;
+                check_KeyboardEvent_Array(_params, _offset);
+                this.bIsUseKeyPress = (this.LogicDocument.OnKeyDown(AscCommon.global_keyboardEvent) === true) ? false : true;
+                break;
+            }
+            case 5: // Press
+            {
+                check_KeyboardEvent_Array(_params, _offset);
+                this.LogicDocument.OnKeyPress(AscCommon.global_keyboardEvent);
+                break;
+            }
+            case 6: // up
+            {
+                AscCommon.global_keyboardEvent.AltKey = false;
+                AscCommon.global_keyboardEvent.CtrlKey = false;
+                AscCommon.global_keyboardEvent.ShiftKey = false;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    this.m_oWordControl.OnUpdateOverlay();
+};
+
 function DrawBackground(graphics, unifill, w, h)
 {
     // первым делом рисуем белый рект!
