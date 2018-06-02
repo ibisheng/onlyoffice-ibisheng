@@ -1647,21 +1647,18 @@
 		//Get data type
         // var dataObject = JSON.parse(data);
         
-        var convertChangeFormat = function(data){
-            let msgs = data.changes;
-            if(!msgs||msgs.length==0){
-                return;
-            }
+        let convertChangeFormat = (data)=>{
+            let changes = data["changes"]||[];
             let res = [];
-            for (let i = 0; i < msgs.length; i++) {
-                let element = msgs[i];
+            for (let i = 0; i < changes.length; i++) {
+                let element = changes[i];
                 res.push({
                     change: element['change_data'],
                     time: new Date(element['change_date']).getTime(), user: element['user_id'],
                     useridoriginal: element['user_id_original']
                 })
             }
-            data.changes = res;
+            data["changes"] = res;
         };
         var loadMedia = window["loadMedia"];
 
