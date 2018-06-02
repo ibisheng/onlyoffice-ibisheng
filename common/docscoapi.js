@@ -1667,7 +1667,6 @@
 
 		switch (dataObject['type']) {
             case 'auth'        :
-                convertChangeFormat(dataObject);
 				this._onAuth(dataObject);
 				break;
 			case 'message'      :
@@ -1692,6 +1691,7 @@
 				this._onSaveChanges(dataObject);
 				break;
 			case 'authChanges' :
+                convertChangeFormat(dataObject);
 				this._onAuthChanges(dataObject);
 				break;
 			case 'saveLock'      :
