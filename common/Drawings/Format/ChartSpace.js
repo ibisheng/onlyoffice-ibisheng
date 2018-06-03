@@ -3559,18 +3559,26 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
     {
         var aParsedRef = this.parseChartFormula(val.numRef.f);
         var num_cache;
+        var hidden = true;
         if(!val.numRef.numCache )
         {
             num_cache = new AscFormat.CNumLit();
             num_cache.setFormatCode("General");
+            num_cache.setPtCount(0);
         }
         else
         {
             num_cache = val.numRef.numCache;
-            removePtsFromLit(num_cache);
+            if(aParsedRef.length > 0){
+                removePtsFromLit(num_cache);
+            }
+            else{
+                hidden = false;
+            }
+
         }
         var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
-        var pt_index = 0, i, j, cell, pt,  hidden = true, row_hidden, col_hidden, nPtCount, t;
+        var pt_index = 0, i, j, cell, pt, row_hidden, col_hidden, nPtCount, t;
         for(i = 0; i < aParsedRef.length; ++i)
         {
             var oCurRef = aParsedRef[i];
@@ -3765,7 +3773,9 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                 };
             }
         }
-        num_cache.setPtCount(pt_index);
+        if(aParsedRef.length > 0){
+            num_cache.setPtCount(pt_index);
+        }
         val.numRef.setNumCache(num_cache);
         if(!(val instanceof AscFormat.CCat))
         {
@@ -3975,7 +3985,7 @@ CChartSpace.prototype.recalculateReferences = function()
 CChartSpace.prototype.checkEmptySeries = function()
 {
     var chart_type = this.chart.plotArea.charts[0];
-    var series = chart_type.series;
+    var series = this.getAllSeries();
     var checkEmptyVal = function(val)
     {
         if(val.numRef)
@@ -3997,7 +4007,7 @@ CChartSpace.prototype.checkEmptySeries = function()
         return false;
     };
     var nChartType = chart_type.getObjectType();
-    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) ? Math.min(1, series.length) : series.length;
+    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) && this.chart.plotArea.charts.length === 1 ? Math.min(1, series.length) : series.length;
     for(var i = 0; i < nSeriesLength; ++i)
     {
         var ser = series[i];
@@ -4749,6 +4759,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
 
     CChartSpace.prototype.recalculateAxes = function(){
         this.plotAreaRect = null;
+        this.bEmptySeries = this.checkEmptySeries();
         if(this.chart && this.chart.plotArea && this.chart.plotArea){
             if(!this.chartObj){
                 this.chartObj = new AscFormat.CChartsDrawer()
