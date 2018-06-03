@@ -4887,7 +4887,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
             var oCheckAxis;
             for(i = 0; i < aAxes.length; ++i){
                 oCurAxis = aAxes[i];
-                if(oCurAxis.bDelete){
+                if(oCurAxis.bDelete && oCurAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
                     var bHorizontal = (oCurAxis.axPos === AscFormat.AX_POS_T || oCurAxis.axPos === AscFormat.AX_POS_B);
                     for(j = 0; j < aAxes.length; ++j){
                         oCheckAxis = aAxes[j];
