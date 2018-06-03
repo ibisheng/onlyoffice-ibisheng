@@ -1220,7 +1220,7 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
             }
             else if(AscFormat.isRealNumber(this.selection.dataLbls))
             {
-                var series = this.chart.plotArea.charts[0].series;
+                var series = this.getAllSeries();
                 var ser = series[this.selection.dataLbls];
                 if(ser)
                 {
@@ -1562,7 +1562,7 @@ CChartSpace.prototype.getParagraphTextPr = function()
     }
     else if(AscFormat.isRealNumber(this.selection.dataLbls))
     {
-        var ser = this.chart.plotArea.charts[0].series[this.selection.dataLbls];
+        var ser = this.getAllSeries()[this.selection.dataLbls];
         if(ser)
         {
             var pts = AscFormat.getPtsFromSeries(ser);
@@ -1635,16 +1635,17 @@ CChartSpace.prototype.applyLabelsFunction = function(fCallback, value)
     }
     else if(AscFormat.isRealNumber(this.selection.dataLbls))
     {
-        var ser = this.chart.plotArea.charts[0].series[this.selection.dataLbls];
+        var ser = this.getAllSeries()[this.selection.dataLbls];
         if(ser)
         {
             var pts = AscFormat.getPtsFromSeries(ser);
             if(!ser.dLbls)
             {
                 var oDlbls;
-                if(this.chart.plotArea.charts[0].dLbls)
+                var oChart = ser.parent;
+                if(oChart && oChart.dLbls)
                 {
-                    oDlbls = this.chart.plotArea.charts[0].dLbls.createDuplicate();
+                    oDlbls = oChart.dLbls.createDuplicate();
                 }
                 else
                 {
@@ -2304,16 +2305,16 @@ CChartSpace.prototype.clearFormatting = function(bNoClearShapeProps)
         }
         else if(AscFormat.isRealNumber(this.selection.dataLbls))
         {
-            var ser = this.chart.plotArea.charts[0].series[this.selection.dataLbls];
+            var ser = this.getAllSeries()[this.selection.dataLbls];
             if(ser)
             {
                 var oDlbls = ser.dLbls;
                 if(!ser.dLbls)
                 {
 
-                    if(this.chart.plotArea.charts[0].dLbls)
+                    if(ser.parent && ser.parent.dLbls)
                     {
-                        oDlbls = this.chart.plotArea.charts[0].dLbls.createDuplicate();
+                        oDlbls = ser.parent.dLbls.createDuplicate();
                     }
                     else
                     {

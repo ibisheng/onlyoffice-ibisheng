@@ -460,49 +460,44 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         if(!window["NATIVE_EDITOR_ENJINE"] && bClickFlag){
 
             var aCharts = drawing.chart.plotArea.charts;
-            for(var t = 0; t < aCharts.length; ++t){
-                var oChart = aCharts[t];
-                if(oChart && oChart.series)
+            var series = drawing.getAllSeries();
+            var _len = aCharts.length === 1 && aCharts[0].getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
+            for(var i = _len - 1; i > -1; --i)
+            {
+                var ser = series[i];
+                var pts = AscFormat.getPtsFromSeries(ser);
+                for(var j = 0; j < pts.length; ++j)
                 {
-                    var series = oChart.series;
-                    var _len = oChart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
-                    for(var i = _len - 1; i > -1; --i)
+                    if(pts[j].compiledDlb)
                     {
-                        var ser = series[i];
-                        var pts = AscFormat.getPtsFromSeries(ser);
-                        for(var j = 0; j < pts.length; ++j)
+                        if(pts[j].compiledDlb.hit(x, y))
                         {
-                            if(pts[j].compiledDlb)
+                            var nDlbl = drawing.selection.dataLbls;
+                            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                             {
-                                if(pts[j].compiledDlb.hit(x, y))
+                                drawingObjectsController.checkChartTextSelection();
+                                selector.resetSelection();
+                                selector.selectObject(drawing, pageIndex);
+                                selector.selection.chartSelection = drawing;
+                                drawing.selection.dataLbls = i;
+                                if(nDlbl === i)
                                 {
-                                    var nDlbl = drawing.selection.dataLbls;
-                                    if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-                                    {
-                                        drawingObjectsController.checkChartTextSelection();
-                                        selector.resetSelection();
-                                        selector.selectObject(drawing, pageIndex);
-                                        selector.selection.chartSelection = drawing;
-                                        drawing.selection.dataLbls = i;
-                                        if(nDlbl === i)
-                                        {
-                                            drawing.selection.dataLbl = j;
-                                        }
-                                        drawingObjectsController.updateSelectionState();
-                                        drawingObjectsController.updateOverlay();
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
-                                    }
+                                    drawing.selection.dataLbl = j;
                                 }
+                                drawingObjectsController.updateSelectionState();
+                                drawingObjectsController.updateOverlay();
+                                return true;
                             }
-
+                            else
+                            {
+                                return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                            }
                         }
                     }
+
                 }
             }
+
         }
 
         var chart_titles = drawing.getAllTitles();
