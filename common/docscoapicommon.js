@@ -70,6 +70,9 @@
   asc_CUser.prototype.asc_getId = function() {
     return this.id;
   };
+  asc_CUser.prototype.asc_getIdOriginal = function() {
+    return this.idOriginal;
+  };
   asc_CUser.prototype.asc_getUserName = function() {
     return this.userName;
   };
@@ -158,6 +161,7 @@
   window["AscCommon"].asc_CUser = asc_CUser;
   prot = asc_CUser.prototype;
   prot["asc_getId"] = prot.asc_getId;
+  prot["asc_getIdOriginal"] = prot.asc_getIdOriginal;
   prot["asc_getUserName"] = prot.asc_getUserName;
   prot["asc_getState"] = prot.asc_getState;
   prot["asc_getColor"] = prot.asc_getColor;
