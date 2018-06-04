@@ -4590,14 +4590,6 @@ function DrawingObjects() {
         return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
     }
 
-    function emuToPx(emu) {
-        return emu * 20 * 96 / 2.54 / 72 / 100 / 1000;
-    }
-
-    function pxToEmu(px) {
-        return px * 2.54 * 72 * 100 * 1000 / 20 / 96;
-    }
-
     function pxToPt(val) {
         return val * ascCvtRatio(0, 1);
     }
