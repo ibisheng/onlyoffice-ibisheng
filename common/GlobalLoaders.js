@@ -454,16 +454,19 @@
             {
                 Image.prototype.preload_crypto = function(_url)
                 {
-                    console.log("preload_crypto: " + _url);
+                    //console.log("preload_crypto: " + _url);
                     window["crypto_images_map"] = window["crypto_images_map"] || {};
                     window["crypto_images_map"][_url] = this;
                     window["AscDesktopEditor"]["PreloadCryptoImage"](_url, AscCommon.g_oDocumentUrls.getLocal(_url));
                 };
 
-                Image.prototype["onload_crypto"] = function(_src, _crypto_data) {
-                    if (_crypto_data)
+                Image.prototype["onload_crypto"] = function(_src, _crypto_data)
+                {
+                    //console.log("onload_crypto: " + _src);
+                    if (_crypto_data && AscCommon.EncryptionWorker && AscCommon.EncryptionWorker.isCryptoImages())
                     {
                         // TODO: send to plugin for decryption & call this method with empty _crypto_data
+                        AscCommon.EncryptionWorker.decryptImage(_src, this, _crypto_data);
                         return;
                     }
                     this.src = _src;

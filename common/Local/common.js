@@ -448,12 +448,6 @@ window["OnNativeReturnCallback"] = function(name, obj)
 	_api.sendEvent(name, obj);
 };
 
-window["OnNativeOpenFilenameDialog"] = function(file)
-{
-	window.on_native_open_filename_dialog(file);
-	delete window.on_native_open_filename_dialog;
-};
-
 window["asc_IsVisibleSign"] = function(guid)
 {
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;

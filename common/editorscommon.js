@@ -1398,6 +1398,12 @@
 
 	function ShowImageFileDialog(documentId, documentUserId, jwt, callback, callbackOld)
 	{
+        if (AscCommon.EncryptionWorker && AscCommon.EncryptionWorker.isCryptoImages())
+		{
+			AscCommon.EncryptionWorker.addCryproImagesFromDialog(callback);
+			return;
+		}
+
 		var fileName;
 		if ("undefined" != typeof(FileReader))
 		{
@@ -3293,23 +3299,21 @@
 	CSignatureDrawer.prototype.selectImage = CSignatureDrawer.prototype["selectImage"] = function()
 	{
 		this.Text = "";
-		window.on_native_open_filename_dialog = function(file)
-		{
-			if (file == "")
-				return;
+		window["AscDesktopEditor"]["OpenFilenameDialog"]("images", false, function(file) {
+            if (file == "")
+                return;
 
-			var _drawer = window.Asc.g_signature_drawer;
-			_drawer.Image = window["AscDesktopEditor"]["GetImageBase64"](file);
+            var _drawer = window.Asc.g_signature_drawer;
+            _drawer.Image = window["AscDesktopEditor"]["GetImageBase64"](file);
 
-			_drawer.ImageHtml = new Image();
-			_drawer.ImageHtml.onload = function()
-			{
-				window.Asc.g_signature_drawer.drawImage();
-			};
-			_drawer.ImageHtml.src = _drawer.Image;
-			_drawer = null;
-		};
-		window["AscDesktopEditor"]["OpenFilenameDialog"]("images");
+            _drawer.ImageHtml = new Image();
+            _drawer.ImageHtml.onload = function()
+            {
+                window.Asc.g_signature_drawer.drawImage();
+            };
+            _drawer.ImageHtml.src = _drawer.Image;
+            _drawer = null;
+		});
 	};
 
 	CSignatureDrawer.prototype.isValid = function()
@@ -3380,7 +3384,41 @@
 
         this.isExistDecryptedChanges = false; // был ли хоть один запрос на расшифровку данных (были ли чужие изменения)
 
-        this.sendChanges = function(sender, data, type)
+		this.isCryptoImages = function()
+		{
+            if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
+            	return false;
+
+            if (!window["AscDesktopEditor"])
+            	return false;
+
+            return true;
+		};
+
+        this.addCryproImagesFromDialog = function(callback)
+		{
+			var _this = this;
+            window["AscDesktopEditor"]["OpenFilenameDialog"]("images", true, function(files) {
+				var _files = [];
+
+				var _options = { isImageCrypt: true, callback: callback, ext : [] };
+
+				for (var i = 0; i < files.length; i++)
+				{
+                    _files.push(window["AscDesktopEditor"]["GetImageBase64"](files[i], true));
+                    _options.ext.push(AscCommon.GetFileExtension(files[i]));
+				}
+
+				_this.sendChanges(this, _files, AscCommon.EncryptionMessageType.Encrypt, _options);
+            });
+		};
+
+        this.decryptImage = function(src, img, data)
+        {
+            this.sendChanges(this, [data], AscCommon.EncryptionMessageType.Decrypt, { isImageDecrypt: true, src: src, img : img });
+        };
+
+        this.sendChanges = function(sender, data, type, options)
         {
             if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
             {
@@ -3396,20 +3434,29 @@
             }
 
             if (undefined !== type)
-                this.arrData.push({ sender: sender, type: type, data: data });
+                this.arrData.push({ sender: sender, type: type, data: data, options: options });
 
             if (this.arrData.length == 0)
                 return;
 
+            if (undefined !== type && 1 != this.arrData.length)
+            	return; // вызовется на коллбэке
+
             if (AscCommon.EncryptionMessageType.Encrypt == this.arrData[0].type)
             {
             	//console.log("encrypt: " + data["changes"]);
-                window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : JSON.parse(data["changes"]) });
+				if (this.arrData[0].options && this.arrData[0].options.isImageCrypt)
+                    window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : this.arrData[0].data });
+				else
+					window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : JSON.parse(this.arrData[0].data["changes"]) });
             }
             else if (AscCommon.EncryptionMessageType.Decrypt == this.arrData[0].type)
             {
                 //console.log("decrypt: " + data["changes"]);
-                window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : data["changes"] });
+                if (this.arrData[0].options && this.arrData[0].options.isImageDecrypt)
+                    window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.arrData[0].data });
+                else
+                	window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.arrData[0].data["changes"] });
             }
         };
 
@@ -3447,14 +3494,32 @@
 
             if (AscCommon.EncryptionMessageType.Encrypt == obj.type)
             {
-            	obj.data["changes"] = JSON.stringify(data);
-                obj.sender._send(obj.data, true);
+            	if (obj.options && obj.options.isImageCrypt)
+				{
+                    for (var i = 0; i < data.length; i++)
+                        data[i] = "ENCRYPTED;" + obj.options.ext[i] + ";" + data[i];
+
+					obj.options.callback(Asc.c_oAscError.ID.No, data);
+				}
+				else
+				{
+                    obj.data["changes"] = JSON.stringify(data);
+                    obj.sender._send(obj.data, true);
+                }
             }
             else if (AscCommon.EncryptionMessageType.Decrypt == obj.type)
             {
-                this.isExistDecryptedChanges = true;
-                obj.data["changes"] = data;
-                obj.sender._onSaveChanges(obj.data, true);
+                if (obj.options && obj.options.isImageDecrypt)
+                {
+                	window["AscDesktopEditor"]["ResaveFile"](obj.options.src, data[0]);
+                    obj.options.img.src = obj.options.src;
+                }
+                else
+				{
+                    this.isExistDecryptedChanges = true;
+                    obj.data["changes"] = data;
+                    obj.sender._onSaveChanges(obj.data, true);
+                }
             }
 
             this.sendChanges(undefined, undefined);
