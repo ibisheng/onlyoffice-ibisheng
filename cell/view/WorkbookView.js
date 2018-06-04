@@ -278,10 +278,10 @@
     });
 
     this.buffers.mainGraphic = new asc.DrawingContext({
-      canvas: this.canvasGraphic, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+      canvas: this.canvasGraphic, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
     });
     this.buffers.overlayGraphic = new asc.DrawingContext({
-      canvas: this.canvasGraphicOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+      canvas: this.canvasGraphicOverlay, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
     });
 
     this.drawingCtx = this.buffers.main;
@@ -293,16 +293,17 @@
     this._canResize();
 
     // Shapes
+    var vector_koef = AscCommonExcel.vector_koef;
     var canvasWidth = this.drawingGraphicCtx.canvas.width;
     var canvasHeight = this.drawingGraphicCtx.canvas.height;
     this.buffers.shapeCtx = new AscCommon.CGraphics();
-    this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, (canvasWidth * 25.4 / this.drawingGraphicCtx.ppiX), (canvasHeight * 25.4 / this.drawingGraphicCtx.ppiY));
+    this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, (canvasWidth * vector_koef / this.drawingGraphicCtx.ppiX), (canvasHeight * vector_koef / this.drawingGraphicCtx.ppiY));
     this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
 
     var overlayWidth = this.overlayGraphicCtx.canvas.width;
     var overlayHeight = this.overlayGraphicCtx.canvas.height;
     this.buffers.shapeOverlayCtx = new AscCommon.CGraphics();
-    this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, overlayWidth, overlayHeight, (overlayWidth * 25.4 / this.overlayGraphicCtx.ppiX), (overlayHeight * 25.4 / this.overlayGraphicCtx.ppiY));
+    this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, overlayWidth, overlayHeight, (overlayWidth * vector_koef / this.overlayGraphicCtx.ppiX), (overlayHeight * vector_koef / this.overlayGraphicCtx.ppiY));
     this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
 
     this.stringRender = new AscCommonExcel.StringRender(this.buffers.main);
