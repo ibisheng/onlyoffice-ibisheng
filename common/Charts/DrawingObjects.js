@@ -4759,15 +4759,13 @@ function CoordsManager(ws) {
     _t.calculateCell = function(x, y) {
 
         var cell = new CCellObjectInfo();
+        var offset = worksheet.getCellsOffset(0);
 
-        var _x = x + worksheet.getCellLeft(0, 0);
-        var _y = y + worksheet.getCellTop(0, 0);
+        var _x = x + offset.left;
+        var _y = y + offset.top;
 
-        var xPt = worksheet.objectRender.convertMetric(_x, 0, 1);
-        var yPt = worksheet.objectRender.convertMetric(_y, 0, 1);
-
-        var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
-        var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
+        var offsetX = worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0) - offset.left;
+        var offsetY = worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0) - offset.top;
 
         /* Проверки на максимум в листе */
         function isMaxCol() {
@@ -4786,7 +4784,7 @@ function CoordsManager(ws) {
         //
 
         var delta = 0;
-        var what = roundPlus(xPt - offsetX, 3);
+        var what = _x - offsetX;
         var col = worksheet._findColUnderCursor( what, true );
         while (col == null) {
             if ( isMaxCol() ) {
@@ -4804,7 +4802,7 @@ function CoordsManager(ws) {
         cell.colOff = worksheet.objectRender.convertMetric(cell.colOffPx, 0, 3);
 
         delta = 0;
-        what = roundPlus(yPt - offsetY, 3);
+        what = _y - offsetY;
         var row = worksheet._findRowUnderCursor( what, true );
         while (row == null) {
             if ( isMaxRow() ) {
