@@ -114,22 +114,6 @@
     }
 
     /**
-     * Округляет текущее значение в pt таким образом, чтобы при переводе его в px при указанном DPI получалось
-     * целое число пикселей
-     * @param {type} origPt
-     * @param {type} ppi
-     * @param {type} pxAddon
-     * @returns {Number}
-     */
-    function calcNearestPt(origPt, ppi, pxAddon) {
-        var a = pxAddon !== undefined ? pxAddon : 0,
-            x = origPt * ppi / 72,
-            y = x | x,
-            p = x - y < .000000001 ? 0 : 1; // to fix float number precision caused by binary presentation
-        return (y + p + a) / ppi * 72;
-    }
-
-    /**
      * @constructor
      */
     function Matrix() {
@@ -1296,7 +1280,6 @@
      */
 
     window["Asc"].getCvtRatio      = getCvtRatio;
-    window["Asc"].calcNearestPt    = calcNearestPt;
     window["Asc"].colorObjToAscColor = colorObjToAscColor;
 
     window["Asc"].FontProperties   = FontProperties;
