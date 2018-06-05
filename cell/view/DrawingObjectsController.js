@@ -590,8 +590,8 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
                     _x = oPos.X;
                     _y = oPos.Y;
                 }
-                _x = this.drawingObjects.convertMetric(_x, 3, 1);
-                _y = this.drawingObjects.convertMetric(_y, 3, 1);
+                _x = this.drawingObjects.convertMetric(_x, 3, 0);
+                _y = this.drawingObjects.convertMetric(_y, 3, 0);
                 var oCell = oWorksheet.findCellByXY(_x, _y, true, false, false);
                 if(oCell && oCell.col !== null && oCell.row !== null){
                     var oRange = new Asc.Range(oCell.col, oCell.row, oCell.col, oCell.row, false);

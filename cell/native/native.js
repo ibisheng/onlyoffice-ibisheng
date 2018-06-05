@@ -4824,7 +4824,7 @@ function OfflineEditor () {
                     width /= metricCoeff;
                 }
                 
-                var findVal = pxToPt(realLeftOffset + width);
+                var findVal = realLeftOffset + width;
                 var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
                 while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
                     worksheet.expandColsOnScroll(true);
@@ -4833,7 +4833,7 @@ function OfflineEditor () {
                 object.to.col = toCell.col;
                 object.to.colOff = ptToMm(toCell.colOff);
                 
-                findVal = pxToPt(realTopOffset + height);
+                findVal = realTopOffset + height;
                 toCell = worksheet.findCellByXY(0, findVal, true, true, false);
                 while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
                     worksheet.expandRowsOnScroll(true);

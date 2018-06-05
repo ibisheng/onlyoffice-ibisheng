@@ -1452,10 +1452,10 @@ function DrawingObjects() {
             var fromX, fromY, toX, toY;
             if (AscFormat.checkNormalRotate(rot))
             {
-                fromX =  mmToPt(_t.graphicObject.x);
-                fromY =  mmToPt(_t.graphicObject.y);
-                toX = mmToPt(_t.graphicObject.x + _t.graphicObject.extX);
-                toY = mmToPt(_t.graphicObject.y + _t.graphicObject.extY);
+                fromX =  mmToPx(_t.graphicObject.x);
+                fromY =  mmToPx(_t.graphicObject.y);
+                toX = mmToPx(_t.graphicObject.x + _t.graphicObject.extX);
+                toY = mmToPx(_t.graphicObject.y + _t.graphicObject.extY);
                 this.Pos.X = _t.graphicObject.x;
                 this.Pos.Y = _t.graphicObject.y;
                 this.ext.cx = _t.graphicObject.extX;
@@ -1466,10 +1466,10 @@ function DrawingObjects() {
                 var _xc, _yc;
                 _xc = _t.graphicObject.x + _t.graphicObject.extX/2;
                 _yc = _t.graphicObject.y + _t.graphicObject.extY/2;
-                fromX =  mmToPt(_xc - _t.graphicObject.extY/2);
-                fromY =  mmToPt(_yc - _t.graphicObject.extX/2);
-                toX = mmToPt(_xc + _t.graphicObject.extY/2);
-                toY = mmToPt(_yc + _t.graphicObject.extX/2);
+                fromX =  mmToPx(_xc - _t.graphicObject.extY/2);
+                fromY =  mmToPx(_yc - _t.graphicObject.extX/2);
+                toX = mmToPx(_xc + _t.graphicObject.extY/2);
+                toY = mmToPx(_yc + _t.graphicObject.extX/2);
                 this.Pos.X = _xc - _t.graphicObject.extY/2;
                 this.Pos.Y = _yc - _t.graphicObject.extX/2;
                 this.ext.cx = _t.graphicObject.extY;
@@ -1531,14 +1531,14 @@ function DrawingObjects() {
             }
 
             _t.from.col = fromColCell.col;
-            _t.from.colOff = ptToMm(fromColCell.colOff);
+            _t.from.colOff = pxToMm(fromColCell.colOff);
             _t.from.row = fromRowCell.row;
-            _t.from.rowOff = ptToMm(fromRowCell.rowOff);
+            _t.from.rowOff = pxToMm(fromRowCell.rowOff);
 
             _t.to.col = toColCell.col;
-            _t.to.colOff = ptToMm(toColCell.colOff);
+            _t.to.colOff = pxToMm(toColCell.colOff);
             _t.to.row = toRowCell.row;
-            _t.to.rowOff = ptToMm(toRowCell.rowOff);
+            _t.to.rowOff = pxToMm(toRowCell.rowOff);
             if(bReinitHorScroll)
             {
                 worksheet.handlers.trigger("reinitializeScrollX");
@@ -1560,8 +1560,8 @@ function DrawingObjects() {
             var bounds = _t.graphicObject.bounds;
 
 
-            var fromX =  mmToPt(bounds.x > 0 ? bounds.x : 0), fromY =  mmToPt(bounds.y > 0 ? bounds.y : 0),
-                toX = mmToPt(bounds.x + bounds.w), toY = mmToPt(bounds.y + bounds.h);
+            var fromX =  mmToPx(bounds.x > 0 ? bounds.x : 0), fromY =  mmToPx(bounds.y > 0 ? bounds.y : 0),
+                toX = mmToPx(bounds.x + bounds.w), toY = mmToPx(bounds.y + bounds.h);
             if(toX < 0)
             {
                 toX = 0;
@@ -1622,14 +1622,14 @@ function DrawingObjects() {
             }
 
             _t.boundsFromTo.from.col = fromColCell.col;
-            _t.boundsFromTo.from.colOff = ptToMm(fromColCell.colOff);
+            _t.boundsFromTo.from.colOff = pxToMm(fromColCell.colOff);
             _t.boundsFromTo.from.row = fromRowCell.row;
-            _t.boundsFromTo.from.rowOff = ptToMm(fromRowCell.rowOff);
+            _t.boundsFromTo.from.rowOff = pxToMm(fromRowCell.rowOff);
 
             _t.boundsFromTo.to.col = toColCell.col;
-            _t.boundsFromTo.to.colOff = ptToMm(toColCell.colOff);
+            _t.boundsFromTo.to.colOff = pxToMm(toColCell.colOff);
             _t.boundsFromTo.to.row = toRowCell.row;
-            _t.boundsFromTo.to.rowOff = ptToMm(toRowCell.rowOff);
+            _t.boundsFromTo.to.rowOff = pxToMm(toRowCell.rowOff);
             if(bReinitHorScroll)
             {
                 worksheet.handlers.trigger("reinitializeScrollX");
@@ -2195,9 +2195,9 @@ function DrawingObjects() {
                     updatedRect.h = pxToMm(h);
 
 					var offsetScroll = graphicOption.getOffset();
-					shapeCtx.m_oContext.save();
-					shapeCtx.m_oContext.beginPath();
-					shapeCtx.m_oContext.rect(ptToPx(x1 - offsetScroll.offsetX), ptToPx(y1 - offsetScroll.offsetY), ptToPx(w), ptToPx(h));
+                    shapeCtx.m_oContext.save();
+                    shapeCtx.m_oContext.beginPath();
+                    shapeCtx.m_oContext.rect(x1 - offsetScroll.offsetX, y1 - offsetScroll.offsetY, w, h);
                     shapeCtx.m_oContext.clip();
 
                     shapeCtx.updatedRect = updatedRect;
@@ -2458,23 +2458,23 @@ function DrawingObjects() {
             width /= metricCoeff;
         }
 
-        var findVal = pxToPt(realLeftOffset + width);
+        var findVal = realLeftOffset + width;
         var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
         while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
             worksheet.expandColsOnScroll(true);
             toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
         }
         object.to.col = toCell.col;
-        object.to.colOff = ptToMm(toCell.colOff);
+        object.to.colOff = pxToMm(toCell.colOff);
 
-        findVal = pxToPt(realTopOffset + height);
+        findVal = realTopOffset + height;
         toCell = worksheet.findCellByXY(0, findVal, true, true, false);
         while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
             worksheet.expandRowsOnScroll(true);
             toCell = worksheet.findCellByXY(0, findVal, true, true, false);
         }
         object.to.row = toCell.row;
-        object.to.rowOff = ptToMm(toCell.rowOff);
+        object.to.rowOff = pxToMm(toCell.rowOff);
 
         worksheet.handlers.trigger("reinitializeScroll");
     };
