@@ -455,9 +455,9 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 				x = metrics.left + metrics.width;
 				y = metrics.top;
 				this.drawingCtx.beginPath();
-				this.drawingCtx.moveTo(x - this.pxToPt(7), y);
-				this.drawingCtx.lineTo(x - this.pxToPt(1), y);
-				this.drawingCtx.lineTo(x - this.pxToPt(1), y + this.pxToPt(6));
+				this.drawingCtx.moveTo(x - 7, y);
+				this.drawingCtx.lineTo(x - 1, y);
+				this.drawingCtx.lineTo(x - 1, y + 6);
 				this.drawingCtx.fill();
 			}
 		}
@@ -645,7 +645,7 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 	if (this.lastSelectedId) {
 		var lastComment = this.findComment(this.lastSelectedId);
 		if (lastComment && (metrics = this.worksheet.getCellMetrics(lastComment.nCol, lastComment.nRow))) {
-			var extraOffset = this.pxToPt(1);
+			var extraOffset = 1;
 			this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
 		}
 	}
@@ -839,7 +839,7 @@ CCellCommentator.prototype.selectComment = function(id, bMove) {
 		}
 
 		if (metrics = this.worksheet.getCellMetrics(col, row)) {
-			var extraOffset = this.pxToPt(1);
+			var extraOffset = 1;
 			this.overlayCtx.ctx.globalAlpha = 0.2;
 			this.overlayCtx.beginPath();
 			this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
