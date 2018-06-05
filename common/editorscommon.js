@@ -3512,7 +3512,7 @@
                 if (obj.options && obj.options.isImageDecrypt)
                 {
                 	window["AscDesktopEditor"]["ResaveFile"](obj.options.src, data[0]);
-                    obj.options.img.src = obj.options.src;
+                    obj.options.img["onload_crypto"](obj.options.src);
                 }
                 else
 				{
