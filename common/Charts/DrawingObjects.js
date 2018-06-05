@@ -2181,18 +2181,18 @@ function DrawingObjects() {
                     var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
                     var updatedRange = graphicOption.getUpdatedRange();
 
-					var x1 = worksheet.getCellLeft(updatedRange.c1, 1);// - offsetX;
-                    var y1 = worksheet.getCellTop(updatedRange.r1, 1) ;//- offsetY;
-                    var x2 = worksheet.getCellLeft(updatedRange.c2, 1) + worksheet.getColumnWidth(updatedRange.c2, 1);// - offsetX;
-                    var y2 = worksheet.getCellTop(updatedRange.r2, 1) + worksheet.getRowHeight(updatedRange.r2, 1);//- offsetY;
+					var x1 = worksheet.getCellLeft(updatedRange.c1, 0);
+                    var y1 = worksheet.getCellTop(updatedRange.r1, 0);
+                    var x2 = worksheet.getCellLeft(updatedRange.c2, 0) + worksheet.getColumnWidth(updatedRange.c2, 0);
+                    var y2 = worksheet.getCellTop(updatedRange.r2, 0) + worksheet.getRowHeight(updatedRange.r2, 0);
                     var w = x2 - x1;
                     var h = y2 - y1;
-					var offset = worksheet.getCellsOffset(1);
+					var offset = worksheet.getCellsOffset(0);
 
-                    updatedRect.x = ptToMm(x1 - offset.left);//ptToMm(x1);
-                    updatedRect.y = ptToMm(y1 - offset.top);//ptToMm(y1);
-                    updatedRect.w = ptToMm(w);
-                    updatedRect.h = ptToMm(h);
+                    updatedRect.x = pxToMm(x1 - offset.left);//ptToMm(x1);
+                    updatedRect.y = pxToMm(y1 - offset.top);//ptToMm(y1);
+                    updatedRect.w = pxToMm(w);
+                    updatedRect.h = pxToMm(h);
 
 					var offsetScroll = graphicOption.getOffset();
 					shapeCtx.m_oContext.save();
