@@ -34,7 +34,7 @@
 
 (function (window, undefined) {
 
-var vector_koef = 25.4 / 72;
+var vector_koef = 25.4 / 96;
 var pxInPt = 0.75;
 
 function CPdfPrinter(fontManager)

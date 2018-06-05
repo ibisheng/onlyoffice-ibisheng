@@ -3567,10 +3567,10 @@ function OfflineEditor () {
             }
         };
 
-        AscCommonExcel.WorksheetView.prototype.__drawGrid = function (drawingCtx, c1, r1, c2, r2, leftFieldInPt, topFieldInPt, width, height) {
+        AscCommonExcel.WorksheetView.prototype.__drawGrid = function (drawingCtx, c1, r1, c2, r2, leftFieldInPx, topFieldInPx, width, height) {
             var range = new asc_Range(c1, r1, c2, r2);
             this._prepareCellTextMetricsCache(range);
-            this._drawGrid(drawingCtx, range, leftFieldInPt, topFieldInPt, width, height);
+            this._drawGrid(drawingCtx, range, leftFieldInPx, topFieldInPx, width, height);
         };
 
         AscCommonExcel.WorksheetView.prototype.__drawCellsAndBorders = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw, istoplayer) {
@@ -4783,9 +4783,6 @@ function OfflineEditor () {
         function ascCvtRatio(fromUnits, toUnits) {
             return window["Asc"].getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
         }
-        function ptToMm(val) {
-            return val * ascCvtRatio(1, 3);
-        }
         function pxToMm(val) {
             return val * ascCvtRatio(0, 3);
         }
@@ -4828,7 +4825,7 @@ function OfflineEditor () {
                     toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
                 }
                 object.to.col = toCell.col;
-                object.to.colOff = ptToMm(toCell.colOff);
+                object.to.colOff = pxToMm(toCell.colOff);
                 
                 findVal = realTopOffset + height;
                 toCell = worksheet.findCellByXY(0, findVal, true, true, false);
@@ -4837,7 +4834,7 @@ function OfflineEditor () {
                     toCell = worksheet.findCellByXY(0, findVal, true, true, false);
                 }
                 object.to.row = toCell.row;
-                object.to.rowOff = ptToMm(toCell.rowOff);
+                object.to.rowOff = pxToMm(toCell.rowOff);
             };
 
             var addImageObject = function (_image) {
@@ -4904,9 +4901,6 @@ function OfflineEditor () {
 
         function ascCvtRatio(fromUnits, toUnits) {
             return window["Asc"].getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
-        }
-        function ptToMm(val) {
-            return val * ascCvtRatio(1, 3);
         }
         function pxToMm(val) {
             return val * ascCvtRatio(0, 3);

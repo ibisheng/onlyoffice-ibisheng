@@ -2211,16 +2211,16 @@ function DrawingObjects() {
 
                             var range = printOptions.printPagesData.pageRange;
                             var printPagesData = printOptions.printPagesData;
-                            var offsetCols = printPagesData.startOffsetPt;
+                            var offsetCols = printPagesData.startOffsetPx;
 
-                            var left = worksheet.getCellLeft(range.c1, 3) - worksheet.getCellLeft(0, 3) - ptToMm(printPagesData.leftFieldInPt);
-                            var top = worksheet.getCellTop(range.r1, 3) - worksheet.getCellTop(0, 3) - ptToMm(printPagesData.topFieldInPt);
+                            var left = worksheet.getCellLeft(range.c1, 3) - worksheet.getCellLeft(0, 3) - pxToMm(printPagesData.leftFieldInPx);
+                            var top = worksheet.getCellTop(range.r1, 3) - worksheet.getCellTop(0, 3) - pxToMm(printPagesData.topFieldInPx);
 
                             _this.printGraphicObject(drawingObject.graphicObject, printOptions.ctx.DocumentRenderer, top, left);
 
                             if ( printPagesData.pageHeadings ) {
-                                worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
-                                worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPt);
+                                worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPx + offsetCols, printPagesData.topFieldInPx - worksheet.cellsTop);
+                                worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPx - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPx);
                             }
                         }
                         else {
@@ -4586,10 +4586,6 @@ function DrawingObjects() {
 
     function ascCvtRatio(fromUnits, toUnits) {
         return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
-    }
-
-    function ptToMm(val) {
-        return val * ascCvtRatio(1, 3);
     }
 
     function mmToPx(val) {

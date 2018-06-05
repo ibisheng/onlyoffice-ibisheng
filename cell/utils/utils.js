@@ -1995,10 +1995,8 @@
 
 			this.pageRange = null;
 
-			this.leftFieldInPt = 0;
-			this.topFieldInPt = 0;
-			this.rightFieldInPt = 0;
-			this.bottomFieldInPt = 0;
+			this.leftFieldInPx = 0;
+			this.topFieldInPx = 0;
 
 			this.pageGridLines = false;
 			this.pageHeadings = false;
@@ -2006,7 +2004,7 @@
 			this.indexWorksheet = -1;
 
 			this.startOffset = 0;
-			this.startOffsetPt = 0;
+			this.startOffsetPx = 0;
 
 			return this;
 		}

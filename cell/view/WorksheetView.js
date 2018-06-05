@@ -1684,19 +1684,17 @@
         } else {
             var pageWidthWithFields = pageWidth - pageLeftField - pageRightField;
             var pageHeightWithFields = pageHeight - pageTopField - pageBottomField;
-            var leftFieldInPt = pageLeftField / vector_koef + AscCommonExcel.sizePxinPt;
-            var topFieldInPt = pageTopField / vector_koef + AscCommonExcel.sizePxinPt;
-            var rightFieldInPt = pageRightField / vector_koef + AscCommonExcel.sizePxinPt;
-            var bottomFieldInPt = pageBottomField / vector_koef + AscCommonExcel.sizePxinPt;
+            var leftFieldInPx = pageLeftField / vector_koef + 1;
+            var topFieldInPx = pageTopField / vector_koef + 1;
 
             if (pageHeadings) {
                 // Рисуем заголовки, нужно чуть сдвинуться
-                leftFieldInPt += this.cellsLeft;
-                topFieldInPt += this.cellsTop;
+                leftFieldInPx += this.cellsLeft;
+				topFieldInPx += this.cellsTop;
             }
 
-            var pageWidthWithFieldsHeadings = (pageWidth - pageRightField) / vector_koef - leftFieldInPt;
-            var pageHeightWithFieldsHeadings = (pageHeight - pageBottomField) / vector_koef - topFieldInPt;
+            var pageWidthWithFieldsHeadings = (pageWidth - pageRightField) / vector_koef - leftFieldInPx;
+            var pageHeightWithFieldsHeadings = (pageHeight - pageBottomField) / vector_koef - topFieldInPx;
 
             var currentColIndex = (null !== selectionRange) ? selectionRange.c1 : 0;
             var currentWidth = 0;
@@ -1725,10 +1723,8 @@
                 newPagePrint.pageClipRectWidth = pageWidthWithFields / vector_koef;
                 newPagePrint.pageClipRectHeight = pageHeightWithFields / vector_koef;
 
-                newPagePrint.leftFieldInPt = leftFieldInPt;
-                newPagePrint.topFieldInPt = topFieldInPt;
-                newPagePrint.rightFieldInPt = rightFieldInPt;
-                newPagePrint.bottomFieldInPt = bottomFieldInPt;
+                newPagePrint.leftFieldInPx = leftFieldInPx;
+                newPagePrint.topFieldInPx = topFieldInPx;
 
                 for (rowIndex = currentRowIndex; rowIndex < maxRows; ++rowIndex) {
                     var currentRowHeight = this.rows[rowIndex].height;
@@ -1741,8 +1737,8 @@
                             var currentColWidth = this.cols[colIndex].width;
                             if (bIsAddOffset) {
                                 newPagePrint.startOffset = ++nCountOffset;
-                                newPagePrint.startOffsetPt = (pageWidthWithFieldsHeadings * newPagePrint.startOffset);
-                                currentColWidth -= newPagePrint.startOffsetPt;
+                                newPagePrint.startOffsetPx = (pageWidthWithFieldsHeadings * newPagePrint.startOffset);
+                                currentColWidth -= newPagePrint.startOffsetPx;
                             }
 
                             if (!bFitToWidth && currentWidth + currentColWidth > pageWidthWithFieldsHeadings &&
@@ -1847,10 +1843,10 @@
             drawingCtx.AddClipRect(printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop,
               printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight);
 
-            var offsetCols = printPagesData.startOffsetPt;
+            var offsetCols = printPagesData.startOffsetPx;
             var range = printPagesData.pageRange;
-            var offsetX = this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols;
-            var offsetY = this.rows[range.r1].top - printPagesData.topFieldInPt;
+            var offsetX = this.cols[range.c1].left - printPagesData.leftFieldInPx + offsetCols;
+            var offsetY = this.rows[range.r1].top - printPagesData.topFieldInPx;
 
             var tmpVisibleRange = this.visibleRange;
             // Сменим visibleRange для прохождения проверок отрисовки
@@ -1859,9 +1855,9 @@
             // Нужно отрисовать заголовки
             if (printPagesData.pageHeadings) {
                 this._drawColumnHeaders(drawingCtx, range.c1, range.c2, /*style*/ undefined, offsetX,
-                  printPagesData.topFieldInPt - this.cellsTop);
+                  printPagesData.topFieldInPx - this.cellsTop);
                 this._drawRowHeaders(drawingCtx, range.r1, range.r2, /*style*/ undefined,
-                  printPagesData.leftFieldInPt - this.cellsLeft, offsetY);
+                  printPagesData.leftFieldInPx - this.cellsLeft, offsetY);
             }
 
             // Рисуем сетку
@@ -2285,7 +2281,7 @@
     };
 
 	/** Рисует сетку таблицы */
-	WorksheetView.prototype._drawGrid = function (drawingCtx, range, leftFieldInPt, topFieldInPt, width, height) {
+	WorksheetView.prototype._drawGrid = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
 		// Возможно сетку не нужно рисовать (при печати свои проверки)
 		if (null === drawingCtx && false === this.model.getSheetView().asc_getShowGridLines()) {
 			return;
@@ -2299,14 +2295,14 @@
 		var r = this.rows;
 		var widthCtx = (width) ? width : ctx.getWidth();
 		var heightCtx = (height) ? height : ctx.getHeight();
-		var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
-		var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
+		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
 		if (null === drawingCtx && this.topLeftFrozenCell) {
-			if (undefined === leftFieldInPt) {
+			if (undefined === leftFieldInPx) {
 				var cFrozen = this.topLeftFrozenCell.getCol0();
 				offsetX -= c[cFrozen].left - c[0].left;
 			}
-			if (undefined === topFieldInPt) {
+			if (undefined === topFieldInPx) {
 				var rFrozen = this.topLeftFrozenCell.getRow0();
 				offsetY -= r[rFrozen].top - r[0].top;
 			}
