@@ -1247,11 +1247,11 @@ function DrawingObjects() {
     var ScrollOffset = function() {
 
         this.getX = function() {
-            return -ptToPx((worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft)) + worksheet.getCellLeft(0, 0);
+            return 2 * worksheet.getCellLeft(0, 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(true));
         };
 
         this.getY = function() {
-            return -ptToPx((worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop)) + worksheet.getCellTop(0, 0);
+            return 2 * worksheet.getCellTop(0, 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(true));
         }
     };
 
@@ -1476,9 +1476,6 @@ function DrawingObjects() {
                 this.ext.cy = _t.graphicObject.extX;
             }
 
-
-           // var fromX =  mmToPt(_t.graphicObject.x), fromY =  mmToPt(_t.graphicObject.y),
-           //     toX = mmToPt(_t.graphicObject.x + _t.graphicObject.extX), toY = mmToPt(_t.graphicObject.y + _t.graphicObject.extY);
             var bReinitHorScroll = false, bReinitVertScroll = false;
 
             var fromColCell = worksheet.findCellByXY(fromX, fromY, true, false, true);
@@ -2189,8 +2186,8 @@ function DrawingObjects() {
                     var h = y2 - y1;
 					var offset = worksheet.getCellsOffset(0);
 
-                    updatedRect.x = pxToMm(x1 - offset.left);//ptToMm(x1);
-                    updatedRect.y = pxToMm(y1 - offset.top);//ptToMm(y1);
+                    updatedRect.x = pxToMm(x1 - offset.left);
+                    updatedRect.y = pxToMm(y1 - offset.top);
                     updatedRect.w = pxToMm(w);
                     updatedRect.h = pxToMm(h);
 
@@ -2386,15 +2383,16 @@ function DrawingObjects() {
             if ( graphicOption ) {
                 var updatedRange = graphicOption.getUpdatedRange();
 
-                var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
-                var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
+                var offset = worksheet.getCellsOffset();
+                var offsetX = worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0) - offset.left;
+                var offsetY = worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0) - offset.top;
 
                 var vr = worksheet.visibleRange;
                 var borderOffsetX = (updatedRange.c1 <= vr.c1) ? 0 : 3;
                 var borderOffsetY = (updatedRange.r1 <= vr.r1) ? 0 : 3;
 
-                x = ptToPx(worksheet.getCellLeft(updatedRange.c1, 1) - offsetX) - borderOffsetX;
-                y = ptToPx(worksheet.getCellTop(updatedRange.r1, 1) - offsetY) - borderOffsetY;
+                x = worksheet.getCellLeft(updatedRange.c1, 0) - offsetX - borderOffsetX;
+                y = worksheet.getCellTop(updatedRange.r1, 0) - offsetY - borderOffsetY;
                 w = worksheet.getCellLeft(updatedRange.c2, 0) - worksheet.getCellLeft(updatedRange.c1, 0) + 3;
                 h = worksheet.getCellTop(updatedRange.r2, 0) - worksheet.getCellTop(updatedRange.r1, 0) + 3;
 
@@ -3888,39 +3886,39 @@ function DrawingObjects() {
         // выход за границу справа
         if ( x + w > right ) {
             var scrollX = scrollOffset.getX();
-            var foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
+            var foundCol = worksheet._findColUnderCursor(mmToPx(x + w) + scrollX, true);
             while ( foundCol == null ) {
                 if ( worksheet.isMaxCol() )
                 {
                     var lastCol = worksheet.cols[worksheet.nColsCount - 1];
-                    if ( mmToPt(x + w) + scrollX > lastCol.left ) {
+                    if ( mmToPx(x + w) + scrollX > lastCol.left ) {
                         response.result = false;
-                        response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
+                        response.x = pxToMm( lastCol.left - (mmToPx(x + w) + scrollX) );
                     }
                     break;
                 }
                 worksheet.expandColsOnScroll(true);
                 worksheet.handlers.trigger("reinitializeScrollX");
-                foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
+                foundCol = worksheet._findColUnderCursor(mmToPx(x + w) + scrollX, true);
             }
         }
         // выход за границу снизу
         if ( y + h > bottom ) {
             var scrollY = scrollOffset.getY();
-            var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
+            var foundRow = worksheet._findRowUnderCursor(mmToPx(y + h) + scrollY, true);
             while ( foundRow == null ) {
                 if ( worksheet.isMaxRow() )
                 {
                     var lastRow = worksheet.rows[worksheet.nRowsCount - 1];
-                    if ( mmToPt(y + h) + scrollY > lastRow.top ) {
+                    if ( mmToPx(y + h) + scrollY > lastRow.top ) {
                         response.result = false;
-                        response.y = ptToMm( lastRow.top - (mmToPt(y + h) + scrollY) );
+                        response.y = pxToMm( lastRow.top - (mmToPx(y + h) + scrollY) );
                     }
                     break;
                 }
                 worksheet.expandRowsOnScroll(true);
                 worksheet.handlers.trigger("reinitializeScrollY");
-                foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
+                foundRow = worksheet._findRowUnderCursor(mmToPx(y + h) + scrollY, true);
             }
         }
 
@@ -4590,20 +4588,12 @@ function DrawingObjects() {
         return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
     }
 
-    function ptToPx(val) {
-        return val * ascCvtRatio(1, 0);
-    }
-
     function ptToMm(val) {
         return val * ascCvtRatio(1, 3);
     }
 
     function mmToPx(val) {
         return val * ascCvtRatio(3, 0);
-    }
-
-    function mmToPt(val) {
-        return val * ascCvtRatio(3, 1);
     }
 
     function pxToMm(val) {
