@@ -4630,59 +4630,13 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			var rData = {
-				"id"        : this.documentId,
-				"userid"    : this.documentUserId,
-				"c"         : "imgurl",
-				"saveindex" : g_oDocumentUrls.getMaxIndex(),
-				"data"      : url
-			};
+		    var t = this;
+			AscCommon.sendImgUrls(this, [url], function(data) {
 
-			var t = this;
-			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			this.fCurCallback = function(input)
-			{
-				if (null != input && "imgurl" == input["type"])
-				{
-					if ("ok" == input["status"])
-					{
-						var data = input["data"];
-						var urls = {};
-						var firstUrl;
-						for (var i = 0; i < data.length; ++i)
-						{
-							var elem = data[i];
-							if (elem.url)
-							{
-								if (!firstUrl)
-								{
-									firstUrl = elem.url;
-								}
-								urls[elem.path] = elem.url;
-							}
-						}
-						g_oDocumentUrls.addUrls(urls);
-						if (firstUrl)
-						{
-							t.AddImageUrlAction(firstUrl, imgProp);
-						}
-						else
-						{
-							t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-						}
-					}
-					else
-					{
-						t.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-					}
-				}
-				else
-				{
-					t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			};
-			sendCommand(this, null, rData);
+                if (data && data[0])
+                    t.AddImageUrlAction(data[0].url, imgProp);
+
+            }, false);
 		}
 	};
 	asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
@@ -5001,59 +4955,15 @@ background-repeat: no-repeat;\
 						return;
 					}
 
-					var rData = {
-						"id"        : this.documentId,
-						"userid"    : this.documentUserId,
-						"c"         : "imgurl",
-						"saveindex" : g_oDocumentUrls.getMaxIndex(),
-						"data"      : sImageToDownLoad
-					};
+                    AscCommon.sendImgUrls(this, [sImageToDownLoad], function(data) {
 
-					this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-					this.fCurCallback = function(input)
-					{
-						if (null != input && "imgurl" == input["type"])
-						{
-							if ("ok" == input["status"])
-							{
-								var data = input["data"];
-								var urls = {};
-								var firstUrl;
-								for (var i = 0; i < data.length; ++i)
-								{
-									var elem = data[i];
-									if (elem.url)
-									{
-										if (!firstUrl)
-										{
-											firstUrl = elem.url;
-										}
-										urls[elem.path] = elem.url;
-									}
-								}
-								g_oDocumentUrls.addUrls(urls);
-								if (firstUrl)
-								{
-									fReplaceCallback(firstUrl);
-									fApplyCallback();
-								}
-								else
-								{
-									oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-								}
-							}
-							else
-							{
-								oApi.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-							}
-						}
-						else
-						{
-							oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-						}
-						oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-					};
-					sendCommand(this, null, rData);
+                        if (data && data[0])
+                        {
+                            fReplaceCallback(data[0].url);
+                            fApplyCallback();
+                        }
+
+                    }, false);
 				}
 				else
 				{

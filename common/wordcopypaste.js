@@ -1968,6 +1968,11 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
   }
 
+  if (AscCommon.EncryptionWorker && AscCommon.EncryptionWorker.isCryptoImages())
+  {
+      return AscCommon.EncryptionWorker.addCryproImagesFromUrls(images, callback);
+  }
+
   var rData = {"id": api.documentId, "c": "imgurls", "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 

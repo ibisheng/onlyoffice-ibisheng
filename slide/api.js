@@ -2894,58 +2894,15 @@ background-repeat: no-repeat;\
 					return;
 				}
 
-				this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-				this.fCurCallback = function(input)
-				{
-					if (null != input && "imgurl" == input["type"])
-					{
-						if ("ok" == input["status"])
-						{
-							var data = input["data"];
-							var urls = {};
-							var firstUrl;
-							for (var i = 0; i < data.length; ++i)
-							{
-								var elem = data[i];
-								if (elem.url)
-								{
-									if (!firstUrl)
-									{
-										firstUrl = elem.url;
-									}
-									urls[elem.path] = elem.url;
-								}
-							}
-							g_oDocumentUrls.addUrls(urls);
-							if (firstUrl)
-							{
-								image_url = firstUrl;
-								fApplyCallback();
-							}
-							else
-							{
-								oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-							}
-						}
-						else
-						{
-							oApi.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-						}
-					}
-					else
-					{
-						oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-					}
-					oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-				};
-				var rData         = {
-					"id"        : this.documentId,
-					"userid"    : this.documentUserId,
-					"c"         : "imgurl",
-					"saveindex" : g_oDocumentUrls.getMaxIndex(),
-					"data"      : sImageUrl
-				};
-				sendCommand(this, null, rData);
+                AscCommon.sendImgUrls(this, [sImageUrl], function(data) {
+
+                    if (data && data[0])
+                    {
+                        image_url = data[0].url;
+                        fApplyCallback();
+                    }
+
+                }, false);
 			}
 		}
 		else
@@ -3124,58 +3081,15 @@ background-repeat: no-repeat;\
                         return;
                     }
 
-                    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-                    this.fCurCallback = function(input)
-                    {
-                        if (null != input && "imgurl" == input["type"])
+                    AscCommon.sendImgUrls(this, [sImageUrl], function(data) {
+
+                        if (data && data[0])
                         {
-                            if ("ok" == input["status"])
-                            {
-                                var data = input["data"];
-                                var urls = {};
-                                var firstUrl;
-                                for (var i = 0; i < data.length; ++i)
-                                {
-                                    var elem = data[i];
-                                    if (elem.url)
-                                    {
-                                        if (!firstUrl)
-                                        {
-                                            firstUrl = elem.url;
-                                        }
-                                        urls[elem.path] = elem.url;
-                                    }
-                                }
-                                g_oDocumentUrls.addUrls(urls);
-                                if (firstUrl)
-                                {
-                                    image_url = firstUrl;
-                                    fApplyCallback();
-                                }
-                                else
-                                {
-                                    oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-                                }
-                            }
-                            else
-                            {
-                                oApi.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-                            }
+                            image_url = data[0].url;
+                            fApplyCallback();
                         }
-                        else
-                        {
-                            oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-                        }
-                        oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-                    };
-                    var rData         = {
-                        "id"        : this.documentId,
-                        "userid"    : this.documentUserId,
-                        "c"         : "imgurl",
-                        "saveindex" : g_oDocumentUrls.getMaxIndex(),
-                        "data"      : sImageUrl
-                    };
-                    sendCommand(this, null, rData);
+
+                    }, false);
                 }
 			}
 			else
@@ -4086,59 +4000,13 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			var rData = {
-				"id"        : this.documentId,
-				"userid"    : this.documentUserId,
-				"c"         : "imgurl",
-				"saveindex" : g_oDocumentUrls.getMaxIndex(),
-				"data"      : url
-			};
+            var t = this;
+            AscCommon.sendImgUrls(this, [url], function(data) {
 
-			var t = this;
-			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			this.fCurCallback = function(input)
-			{
-				if (null != input && "imgurl" == input["type"])
-				{
-					if ("ok" == input["status"])
-					{
-						var data = input["data"];
-						var urls = {};
-						var firstUrl;
-						for (var i = 0; i < data.length; ++i)
-						{
-							var elem = data[i];
-							if (elem.url)
-							{
-								if (!firstUrl)
-								{
-									firstUrl = elem.url;
-								}
-								urls[elem.path] = elem.url;
-							}
-						}
-						g_oDocumentUrls.addUrls(urls);
-						if (firstUrl)
-						{
-							t.AddImageUrlAction(firstUrl);
-						}
-						else
-						{
-							t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-						}
-					}
-					else
-					{
-						t.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-					}
-				}
-				else
-				{
-					t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-				}
-				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			};
-			sendCommand(this, null, rData);
+                if (data && data[0])
+                    t.AddImageUrlAction(data[0].url);
+
+            }, false);
 		}
 	};
 
@@ -4311,10 +4179,9 @@ background-repeat: no-repeat;\
 			}
 			else
 			{
-				this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-
 				if (window["AscDesktopEditor"])
                 {
+                    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
                     var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
                     _url     = g_oDocumentUrls.getImageUrl(_url);
                     ImagePr.ImageUrl = _url;
@@ -4323,58 +4190,15 @@ background-repeat: no-repeat;\
                     return;
                 }
 
-				this.fCurCallback = function(input)
-				{
-					if (null != input && "imgurl" == input["type"])
-					{
-						if ("ok" == input["status"])
-						{
-							var data = input["data"];
-							var urls = {};
-							var firstUrl;
-							for (var i = 0; i < data.length; ++i)
-							{
-								var elem = data[i];
-								if (elem.url)
-								{
-									if (!firstUrl)
-									{
-										firstUrl = elem.url;
-									}
-									urls[elem.path] = elem.url;
-								}
-							}
-							g_oDocumentUrls.addUrls(urls);
-							if (firstUrl)
-							{
-								ImagePr.ImageUrl = firstUrl;
-								fApplyCallback();
-							}
-							else
-							{
-								oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-							}
-						}
-						else
-						{
-							oApi.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-						}
-					}
-					else
-					{
-						oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-					}
-					oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-				};
+                AscCommon.sendImgUrls(this, [sImageUrl], function(data) {
 
-				var rData = {
-					"id"        : this.documentId,
-					"userid"    : this.documentUserId,
-					"c"         : "imgurl",
-					"saveindex" : g_oDocumentUrls.getMaxIndex(),
-					"data"      : sImageUrl
-				};
-				sendCommand(this, null, rData);
+                    if (data && data[0])
+                    {
+                        ImagePr.ImageUrl = data[0].url;
+                        fApplyCallback();
+                    }
+
+                }, false);
 			}
 		}
 		else

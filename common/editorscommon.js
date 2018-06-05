@@ -1522,7 +1522,7 @@
                             url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
                             if (jwt)
                             {
-                                url += '/' + jwt;
+                                url += '?token=' + encodeURIComponent(jwt);
                             }
 
                             xhr.open('POST', url, true);
@@ -1547,6 +1547,77 @@
 			callback(Asc.c_oAscError.ID.UplImageFileCount);
 		}
 	}
+
+    function UploadImageUrls(files, documentId, documentUserId, jwt, callback)
+    {
+        if (files.length > 0)
+        {
+            var url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
+            if (jwt)
+            {
+                url += '?token=' + encodeURIComponent(jwt);
+            }
+
+            var aFiles = [];
+            for(var i = files.length - 1;  i > - 1; --i){
+                aFiles.push(files[i]);
+            }
+            var file = aFiles.pop();
+            var aResultUrls = [];
+
+            var fOnReadyChnageState = function()
+			{
+                if (4 == this.readyState)
+                {
+                    if ((this.status == 200 || this.status == 1223))
+                    {
+                        var urls = JSON.parse(this.responseText);
+                        g_oDocumentUrls.addUrls(urls);
+                        for (var i in urls)
+                        {
+                            if (urls.hasOwnProperty(i))
+                            {
+                                aResultUrls.push({ path: i, url: urls[i] });
+                                break;
+                            }
+                        }
+                        if (aFiles.length === 0)
+                        {
+                            callback(aResultUrls);
+                        }
+                        else
+						{
+                            file = aFiles.pop();
+                            var xhr = new XMLHttpRequest();
+
+                            url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
+                            if (jwt)
+                            {
+                                url += '?token=' + encodeURIComponent(jwt);
+                            }
+
+                            xhr.open('POST', url, true);
+                            xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+                            xhr.onreadystatechange = fOnReadyChnageState;
+                            xhr.send(file);
+                        }
+                    }
+                    else
+                        callback([]);
+                }
+            };
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+            xhr.onreadystatechange = fOnReadyChnageState;
+            xhr.send(file);
+        }
+        else
+        {
+            callback(Asc.c_oAscError.ID.UplImageFileCount);
+        }
+    }
 
 	function ValidateUploadImage(files)
 	{
@@ -3413,6 +3484,33 @@
             });
 		};
 
+        this.addCryproImagesFromUrls = function(urls, callback)
+        {
+            var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+            _editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
+
+            var _this = this;
+            window["AscDesktopEditor"]["DownloadFiles"](urls, [], function(files) {
+
+            	_editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
+
+                _editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
+
+            	var _files = [];
+
+                var _options = { isImageCrypt: true, isUrls: true, callback: callback, ext : [], api: _editor };
+
+                for (var elem in files)
+                {
+                    _files.push(window["AscDesktopEditor"]["GetImageBase64"](files[elem], true));
+                    window["AscDesktopEditor"]["RemoveFile"](files[elem]);
+                    _options.ext.push("png"); // TODO
+                }
+
+                _this.sendChanges(this, _files, AscCommon.EncryptionMessageType.Encrypt, _options);
+            });
+        };
+
         this.decryptImage = function(src, img, data)
         {
             this.sendChanges(this, [data], AscCommon.EncryptionMessageType.Decrypt, { isImageDecrypt: true, src: src, img : img });
@@ -3499,7 +3597,17 @@
                     for (var i = 0; i < data.length; i++)
                         data[i] = "ENCRYPTED;" + obj.options.ext[i] + ";" + data[i];
 
-					obj.options.callback(Asc.c_oAscError.ID.No, data);
+					if (!obj.options.isUrls)
+						obj.options.callback(Asc.c_oAscError.ID.No, data);
+					else
+					{
+						AscCommon.UploadImageUrls(data, obj.options.api.documentId, obj.options.api.documentUserId, obj.options.api.CoAuthoringApi.get_jwt(), function(urls)
+                        {
+                            obj.options.api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
+
+                            obj.options.callback(urls);
+                        });
+					}
 				}
 				else
 				{
@@ -3679,6 +3787,7 @@
 	window["AscCommon"].ShowImageFileDialog = ShowImageFileDialog;
 	window["AscCommon"].InitDragAndDrop = InitDragAndDrop;
 	window["AscCommon"].UploadImageFiles = UploadImageFiles;
+    window["AscCommon"].UploadImageUrls = UploadImageUrls;
 	window["AscCommon"].CanDropFiles = CanDropFiles;
 	window["AscCommon"].getUrlType = getUrlType;
 	window["AscCommon"].prepareUrl = prepareUrl;
