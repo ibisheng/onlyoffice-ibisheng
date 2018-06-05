@@ -4786,9 +4786,6 @@ function OfflineEditor () {
         function ptToMm(val) {
             return val * ascCvtRatio(1, 3);
         }
-        function pxToPt(val) {
-            return val * ascCvtRatio(0, 1);
-        }
         function pxToMm(val) {
             return val * ascCvtRatio(0, 3);
         }
@@ -4910,9 +4907,6 @@ function OfflineEditor () {
         }
         function ptToMm(val) {
             return val * ascCvtRatio(1, 3);
-        }
-        function pxToPt(val) {
-            return val * ascCvtRatio(0, 1);
         }
         function pxToMm(val) {
             return val * ascCvtRatio(0, 3);
