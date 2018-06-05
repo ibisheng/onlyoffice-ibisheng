@@ -1672,6 +1672,7 @@
 
     // Посылаем эвент о смене активного листа
     this.handlers.trigger("asc_onActiveSheetChanged", this.wsActive);
+    this.handlers.trigger("asc_onHideComment");
 
     ws = this.getWorksheet(index);
     // Мы делали resize или меняли zoom, но не перерисовывали данный лист (он был не активный)
