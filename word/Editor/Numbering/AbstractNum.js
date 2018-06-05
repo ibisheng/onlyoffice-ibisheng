@@ -281,17 +281,27 @@ CAbstractNum.prototype.Refresh_RecalcData = function(Data)
 	if (!oHistory.AddChangedNumberingToRecalculateData(this.Get_Id(), Data.Index, this))
 		return;
 
-	var NumPr   = new CNumPr();
-	NumPr.NumId = this.Id;
-	NumPr.Lvl   = Data.Index;
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+	if (!oLogicDocument)
+		return;
 
-	var AllParagraphs = oHistory.GetAllParagraphsForRecalcData({Numbering : true, NumPr : NumPr});
+	var oNumbering = oLogicDocument.GetNumbering();
+	var arrNumPr   = [];
 
-	var Count = AllParagraphs.length;
-	for (var Index = 0; Index < Count; Index++)
+	for (var sId in oNumbering.Num)
 	{
-		var Para = AllParagraphs[Index];
-		Para.Refresh_RecalcData({Type : AscDFH.historyitem_Paragraph_Numbering});
+		var oNum = oNumbering.Num[sId];
+		if (this.Id === oNum.GetAbstractNumId())
+		{
+			arrNumPr.push(new CNumPr(oNum.GetId(), Data.Index));
+		}
+	}
+
+	var arrAllParagraphs = oLogicDocument.GetAllParagraphsByNumbering(arrNumPr);
+
+	for (var nIndex = 0, nCount = arrAllParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		arrAllParagraphs[nIndex].Refresh_RecalcData({Type : AscDFH.historyitem_Paragraph_Numbering});
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------

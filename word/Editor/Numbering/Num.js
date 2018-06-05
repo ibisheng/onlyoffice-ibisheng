@@ -747,6 +747,14 @@ CNum.prototype.GetAbstractNum = function()
 	return this.Numbering.GetAbstractNum(this.AbstractNumId);
 };
 /**
+ * Получаем идентификатор связанной абстрактной нумерации
+ * @returns {string}
+ */
+CNum.prototype.GetAbstractNumId = function()
+{
+	return this.AbstractNumId;
+};
+/**
  * Получаем параметр StartOverride для заданного уровня
  * @param nLvl {number} 0..8
  * @returns {number} возвращаем -1, если данный параметр не задан

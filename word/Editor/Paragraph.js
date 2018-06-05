@@ -415,11 +415,28 @@ Paragraph.prototype.GetAllParagraphs = function(Props, ParaArray)
 	}
 	else if (true === Props.Numbering)
 	{
-		var NumPr  = Props.NumPr;
-		var _NumPr = this.GetNumPr();
+		var oCurNumPr = this.GetNumPr();
+		if (!oCurNumPr)
+			return;
 
-		if (undefined != _NumPr && _NumPr.NumId === NumPr.NumId && ( _NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl ))
-			ParaArray.push(this);
+		if (Props.NumPr instanceof CNumPr)
+		{
+			var oNumPr = Props.NumPr;
+			if (oCurNumPr.NumId === oNumPr.NumId && (oCurNumPr.Lvl === oNumPr.Lvl || undefined === oNumPr.Lvl))
+				ParaArray.push(this);
+		}
+		else if (Props.NumPr instanceof Array)
+		{
+			for (var nIndex = 0, nCount = Props.NumPr.length; nIndex < nCount; ++nIndex)
+			{
+				var oNumPr = Props.NumPr[nIndex];
+				if (oCurNumPr.NumId === oNumPr.NumId && (oCurNumPr.Lvl === oNumPr.Lvl || undefined === oNumPr.Lvl))
+				{
+					ParaArray.push(this);
+					break;
+				}
+			}
+		}
 	}
 	else if (true === Props.Style)
 	{
