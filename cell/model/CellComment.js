@@ -424,8 +424,8 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 };
 
 	CCellCommentator.prototype.getCommentByXY = function (x, y) {
-		var findCol = this.worksheet._findColUnderCursor(this.pxToPt(x), true);
-		var findRow = this.worksheet._findRowUnderCursor(this.pxToPt(y), true);
+		var findCol = this.worksheet._findColUnderCursor(x, true);
+		var findRow = this.worksheet._findRowUnderCursor(y, true);
 		return (findCol && findRow) ? this.getComment(findCol.col, findRow.row) : null;
 	};
 
@@ -663,11 +663,12 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 		if (!comment.coords) {
 			comment.coords = new asc_CCommentCoords();
 		}
+		var zoom = this.worksheet.getZoom();
 		var coords = comment.coords;
-		var dWidthPT = 108;
-		var dHeightPT = 59.25;
-		coords.dWidthMM = this.ptToMm(dWidthPT);
-		coords.dHeightMM = this.ptToMm(dHeightPT);
+		var dWidthPX = 144;
+		var dHeightPX = 79;
+		coords.dWidthMM = this.pxToMm(dWidthPX);
+		coords.dHeightMM = this.pxToMm(dHeightPX);
 
 		coords.nCol = comment.nCol;
 		coords.nRow = comment.nRow;
@@ -685,28 +686,28 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 
 		var pos;
 		var left = mergedRange ? mergedRange.c2 : comment.nCol;
-		var x = this.worksheet.getCellLeft(left, 1) + this.worksheet.getColumnWidth(left, 1) + 10.5;
-		coords.dLeftMM = this.ptToMm(x);
+		var x = this.worksheet.getCellLeft(left, 0) + this.worksheet.getColumnWidth(left, 0) + Asc.round(14 * zoom);
 		pos = this.worksheet._findColUnderCursor(x, true);
 		coords.nLeft = pos ? pos.col : 0;
-		coords.nLeftOffset = this.ptToPx(x - this.worksheet.getCellLeft(coords.nLeft, 1));
+		coords.dLeftMM = this.pxToMm(Asc.round(x / zoom));
+		coords.nLeftOffset = Asc.round((x - this.worksheet.getCellLeft(coords.nLeft, 0)) / zoom);
 
 		var top = mergedRange ? mergedRange.r1 : comment.nRow;
-		var y = this.worksheet.getCellTop(top, 1) + - 8.25;
-		coords.dTopMM = this.ptToMm(y);
+		var y = this.worksheet.getCellTop(top, 0) - Asc.round(11 * zoom);
 		pos = this.worksheet._findRowUnderCursor(y, true);
 		coords.nTop = pos ? pos.row : 0;
-		coords.nTopOffset = this.ptToPx(y - this.worksheet.getCellTop(coords.nTop, 1));
+		coords.dTopMM = this.pxToMm(Asc.round(y / zoom));
+		coords.nTopOffset = Asc.round((y - this.worksheet.getCellTop(coords.nTop, 0)) / zoom);
 
-		x += dWidthPT;
+		x += Asc.round(dWidthPX * zoom);
 		pos = this.worksheet._findColUnderCursor(x, true);
 		coords.nRight = pos ? pos.col : 0;
-		coords.nRightOffset = this.ptToPx(x - this.worksheet.getCellLeft(coords.nRight, 1));
+		coords.nRightOffset = Asc.round((x - this.worksheet.getCellLeft(coords.nRight, 0)) / zoom);
 
-		y += dHeightPT;
+		y += Asc.round(dHeightPX * zoom);
 		pos = this.worksheet._findRowUnderCursor(y, true);
 		coords.nBottom = pos ? pos.row : 0;
-		coords.nBottomOffset = this.ptToPx(y - this.worksheet.getCellTop(coords.nBottom, 1));
+		coords.nBottomOffset = Asc.round((y - this.worksheet.getCellTop(coords.nBottom, 0)) / zoom);
 
 		History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Coords, this.model.getId(), null,
 			new AscCommonExcel.UndoRedoData_FromTo(lastCoords, coords.clone()));
@@ -718,7 +719,7 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 		var fvr = this.worksheet.getFirstVisibleRow(false);
 		var fvc = this.worksheet.getFirstVisibleCol(false);
 
-		var headerCellsOffset = this.worksheet.getCellsOffset(1);
+		var headerCellsOffset = this.worksheet.getCellsOffset(0);
 
 		var mergedRange = this.model.getMergedByCell(comment.nRow, comment.nCol);
 		var left = mergedRange ? mergedRange.c2 : comment.nCol;
@@ -736,12 +737,11 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 			}
 		}
 
-		var dReverseLeftPT = this.worksheet.getCellLeft(left, 1) - this.worksheet.getCellLeft(fvc, 1) +
+		pos.dReverseLeftPX = this.worksheet.getCellLeft(left, 0) - this.worksheet.getCellLeft(fvc, 0) +
 			headerCellsOffset.left + frozenOffset.offsetX;
-		pos.dReverseLeftPX = this.ptToPx(dReverseLeftPT);
-		pos.dLeftPX = this.ptToPx(dReverseLeftPT + this.worksheet.getColumnWidth(left, 1));
-		pos.dTopPX = this.ptToPx(this.worksheet.getCellTop(top, 1) + ((this.worksheet.getRowHeight(top, 1) / 2) | 0) -
-			this.worksheet.getCellTop(fvr, 1) + headerCellsOffset.top + frozenOffset.offsetY);
+		pos.dLeftPX = pos.dReverseLeftPX + this.worksheet.getColumnWidth(left, 0);
+		pos.dTopPX = this.worksheet.getCellTop(top, 0) + ((this.worksheet.getRowHeight(top, 0) / 2) | 0) -
+			this.worksheet.getCellTop(fvr, 0) + headerCellsOffset.top + frozenOffset.offsetY;
 
 		if (AscCommon.AscBrowser.isRetina) {
 			pos.dLeftPX = AscCommon.AscBrowser.convertToRetinaValue(pos.dLeftPX);
@@ -766,20 +766,8 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 	// Misc methods
 	//-----------------------------------------------------------------------------------
 
-	CCellCommentator.prototype.pxToPt = function (val) {
-		return val * this.ascCvtRatio(0, 1);
-	};
-
-	CCellCommentator.prototype.ptToPx = function(val) {
-		return val * this.ascCvtRatio(1, 0);
-	};
-
-	CCellCommentator.prototype.ptToMm = function(val) {
-		return val * this.ascCvtRatio(1, 3);
-	};
-
-	CCellCommentator.prototype.mmToPx = function (val) {
-		return val * this.ascCvtRatio(3, 0);
+	CCellCommentator.prototype.pxToMm = function(val) {
+		return val * this.ascCvtRatio(0, 3);
 	};
 
 	CCellCommentator.prototype.ascCvtRatio = function (fromUnits, toUnits) {

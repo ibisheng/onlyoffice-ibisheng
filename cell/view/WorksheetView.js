@@ -4691,18 +4691,18 @@
               .setLineWidth(1)
               .beginPath()
               .lineDiag
-              .moveTo(_cc.pxToPt(fromx), _cc.pxToPt(fromy))
-              .lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy));
-            // .dashLine(_cc.pxToPt(fromx-.5), _cc.pxToPt(fromy-.5), _cc.pxToPt(tox-.5), _cc.pxToPt(toy-.5), 15, 5)
+              .moveTo(fromx, fromy)
+              .lineTo(tox, toy);
+            // .dashLine(fromx-.5, fromy-.5, tox-.5, toy-.5, 15, 5)
             if (showArrow) {
                 context
-                  .moveTo(_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-                    _cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
-                  .lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy))
-                  .lineTo(_cc.pxToPt(tox - headlen * Math.cos(angle + _a)),
-                    _cc.pxToPt(toy - headlen * Math.sin(angle + _a)))
-                  .lineTo(_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-                    _cc.pxToPt(toy - headlen * Math.sin(angle - _a)));
+                  .moveTo(tox - headlen * Math.cos(angle - _a),
+                    toy - headlen * Math.sin(angle - _a))
+                  .lineTo(tox, toy)
+                  .lineTo(tox - headlen * Math.cos(angle + _a),
+                    toy - headlen * Math.sin(angle + _a))
+                  .lineTo(tox - headlen * Math.cos(angle - _a),
+                    toy - headlen * Math.sin(angle - _a));
             }
 
             context
@@ -4833,15 +4833,15 @@
                 if (nodeCellMetrics.apl > this.getCellLeft(0, 0) && nodeCellMetrics.apt > this.getCellTop(0, 0)) {
                     ctx.save()
                       .beginPath()
-                      .arc(_cc.pxToPt(Math.floor(nodeCellMetrics.apl)), _cc.pxToPt(Math.floor(nodeCellMetrics.apt)), 3,
+                      .arc(Math.floor(nodeCellMetrics.apl), Math.floor(nodeCellMetrics.apt), 3,
                         0, 2 * Math.PI, false, -0.5, -0.5)
                       .setFillStyle(color)
                       .fill()
                       .closePath()
                       .setLineWidth(1)
                       .setStrokeStyle(color)
-                      .rect(_cc.pxToPt(nodeCellMetrics.l), _cc.pxToPt(nodeCellMetrics.t),
-                        _cc.pxToPt(nodeCellMetrics.w - 1), _cc.pxToPt(nodeCellMetrics.h - 1))
+                      .rect(nodeCellMetrics.l, nodeCellMetrics.t,
+                        nodeCellMetrics.w - 1, nodeCellMetrics.h - 1)
                       .stroke()
                       .restore();
                 }
