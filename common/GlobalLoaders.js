@@ -456,9 +456,11 @@
             {
                 Image.prototype.preload_crypto = function(_url)
                 {
-                    //console.log("preload_crypto: " + _url);
                     window["crypto_images_map"] = window["crypto_images_map"] || {};
-                    window["crypto_images_map"][_url] = this;
+                    if (!window["crypto_images_map"][_url])
+                        window["crypto_images_map"][_url] = [];
+                    window["crypto_images_map"][_url].push(this);
+
                     window["AscDesktopEditor"]["PreloadCryptoImage"](_url, AscCommon.g_oDocumentUrls.getLocal(_url));
 
                     oThis.Api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
@@ -466,7 +468,6 @@
 
                 Image.prototype["onload_crypto"] = function(_src, _crypto_data)
                 {
-                    //console.log("onload_crypto: " + _src);
                     if (_crypto_data && AscCommon.EncryptionWorker && AscCommon.EncryptionWorker.isCryptoImages())
                     {
                         // TODO: send to plugin for decryption & call this method with empty _crypto_data
