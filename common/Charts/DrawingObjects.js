@@ -4395,12 +4395,12 @@ function DrawingObjects() {
 
         var info = new CCellObjectInfo();
 
-        var tmp = worksheet._findColUnderCursor(pxToPt(x), true);
+        var tmp = worksheet._findColUnderCursor(x, true);
         if (tmp) {
             info.col = tmp.col;
             info.colOff = pxToMm(x - worksheet.getCellLeft(info.col, 0));
         }
-        tmp = worksheet._findRowUnderCursor(pxToPt(y), true);
+        tmp = worksheet._findRowUnderCursor(y, true);
         if (tmp) {
             info.row = tmp.row;
             info.rowOff = pxToMm(y - worksheet.getCellTop(info.row, 0));
@@ -4588,10 +4588,6 @@ function DrawingObjects() {
 
     function ascCvtRatio(fromUnits, toUnits) {
         return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
-    }
-
-    function pxToPt(val) {
-        return val * ascCvtRatio(0, 1);
     }
 
     function ptToPx(val) {
