@@ -5652,13 +5652,13 @@
     };
     ApiNumberingLevel.prototype.OnChangeTextPr = function(oApiTextPr)
     {
-        this.Num.Set_TextPr(this.Lvl, oApiTextPr.TextPr);
-        oApiTextPr.TextPr = this.Num.Lvl[this.Lvl].TextPr.Copy();
+        this.Num.SetTextPr(this.Lvl, oApiTextPr.TextPr);
+        oApiTextPr.TextPr = this.Num.GetLvl(this.Lvl).GetTextPr().Copy();
     };
     ApiNumberingLevel.prototype.OnChangeParaPr = function(oApiParaPr)
     {
-        this.Num.Set_ParaPr(this.Lvl, oApiParaPr.ParaPr);
-        oApiParaPr.ParaPr = this.Num.Lvl[this.Lvl].ParaPr.Copy();
+        this.Num.SetParaPr(this.Lvl, oApiParaPr.ParaPr);
+        oApiParaPr.ParaPr = this.Num.GetLvl(this.Lvl).GetParaPr().Copy();
     };
     ApiTableRow.prototype.OnChangeTableRowPr = function(oApiTableRowPr)
     {

@@ -252,6 +252,8 @@ CAbstractNum.prototype.SetLvlSuff = function(nLvl, nSuff)
 };
 /**
  * Применяем новые тектовые настройки к данной нумерации на заданном уровне
+ * @param nLvl {number} 0..8
+ * @param oTextPr {CTextPr}
  */
 CAbstractNum.prototype.ApplyTextPr = function(nLvl, oTextPr)
 {
@@ -259,12 +261,22 @@ CAbstractNum.prototype.ApplyTextPr = function(nLvl, oTextPr)
 	this.Lvl[nLvl].TextPr.Merge(oTextPr);
 	History.Add(new CChangesAbstractNumTextPrChange(this, oTextPrOld, this.Lvl[nLvl].TextPr.Copy(), nLvl));
 };
-CAbstractNum.prototype.Set_TextPr = function(nLvl, oTextPr)
+/**
+ * Выставляем текстовые настройки для заданного уровня
+ * @param nLvl {number} 0..8
+ * @param oTextPr {CTextPr}
+ */
+CAbstractNum.prototype.SetTextPr = function(nLvl, oTextPr)
 {
 	History.Add(new CChangesAbstractNumTextPrChange(this, this.Lvl[nLvl].TextPr, oTextPr.Copy(), nLvl));
 	this.Lvl[nLvl].TextPr = oTextPr;
 };
-CAbstractNum.prototype.Set_ParaPr = function(nLvl, oParaPr)
+/**
+ * Выставляем настройки параграфа для заданного уровня
+ * @param nLvl {number} 0..8
+ * @param oParaPr {CParaPr}
+ */
+CAbstractNum.prototype.SetParaPr = function(nLvl, oParaPr)
 {
 	History.Add(new CChangesAbstractNumParaPrChange(this, this.Lvl[nLvl].ParaPr, oParaPr.Copy(), nLvl));
 	this.Lvl[nLvl].ParaPr = oParaPr;

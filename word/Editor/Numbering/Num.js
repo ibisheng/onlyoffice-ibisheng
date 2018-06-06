@@ -793,6 +793,58 @@ CNum.prototype.IsHaveRelatedLvlText = function()
 
 	return false;
 };
+/**
+ * Выставляем текстовые настройки для заданного уровня
+ * @param nLvl {number} 0..8
+ * @param oTextPr {CTextPr}
+ */
+CNum.prototype.SetTextPr = function(nLvl, oTextPr)
+{
+	if (nLvl < 0 || nLvl > 8)
+		return;
+
+	if (this.private_HaveLvlOverride(nLvl))
+	{
+		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
+		var oNewNumberingLvl = oNumberingLvl.Copy();
+		oNewNumberingLvl.TextPr = oTextPr;
+		this.SetLvlOverride(oNewNumberingLvl, nLvl);
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetTextPr(nLvl, oTextPr);
+	}
+};
+/**
+ * Выставляем настройки параграфа для заданного уровня
+ * @param nLvl {number} 0..8
+ * @param oParaPr {CParaPr}
+ */
+CNum.prototype.SetParaPr = function(nLvl, oParaPr)
+{
+	if (nLvl < 0 || nLvl > 8)
+		return;
+
+	if (this.private_HaveLvlOverride(nLvl))
+	{
+		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
+		var oNewNumberingLvl = oNumberingLvl.Copy();
+		oNewNumberingLvl.ParaPr = oParaPr;
+		this.SetLvlOverride(oNewNumberingLvl, nLvl);
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetParaPr(nLvl, oParaPr);
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //----------------------------------------------------------------------------------------------------------------------
