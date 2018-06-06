@@ -1201,7 +1201,7 @@ CDocumentContentBase.prototype.GetAllParagraphs = function(oProps, arrParagraphs
 };
 /**
  * Получаем массив всех параграфов с заданной нумерацией
- * @param oNumPr {CNumPr}
+ * @param oNumPr {CNumPr | CNumPr[]}
  * @returns {Paragraph[]}
  */
 CDocumentContentBase.prototype.GetAllParagraphsByNumbering = function(oNumPr)

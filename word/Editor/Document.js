@@ -4814,41 +4814,50 @@ CDocument.prototype.SetParagraphNumbering = function(NumInfo)
 };
 CDocument.prototype.private_SetParagraphNumbering = function(oNumInfo)
 {
-	var arrSelectedParagraphs = this.GetSelectedParagraphs();
+	var oNumPr = this.GetSelectedNum();
+
+	var arrSelectedParagraphs;
+
+	if (oNumPr)
+		arrSelectedParagraphs = this.GetAllParagraphsByNumbering(oNumPr);
+	else
+		arrSelectedParagraphs = this.GetSelectedParagraphs();
+
 	if (arrSelectedParagraphs.length <= 0)
 		return false;
 
 	if (oNumInfo.SubType < 0)
 	{
-		this.private_RemoveParagraphNumbering(arrSelectedParagraphs);
+		this.private_RemoveParagraphNumbering(arrSelectedParagraphs, oNumPr);
 	}
 	else
 	{
 		if (0 === oNumInfo.Type) // Bullet
 		{
 			if (0 === oNumInfo.SubType)
-				this.private_SetParagraphNumberingSimpleBullet(arrSelectedParagraphs);
+				this.private_SetParagraphNumberingSimpleBullet(arrSelectedParagraphs, oNumPr);
 			else
-				this.private_SetParagraphNumberingCustomBullet(arrSelectedParagraphs, oNumInfo.SubType)
+				this.private_SetParagraphNumberingCustomBullet(arrSelectedParagraphs, oNumPr, oNumInfo.SubType)
 		}
 		else if (1 === oNumInfo.Type) // Numbered
 		{
 			if (0 === oNumInfo.SubType)
-				this.private_SetParagraphNumberingSimpleNumbered(arrSelectedParagraphs);
+				this.private_SetParagraphNumberingSimpleNumbered(arrSelectedParagraphs, oNumPr);
 			else
-				this.private_SetParagraphNumberingCustomNumbered(arrSelectedParagraphs, oNumInfo.SubType);
+				this.private_SetParagraphNumberingCustomNumbered(arrSelectedParagraphs, oNumPr, oNumInfo.SubType);
 		}
 		else if (2 === oNumInfo.Type) // Multilevel
 		{
-			this.private_SetParagraphNumberingMultiLevel(arrSelectedParagraphs, oNumInfo.SubType);
+			this.private_SetParagraphNumberingMultiLevel(arrSelectedParagraphs, oNumPr, oNumInfo.SubType);
 		}
 	}
 
 	return true;
 };
-CDocument.prototype.private_RemoveParagraphNumbering = function(arrParagraphs)
+CDocument.prototype.private_RemoveParagraphNumbering = function(arrParagraphs, oNumPr)
 {
-	// TODO: Если селект был selectionflag_Numbering === this.Selection.Flag, нужно его переключить
+	if (this.GetSelectedNum())
+		this.RemoveSelection();
 
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
@@ -4856,12 +4865,8 @@ CDocument.prototype.private_RemoveParagraphNumbering = function(arrParagraphs)
 		oPara.RemoveNumPr();
 	}
 };
-CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrParagraphs)
+CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrParagraphs, oNumPr)
 {
-	var oNumbering = this.GetNumbering();
-	if (!oNumbering)
-		return;
-
 	if (arrParagraphs.length <= 0)
 		return;
 
@@ -4877,7 +4882,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 	if (oPrevPara && oPrevPara.GetNumPr())
 	{
 		var oPrevNumPr = oPrevPara.GetNumPr();
-		if (oPrevNumPr && oNumbering.CheckFormat(oPrevNumPr.NumId, oPrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
+		if (oPrevNumPr && this.Numbering.CheckFormat(oPrevNumPr.NumId, oPrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
 		{
 			sNumId  = oPrevNumPr.NumId;
 			nNumLvl = oPrevNumPr.Lvl;
@@ -4890,7 +4895,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 		if (oNextPara && oNextPara.GetNumPr())
 		{
 			var oNextNumPr = oNextPara.GetNumPr();
-			if (oNextNumPr && oNumbering.CheckFormat(oNextNumPr.NumId, oNextNumPr.Lvl, c_oAscNumberingFormat.Bullet))
+			if (oNextNumPr && this.Numbering.CheckFormat(oNextNumPr.NumId, oNextNumPr.Lvl, c_oAscNumberingFormat.Bullet))
 			{
 				sNumId  = oNextNumPr.NumId;
 				nNumLvl = oNextNumPr.Lvl;
@@ -4898,14 +4903,41 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 		}
 	}
 
+	if (oNumPr && this.Numbering.GetNum(oNumPr.NumId))
+	{
+		var oNum = this.Numbering.GetNum(oNumPr.NumId);
+		var oLvl;
+
+		var oLastNumPr = this.GetLastBulletList();
+		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId))
+		{
+			var oLastNum = this.Numbering.GetNum(oLastNumPr.NumId);
+			oLvl         = oLastNum.GetLvl(oLastNumPr.Lvl).Copy();
+		}
+		else
+		{
+			oLvl = oNum.GetLvl(oNumPr.Lvl).Copy();
+
+			var oTextPr = new CTextPr();
+			oTextPr.SetAll("Symbol");
+			oLvl.SetByType(c_oAscNumberingLevel.Bullet, oNumPr.Lvl, String.fromCharCode(0x00B7), oTextPr);
+		}
+
+		oLvl.ParaPr = oNum.GetLvl(oNumPr.Lvl).ParaPr.Copy();
+
+		oNum.SetLvl(oLvl, oNumPr.Lvl);
+		this.SetLastBulletList(oNumPr.NumId, oNumPr.Lvl);
+		return;
+	}
+
 	if (!sNumId)
 	{
 		var oLastNumPr = this.GetLastBulletList();
-		if (oLastNumPr && oNumbering.GetNum(oLastNumPr.NumId))
+		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId))
 		{
-			var oPrevNum = oNumbering.GetNum(oLastNumPr.NumId);
+			var oPrevNum = this.Numbering.GetNum(oLastNumPr.NumId);
 
-			var oNum = oNumbering.CreateNum();
+			var oNum = this.Numbering.CreateNum();
 			oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 			oNum.SetLvl(oPrevNum.GetLvl(oLastNumPr.Lvl).Copy(), 0);
 
@@ -4914,9 +4946,10 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 		}
 	}
 
+
 	if (!sNumId)
 	{
-		var oNum = oNumbering.CreateNum();
+		var oNum = this.Numbering.CreateNum();
 		oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 
 		sNumId  = oNum.GetId();
@@ -4936,7 +4969,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 			arrParagraphs[nIndex].ApplyNumPr(sNumId, nNumLvl);
 	}
 };
-CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrParagraphs, nType)
+CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrParagraphs, oNumPr, nType)
 {
 	if (arrParagraphs.length <= 0)
 		return;
@@ -4948,19 +4981,19 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 	var sPrevId  = null;
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
-		var oNumPr = arrParagraphs[nIndex].GetNumPr();
-		if (oNumPr)
+		var oTempNumPr = arrParagraphs[nIndex].GetNumPr();
+		if (oTempNumPr)
 		{
 			if (null === nPrevLvl)
-				nPrevLvl = oNumPr.Lvl;
+				nPrevLvl = oTempNumPr.Lvl;
 
 			if (null === sPrevId)
-				sPrevId = oNumPr.NumId;
+				sPrevId = oTempNumPr.NumId;
 
-			if (sPrevId !== oNumPr.NumId)
+			if (sPrevId !== oTempNumPr.NumId)
 				bDiffId = true;
 
-			if (nPrevLvl !== oNumPr.Lvl)
+			if (nPrevLvl !== oTempNumPr.Lvl)
 			{
 				bDiffLvl = true;
 				break;
@@ -5041,7 +5074,17 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 	}
 
 	var sNumId = null;
-	if (true === bDiffLvl)
+	if (oNumPr)
+	{
+		oNum = this.Numbering.GetNum(oNumPr.NumId);
+		if (oNum)
+		{
+			oNum.SetLvlByType(oNumPr.Lvl, c_oAscNumberingLevel.Bullet, sLvlText, oLvlTextPr);
+		}
+
+		this.SetLastBulletList(sPrevId, nPrevLvl);
+	}
+	else if (true === bDiffLvl)
 	{
 		var oNum = this.Numbering.CreateNum();
 		oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
@@ -5084,7 +5127,7 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 		this.SetLastBulletList(sNumId, 0);
 	}
 };
-CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrParagraphs)
+CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrParagraphs, oNumPr)
 {
 	if (arrParagraphs.length <= 0)
 		return;
@@ -5122,6 +5165,47 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 		}
 	}
 
+	if (oNumPr && this.Numbering.GetNum(oNumPr.NumId))
+	{
+		var oNum = this.Numbering.GetNum(oNumPr.NumId);
+		var oLvl;
+
+		var oLastNumPr = this.GetLastNumberedList();
+		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId))
+		{
+			var oPrevNum = this.Numbering.GetNum(oLastNumPr.NumId);
+
+			if (oPrevNum.IsHaveRelatedLvlText())
+			{
+				// В этом случае мы не можем подменить просто текущий уровень, меняем целиком весь список
+				for (var nLvl = 0; nLvl < 9; ++nLvl)
+				{
+					oNum.SetLvl(oPrevNum.GetLvl(nLvl).Copy(), nLvl);
+				}
+			}
+			else
+			{
+				oLvl        = oPrevNum.GetLvl(oLastNumPr.Lvl).Copy();
+				oLvl.ParaPr = oNum.GetLvl(oNumPr.Lvl).ParaPr.Copy();
+				oLvl.ResetNumberedText(oNumPr.Lvl);
+
+				oNum.SetLvl(oLvl, oNumPr.Lvl);
+				this.SetLastNumberedList(oNumPr.NumId, oNumPr.Lvl);
+			}
+		}
+		else
+		{
+			oLvl = oNum.GetLvl(oNumPr.Lvl).Copy();
+			oLvl.SetByType(c_oAscNumberingLevel.DecimalDot_Right, oNumPr.Lvl);
+			oLvl.ParaPr = oNum.GetLvl(oNumPr.Lvl).ParaPr.Copy();
+
+			oNum.SetLvl(oLvl, oNumPr.Lvl);
+			this.SetLastBulletList(oNumPr.NumId, oNumPr.Lvl);
+		}
+
+		return;
+	}
+
 	if (!sNumId)
 	{
 		var oLastNumPr = this.GetLastNumberedList();
@@ -5130,8 +5214,19 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 			var oLastNum = this.Numbering.GetNum(oLastNumPr.NumId);
 
 			var oNum = this.Numbering.CreateNum();
-			oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
-			oNum.SetLvl(oLastNum.GetLvl(oLastNumPr.Lvl).Copy(), 0);
+
+			if (oLastNum.IsHaveRelatedLvlText())
+			{
+				for (var nLvl = 0; nLvl < 9; ++nLvl)
+				{
+					oNum.SetLvl(oLastNum.GetLvl(nLvl).Copy(), nLvl);
+				}
+			}
+			else
+			{
+				oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
+				oNum.SetLvl(oLastNum.GetLvl(oLastNumPr.Lvl).Copy(), 0);
+			}
 
 			sNumId  = oNum.GetId();
 			nNumLvl = 0;
@@ -5159,7 +5254,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 			arrParagraphs[nIndex].ApplyNumPr(sNumId, nNumLvl);
 	}
 };
-CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrParagraphs, nType)
+CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrParagraphs, oNumPr, nType)
 {
 	if (arrParagraphs.length <= 0)
 		return;
@@ -5171,19 +5266,19 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 	var sPrevId  = null;
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
-		var oNumPr = arrParagraphs[nIndex].GetNumPr();
-		if (oNumPr)
+		var oTempNumPr = arrParagraphs[nIndex].GetNumPr();
+		if (oTempNumPr)
 		{
 			if (null === nPrevLvl)
-				nPrevLvl = oNumPr.Lvl;
+				nPrevLvl = oTempNumPr.Lvl;
 
 			if (null === sPrevId)
-				sPrevId = oNumPr.NumId;
+				sPrevId = oTempNumPr.NumId;
 
-			if (sPrevId !== oNumPr.NumId)
+			if (sPrevId !== oTempNumPr.NumId)
 				bDiffId = true;
 
-			if (nPrevLvl !== oNumPr.Lvl)
+			if (nPrevLvl !== oTempNumPr.Lvl)
 			{
 				bDiffLvl = true;
 				break;
@@ -5210,7 +5305,13 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 	var oNum       = null;
 	var sNumId     = null;
 	var nChangeLvl = 0;
-	if (true === bDiffLvl)
+
+	if (oNumPr)
+	{
+		oNum       = this.Numbering.GetNum(oNumPr.NumId);
+		nChangeLvl = oNumPr.Lvl;
+	}
+	else if (true === bDiffLvl)
 	{
 		oNum = this.Numbering.CreateNum();
 		oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
@@ -5218,7 +5319,7 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 		sNumId     = oNum.GetId();
 		nChangeLvl = 0;
 	}
-	else if (true === bDiffId || true != this.Numbering.CheckFormat(sPrevId, nPrevLvl, c_oAscNumberingFormat.Decimal))
+	else if (true === bDiffId)
 	{
 		oNum = this.Numbering.CreateNum();
 		oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
@@ -5289,7 +5390,7 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 		this.SetLastNumberedList(sNumId, 0);
 	}
 };
-CDocument.prototype.private_SetParagraphNumberingMultiLevel = function(arrParagraphs, nType)
+CDocument.prototype.private_SetParagraphNumberingMultiLevel = function(arrParagraphs, oNumPr, nType)
 {
 	if (arrParagraphs.length <= 0)
 		return;
@@ -5298,13 +5399,13 @@ CDocument.prototype.private_SetParagraphNumberingMultiLevel = function(arrParagr
 	var sPrevId = null;
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
-		var oNumPr = arrParagraphs[nIndex].GetNumPr();
-		if (oNumPr)
+		var oTempNumPr = arrParagraphs[nIndex].GetNumPr();
+		if (oTempNumPr)
 		{
 			if (null === sPrevId)
-				sPrevId = oNumPr.NumId;
+				sPrevId = oTempNumPr.NumId;
 
-			if (sPrevId !== oNumPr.NumId)
+			if (sPrevId !== oTempNumPr.NumId)
 				bDiffId = true;
 		}
 		else
@@ -5317,7 +5418,11 @@ CDocument.prototype.private_SetParagraphNumberingMultiLevel = function(arrParagr
 	var oNum   = null;
 	var sNumId = null;
 
-	if (bDiffId)
+	if (oNumPr)
+	{
+		oNum = this.Numbering.GetNum(oNumPr.NumId);
+	}
+	else if (bDiffId)
 	{
 		oNum   = this.Numbering.CreateNum();
 		sNumId = oNum.GetId();
@@ -9569,6 +9674,10 @@ CDocument.prototype.Document_Undo = function(Options)
 	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== this.IsFillingFormMode())
 		return;
 
+	// Нужно сбрасывать, т.к. после Undo/Redo данные списки у нас будут в глобальной таблице, но не такие, какие нужны
+	this.SetLastNumberedList(null);
+	this.SetLastBulletList(null);
+
 	if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
 	{
 		if (this.CollaborativeEditing.CanUndo() && true === this.Api.canSave)
@@ -9596,6 +9705,10 @@ CDocument.prototype.Document_Redo = function()
 {
 	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== this.IsFillingFormMode())
 		return;
+
+	// Нужно сбрасывать, т.к. после Undo/Redo данные списки у нас будут в глобальной таблице, но не такие, какие нужны
+	this.SetLastNumberedList(null);
+	this.SetLastBulletList(null);
 
 	this.DrawingDocument.EndTrackTable(null, true);
 	this.DrawingObjects.TurnOffCheckChartSelection();
@@ -16718,6 +16831,30 @@ CDocument.prototype.SetLastNumberedList = function(sNumId, nLvl)
 		this.LastNumberedList = undefined;
 	else
 		this.LastNumberedList = new CNumPr(sNumId, nLvl);
+};
+/**
+ * Получаем текущую выделенную нумерацию
+ * @returns {?CNumPr}
+ */
+CDocument.prototype.GetSelectedNum = function()
+{
+	var oCurrentPara = this.GetCurrentParagraph(true);
+	if (!oCurrentPara)
+		return null;
+
+	var oDocContent = oCurrentPara.GetParent();
+	if (!oDocContent)
+		return null;
+
+	var oTopDocContent = oDocContent.GetTopDocumentContent();
+	if (!oTopDocContent || !oTopDocContent.IsNumberingSelection())
+		return null;
+
+	oCurrentPara = oTopDocContent.Selection.Data.CurPara;
+	if (!oCurrentPara)
+		return null;
+
+	return oCurrentPara.GetNumPr();
 };
 
 

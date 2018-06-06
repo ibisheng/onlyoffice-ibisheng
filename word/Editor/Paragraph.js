@@ -7474,7 +7474,7 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 			if (-1 === LvlFound)
 				LvlFound = 8;
 
-			if (undefined != this.Pr.Ind && undefined != this.Ind && undefined != this.Ind.Left)
+			if (this.Pr.Ind && (undefined !== this.Pr.Ind || undefined !== this.Pr.Ind.Left))
 			{
 				History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, undefined));
 				History.Add(new CChangesParagraphIndLeft(this, this.Pr.Ind.Left, undefined));

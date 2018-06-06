@@ -735,6 +735,18 @@ CNumberingLvl.prototype.CollectDocumentStatistics = function(oStats)
 	if (c_oAscNumberingSuff.Tab === this.Suff || c_oAscNumberingSuff.Space === this.Suff)
 		oStats.Add_Symbol(true);
 };
+/**
+ * Все нумерованные значение переделываем на заданный уровень
+ * @param nLvl {number} 0..8
+ */
+CNumberingLvl.prototype.ResetNumberedText = function(nLvl)
+{
+	for (var nIndex = 0, nCount = this.LvlText.length; nIndex < nCount; ++nIndex)
+	{
+		if (numbering_lvltext_Num === this.LvlText[nIndex].Type)
+			this.LvlText[nIndex].Value = nLvl;
+	}
+};
 CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 {
 	// Long               : Jc

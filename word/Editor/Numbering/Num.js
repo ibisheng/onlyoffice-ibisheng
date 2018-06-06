@@ -773,6 +773,26 @@ CNum.prototype.GetStartOverride = function(nLvl)
 
 	return nStartOverride;
 };
+/**
+ * Проверяем есть ли у данной нумерации уровни с текстом, зависящим от других уровней
+ * @returns {boolean}
+ */
+CNum.prototype.IsHaveRelatedLvlText = function()
+{
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		var oLvl = this.GetLvl(nLvl);
+		var arrLvlText = oLvl.GetLvlText();
+		for (var nIndex = 0, nCount = arrLvlText.length; nIndex < nCount; ++nIndex)
+		{
+			var oLvlText = arrLvlText[nIndex];
+			if (numbering_lvltext_Num === oLvlText.Type && nLvl !== oLvlText.Value)
+				return true;
+		}
+	}
+
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //----------------------------------------------------------------------------------------------------------------------
