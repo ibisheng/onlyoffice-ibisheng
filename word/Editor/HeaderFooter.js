@@ -837,11 +837,6 @@ CHeaderFooter.prototype =
 		return this.Content.SetParagraphIndent(Ind);
 	},
 
-	SetParagraphNumbering : function(NumInfo)
-	{
-		return this.Content.SetParagraphNumbering(NumInfo);
-	},
-
 	SetParagraphShd : function(Shd)
 	{
 		return this.Content.SetParagraphShd(Shd);
@@ -2018,12 +2013,6 @@ CHeaderFooterController.prototype =
 	{
 		if (null != this.CurHdrFtr)
 			return this.CurHdrFtr.SetParagraphIndent(Ind);
-	},
-
-	SetParagraphNumbering : function(NumInfo)
-	{
-		if (null != this.CurHdrFtr)
-			return this.CurHdrFtr.SetParagraphNumbering(NumInfo);
 	},
 
 	SetParagraphShd : function(Shd)

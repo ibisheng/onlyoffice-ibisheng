@@ -47,132 +47,269 @@ function CNumbering()
 	this.Num         = {};
 }
 
-CNumbering.prototype.Copy_All_AbstractNums = function()
+/**
+ * Копируем все нумерации и абстрактные нумерации. Возвращаем новые объекты с мапом из старых Id в новые
+ * @param oNumbering {CNumbering}
+ * @returns {{AbstractNum: {}, AbstractMap: {}, Num: {}, NumMap: {}}}
+ */
+CNumbering.prototype.CopyAllNums = function(oNumbering)
 {
-	var Map             = {};
-	var NewAbstractNums = [];
+	if (!oNumbering)
+		oNumbering = this;
 
-	for (var OldId in this.AbstractNum)
+	var oAbstractMap     = {};
+	var oNumMap          = {};
+	var oNewAbstractNums = {};
+	var oNewNums         = {}
+
+	for (var sOldId in this.AbstractNum)
 	{
-		var OldAbsNum = this.AbstractNum[OldId];
-		var NewAbsNum = new CAbstractNum();
+		var oOldAbstractNum = this.AbstractNum[sOldId];
+		var oNewAbstractNum = new CAbstractNum();
 
-		var NewId = NewAbsNum.Get_Id();
+		var sNewId = oNewAbstractNum.GetId();
+		oNewAbstractNum.Copy(oOldAbstractNum);
 
-		NewAbsNum.Copy(OldAbsNum);
-
-		NewAbstractNums[NewId] = NewAbsNum;
-		Map[OldId]             = NewId;
+		oNewAbstractNums[sNewId] = oNewAbstractNum;
+		oAbstractMap[sOldId]     = sNewId;
 	}
 
-	return {AbstractNums : NewAbstractNums, Map : Map};
+	for (var sOldId in this.Num)
+	{
+		var oOldNum = this.Num[sOldId];
+		var oNewNum = new CNum(oNumbering, oAbstractMap[oOldNum.AbstractNumId]);
+
+		for (var nLvl = 0; nLvl < 9; ++nLvl)
+		{
+			if (oOldNum.LvlOverride[nLvl])
+				oNewNum.SetLvlOverride(oOldNum.LvlOverride[nLvl].GetLvl().Copy(), nLvl, oOldNum.LvlOverride[nLvl].GetStartOverride());
+		}
+
+		var sNewId = oNewNum.GetId();
+
+		oNewNums[sNewId] = oNewNum;
+		oNumMap[sOldId]  = sNewId;
+	}
+
+	return {
+		AbstractNum : oNewAbstractNums,
+		AbstractMap : oAbstractMap,
+		Num         : oNewNums,
+		NumMap      : oNumMap
+	};
 };
+/**
+ * Удаляем все нумерации
+ */
 CNumbering.prototype.Clear = function()
 {
 	this.AbstractNum = {};
 	this.Num         = {};
 };
-CNumbering.prototype.Append_AbstractNums = function(AbstractNums)
+/**
+ * Добавляем к текущим абстрактным нумеациям новые
+ * @param oAbstractNums
+ */
+CNumbering.prototype.AppendAbstractNums = function(oAbstractNums)
 {
-	for (var Id in AbstractNums)
+	for (var sId in oAbstractNums)
 	{
-		if (undefined === this.AbstractNum[Id])
-			this.AbstractNum[Id] = AbstractNums[Id];
+		if (undefined === this.AbstractNum[sId])
+			this.AbstractNum[sId] = oAbstractNums[sId];
 	}
 };
-CNumbering.prototype.Create_AbstractNum = function(Type)
+/**
+ * Добавляем к текущим нумеациям новые
+ * @param oNums
+ */
+CNumbering.prototype.AppendNums = function(oNums)
 {
-	// TODO: переделать работу с ID
-	var AbstractNum      = new CAbstractNum(Type);
-	var Id               = AbstractNum.Get_Id();
-	this.AbstractNum[Id] = AbstractNum;
-
-	return Id;
-};
-CNumbering.prototype.Add_AbstractNum = function(AbstractNum)
-{
-	var Id               = AbstractNum.Get_Id();
-	this.AbstractNum[Id] = AbstractNum;
-
-	return Id;
-};
-CNumbering.prototype.Get_AbstractNum = function(Id)
-{
-	var AbstractNum = this.AbstractNum[Id];
-	if (undefined != AbstractNum && undefined != AbstractNum.NumStyleLink)
+	for (var sId in oNums)
 	{
-		var Styles   = editor.WordControl.m_oLogicDocument.Get_Styles();
-		var NumStyle = Styles.Style[AbstractNum.NumStyleLink];
+		if (undefined === this.Num[sId])
+			this.Num[sId] = oNums[sId];
+	}
+};
+/**
+ * Создаем новую абстрактную нумерацию
+ * @returns {CAbstractNum}
+ */
+CNumbering.prototype.CreateAbstractNum = function()
+{
+	var oAbstractNum                       = new CAbstractNum();
+	this.AbstractNum[oAbstractNum.GetId()] = oAbstractNum;
+	return oAbstractNum;
+};
+/**
+ * Добавляем абстрактную нумерацию
+ * @param oAbstractNum {CAbstractNum}
+ * @returns {string} идентификатор нумерации
+ */
+CNumbering.prototype.AddAbstractNum = function(oAbstractNum)
+{
+	if (!(oAbstractNum instanceof CAbstractNum))
+		return;
 
-		if (undefined != NumStyle && undefined != NumStyle.ParaPr.NumPr && undefined != NumStyle.ParaPr.NumPr.NumId)
-			return this.Get_AbstractNum(NumStyle.ParaPr.NumPr.NumId);
+	var sId               = oAbstractNum.GetId();
+	this.AbstractNum[sId] = oAbstractNum;
+
+	return sId;
+};
+/**
+ * Добавляем абстрактную нумерацию
+ * @param oNum {CNum}
+ * @returns {string} идентификатор нумерации
+ */
+CNumbering.prototype.AddNum = function(oNum)
+{
+	if (!(oNum instanceof CNum))
+		return;
+
+	var sNumId       = oNum.GetId();
+	this.Num[sNumId] = oNum;
+
+	return sNumId;
+};
+/**
+ * Доступ к абстрактной нумерации по Id
+ * @param sId
+ * @returns {CAbstractNum}
+ */
+CNumbering.prototype.GetAbstractNum = function(sId)
+{
+	var oAbstractNum = this.AbstractNum[sId];
+	if (oAbstractNum && oAbstractNum.GetNumStyleLink())
+	{
+		var oStyles   = editor.WordControl.m_oLogicDocument.GetStyles();
+		var oNumStyle = oStyles.Get(oAbstractNum.GetNumStyleLink());
+
+		if (oNumStyle && oNumStyle.ParaPr.NumPr && undefined !== oNumStyle.ParaPr.NumPr.NumId)
+			return this.GetAbstractNum(oNumStyle.ParaPr.NumPr.NumId);
 	}
 
-	return AbstractNum;
+	return oAbstractNum;
 };
-CNumbering.prototype.Get_ParaPr = function(NumId, Lvl)
+/**
+ * Создаем новую нумерацию
+ * @returns {CNum}
+ */
+CNumbering.prototype.CreateNum = function()
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
+	var oAbstractNum = new CAbstractNum();
+	this.AbstractNum[oAbstractNum.GetId()] = oAbstractNum;
 
-	if (undefined != AbstractId)
-		return AbstractId.Lvl[Lvl].ParaPr;
+	var oNum = new CNum(this, oAbstractNum.GetId());
+	this.Num[oNum.GetId()] = oNum;
+
+	return oNum;
+};
+/**
+ * @param sId
+ * @returns {CNum}
+ */
+CNumbering.prototype.GetNum = function(sId)
+{
+	if (this.Num[sId])
+		return this.Num[sId];
+
+	return null;
+};
+/**
+ * Получаем настройки параграфа для заданного уровня заданной нумерации
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
+ * @returns {CParaPr}
+ */
+CNumbering.prototype.GetParaPr = function(sNumId, nLvl)
+{
+	var oNum = this.GetNum(sNumId);
+	if (oNum)
+		return oNum.GetLvl(nLvl).GetParaPr();
 
 	return new CParaPr();
 };
-CNumbering.prototype.Get_Format = function(NumId, Lvl)
+/**
+ * Получаем формат заданного уровня заданной нумерации
+ * @param sNumId
+ * @param nLvl
+ * @returns {c_oAscNumberingFormat}
+ */
+CNumbering.prototype.GetNumFormat = function(sNumId, nLvl)
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
+	var oNum = this.GetNum(sNumId);
+	if (!oNum)
+		return c_oAscNumberingFormat.Bullet;
 
-	if (undefined != AbstractId)
-		return AbstractId.Lvl[Lvl].Format;
+	var oLvl = oNum.GetLvl(nLvl);
+	if (!oLvl)
+		return c_oAscNumberingFormat.Bullet;
 
-	return numbering_numfmt_Bullet;
+	return oLvl.Format;
 };
 /**
  * Проверяем по типам Numbered и Bullet
- * @param NumId
- * @param Lvl
- * @param Type
+ * @param sNumId {string}
+ * @param nLvl {number}
+ * @param nType {c_oAscNumberingFormat}
  * @returns {boolean}
  */
-CNumbering.prototype.Check_Format = function(NumId, Lvl, Type)
+CNumbering.prototype.CheckFormat = function(sNumId, nLvl, nType)
 {
-	var Format = this.Get_Format(NumId, Lvl);
+	var nFormat = this.GetNumFormat(sNumId, nLvl);
 
-	if (( 0x1000 & Format && 0x1000 & Type ) || ( 0x2000 & Format && 0x2000 & Type ))
+	if ((c_oAscNumberingFormat.BulletFlag & nFormat && c_oAscNumberingFormat.BulletFlag & nType)
+		|| (c_oAscNumberingFormat.NumberedFlag & nFormat && c_oAscNumberingFormat.NumberedFlag & nType))
 		return true;
 
 	return false;
 };
-CNumbering.prototype.Draw = function(NumId, Lvl, X, Y, Context, NumInfo, TextPr, Theme)
+CNumbering.prototype.Draw = function(sNumId, nLvl, nX, nY, oContext, oNumInfo, oTextPr, oTheme)
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
-	return AbstractId.Draw(X, Y, Context, Lvl, NumInfo, TextPr, Theme);
+	var oNum = this.GetNum(sNumId);
+	return oNum.Draw(nX, nY, oContext, nLvl, oNumInfo, oTextPr, oTheme);
 };
-CNumbering.prototype.Measure = function(NumId, Lvl, Context, NumInfo, TextPr, Theme)
+CNumbering.prototype.Measure = function(sNumId, nLvl, oContext, oNumInfo, oTextPr, oTheme)
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
-	return AbstractId.Measure(Context, Lvl, NumInfo, TextPr, Theme);
+	var oNum = this.GetNum(sNumId);
+	return oNum.Measure(oContext, nLvl, oNumInfo, oTextPr, oTheme);
 };
-CNumbering.prototype.Document_CreateFontCharMap = function(FontCharMap, NumTextPr, NumPr, NumInfo)
+/**
+ * Получаем список всех символов используемых в заданном уровне заданной нумерации
+ * @param oFontCharMap
+ * @param oNumTextPr
+ * @param oNumPr
+ * @param oNumInfo
+ */
+CNumbering.prototype.CreateFontCharMap = function(oFontCharMap, oNumTextPr, oNumPr, oNumInfo)
 {
-	var AbstractId = this.Get_AbstractNum(NumPr.NumId);
-	AbstractId.Document_CreateFontCharMap(FontCharMap, NumPr.Lvl, NumInfo, NumTextPr);
+	var oNum = this.GetNum(oNumPr.NumId);
+	oNum.CreateFontCharMap(oFontCharMap, oNumPr.Lvl, oNumInfo, oNumTextPr);
 };
-CNumbering.prototype.Document_Get_AllFontNames = function(AllFonts)
+/**
+ * Получаем список всех используемых шрифтов
+ * @param arrAllFonts {array}
+ */
+CNumbering.prototype.GetAllFontNames = function(arrAllFonts)
 {
-	for (var Id in this.AbstractNum)
+	for (var sNumId in this.Num)
 	{
-		var AbstractNum = this.Get_AbstractNum(Id);
-		AbstractNum.Document_Get_AllFontNames(AllFonts);
+		var oNum = this.GetNum(sNumId);
+		oNum.GetAllFontNames(arrAllFonts);
 	}
 
-	AllFonts["Symbol"]      = true;
-	AllFonts["Courier New"] = true;
-	AllFonts["Wingdings"]   = true;
+	arrAllFonts["Symbol"]      = true;
+	arrAllFonts["Courier New"] = true;
+	arrAllFonts["Wingdings"]   = true;
 };
-CNumbering.prototype.GetText = function(NumId, Lvl, NumInfo)
+/**
+ * Получаем текст нумерации для заданного уровня
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
+ * @param oNumInfo
+ * @returns {string}
+ */
+CNumbering.prototype.GetText = function(sNumId, nLvl, oNumInfo)
 {
-	var oAbstractId = this.Get_AbstractNum(NumId);
-	return oAbstractId.GetText(Lvl, NumInfo);
+	var oNum = this.GetNum(sNumId);
+	return oNum.GetText(nLvl, oNumInfo);
 };

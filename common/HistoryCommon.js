@@ -1157,6 +1157,7 @@
 	window['AscDFH'].historyitem_type_SdtPr            = 60 << 16;
 	window['AscDFH'].historyitem_type_InlineLevelSdt   = 61 << 16;
 	window['AscDFH'].historyitem_type_ParaBookmark     = 62 << 16;
+	window['AscDFH'].historyitem_type_Num              = 63 << 16;
 
 	window['AscDFH'].historyitem_type_CommonShape            = 1000 << 16; // Этот класс добавлен для элементов, у которых нет конкретного класса
 
@@ -1480,6 +1481,10 @@
 	window['AscDFH'].historyitem_AbstractNum_ParaPrChange = window['AscDFH'].historyitem_type_AbstractNum | 3;
 	window['AscDFH'].historyitem_AbstractNum_StyleLink    = window['AscDFH'].historyitem_type_AbstractNum | 4;
 	window['AscDFH'].historyitem_AbstractNum_NumStyleLink = window['AscDFH'].historyitem_type_AbstractNum | 5;
+	//------------------------------------------------------------------------------------------------------------------
+	// Типы изменений в классе CNum
+	//------------------------------------------------------------------------------------------------------------------
+	window['AscDFH'].historyitem_Num_LvlOverrideChange = window['AscDFH'].historyitem_type_Num | 1;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе СComment
 	//------------------------------------------------------------------------------------------------------------------

@@ -3351,7 +3351,7 @@
 				var documentContent = pasteData.content;
 				var t = this;
 				
-				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия Internal_GetNumInfo требует наличие этих параграфов в родителе. 
+				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия CalculateNumberingValues требует наличие этих параграфов в родителе.
 				var cDocument = documentContent && documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
 				if(cDocument && cDocument.Content && 1 === cDocument.Content.length)
 				{
@@ -3535,13 +3535,13 @@
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
-				var oNumPr = paragraph.elem.Numbering_Get ? paragraph.elem.Numbering_Get() : null;
+				var oNumPr = paragraph.elem.GetNumPr ? paragraph.elem.GetNumPr() : null;
 				var numberingText = null;
 				var formatText;
 				if (oNumPr != null) {
-					var aNum = paragraph.elem.Parent.Numbering.Get_AbstractNum(oNumPr.NumId);
-					if (null != aNum) {
-						LvlPr = aNum.Lvl[oNumPr.Lvl];
+					var oNum = paragraph.elem.Parent.GetNumbering().GetNum(oNumPr.NumId);
+					if (oNum) {
+						LvlPr = oNum.GetLvl(oNumPr.Lvl);
 						Lvl = oNumPr.Lvl;
 					}
 
@@ -3553,7 +3553,7 @@
 
 					text += this._getAllNumberingText(Lvl, numberingText);
 
-					formatText = this._getPrParaRun(paraPr, LvlPr.TextPr);
+					formatText = this._getPrParaRun(paraPr, LvlPr.GetTextPr());
 					fontFamily = formatText.format.getName();
 					this.fontsNew[fontFamily] = 1;
 
@@ -4002,37 +4002,37 @@
 						}
 						else
 						{
-							var Numbering = paragraph.Parent.Get_Numbering();
-							var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-							var NumSuff   = NumLvl.Suff;
-							var NumJc     = NumLvl.Jc;
+							var Numbering = paragraph.Parent.GetNumbering();
+							var NumLvl    = Numbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
+							var NumSuff   = NumLvl.GetSuff();
+							var NumJc     = NumLvl.GetJc();
 							var NumTextPr = paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
 							// Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
 							// символа параграфа.
 
-							var TextPr_temp = paragraph.TextPr.Value.Copy();
+							var TextPr_temp       = paragraph.TextPr.Value.Copy();
 							TextPr_temp.Underline = undefined;
 
-							NumTextPr.Merge( TextPr_temp );
-							NumTextPr.Merge( NumLvl.TextPr );
-							
-							var oNumPr = paragraph.Numbering_Get();
+							NumTextPr.Merge(TextPr_temp);
+							NumTextPr.Merge(NumLvl.GetTextPr());
+
+							var oNumPr = paragraph.GetNumPr();
 							var LvlPr, Lvl;
-							if(oNumPr != null)
+							if (oNumPr != null)
 							{
-								var aNum = paragraph.Parent.Numbering.Get_AbstractNum( oNumPr.NumId );
-								if(null != aNum)
+								var oNum = paragraph.Parent.GetNumbering().GetNum(oNumPr.NumId);
+								if (null != oNum)
 								{
-									LvlPr = aNum.Lvl[oNumPr.Lvl];
-									Lvl = oNumPr.Lvl;
+									LvlPr = oNum.GetLvl(oNumPr.Lvl);
+									Lvl   = oNumPr.Lvl;
 								}
 							}
-							
 
-							var NumInfo = paragraph.Parent.Internal_GetNumInfo(paragraph.Id, NumPr);
-							
-							return this._getNumberingText( NumPr.Lvl, NumInfo, NumTextPr, null, LvlPr );
+
+							var NumInfo = paragraph.Parent.CalculateNumberingValues(paragraph, NumPr);
+
+							return this._getNumberingText(NumPr.Lvl, NumInfo, NumTextPr, null, LvlPr);
 						}
 					}
 				}
@@ -4079,16 +4079,16 @@
 							var CurLvl = Text[Index].Value;
 							switch( LvlPr.Format )
 							{
-								case numbering_numfmt_Bullet:
+								case c_oAscNumberingFormat.Bullet:
 								{
 									break;
 								}
 
-								case numbering_numfmt_Decimal:
+								case c_oAscNumberingFormat.Decimal:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+										var T = "" + NumInfo[CurLvl];
 										for ( var Index2 = 0; Index2 < T.length; Index2++ )
 										{
 											Char += T.charAt(Index2);
@@ -4099,11 +4099,11 @@
 									break;
 								}
 
-								case numbering_numfmt_DecimalZero:
+								case c_oAscNumberingFormat.DecimalZero:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+										var T = "" + NumInfo[CurLvl];
 
 										if ( 1 === T.length )
 										{
@@ -4127,13 +4127,13 @@
 									break;
 								}
 
-								case numbering_numfmt_LowerLetter:
-								case numbering_numfmt_UpperLetter:
+								case c_oAscNumberingFormat.LowerLetter:
+								case c_oAscNumberingFormat.UpperLetter:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
 										// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-										var Num = LvlPr.Start - 1 + NumInfo[CurLvl] - 1;
+										var Num = NumInfo[CurLvl];
 
 										var Count = (Num - Num % 26) / 26;
 										var Ost   = Num % 26;
@@ -4141,7 +4141,7 @@
 										var T = "";
 
 										var Letter;
-										if ( numbering_numfmt_LowerLetter === LvlPr.Format )
+										if ( c_oAscNumberingFormat.LowerLetter === LvlPr.Format )
 											Letter = String.fromCharCode( Ost + 97 );
 										else
 											Letter = String.fromCharCode( Ost + 65 );
@@ -4159,17 +4159,17 @@
 									break;
 								}
 
-								case numbering_numfmt_LowerRoman:
-								case numbering_numfmt_UpperRoman:
+								case c_oAscNumberingFormat.LowerRoman:
+								case c_oAscNumberingFormat.UpperRoman:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var Num = LvlPr.Start - 1 + NumInfo[CurLvl];
+										var Num = NumInfo[CurLvl];
 
 										// Переводим число Num в римскую систему исчисления
 										var Rims;
 
-										if ( numbering_numfmt_LowerRoman === LvlPr.Format )
+										if ( c_oAscNumberingFormat.LowerRoman === LvlPr.Format )
 											Rims = [  'm', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 										else
 											Rims = [  'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];

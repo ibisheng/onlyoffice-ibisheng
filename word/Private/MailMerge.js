@@ -365,10 +365,12 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     {
         // Подменяем ссылку на менеджер полей, чтобы скопированные поля регистрировались в новом классе
         this.FieldsManager = LogicDocument.FieldsManager;
-        var NewNumbering = this.Numbering.Copy_All_AbstractNums();
-        LogicDocument.Numbering.Append_AbstractNums(NewNumbering.AbstractNums);
+        var NewNumbering = this.Numbering.CopyAllNums(LogicDocument.Numbering);
 
-        this.CopyNumberingMap = NewNumbering.Map;
+        LogicDocument.Numbering.AppendAbstractNums(NewNumbering.AbstractNum);
+        LogicDocument.Numbering.AppendNums(NewNumbering.Num);
+
+        this.CopyNumberingMap = NewNumbering.NumMap;
 
         for (var ContentIndex = 0; ContentIndex < ContentCount; ContentIndex++)
         {

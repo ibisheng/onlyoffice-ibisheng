@@ -1119,7 +1119,7 @@ CHistory.prototype.GetAllParagraphsForRecalcData = function(Props)
 			var oPara = this.RecalculateData.AllParagraphs[nParaIndex];
 
 			var NumPr  = Props.NumPr;
-			var _NumPr = oPara.Numbering_Get();
+			var _NumPr = oPara.GetNumPr();
 
 			if (undefined != _NumPr && _NumPr.NumId === NumPr.NumId && (_NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl))
 				arrParagraphs.push(oPara);

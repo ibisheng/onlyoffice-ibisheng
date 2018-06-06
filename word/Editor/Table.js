@@ -5289,21 +5289,6 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
 	var Page    = this.Pages[CurPage];
 	var PageAbs = this.private_GetAbsolutePageIndex(CurPage);
 
-	if (this.Parent && selectionflag_Numbering === this.Parent.Selection.Flag)
-	{
-		for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; ++CurRow)
-		{
-			var Row = this.Get_Row(CurRow);
-			for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; ++CurCell)
-			{
-				var Cell         = Row.Get_Cell(CurCell);
-				var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-				Cell.Content_DrawSelectionOnPage(Cell_PageRel);
-			}
-		}
-		return;
-	}
-
 	switch (this.Selection.Type)
 	{
 		case table_Selection_Cell:
@@ -7184,28 +7169,6 @@ CTable.prototype.SetParagraphIndent = function(Ind)
 		return this.CurCell.Content.SetParagraphIndent(Ind);
 	}
 };
-CTable.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
-	{
-		var Cells_array = this.Internal_Get_SelectionArray();
-		for (var Index = 0; Index < Cells_array.length; Index++)
-		{
-			var Pos  = Cells_array[Index];
-			var Row  = this.Content[Pos.Row];
-			var Cell = Row.Get_Cell(Pos.Cell);
-
-			var Cell_Content = Cell.Content;
-			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.SetParagraphNumbering(NumInfo);
-			Cell_Content.Set_ApplyToAll(false);
-		}
-	}
-	else
-	{
-		return this.CurCell.Content.SetParagraphNumbering(NumInfo);
-	}
-};
 CTable.prototype.Set_ParagraphPresentationNumbering = function(NumInfo)
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
@@ -7710,13 +7673,27 @@ CTable.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedPar
 {
 	if (arrSelectedParagraphs)
 	{
-		var SelectionArray = this.Internal_Get_SelectionArray();
-		for (var nIndex = 0, nCount = SelectionArray.length; nIndex < nCount; ++nIndex)
+		var arrSelectionArray = this.GetSelectionArray();
+		for (var nIndex = 0, nCount = arrSelectionArray.length; nIndex < nCount; ++nIndex)
 		{
-			var CurCell = SelectionArray[nIndex].Cell;
-			var CurRow  = SelectionArray[nIndex].Row;
-			this.Get_Row(CurRow).Get_Cell(CurCell).Content.GetCurrentParagraph(false, arrSelectedParagraphs);
+			var nCurCell = arrSelectionArray[nIndex].Cell;
+			var nCurRow  = arrSelectionArray[nIndex].Row;
+
+			var oCellContent = this.GetRow(nCurRow).GetCell(nCurCell).GetContent();
+
+			if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
+			{
+				oCellContent.Set_ApplyToAll(true);
+				oCellContent.GetCurrentParagraph(false, arrSelectedParagraphs);
+				oCellContent.Set_ApplyToAll(false);
+			}
+			else
+			{
+				oCellContent.GetCurrentParagraph(false, arrSelectedParagraphs);
+			}
 		}
+
+		return arrSelectedParagraphs;
 	}
 	else if (true === bIgnoreSelection)
 	{
@@ -7727,13 +7704,25 @@ CTable.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedPar
 	}
 	else
 	{
-		var SelectionArray = this.Internal_Get_SelectionArray();
-		if (SelectionArray.length > 0)
+		var arrSelectionArray = this.GetSelectionArray();
+		if (arrSelectionArray.length > 0)
 		{
-			var CurCell = SelectionArray[0].Cell;
-			var CurRow  = SelectionArray[0].Row;
+			var nCurCell = arrSelectionArray[0].Cell;
+			var nCurRow  = arrSelectionArray[0].Row;
 
-			return this.Get_Row(CurRow).Get_Cell(CurCell).Content.GetCurrentParagraph(bIgnoreSelection, null);
+			var oCellContent = this.GetRow(nCurRow).GetCell(nCurCell).GetContent();
+
+			if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
+			{
+				oCellContent.Set_ApplyToAll(true);
+				var oRes = oCellContent.GetCurrentParagraph(bIgnoreSelection, null);
+				oCellContent.Set_ApplyToAll(false);
+				return oRes;
+			}
+			else
+			{
+				return oCellContent.GetCurrentParagraph(bIgnoreSelection, null);
+			}
 		}
 	}
 
@@ -7873,10 +7862,6 @@ CTable.prototype.Remove_Style = function()
 
 	// Надо пересчитать конечный стиль
 	this.CompiledPr.NeedRecalc = true;
-};
-CTable.prototype.Numbering_IsUse = function(NumId, NumLvl)
-{
-	return false;
 };
 /**
  * Формируем конечные свойства таблицы на основе стиля и прямых настроек.
@@ -11805,6 +11790,11 @@ CTable.prototype.GetRowsCount = function()
 {
 	return this.Content.length;
 };
+/**
+ * Получаем строку с заданным номером
+ * @param {number} nIndex
+ * @returns {CTableRow}
+ */
 CTable.prototype.GetRow = function(nIndex)
 {
 	return this.Get_Row(nIndex);
@@ -12313,20 +12303,20 @@ CTable.prototype.Correct_BadTable = function()
     this.Internal_Check_TableRows(false);
 	this.CorrectBadGrid();
 };
-CTable.prototype.GetNumberingInfo = function(NumberingEngine)
+CTable.prototype.GetNumberingInfo = function(oNumberingEngine)
 {
-    if (NumberingEngine.Is_Found())
+    if (oNumberingEngine.IsStop())
         return;
 
-    for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; ++CurRow)
+    for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
     {
-        var Row = this.Get_Row(CurRow);
-        for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; ++CurCell)
+        var oRow = this.GetRow(nCurRow);
+        for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
         {
-            var Cell = Row.Get_Cell(CurCell);
-            Cell.Content.GetNumberingInfo(NumberingEngine);
+            var oCell = oRow.GetCell(nCurCell);
+            oCell.GetContent().GetNumberingInfo(oNumberingEngine);
 
-            if (NumberingEngine.Is_Found())
+            if (oNumberingEngine.IsStop())
                 return;
         }
     }

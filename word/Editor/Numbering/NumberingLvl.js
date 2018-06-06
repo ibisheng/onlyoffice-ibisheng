@@ -40,15 +40,118 @@
 function CNumberingLvl()
 {
 	this.Jc      = AscCommon.align_Left;
-	this.Format  = numbering_numfmt_Bullet;
+	this.Format  = c_oAscNumberingFormat.Bullet;
 	this.PStyle  = undefined;
 	this.Start   = 1;
 	this.Restart = -1; // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 	this.TextPr  = new CTextPr();
 	this.ParaPr  = new CParaPr();
 	this.LvlText = [];
+	this.Legacy  = undefined;
 }
+/**
+ * Доступ к типу прилегания данного уровня
+ * @returns {AscCommon.align_Left | AscCommon.align_Right | AscCommon.align_Center}
+ */
+CNumberingLvl.prototype.GetJc = function()
+{
+	return this.Jc;
+};
+/**
+ * Доступ к типу данного уровня
+ * @returns {c_oAscNumberingFormat}
+ */
+CNumberingLvl.prototype.GetFormat = function()
+{
+	return this.Format;
+};
+/**
+ * Доступ к связанному стилю
+ * @returns {?string}
+ */
+CNumberingLvl.prototype.GetPStyle = function()
+{
+	return this.PStyle;
+};
+/**
+ * Доступ к начальному значению для данного уровня
+ * @returns {number}
+ */
+CNumberingLvl.prototype.GetStart = function()
+{
+	return this.Start;
+};
+/**
+ * Доступ к параметру, означающему нужно ли перестартовывать нумерации при смене уровня или оставлять её сквозной
+ * @returns {number}
+ */
+CNumberingLvl.prototype.GetRestart = function()
+{
+	return this.Restart;
+};
+/**
+ * Доступ к типу разделителя между нумерацией и содержимым параграфа
+ * @returns {c_oAscNumberingSuff}
+ */
+CNumberingLvl.prototype.GetSuff = function()
+{
+	return this.Suff;
+};
+/**
+ * Доуступ к текстовым настройкам уровня
+ * @returns {CTextPr}
+ */
+CNumberingLvl.prototype.GetTextPr = function()
+{
+	return this.TextPr;
+};
+/**
+ * Доступ к настройкам параграфа данного уровня
+ * @returns {CParaPr}
+ */
+CNumberingLvl.prototype.GetParaPr = function()
+{
+	return this.ParaPr;
+};
+/**
+ * Доступ к содержимому нумерации
+ * @returns {[CNumberingLvlTextString | CNumberingLvlTextNum]}
+ */
+CNumberingLvl.prototype.GetLvlText = function()
+{
+	return this.LvlText;
+};
+/**
+ * Проверяем совместимость с устаревшей нумерацией
+ * @returns {boolean}
+ */
+CNumberingLvl.prototype.IsLegacy = function()
+{
+	return !!(this.Legacy instanceof CNumberingLvlLegacy && this.Legacy.Legacy);
+};
+/**
+ * Получаем расстояние между символом нумерации и текстом
+ * @return {twips}
+ */
+CNumberingLvl.prototype.GetLegacySpace = function()
+{
+	if (this.Legacy)
+		return this.Legacy.Space;
+
+	return 0;
+};
+/**
+ * Получаем расстояние выделенное под знак нумерации (вместе с расстоянием до текста)
+ * @return {twips}
+ */
+CNumberingLvl.prototype.GetLegacyIndent = function()
+{
+	if (this.Legacy)
+		return this.Legacy.Indent;
+
+	return 0;
+};
 /**
  * Выставляем значения по умолчанию для заданного уровня
  * @param nLvl {number} 0..8
@@ -80,11 +183,11 @@ CNumberingLvl.prototype.InitDefault = function(nLvl, nType)
 CNumberingLvl.prototype.private_InitDefault = function(nLvl)
 {
 	this.Jc      = AscCommon.align_Left;
-	this.Format  = numbering_numfmt_Bullet;
+	this.Format  = c_oAscNumberingFormat.Bullet;
 	this.PStyle  = undefined;
 	this.Start   = 1;
 	this.Restart = -1; // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 
 	this.ParaPr               = new CParaPr();
 	this.ParaPr.Ind.Left      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
@@ -117,7 +220,7 @@ CNumberingLvl.prototype.private_InitDefaultNumbered = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 
 	var nLeft      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
 	var nFirstLine = -18 * g_dKoef_pt_to_mm;
@@ -125,17 +228,17 @@ CNumberingLvl.prototype.private_InitDefaultNumbered = function(nLvl)
 	if (0 == nLvl % 3)
 	{
 		this.Jc     = AscCommon.align_Left;
-		this.Format = numbering_numfmt_Decimal;
+		this.Format = c_oAscNumberingFormat.Decimal;
 	}
 	else if (1 == nLvl % 3)
 	{
 		this.Jc     = AscCommon.align_Left;
-		this.Format = numbering_numfmt_LowerLetter;
+		this.Format = c_oAscNumberingFormat.LowerLetter;
 	}
 	else
 	{
 		this.Jc     = AscCommon.align_Right;
-		this.Format = numbering_numfmt_LowerRoman;
+		this.Format = c_oAscNumberingFormat.LowerRoman;
 		nFirstLine  = -9 * g_dKoef_pt_to_mm;
 	}
 
@@ -157,9 +260,9 @@ CNumberingLvl.prototype.private_InitDefaultBullet = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 	this.Jc      = AscCommon.align_Left;
-	this.Format  = numbering_numfmt_Bullet;
+	this.Format  = c_oAscNumberingFormat.Bullet;
 
 	this.ParaPr               = new CParaPr();
 	this.ParaPr.Ind.Left      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
@@ -191,20 +294,20 @@ CNumberingLvl.prototype.private_InitDefaultMultilevel1 = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 	this.Jc      = AscCommon.align_Left;
 
 	if (0 == nLvl % 3)
 	{
-		this.Format = numbering_numfmt_Decimal;
+		this.Format = c_oAscNumberingFormat.Decimal;
 	}
 	else if (1 == nLvl % 3)
 	{
-		this.Format = numbering_numfmt_LowerLetter;
+		this.Format = c_oAscNumberingFormat.LowerLetter;
 	}
 	else
 	{
-		this.Format = numbering_numfmt_LowerRoman;
+		this.Format = c_oAscNumberingFormat.LowerRoman;
 	}
 
 	this.LvlText = [];
@@ -227,10 +330,10 @@ CNumberingLvl.prototype.private_InitDefaultMultilevel1 = function(nLvl)
 CNumberingLvl.prototype.private_InitDefaultMultilevel2 = function(nLvl)
 {
 	this.Jc     = AscCommon.align_Left;
-	this.Format = numbering_numfmt_Decimal;
+	this.Format = c_oAscNumberingFormat.Decimal;
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 
 	var nLeft      = 0;
 	var nFirstLine = 0;
@@ -296,8 +399,8 @@ CNumberingLvl.prototype.private_InitDefaultMultiLevel3 = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
-	this.Format  = numbering_numfmt_Bullet;
+	this.Suff    = c_oAscNumberingSuff.Tab;
+	this.Format  = c_oAscNumberingFormat.Bullet;
 	this.Jc      = AscCommon.align_Left;
 	this.LvlText = [];
 
@@ -368,6 +471,9 @@ CNumberingLvl.prototype.Copy = function()
 	oLvl.TextPr = this.TextPr.Copy();
 	oLvl.ParaPr = this.ParaPr.Copy();
 
+	if (this.Legacy)
+		oLvl.Legacy = this.Legacy.Copy();
+
 	return oLvl;
 };
 /**
@@ -382,19 +488,19 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 	switch (nType)
 	{
 		case c_oAscNumberingLevel.None:
-			this.Format  = numbering_numfmt_None;
+			this.Format  = c_oAscNumberingFormat.None;
 			this.LvlText = [];
 			this.TextPr  = new CTextPr();
 			break;
 		case c_oAscNumberingLevel.Bullet:
-			this.Format  = numbering_numfmt_Bullet;
+			this.Format  = c_oAscNumberingFormat.Bullet;
 			this.TextPr  = oTextPr;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextString(sText));
 			break;
 		case c_oAscNumberingLevel.DecimalBracket_Right:
 			this.Jc      = AscCommon.align_Right;
-			this.Format  = numbering_numfmt_Decimal;
+			this.Format  = c_oAscNumberingFormat.Decimal;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString(")"));
@@ -402,7 +508,7 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.DecimalBracket_Left:
 			this.Jc      = AscCommon.align_Left;
-			this.Format  = numbering_numfmt_Decimal;
+			this.Format  = c_oAscNumberingFormat.Decimal;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString(")"));
@@ -410,7 +516,7 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.DecimalDot_Right:
 			this.Jc      = AscCommon.align_Right;
-			this.Format  = numbering_numfmt_Decimal;
+			this.Format  = c_oAscNumberingFormat.Decimal;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString("."));
@@ -418,7 +524,7 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.DecimalDot_Left:
 			this.Jc      = AscCommon.align_Left;
-			this.Format  = numbering_numfmt_Decimal;
+			this.Format  = c_oAscNumberingFormat.Decimal;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString("."));
@@ -426,7 +532,7 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.UpperRomanDot_Right:
 			this.Jc      = AscCommon.align_Right;
-			this.Format  = numbering_numfmt_UpperRoman;
+			this.Format  = c_oAscNumberingFormat.UpperRoman;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString("."));
@@ -434,7 +540,7 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.UpperLetterDot_Left:
 			this.Jc      = AscCommon.align_Left;
-			this.Format  = numbering_numfmt_UpperLetter;
+			this.Format  = c_oAscNumberingFormat.UpperLetter;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString("."));
@@ -442,7 +548,7 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.LowerLetterBracket_Left:
 			this.Jc      = AscCommon.align_Left;
-			this.Format  = numbering_numfmt_LowerLetter;
+			this.Format  = c_oAscNumberingFormat.LowerLetter;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString(")"));
@@ -450,7 +556,7 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.LowerLetterDot_Left:
 			this.Jc      = AscCommon.align_Left;
-			this.Format  = numbering_numfmt_LowerLetter;
+			this.Format  = c_oAscNumberingFormat.LowerLetter;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString("."));
@@ -458,13 +564,92 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			break;
 		case c_oAscNumberingLevel.LowerRomanDot_Right:
 			this.Jc      = AscCommon.align_Right;
-			this.Format  = numbering_numfmt_LowerRoman;
+			this.Format  = c_oAscNumberingFormat.LowerRoman;
 			this.LvlText = [];
 			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
 			this.LvlText.push(new CNumberingLvlTextString("."));
 			this.TextPr = new CTextPr();
 			break;
 	}
+};
+/**
+ * Получаем тип пресета (если это возможно)
+ * @returns {{Type: number, SubType: number}}
+ */
+CNumberingLvl.prototype.GetPresetType = function()
+{
+	var nType    = -1;
+	var nSubType = -1;
+
+	if (c_oAscNumberingFormat.Bullet === this.Format)
+	{
+		nType    = 0;
+		nSubType = 0;
+
+		if (1 === this.LvlText.length && numbering_lvltext_Text === this.LvlText[0].Type)
+		{
+			var nNumVal = this.LvlText[0].Value.charCodeAt(0);
+
+			if (0x00B7 === nNumVal)
+				nSubType = 1;
+			else if (0x006F === nNumVal)
+				nSubType = 2;
+			else if (0x00A7 === nNumVal)
+				nSubType = 3;
+			else if (0x0076 === nNumVal)
+				nSubType = 4;
+			else if (0x00D8 === nNumVal)
+				nSubType = 5;
+			else if (0x00FC === nNumVal)
+				nSubType = 6;
+			else if (0x00A8 === nNumVal)
+				nSubType = 7;
+			else if (0x2013 === nNumVal)
+				nSubType = 8;
+		}
+	}
+	else
+	{
+		nType    = 1;
+		nSubType = 0;
+
+		if (2 === this.LvlText.length && numbering_lvltext_Num === this.LvlText[0].Type && numbering_lvltext_Text === this.LvlText[1].Type)
+		{
+			var nNumVal2 = this.LvlText[1].Value;
+
+			if (c_oAscNumberingFormat.Decimal === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 1;
+				else if (")" === nNumVal2)
+					nSubType = 2;
+			}
+			else if (c_oAscNumberingFormat.UpperRoman === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 3;
+			}
+			else if (c_oAscNumberingFormat.UpperLetter === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 4;
+			}
+			else if (c_oAscNumberingFormat.LowerLetter === this.Format)
+			{
+				if (")" === nNumVal2)
+					nSubType = 5;
+				else if ("." === nNumVal2)
+					nSubType = 6;
+			}
+			else if (c_oAscNumberingFormat.LowerRoman === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 7;
+			}
+		}
+	}
+
+	return {Type : nType, SubType : nSubType};
 };
 /**
  * Выставляем значения по заданному формату
@@ -511,6 +696,57 @@ CNumberingLvl.prototype.SetByFormat = function(nLvl, nType, sFormatText, nAlign)
 
 	this.TextPr = new CTextPr();
 };
+/**
+ * Собираем статистику документа о количестве слов, букв и т.д.
+ * @param oStats объект статистики
+ */
+CNumberingLvl.prototype.CollectDocumentStatistics = function(oStats)
+{
+	var bWord = false;
+	for (var nIndex = 0, nCount = this.LvlText.length; nIndex < nCount; ++nIndex)
+	{
+		var bSymbol  = false;
+		var bSpace   = false;
+		var bNewWord = false;
+
+		if (numbering_lvltext_Text === this.LvlText[nIndex].Type && (sp_string === this.LvlText[nIndex].Value || nbsp_string === this.LvlText[nIndex].Value))
+		{
+			bWord   = false;
+			bSymbol = true;
+			bSpace  = true;
+		}
+		else
+		{
+			if (false === bWord)
+				bNewWord = true;
+
+			bWord   = true;
+			bSymbol = true;
+			bSpace  = false;
+		}
+
+		if (true === bSymbol)
+			oStats.Add_Symbol(bSpace);
+
+		if (true === bNewWord)
+			oStats.Add_Word();
+	}
+
+	if (c_oAscNumberingSuff.Tab === this.Suff || c_oAscNumberingSuff.Space === this.Suff)
+		oStats.Add_Symbol(true);
+};
+/**
+ * Все нумерованные значение переделываем на заданный уровень
+ * @param nLvl {number} 0..8
+ */
+CNumberingLvl.prototype.ResetNumberedText = function(nLvl)
+{
+	for (var nIndex = 0, nCount = this.LvlText.length; nIndex < nCount; ++nIndex)
+	{
+		if (numbering_lvltext_Num === this.LvlText[nIndex].Type)
+			this.LvlText[nIndex].Value = nLvl;
+	}
+};
 CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 {
 	// Long               : Jc
@@ -523,6 +759,8 @@ CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 	// Variable           : ParaPr
 	// Long               : количество элементов в LvlText
 	// Array of variables : массив LvlText
+	// Bool               : true -> CNumberingLegacy
+	//                    : false -> Legacy = undefined
 
 	oWriter.WriteLong(this.Jc);
 	oWriter.WriteLong(this.Format);
@@ -541,6 +779,16 @@ CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 
 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
 		this.LvlText[nIndex].WriteToBinary(oWriter);
+
+	if (this.Legacy instanceof CNumberingLvlLegacy)
+	{
+		oWriter.WriteBool(true);
+		this.Legacy.WriteToBinary(oWriter);
+	}
+	else
+	{
+		oWriter.WriteBool(false);
+	}
 };
 CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 {
@@ -554,6 +802,9 @@ CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 	// Variable           : ParaPr
 	// Long               : количество элементов в LvlText
 	// Array of variables : массив LvlText
+	// Bool               : true -> CNumberingLegacy
+	//                    : false -> Legacy = undefined
+
 
 	this.Jc     = oReader.GetLong();
 	this.Format = oReader.GetLong();
@@ -578,6 +829,12 @@ CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 		var oElement = this.private_ReadLvlTextFromBinary(oReader);
 		if (oElement)
 			this.LvlText.push(oElement);
+	}
+
+	if (oReader.GetBool())
+	{
+		this.Legacy = new CNumberingLvlLegacy();
+		this.Legacy.ReadFromBinary(oReader);
 	}
 };
 CNumberingLvl.prototype.private_ReadLvlTextFromBinary = function(oReader)
@@ -645,4 +902,33 @@ CNumberingLvlTextNum.prototype.WriteToBinary = function(Writer)
 CNumberingLvlTextNum.prototype.ReadFromBinary = function(Reader)
 {
 	this.Value = Reader.GetLong();
+};
+
+function CNumberingLvlLegacy(isUse, twIndent, twSpace)
+{
+	this.Legacy = !!isUse;
+	this.Indent = twIndent ? twIndent : 0; // Значение в твипсах
+	this.Space  = twSpace ? twSpace : 0;   // Значение в твипсах
+}
+CNumberingLvlLegacy.prototype.Copy = function()
+{
+	return new CNumberingLvlLegacy(this.Legacy, this.Indent, this.Space);
+};
+CNumberingLvlLegacy.prototype.WriteToBinary = function(oWriter)
+{
+	// Bool : Legacy
+	// Long : Indent
+	// Long : Space
+	oWriter.WriteBool(this.Legacy);
+	oWriter.WriteLong(this.Indent);
+	oWriter.WriteLong(this.Space);
+};
+CNumberingLvlLegacy.prototype.ReadFromBinary = function(oReader)
+{
+	// Bool : Legacy
+	// Long : Indent
+	// Long : Space
+	this.Legacy = oReader.GetBool();
+	this.Indent = oReader.GetLong();
+	this.Space  = oReader.GetSpace();
 };

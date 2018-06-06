@@ -196,14 +196,18 @@ var c_oAscFootnoteRestart = {
 };
 
 var c_oAscNumberingFormat = {
-	None        : 0x0000, // numbering_numfmt_None
-	Bullet      : 0x1001, // numbering_numfmt_Bullet
-	Decimal     : 0x2002, // numbering_numfmt_Decimal
-	LowerRoman  : 0x2003, // numbering_numfmt_LowerRoman
-	UpperRoman  : 0x2004, // numbering_numfmt_UpperRoman
-	LowerLetter : 0x2005, // numbering_numfmt_LowerLetter
-	UpperLetter : 0x2006, // numbering_numfmt_UpperLetter
-	DecimalZero : 0x2007  // numbering_numfmt_DecimalZero
+	None        : 0x0000,
+	Bullet      : 0x1001,
+	Decimal     : 0x2002,
+	LowerRoman  : 0x2003,
+	UpperRoman  : 0x2004,
+	LowerLetter : 0x2005,
+	UpperLetter : 0x2006,
+	DecimalZero : 0x2007,
+
+
+	BulletFlag   : 0x1000,
+	NumberedFlag : 0x2000
 };
 
 var c_oAscSdtLockType = {

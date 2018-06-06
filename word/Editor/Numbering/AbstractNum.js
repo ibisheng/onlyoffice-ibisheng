@@ -117,24 +117,6 @@ CAbstractNum.prototype.GetNumStyleLink = function()
 {
 	return this.NumStyleLink;
 };
-/**
- * Сдвигаем все уровни на заданное значение (оно задается для нулевого уровня)
- * @param nLeftNew {number}
- */
-CAbstractNum.prototype.ShiftLeftInd = function(nLeftNew)
-{
-	var nLeftOld = this.Lvl[0].ParaPr.Ind.Left ? this.Lvl[0].ParaPr.Ind.Left : 0;
-	for (var nLvl = 0; nLvl < 9; ++nLvl)
-	{
-		var oLvlNew = this.Lvl[nLvl];
-		var oLvlOld = this.Lvl[nLvl].Copy();
-
-		oLvlNew.ParaPr.Ind.Left = oLvlOld.ParaPr.Ind.Left ? oLvlOld.ParaPr.Ind.Left - nLeftOld + nLeftNew : nLeftNew - nLeftOld;
-		History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, oLvlNew, nLvl));
-	}
-
-	this.private_RecalculateRelatedParagraphs(-1);
-};
 CAbstractNum.prototype.private_RecalculateRelatedParagraphs = function(nLvl)
 {
 	if (nLvl < 0 || nLvl > 8)
@@ -147,21 +129,6 @@ CAbstractNum.prototype.private_RecalculateRelatedParagraphs = function(nLvl)
 	{
 		arrParagraphs[nIndex].RecalcCompiledPr();
 	}
-};
-/**
- * Получаем уровень списка по заданном стилю
- * @param sStyleId {string}
- * @returns {number}
- */
-CAbstractNum.prototype.GetLvlByStyle = function(sStyleId)
-{
-	for (var nLvl = 0; nLvl < 9; ++nLvl)
-	{
-		if (sStyleId === this.Lvl[nLvl].PStyle)
-			return nLvl;
-	}
-
-	return -1;
 };
 /**
  * Получаем заданный уровень
@@ -238,6 +205,11 @@ CAbstractNum.prototype.SetLvlByFormat = function(nLvl, nType, sFormatText, nAlig
 
 	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
+/**
+ * Выставляем является ли данный уровень сквозным или каждый раз перестартовывать нумерацию
+ * @param nLvl {number} 0..8
+ * @param isRestart {boolean}
+ */
 CAbstractNum.prototype.SetLvlRestart = function(nLvl, isRestart)
 {
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
@@ -248,6 +220,11 @@ CAbstractNum.prototype.SetLvlRestart = function(nLvl, isRestart)
 	this.Lvl[nLvl].Restart = (isRestart ? -1 : 0);
 	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
+/**
+ * Задаем начальное значения для данного уровня
+ * @param nLvl {number} 0..8
+ * @param nStart {number}
+ */
 CAbstractNum.prototype.SetLvlStart = function(nLvl, nStart)
 {
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
@@ -258,6 +235,11 @@ CAbstractNum.prototype.SetLvlStart = function(nLvl, nStart)
 	this.Lvl[nLvl].Start = nStart;
 	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
+/**
+ * Выставляем тип разделителя между табом и последующим текстом
+ * @param nLvl {number} 0..8
+ * @param nSuff {number}
+ */
 CAbstractNum.prototype.SetLvlSuff = function(nLvl, nSuff)
 {
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
@@ -269,536 +251,11 @@ CAbstractNum.prototype.SetLvlSuff = function(nLvl, nSuff)
 	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
 /**
- *
- * @param X
- * @param Y
- * @param Context
- * @param Lvl - уровень, с которого мы берем текст и настройки для текста
- * @param NumInfo - информация о номере данного элемента в списке (массив из Lvl элементов)
- * @param NumTextPr - рассчитанные настройки для символов нумерации (уже с учетом настроек текущего уровня)
- * @param Theme
- */
-CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, Theme)
-{
-	var Text = this.Lvl[Lvl].LvlText;
-
-	Context.SetTextPr(NumTextPr, Theme);
-	Context.SetFontSlot(fontslot_ASCII);
-	g_oTextMeasurer.SetTextPr(NumTextPr, Theme);
-	g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-
-	for (var Index = 0; Index < Text.length; Index++)
-	{
-		switch (Text[Index].Type)
-		{
-			case numbering_lvltext_Text:
-			{
-				var Hint = NumTextPr.RFonts.Hint;
-				var bCS  = NumTextPr.CS;
-				var bRTL = NumTextPr.RTL;
-				var lcid = NumTextPr.Lang.EastAsia;
-
-				var FontSlot = g_font_detector.Get_FontClass(Text[Index].Value.charCodeAt(0), Hint, lcid, bCS, bRTL);
-
-				Context.SetFontSlot(FontSlot);
-				g_oTextMeasurer.SetFontSlot(FontSlot);
-
-				Context.FillText(X, Y, Text[Index].Value);
-				X += g_oTextMeasurer.Measure(Text[Index].Value).Width;
-
-				break;
-			}
-			case numbering_lvltext_Num:
-			{
-				Context.SetFontSlot(fontslot_ASCII);
-				g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-
-				var CurLvl = Text[Index].Value;
-				switch (this.Lvl[CurLvl].Format)
-				{
-					case numbering_numfmt_Bullet:
-					{
-						break;
-					}
-
-					case numbering_numfmt_Decimal:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								Context.FillText(X, Y, Char);
-								X += g_oTextMeasurer.Measure(Char).Width;
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_DecimalZero:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-
-							if (1 === T.length)
-							{
-								Context.FillText(X, Y, '0');
-								X += g_oTextMeasurer.Measure('0').Width;
-
-								var Char = T.charAt(0);
-								Context.FillText(X, Y, Char);
-								X += g_oTextMeasurer.Measure(Char).Width;
-							}
-							else
-							{
-								for (var Index2 = 0; Index2 < T.length; Index2++)
-								{
-									var Char = T.charAt(Index2);
-									Context.FillText(X, Y, Char);
-									X += g_oTextMeasurer.Measure(Char).Width;
-								}
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] - 1;
-
-							var Count = (Num - Num % 26) / 26;
-							var Ost   = Num % 26;
-
-							var T = "";
-
-							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
-								Letter = String.fromCharCode(Ost + 97);
-							else
-								Letter = String.fromCharCode(Ost + 65);
-
-							for (var Index2 = 0; Index2 < Count + 1; Index2++)
-								T += Letter;
-
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								Context.FillText(X, Y, Char);
-								X += g_oTextMeasurer.Measure(Char).Width;
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl];
-
-							// Переводим число Num в римскую систему исчисления
-							var Rims;
-
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
-								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
-							else
-								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
-
-							var Vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1, 0];
-
-							var T      = "";
-							var Index2 = 0;
-							while (Num > 0)
-							{
-								while (Vals[Index2] <= Num)
-								{
-									T += Rims[Index2];
-									Num -= Vals[Index2];
-								}
-
-								Index2++;
-
-								if (Index2 >= Rims.length)
-									break;
-							}
-
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								Context.FillText(X, Y, Char);
-								X += g_oTextMeasurer.Measure(T.charAt(Index2)).Width;
-							}
-						}
-						break;
-					}
-				}
-
-				break;
-			}
-		}
-	}
-};
-CAbstractNum.prototype.Measure = function(Context, Lvl, NumInfo, NumTextPr, Theme)
-{
-	var X    = 0;
-	var Text = this.Lvl[Lvl].LvlText;
-
-	Context.SetTextPr(NumTextPr, Theme);
-	Context.SetFontSlot(fontslot_ASCII);
-	var Ascent = Context.GetAscender();
-
-	for (var Index = 0; Index < Text.length; Index++)
-	{
-		switch (Text[Index].Type)
-		{
-			case numbering_lvltext_Text:
-			{
-				var Hint = NumTextPr.RFonts.Hint;
-				var bCS  = NumTextPr.CS;
-				var bRTL = NumTextPr.RTL;
-				var lcid = NumTextPr.Lang.EastAsia;
-
-				var FontSlot = g_font_detector.Get_FontClass(Text[Index].Value.charCodeAt(0), Hint, lcid, bCS, bRTL);
-
-				Context.SetFontSlot(FontSlot);
-				X += Context.Measure(Text[Index].Value).Width;
-
-				break;
-			}
-			case numbering_lvltext_Num:
-			{
-				Context.SetFontSlot(fontslot_ASCII);
-				var CurLvl = Text[Index].Value;
-				switch (this.Lvl[CurLvl].Format)
-				{
-					case numbering_numfmt_Bullet:
-					{
-						break;
-					}
-
-					case numbering_numfmt_Decimal:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								X += Context.Measure(Char).Width;
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_DecimalZero:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-
-							if (1 === T.length)
-							{
-								X += Context.Measure('0').Width;
-
-								var Char = T.charAt(0);
-								X += Context.Measure(Char).Width;
-							}
-							else
-							{
-								for (var Index2 = 0; Index2 < T.length; Index2++)
-								{
-									var Char = T.charAt(Index2);
-									X += Context.Measure(Char).Width;
-								}
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] - 1;
-
-							var Count = (Num - Num % 26) / 26;
-							var Ost   = Num % 26;
-
-							var T = "";
-
-							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
-								Letter = String.fromCharCode(Ost + 97);
-							else
-								Letter = String.fromCharCode(Ost + 65);
-
-							for (var Index2 = 0; Index2 < Count + 1; Index2++)
-								T += Letter;
-
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								X += Context.Measure(Char).Width;
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl];
-
-							// Переводим число Num в римскую систему исчисления
-							var Rims;
-
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
-								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
-							else
-								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
-
-							var Vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1, 0];
-
-							var T      = "";
-							var Index2 = 0;
-							while (Num > 0)
-							{
-								while (Vals[Index2] <= Num)
-								{
-									T += Rims[Index2];
-									Num -= Vals[Index2];
-								}
-
-								Index2++;
-
-								if (Index2 >= Rims.length)
-									break;
-							}
-
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								X += Context.Measure(T.charAt(Index2)).Width;
-							}
-						}
-						break;
-					}
-				}
-
-				break;
-			}
-		}
-	}
-
-	return {Width : X, Ascent : Ascent};
-};
-CAbstractNum.prototype.Document_CreateFontCharMap = function(FontCharMap, Lvl, NumInfo, NumTextPr)
-{
-	FontCharMap.StartFont(NumTextPr.FontFamily.Name, NumTextPr.Bold, NumTextPr.Italic, NumTextPr.FontSize);
-	var Text = this.Lvl[Lvl].LvlText;
-
-	for (var Index = 0; Index < Text.length; Index++)
-	{
-		switch (Text[Index].Type)
-		{
-			case numbering_lvltext_Text:
-			{
-				FontCharMap.AddChar(Text[Index].Value);
-				break;
-			}
-			case numbering_lvltext_Num:
-			{
-				var CurLvl = Text[Index].Value;
-				switch (this.Lvl[CurLvl].Format)
-				{
-					case numbering_numfmt_Bullet:
-					{
-						break;
-					}
-
-					case numbering_numfmt_Decimal:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								FontCharMap.AddChar(Char);
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_DecimalZero:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-
-							if (1 === T.length)
-							{
-								FontCharMap.AddChar('0');
-
-								var Char = T.charAt(0);
-								FontCharMap.AddChar(Char);
-							}
-							else
-							{
-								for (var Index2 = 0; Index2 < T.length; Index2++)
-								{
-									var Char = T.charAt(Index2);
-									FontCharMap.AddChar(Char);
-								}
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] - 1;
-
-							var Count = (Num - Num % 26) / 26;
-							var Ost   = Num % 26;
-
-							var T = "";
-
-							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
-								Letter = String.fromCharCode(Ost + 97);
-							else
-								Letter = String.fromCharCode(Ost + 65);
-
-							for (var Index2 = 0; Index2 < Count + 1; Index2++)
-								T += Letter;
-
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								FontCharMap.AddChar(Char);
-							}
-						}
-						break;
-					}
-
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl];
-
-							// Переводим число Num в римскую систему исчисления
-							var Rims;
-
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
-								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
-							else
-								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
-
-							var Vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1, 0];
-
-							var T      = "";
-							var Index2 = 0;
-							while (Num > 0)
-							{
-								while (Vals[Index2] <= Num)
-								{
-									T += Rims[Index2];
-									Num -= Vals[Index2];
-								}
-
-								Index2++;
-
-								if (Index2 >= Rims.length)
-									break;
-							}
-
-							for (var Index2 = 0; Index2 < T.length; Index2++)
-							{
-								var Char = T.charAt(Index2);
-								FontCharMap.AddChar(Char);
-							}
-						}
-						break;
-					}
-				}
-
-				break;
-			}
-		}
-	}
-};
-CAbstractNum.prototype.Document_Get_AllFontNames = function(AllFonts)
-{
-	var Count = this.Lvl.length;
-	for (var Index = 0; Index < Count; Index++)
-	{
-		var Lvl = this.Lvl[Index];
-
-		if (undefined !== Lvl.TextPr && Lvl.TextPr.Document_Get_AllFontNames)
-			Lvl.TextPr.Document_Get_AllFontNames(AllFonts);
-	}
-};
-CAbstractNum.prototype.CollectDocumentStatistics = function(Lvl, Stats)
-{
-	var Text = this.Lvl[Lvl].LvlText;
-
-	var bWord = false;
-	for (var Index = 0; Index < Text.length; Index++)
-	{
-		var bSymbol  = false;
-		var bSpace   = false;
-		var bNewWord = false;
-
-		if (numbering_lvltext_Text === Text[Index].Type && ( sp_string === Text[Index].Value || nbsp_string === Text[Index].Value ))
-		{
-			bWord   = false;
-			bSymbol = true;
-			bSpace  = true;
-		}
-		else
-		{
-			if (false === bWord)
-				bNewWord = true;
-
-			bWord   = true;
-			bSymbol = true;
-			bSpace  = false;
-		}
-
-		if (true === bSymbol)
-			Stats.Add_Symbol(bSpace);
-
-		if (true === bNewWord)
-			Stats.Add_Word();
-	}
-
-	if (numbering_suff_Tab === this.Lvl[Lvl].Suff || numbering_suff_Space === this.Lvl[Lvl].Suff)
-		Stats.Add_Symbol(true);
-};
-/**
  * Применяем новые тектовые настройки к данной нумерации на заданном уровне
  */
-CAbstractNum.prototype.Apply_TextPr = function(nLvl, oTextPr)
+CAbstractNum.prototype.ApplyTextPr = function(nLvl, oTextPr)
 {
-	var oTextPrOld = CurTextPr.Copy();
+	var oTextPrOld = this.Lvl[nLvl].TextPr.Copy();
 	this.Lvl[nLvl].TextPr.Merge(oTextPr);
 	History.Add(new CChangesAbstractNumTextPrChange(this, oTextPrOld, this.Lvl[nLvl].TextPr.Copy(), nLvl));
 };
@@ -824,17 +281,27 @@ CAbstractNum.prototype.Refresh_RecalcData = function(Data)
 	if (!oHistory.AddChangedNumberingToRecalculateData(this.Get_Id(), Data.Index, this))
 		return;
 
-	var NumPr   = new CNumPr();
-	NumPr.NumId = this.Id;
-	NumPr.Lvl   = Data.Index;
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+	if (!oLogicDocument)
+		return;
 
-	var AllParagraphs = oHistory.GetAllParagraphsForRecalcData({Numbering : true, NumPr : NumPr});
+	var oNumbering = oLogicDocument.GetNumbering();
+	var arrNumPr   = [];
 
-	var Count = AllParagraphs.length;
-	for (var Index = 0; Index < Count; Index++)
+	for (var sId in oNumbering.Num)
 	{
-		var Para = AllParagraphs[Index];
-		Para.Refresh_RecalcData({Type : AscDFH.historyitem_Paragraph_Numbering});
+		var oNum = oNumbering.Num[sId];
+		if (this.Id === oNum.GetAbstractNumId())
+		{
+			arrNumPr.push(new CNumPr(oNum.GetId(), Data.Index));
+		}
+	}
+
+	var arrAllParagraphs = oLogicDocument.GetAllParagraphsByNumbering(arrNumPr);
+
+	for (var nIndex = 0, nCount = arrAllParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		arrAllParagraphs[nIndex].Refresh_RecalcData({Type : AscDFH.historyitem_Paragraph_Numbering});
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -932,121 +399,6 @@ CAbstractNum.prototype._isEqualLvlText = function(LvlTextOld, LvlTextNew)
 			return false;
 	}
 	return true;
-};
-CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
-{
-	var Text = this.Lvl[Lvl].LvlText;
-
-	var sResult = "";
-	for (var Index = 0; Index < Text.length; Index++)
-	{
-		switch (Text[Index].Type)
-		{
-			case numbering_lvltext_Text:
-			{
-				sResult += Text[Index].Value;
-				break;
-			}
-			case numbering_lvltext_Num:
-			{
-				var CurLvl = Text[Index].Value;
-				switch (this.Lvl[CurLvl].Format)
-				{
-					case numbering_numfmt_Bullet:
-					{
-						break;
-					}
-					case numbering_numfmt_Decimal:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							sResult += "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-						}
-						break;
-					}
-					case numbering_numfmt_DecimalZero:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
-							if (1 === T.length)
-							{
-								sResult += '0' + T.charAt(0);
-							}
-							else
-							{
-								for (var Index2 = 0; Index2 < T.length; Index2++)
-								{
-									sResult += T.charAt(Index2);
-								}
-							}
-						}
-						break;
-					}
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] - 1;
-
-							var Count = (Num - Num % 26) / 26;
-							var Ost   = Num % 26;
-
-							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
-								Letter = String.fromCharCode(Ost + 97);
-							else
-								Letter = String.fromCharCode(Ost + 65);
-
-							for (var Index2 = 0; Index2 < Count + 1; Index2++)
-								sResult += Letter;
-						}
-						break;
-					}
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
-					{
-						if (CurLvl < NumInfo.length)
-						{
-							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl];
-
-							// Переводим число Num в римскую систему исчисления
-							var Rims;
-
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
-								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
-							else
-								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
-
-							var Vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1, 0];
-
-							var Index2 = 0;
-							while (Num > 0)
-							{
-								while (Vals[Index2] <= Num)
-								{
-									sResult += Rims[Index2];
-									Num -= Vals[Index2];
-								}
-
-								Index2++;
-
-								if (Index2 >= Rims.length)
-									break;
-							}
-						}
-						break;
-					}
-				}
-
-				break;
-			}
-		}
-	}
-
-	return sResult;
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

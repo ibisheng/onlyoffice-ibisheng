@@ -37,21 +37,15 @@
  * Time: 15:41
  */
 
-var numbering_numfmt_None        = 0x0000;
-var numbering_numfmt_Bullet      = 0x1001;
-var numbering_numfmt_Decimal     = 0x2002;
-var numbering_numfmt_LowerRoman  = 0x2003;
-var numbering_numfmt_UpperRoman  = 0x2004;
-var numbering_numfmt_LowerLetter = 0x2005;
-var numbering_numfmt_UpperLetter = 0x2006;
-var numbering_numfmt_DecimalZero = 0x2007;
-
 var numbering_lvltext_Text = 1;
 var numbering_lvltext_Num  = 2;
 
-var numbering_suff_Tab     = 1;
-var numbering_suff_Space   = 2;
-var numbering_suff_Nothing = 3;
+/** enum {number} */
+var c_oAscNumberingSuff = {
+	Tab   : 1,
+	Space : 2,
+	None  : 3
+};
 
 /** enum {number} */
 var c_oAscMultiLevelNumbering = {
@@ -65,19 +59,19 @@ var c_oAscMultiLevelNumbering = {
 
 /** enum {number} */
 var c_oAscNumberingLevel = {
-	None   : 0,
-	Bullet : 1,
+	None       : 0,
+	Bullet     : 0x1000,
+	Numbered   : 0x2000,
 
-	DecimalBracket_Right    : 101,
-	DecimalBracket_Left     : 102,
-	DecimalDot_Right        : 103,
-	DecimalDot_Left         : 104,
-	UpperRomanDot_Right     : 105,
-	UpperLetterDot_Left     : 106,
-	LowerLetterBracket_Left : 107,
-	LowerLetterDot_Left     : 108,
-	LowerRomanDot_Right     : 109
-
+	DecimalBracket_Right    : 0x2001,
+	DecimalBracket_Left     : 0x2002,
+	DecimalDot_Right        : 0x2003,
+	DecimalDot_Left         : 0x2004,
+	UpperRomanDot_Right     : 0x2005,
+	UpperLetterDot_Left     : 0x2006,
+	LowerLetterBracket_Left : 0x2007,
+	LowerLetterDot_Left     : 0x2008,
+	LowerRomanDot_Right     : 0x2009
 };
 
 // Преобразовываем число в буквенную строку :
@@ -160,98 +154,3 @@ function Numbering_Number_To_Roman(Num, bLowerCase)
 
 	return T;
 }
-
-function getNumInfoLvl(Lvl)
-{
-	var NumType    = -1;
-	var NumSubType = -1;
-
-	var NumFormat = Lvl.Format;
-	var NumText   = Lvl.LvlText;
-	var TextLen;
-
-	if (numbering_numfmt_Bullet === NumFormat)
-	{
-		NumType    = 0;
-		NumSubType = 0;
-
-		TextLen = NumText.length;
-		if (1 === TextLen && numbering_lvltext_Text === NumText[0].Type)
-		{
-			var NumVal = NumText[0].Value.charCodeAt(0);
-
-			if (0x00B7 === NumVal)
-				NumSubType = 1;
-			else if (0x006F === NumVal)
-				NumSubType = 2;
-			else if (0x00A7 === NumVal)
-				NumSubType = 3;
-			else if (0x0076 === NumVal)
-				NumSubType = 4;
-			else if (0x00D8 === NumVal)
-				NumSubType = 5;
-			else if (0x00FC === NumVal)
-				NumSubType = 6;
-			else if (0x00A8 === NumVal)
-				NumSubType = 7;
-			else if (0x2013 === NumVal)
-				NumSubType = 8;
-		}
-	}
-	else
-	{
-		NumType    = 1;
-		NumSubType = 0;
-
-		TextLen = NumText.length;
-		if (2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type)
-		{
-			var NumVal2 = NumText[1].Value;
-
-			if (numbering_numfmt_Decimal === NumFormat)
-			{
-				if ("." === NumVal2)
-					NumSubType = 1;
-				else if (")" === NumVal2)
-					NumSubType = 2;
-			}
-			else if (numbering_numfmt_UpperRoman === NumFormat)
-			{
-				if ("." === NumVal2)
-					NumSubType = 3;
-			}
-			else if (numbering_numfmt_UpperLetter === NumFormat)
-			{
-				if ("." === NumVal2)
-					NumSubType = 4;
-			}
-			else if (numbering_numfmt_LowerLetter === NumFormat)
-			{
-				if (")" === NumVal2)
-					NumSubType = 5;
-				else if ("." === NumVal2)
-					NumSubType = 6;
-			}
-			else if (numbering_numfmt_LowerRoman === NumFormat)
-			{
-				if ("." === NumVal2)
-					NumSubType = 7;
-			}
-		}
-	}
-
-	return {NumType : NumType, NumSubType : NumSubType};
-}
-
-//--------------------------------------------------------export--------------------------------------------------------
-window['AscCommonWord'] = window['AscCommonWord'] || {};
-window['AscCommonWord'].getNumInfoLvl = getNumInfoLvl;
-
-window['AscCommonWord']["numbering_numfmt_None"]        = numbering_numfmt_None;
-window['AscCommonWord']["numbering_numfmt_Bullet"]      = numbering_numfmt_Bullet;
-window['AscCommonWord']["numbering_numfmt_Decimal"]     = numbering_numfmt_Decimal;
-window['AscCommonWord']["numbering_numfmt_LowerRoman"]  = numbering_numfmt_LowerRoman;
-window['AscCommonWord']["numbering_numfmt_UpperRoman"]  = numbering_numfmt_UpperRoman;
-window['AscCommonWord']["numbering_numfmt_LowerLetter"] = numbering_numfmt_LowerLetter;
-window['AscCommonWord']["numbering_numfmt_UpperLetter"] = numbering_numfmt_UpperLetter;
-window['AscCommonWord']["numbering_numfmt_DecimalZero"] = numbering_numfmt_DecimalZero;

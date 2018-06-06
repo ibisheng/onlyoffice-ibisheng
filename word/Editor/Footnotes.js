@@ -1058,15 +1058,15 @@ CFootnotesController.prototype.GotoPrevFootnote = function()
 		this.private_SetCurrentFootnoteNoSelection(oPrevFootnote);
 	}
 };
-CFootnotesController.prototype.GetNumberingInfo = function(ParaId, NumPr, oFootnote)
+CFootnotesController.prototype.GetNumberingInfo = function(oPara, oNumPr, oFootnote)
 {
 	var arrFootnotes     = this.LogicDocument.Get_FootnotesList(null, oFootnote);
-	var oNumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+	var oNumberingEngine = new CDocumentNumberingInfoEngine(oPara, oNumPr, this.Get_Numbering());
 	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
 	{
-		arrFootnotes[nIndex].GetNumberingInfo(oNumberingEngine, ParaId, NumPr);
+		arrFootnotes[nIndex].GetNumberingInfo(oNumberingEngine, oPara, oNumPr);
 	}
-	return oNumberingEngine.Get_NumInfo();
+	return oNumberingEngine.GetNumInfo();
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
@@ -2258,14 +2258,6 @@ CFootnotesController.prototype.SetParagraphIndent = function(Ind)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
 		oFootnote.SetParagraphIndent(Ind);
-	}
-};
-CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	for (var sId in this.Selection.Footnotes)
-	{
-		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.SetParagraphNumbering(NumInfo);
 	}
 };
 CFootnotesController.prototype.SetParagraphShd = function(Shd)

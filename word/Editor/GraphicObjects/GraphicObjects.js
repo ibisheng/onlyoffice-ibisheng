@@ -1795,89 +1795,21 @@ CGraphicObjects.prototype =
             if(parent_para)
             {
                 ParaPr = parent_para.Get_CompiledPr2(true).ParaPr;
-                if(ParaPr)
+                if (ParaPr)
                 {
-
-
                     var NumType    = -1;
                     var NumSubType = -1;
-                    if ( !(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId) )
+
+                    var oNumPr = parent_para.GetNumPr();
+                    if (oNumPr && oNumPr.IsValid())
                     {
-                        var Numb = this.document.Numbering.Get_AbstractNum( ParaPr.NumPr.NumId );
-
-                        if ( undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl] )
+                    	var oNum = this.document.GetNumbering().GetNum(oNumPr.NumId);
+                        if (oNum && oNum.GetLvl(oNumPr.Lvl))
                         {
-                            var Lvl = Numb.Lvl[ParaPr.NumPr.Lvl];
-                            var NumFormat = Lvl.Format;
-                            var NumText   = Lvl.LvlText;
+                            var oInfo = oNum.GetLvl(oNumPr.Lvl).GetPresetType();
 
-                            if ( numbering_numfmt_Bullet === NumFormat )
-                            {
-                                NumType    = 0;
-                                NumSubType = 0;
-
-                                var TextLen = NumText.length;
-                                if ( 1 === TextLen && numbering_lvltext_Text === NumText[0].Type )
-                                {
-                                    var NumVal = NumText[0].Value.charCodeAt(0);
-
-                                    if ( 0x00B7 === NumVal )
-                                        NumSubType = 1;
-                                    else if ( 0x006F === NumVal )
-                                        NumSubType = 2;
-                                    else if ( 0x00A7 === NumVal )
-                                        NumSubType = 3;
-                                    else if ( 0x0076 === NumVal )
-                                        NumSubType = 4;
-                                    else if ( 0x00D8 === NumVal )
-                                        NumSubType = 5;
-                                    else if ( 0x00FC === NumVal )
-                                        NumSubType = 6;
-                                    else if ( 0x00A8 === NumVal )
-                                        NumSubType = 7;
-                                }
-                            }
-                            else
-                            {
-                                NumType    = 1;
-                                NumSubType = 0;
-
-                                var TextLen = NumText.length;
-                                if ( 2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type )
-                                {
-                                    var NumVal2 = NumText[1].Value;
-
-                                    if ( numbering_numfmt_Decimal === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 1;
-                                        else if ( ")" === NumVal2 )
-                                            NumSubType = 2;
-                                    }
-                                    else if ( numbering_numfmt_UpperRoman === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 3;
-                                    }
-                                    else if ( numbering_numfmt_UpperLetter === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 4;
-                                    }
-                                    else if ( numbering_numfmt_LowerLetter === NumFormat )
-                                    {
-                                        if ( ")" === NumVal2 )
-                                            NumSubType = 5;
-                                        else if ( "." === NumVal2 )
-                                            NumSubType = 6;
-                                    }
-                                    else if ( numbering_numfmt_LowerRoman === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 7;
-                                    }
-                                }
-                            }
+                            NumType    = oInfo.Type;
+                            NumSubType = oInfo.SubType;
                         }
                     }
 

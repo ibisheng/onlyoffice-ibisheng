@@ -452,9 +452,6 @@ CDocumentContentElementBase.prototype.SetParagraphTabs = function(Tabs)
 CDocumentContentElementBase.prototype.SetParagraphIndent = function(Ind)
 {
 };
-CDocumentContentElementBase.prototype.SetParagraphNumbering = function(NumInfo)
-{
-};
 CDocumentContentElementBase.prototype.SetParagraphShd = function(Shd)
 {
 };

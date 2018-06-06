@@ -166,10 +166,6 @@ CHdrFtrController.prototype.SetParagraphIndent = function(Ind)
 {
 	this.HdrFtr.SetParagraphIndent(Ind);
 };
-CHdrFtrController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	this.HdrFtr.SetParagraphNumbering(NumInfo);
-};
 CHdrFtrController.prototype.SetParagraphShd = function(Shd)
 {
 	this.HdrFtr.SetParagraphShd(Shd);
