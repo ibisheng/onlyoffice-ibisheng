@@ -1930,8 +1930,8 @@
 						ws.expandRowsOnScroll(true);
 					}
 					
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 0), 0, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 0), 0, 3);
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.getCellLeft(activeCol, 0) - ws.getCellLeft(0, 0), 0, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.getCellTop(activeRow, 0)  - ws.getCellTop(0, 0), 0, 3);
 
 					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
 					drawingObject.graphicObject.setDrawingBase(drawingObject);
@@ -2109,8 +2109,8 @@
 					AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[addImagesFromWord[i].col + activeRange.c1].left - ws.getCellLeft(0, 1), 1, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[addImagesFromWord[i].row + activeRange.r1].top  - ws.getCellTop(0, 1), 1, 3);
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.getCellLeft(addImagesFromWord[i].col + activeRange.c1) - ws.getCellLeft(0, 0), 0, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.getCellTop(addImagesFromWord[i].row + activeRange.r1) - ws.getCellTop(0, 0), 0, 3);
 					
 					xfrm.setOffX(curCol);
 					xfrm.setOffY(curRow);
