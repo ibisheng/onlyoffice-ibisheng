@@ -5932,19 +5932,6 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 		return bRes;
 	};
-	parserFormula.prototype.isFoundNestedStAg = function() {
-		var res = false;
-		if (this.outStack) {
-			for (var n = 0; n < outStack.length; n++) {
-				if (outStack[n] instanceof AscCommonExcel.cAGGREGATE ||
-					outStack[n] instanceof AscCommonExcel.cSUBTOTAL) {
-					res = true;
-					break;
-				}
-			}
-		}
-		return res;
-	};
 	/* Сборка функции в инфиксную форму */
 	parserFormula.prototype.assemble = function (rFormula) {
 		if (!rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError) {
