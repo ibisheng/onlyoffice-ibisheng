@@ -6626,11 +6626,8 @@
                     elem.asc_putCol(oCommentCoords.nCol);
 
                     if (elem.asc_getDocumentFlag()) {
-                        elem.nId = "doc_" + (this.wb.aComments.length + 1);
                         this.wb.aComments.push(elem);
                     } else {
-                        elem.wsId = oWorksheet.Id;
-                        elem.nId = "sheet" + elem.wsId + "_" + (oWorksheet.aComments.length + 1);
                         oWorksheet.aComments.push(elem);
                     }
                 }
@@ -6696,6 +6693,13 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCommentData(t,l,oCommentData);
                 });
+
+				if (oCommentData.asc_getDocumentFlag()) {
+					oCommentData.nId = "doc_" + (this.wb.aComments.length + 1);
+				} else {
+					oCommentData.wsId = this.curWorksheet.Id;
+					oCommentData.nId = "sheet" + oCommentData.wsId + "_" + (this.curWorksheet.aComments.length + 1);
+				}
                 aCommentData.push(oCommentData);
             }
             else
