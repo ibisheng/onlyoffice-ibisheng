@@ -1776,6 +1776,9 @@
                     currentWidth = 0;
                 }
 
+				if (pageHeadings) {
+					currentHeight += this.cellsTop;
+				}
                 if (bFitToHeight) {
                     newPagePrint.pageClipRectHeight = Math.max(currentHeight, newPagePrint.pageClipRectHeight);
                     newPagePrint.pageHeight =
