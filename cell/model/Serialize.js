@@ -6097,8 +6097,6 @@
             }
             else if ( c_oSerWorksheetsTypes.Cols == type )
             {
-                if(null == oWorksheet.Cols)
-                    oWorksheet.aCols = [];
                 var aTempCols = [];
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheetCols(t,l, aTempCols, oWorksheet);
