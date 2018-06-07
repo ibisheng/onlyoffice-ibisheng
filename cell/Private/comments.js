@@ -64,7 +64,7 @@
 
     var existComment = this.getComment(oComment.nCol, oComment.nRow);
     if (existComment) {
-      oComment = existComments[0];
+      oComment = existComment;
       bChange = true;
     }
   }
