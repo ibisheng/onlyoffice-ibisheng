@@ -400,19 +400,47 @@ CChangesRunRemoveItem.prototype.Load = function()
 {
 	var oRun = this.Class;
 
+	var nLastChangesPos = null;
+	var nChangesCount   = 0;
 	for (var Index = 0, Count = this.PosArray.length; Index < Count; Index++)
 	{
-		var ChangesPos = oRun.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[Index]);
+		var nChangesPos = oRun.m_oContentChanges.Check(AscCommon.contentchanges_Remove, this.PosArray[Index]);
 
 		// действие совпало, не делаем его
-		if (false === ChangesPos)
+		if (false === nChangesPos)
 			continue;
 
-		oRun.CollaborativeMarks.Update_OnRemove(ChangesPos, 1);
-		oRun.Content.splice(ChangesPos, 1);
-		oRun.private_UpdatePositionsOnRemove(ChangesPos, 1);
-		oRun.private_UpdateCompositeInputPositionsOnRemove(ChangesPos, 1);
-		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oRun, ChangesPos, 1);
+		// В большинстве случаев удаления идут подряд и не меняются, т.е. их позиции у другого клиента тоже идут подряд
+		// Для улучшения производительности мы объединяем подряд идущие удаления
+		if (null === nLastChangesPos)
+		{
+			nLastChangesPos = nChangesPos;
+			nChangesCount   = 1;
+		}
+		else if (nLastChangesPos === nChangesPos)
+		{
+			nChangesCount++;
+		}
+		else
+		{
+			oRun.CollaborativeMarks.Update_OnRemove(nLastChangesPos, nChangesCount);
+			oRun.Content.splice(nLastChangesPos, nChangesCount);
+			oRun.private_UpdatePositionsOnRemove(nLastChangesPos, nChangesCount);
+			oRun.private_UpdateCompositeInputPositionsOnRemove(nLastChangesPos, nChangesCount);
+			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oRun, nLastChangesPos, nChangesCount);
+
+			nLastChangesPos = nChangesPos;
+			nChangesCount   = 1;
+		}
+	}
+
+	if (nChangesCount)
+	{
+		oRun.CollaborativeMarks.Update_OnRemove(nLastChangesPos, nChangesCount);
+		oRun.Content.splice(nLastChangesPos, nChangesCount);
+		oRun.private_UpdatePositionsOnRemove(nLastChangesPos, nChangesCount);
+		oRun.private_UpdateCompositeInputPositionsOnRemove(nLastChangesPos, nChangesCount);
+		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oRun, nLastChangesPos, nChangesCount);
 	}
 
 	oRun.RecalcInfo.Measure = true;
