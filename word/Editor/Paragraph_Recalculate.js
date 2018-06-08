@@ -1828,7 +1828,8 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                             if (1 == RangesCount && !(Line.Info & paralineinfo_End))
                             {
                                 // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
-                                if (RangeWidth - Range.W <= 0.05 * RangeWidth && PRSC.Letters > 1)
+								// либо это набор китайских иероглифов (PRSC.Words > 1)
+                                if ((RangeWidth - Range.W <= 0.05 * RangeWidth || PRSC.Words > 1) && PRSC.Letters > 1)
                                     JustifyWord = (RangeWidth - Range.W) / (PRSC.Letters - 1);
                             }
                             else if (0 == CurRange || Line.Info & paralineinfo_End)
@@ -3164,6 +3165,10 @@ CParagraphRecalculateStateWrap.prototype =
 
         return X;
     }
+};
+CParagraphRecalculateStateWrap.prototype.IsFast = function()
+{
+	return this.Fast;
 };
 CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootnoteReference, oPos)
 {
