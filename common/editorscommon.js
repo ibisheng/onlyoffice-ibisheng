@@ -3458,6 +3458,8 @@
         this.cryptoPrefix = window["AscDesktopEditor"] ? window["AscDesktopEditor"]["GetEncryptedHeader"]() : "ENCRYPTED;";
         this.cryptoPrefixLen = this.cryptoPrefix.length;
 
+        this.editorId = null;
+
 		this.isCryptoImages = function()
 		{
             if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
@@ -3518,6 +3520,15 @@
 		{
             var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 			_editor.sendEvent("asc_onError", c_oAscError.ID.VKeyEncrypt, c_oAscError.Level.Critical);
+		};
+
+        this.checkEditorId = function()
+		{
+            if (null == this.editorId)
+            {
+                var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+                this.editorId = _editor.editorId;
+            }
 		};
 
         this.decryptImage = function(src, img, data)
@@ -3585,8 +3596,9 @@
         	if (this.handleChangesCallback)
 			{
                 this.isExistDecryptedChanges = true;
+                this.checkEditorId();
 
-				if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
+				if (this.editorId == AscCommon.c_oEditorId.Spreadsheet)
 				{
                     for (var i = data.length - 1; i >= 0; i--)
                     {
@@ -3657,8 +3669,13 @@
 
         this.isExistEncryptedChanges = function(_array)
 		{
+			if (0 == _array.length)
+				return false;
+
+            this.checkEditorId();
+
             var isCrypted = false;
-            if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
+            if (this.editorId == AscCommon.c_oEditorId.Spreadsheet)
             {
                 for (var i = _array.length - 1; i >= 0; i--)
                 {
@@ -3693,7 +3710,7 @@
 
         this.handleChanges = function(_array, _sender, _callback)
 		{
-            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length || !this.isNeedCrypt || !isCrypted)
+            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length || !this.isNeedCrypt)
 			{
 				if (this.isExistEncryptedChanges(_array))
 				{
@@ -3709,7 +3726,9 @@
 
 			this.handleChangesCallback = { changesBase : _array, changes : [], sender : _sender, callback : _callback };
 
-            if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
+			this.checkEditorId();
+
+            if (this.editorId == AscCommon.c_oEditorId.Spreadsheet)
             {
                 for (var i = _array.length - 1; i >= 0; i--)
                 {
