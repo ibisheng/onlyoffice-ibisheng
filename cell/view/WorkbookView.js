@@ -1063,9 +1063,9 @@
   };
 
   // Обработка нажатия правой кнопки мыши
-  WorkbookView.prototype._onChangeSelectionRightClick = function(dc, dr) {
+  WorkbookView.prototype._onChangeSelectionRightClick = function(dc, dr, target) {
     var ws = this.getWorksheet();
-    ws.changeSelectionStartPointRightClick(dc, dr);
+    ws.changeSelectionStartPointRightClick(dc, dr, target);
   };
 
   // Обработка движения в выделенной области

@@ -1344,7 +1344,8 @@
 					return;
 				}
 				if (t.targetInfo) {
-					if (t.targetInfo.target === c_oTargetType.ColumnResize || t.targetInfo.target === c_oTargetType.RowResize) {
+					if ((t.targetInfo.target === c_oTargetType.ColumnResize ||
+						t.targetInfo.target === c_oTargetType.RowResize) && 0 === event.button) {
 						t.isResizeMode = true;
 						t._resizeElement(event);
 						return;
@@ -1423,7 +1424,7 @@
 
 			// Если нажали правую кнопку мыши, то сменим выделение только если мы не в выделенной области
 			if (2 === event.button) {
-				this.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
+				this.handlers.trigger("changeSelectionRightClick", coord.x, coord.y, this.targetInfo.target);
 				this.handlers.trigger('onContextMenu', event);
 			} else {
 				if (this.targetInfo && this.targetInfo.target === c_oTargetType.FillHandle && this.canEdit()) {

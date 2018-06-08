@@ -7100,14 +7100,17 @@
 	};
 
     // Смена селекта по нажатию правой кнопки мыши
-    WorksheetView.prototype.changeSelectionStartPointRightClick = function (x, y) {
+    WorksheetView.prototype.changeSelectionStartPointRightClick = function (x, y, target) {
         var isSelectOnShape = this._endSelectionShape();
         this.model.workbook.handlers.trigger("asc_onHideComment");
 
-        var val, c1, c2, r1, r2;
+        var val, c1, c2, r1, r2, range;
         val = this._findColUnderCursor(x, true);
         if (val) {
             c1 = c2 = val.col;
+            if (c_oTargetType.ColumnResize === target && 0 < c1 && 0 === this.cols[c1 - 1].width) {
+				c1 = c2 = c1 - 1;
+            }
         } else {
             c1 = 0;
             c2 = gc_nMaxCol0;
@@ -7115,16 +7118,20 @@
         val = this._findRowUnderCursor(y, true);
         if (val) {
             r1 = r2 = val.row;
+			if (c_oTargetType.RowResize === target && 0 < r1 && 0 === this.rows[r1 - 1].height) {
+				r1 = r2 = r1 - 1;
+			}
         } else {
             r1 = 0;
             r2 = gc_nMaxRow0;
         }
 
-        if (!this.model.selectionRange.containsRange(new asc_Range(c1, r1, c2, r2))) {
+		range = new asc_Range(c1, r1, c2, r2);
+        if (!this.model.selectionRange.containsRange(range)) {
             // Не попали в выделение (меняем первую точку)
             this.cleanSelection();
             this.model.selectionRange.clean();
-            this._moveActiveCellToXY(x, y);
+			this.setSelection(range);
             this._drawSelection();
 
             this._updateSelectionNameAndInfo();
