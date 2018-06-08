@@ -4883,7 +4883,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 	if (oPrevPara && oPrevPara.GetNumPr())
 	{
 		var oPrevNumPr = oPrevPara.GetNumPr();
-		if (oPrevNumPr && this.Numbering.CheckFormat(oPrevNumPr.NumId, oPrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
+		if (oPrevNumPr && this.Numbering.CheckFormat(oPrevNumPr.NumId, oPrevNumPr.Lvl, Asc.c_oAscNumberingFormat.Bullet))
 		{
 			sNumId  = oPrevNumPr.NumId;
 			nNumLvl = oPrevNumPr.Lvl;
@@ -4896,7 +4896,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 		if (oNextPara && oNextPara.GetNumPr())
 		{
 			var oNextNumPr = oNextPara.GetNumPr();
-			if (oNextNumPr && this.Numbering.CheckFormat(oNextNumPr.NumId, oNextNumPr.Lvl, c_oAscNumberingFormat.Bullet))
+			if (oNextNumPr && this.Numbering.CheckFormat(oNextNumPr.NumId, oNextNumPr.Lvl, Asc.c_oAscNumberingFormat.Bullet))
 			{
 				sNumId  = oNextNumPr.NumId;
 				nNumLvl = oNextNumPr.Lvl;
@@ -5093,7 +5093,7 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 
 		sNumId = oNum.GetId();
 	}
-	else if (true === bDiffId || true != this.Numbering.CheckFormat(sPrevId, nPrevLvl, c_oAscNumberingFormat.Bullet))
+	else if (true === bDiffId || true != this.Numbering.CheckFormat(sPrevId, nPrevLvl, Asc.c_oAscNumberingFormat.Bullet))
 	{
 		var oNum = this.Numbering.CreateNum();
 		oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
@@ -5145,7 +5145,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 	if (oPrevPara)
 	{
 		var oPrevNumPr = oPrevPara.GetNumPr();
-		if (oPrevNumPr && true === this.Numbering.CheckFormat(oPrevNumPr.NumId, oPrevNumPr.Lvl, c_oAscNumberingFormat.Decimal))
+		if (oPrevNumPr && true === this.Numbering.CheckFormat(oPrevNumPr.NumId, oPrevNumPr.Lvl, Asc.c_oAscNumberingFormat.Decimal))
 		{
 			sNumId  = oPrevNumPr.NumId;
 			nNumLvl = oPrevNumPr.Lvl;
@@ -5158,7 +5158,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 		if (oNextPara)
 		{
 			var oNextNumPr = oNextPara.GetNumPr();
-			if (oNextNumPr && true == this.Numbering.CheckFormat(oNextNumPr.NumId, oNextNumPr.Lvl, c_oAscNumberingFormat.Decimal))
+			if (oNextNumPr && true == this.Numbering.CheckFormat(oNextNumPr.NumId, oNextNumPr.Lvl, Asc.c_oAscNumberingFormat.Decimal))
 			{
 				sNumId  = oNextNumPr.NumId;
 				nNumLvl = oNextNumPr.Lvl;

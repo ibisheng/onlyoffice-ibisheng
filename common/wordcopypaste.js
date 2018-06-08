@@ -602,19 +602,19 @@ CopyProcessor.prototype =
 					{
 						switch (oNumberingLvl.GetFormat())
 						{
-							case c_oAscNumberingFormat.Decimal:
+							case Asc.c_oAscNumberingFormat.Decimal:
 								sListStyle = "decimal";
 								break;
-							case c_oAscNumberingFormat.LowerRoman:
+							case Asc.c_oAscNumberingFormat.LowerRoman:
 								sListStyle = "lower-roman";
 								break;
-							case c_oAscNumberingFormat.UpperRoman:
+							case Asc.c_oAscNumberingFormat.UpperRoman:
 								sListStyle = "upper-roman";
 								break;
-							case c_oAscNumberingFormat.LowerLetter:
+							case Asc.c_oAscNumberingFormat.LowerLetter:
 								sListStyle = "lower-alpha";
 								break;
-							case c_oAscNumberingFormat.UpperLetter:
+							case Asc.c_oAscNumberingFormat.UpperLetter:
 								sListStyle = "upper-alpha";
 								break;
 							default:
@@ -2929,12 +2929,12 @@ PasteProcessor.prototype =
 					var CurLvl = Text[Index].Value;
 					switch( LvlPr.Format )
 					{
-						case c_oAscNumberingFormat.Bullet:
+						case Asc.c_oAscNumberingFormat.Bullet:
 						{
 							break;
 						}
 
-						case c_oAscNumberingFormat.Decimal:
+						case Asc.c_oAscNumberingFormat.Decimal:
 						{
 							if ( CurLvl < NumInfo.length )
 							{
@@ -2949,7 +2949,7 @@ PasteProcessor.prototype =
 							break;
 						}
 
-						case c_oAscNumberingFormat.DecimalZero:
+						case Asc.c_oAscNumberingFormat.DecimalZero:
 						{
 							if ( CurLvl < NumInfo.length )
 							{
@@ -2977,8 +2977,8 @@ PasteProcessor.prototype =
 							break;
 						}
 
-						case c_oAscNumberingFormat.LowerLetter:
-						case c_oAscNumberingFormat.UpperLetter:
+						case Asc.c_oAscNumberingFormat.LowerLetter:
+						case Asc.c_oAscNumberingFormat.UpperLetter:
 						{
 							if ( CurLvl < NumInfo.length )
 							{
@@ -2991,7 +2991,7 @@ PasteProcessor.prototype =
 								var T = "";
 
 								var Letter;
-								if ( c_oAscNumberingFormat.LowerLetter === LvlPr.Format )
+								if ( Asc.c_oAscNumberingFormat.LowerLetter === LvlPr.Format )
 									Letter = String.fromCharCode( Ost + 97 );
 								else
 									Letter = String.fromCharCode( Ost + 65 );
@@ -3009,8 +3009,8 @@ PasteProcessor.prototype =
 							break;
 						}
 
-						case c_oAscNumberingFormat.LowerRoman:
-						case c_oAscNumberingFormat.UpperRoman:
+						case Asc.c_oAscNumberingFormat.LowerRoman:
+						case Asc.c_oAscNumberingFormat.UpperRoman:
 						{
 							if ( CurLvl < NumInfo.length )
 							{
@@ -3019,7 +3019,7 @@ PasteProcessor.prototype =
 								// Переводим число Num в римскую систему исчисления
 								var Rims;
 
-								if ( c_oAscNumberingFormat.LowerRoman === LvlPr.Format )
+								if ( Asc.c_oAscNumberingFormat.LowerRoman === LvlPr.Format )
 									Rims = [  'm', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 								else
 									Rims = [  'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
@@ -6477,7 +6477,7 @@ PasteProcessor.prototype =
 						{
 							var oLvl = oNum.GetLvl(0);
 							var oTextPr = t._read_rPr(oFirstTextChild);
-							if(c_oAscNumberingFormat.Bullet === num)
+							if(Asc.c_oAscNumberingFormat.Bullet === num)
 								oTextPr.RFonts = oLvl.GetTextPr().RFonts.Copy();
 								
 							//TODO убираю пока при всатвке извне underline/bold/italic у стиля маркера
@@ -6529,7 +6529,7 @@ PasteProcessor.prototype =
 						var oNum = this.oLogicDocument.GetNumbering().CreateNum();
 						NumId    = oNum.GetId();
 
-						if (c_oAscNumberingFormat.Bullet === num)
+						if (Asc.c_oAscNumberingFormat.Bullet === num)
 						{
 							oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							var LvlText = String.fromCharCode(0x00B7);
@@ -6565,12 +6565,12 @@ PasteProcessor.prototype =
 						
 						switch(num)
 						{
-							case c_oAscNumberingFormat.Bullet     : oNum.SetLvlByType(level, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
-							case c_oAscNumberingFormat.Decimal    : oNum.SetLvlByType(level, c_oAscNumberingLevel.DecimalDot_Left); break;
-							case c_oAscNumberingFormat.LowerRoman : oNum.SetLvlByType(level, c_oAscNumberingLevel.LowerRomanDot_Right); break;
-							case c_oAscNumberingFormat.UpperRoman : oNum.SetLvlByType(level, c_oAscNumberingLevel.UpperRomanDot_Right); break;
-							case c_oAscNumberingFormat.LowerLetter: oNum.SetLvlByType(level, c_oAscNumberingLevel.LowerLetterDot_Left); break;
-							case c_oAscNumberingFormat.UpperLetter: oNum.SetLvlByType(level, c_oAscNumberingLevel.UpperLetterDot_Left); break;
+							case Asc.c_oAscNumberingFormat.Bullet     : oNum.SetLvlByType(level, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
+							case Asc.c_oAscNumberingFormat.Decimal    : oNum.SetLvlByType(level, c_oAscNumberingLevel.DecimalDot_Left); break;
+							case Asc.c_oAscNumberingFormat.LowerRoman : oNum.SetLvlByType(level, c_oAscNumberingLevel.LowerRomanDot_Right); break;
+							case Asc.c_oAscNumberingFormat.UpperRoman : oNum.SetLvlByType(level, c_oAscNumberingLevel.UpperRomanDot_Right); break;
+							case Asc.c_oAscNumberingFormat.LowerLetter: oNum.SetLvlByType(level, c_oAscNumberingLevel.LowerLetterDot_Left); break;
+							case Asc.c_oAscNumberingFormat.UpperLetter: oNum.SetLvlByType(level, c_oAscNumberingLevel.UpperLetterDot_Left); break;
 						}
 						
 						//проставляем начальную позицию
@@ -6595,7 +6595,7 @@ PasteProcessor.prototype =
 				}
 				else
 				{
-					var num = c_oAscNumberingFormat.Bullet;
+					var num = Asc.c_oAscNumberingFormat.Bullet;
 					if(null != pNoHtmlPr.numType)
 						num = pNoHtmlPr.numType;
 					var type = pNoHtmlPr["list-style-type"];
@@ -6604,12 +6604,12 @@ PasteProcessor.prototype =
 					{
 						switch(type)
 						{
-							case "disc"       : num = c_oAscNumberingFormat.Bullet;break;
-							case "decimal"    : num = c_oAscNumberingFormat.Decimal;break;
-							case "lower-roman": num = c_oAscNumberingFormat.LowerRoman;break;
-							case "upper-roman": num = c_oAscNumberingFormat.UpperRoman;break;
-							case "lower-alpha": num = c_oAscNumberingFormat.LowerLetter;break;
-							case "upper-alpha": num = c_oAscNumberingFormat.UpperLetter;break;
+							case "disc"       : num = Asc.c_oAscNumberingFormat.Bullet;break;
+							case "decimal"    : num = Asc.c_oAscNumberingFormat.Decimal;break;
+							case "lower-roman": num = Asc.c_oAscNumberingFormat.LowerRoman;break;
+							case "upper-roman": num = Asc.c_oAscNumberingFormat.UpperRoman;break;
+							case "lower-alpha": num = Asc.c_oAscNumberingFormat.LowerLetter;break;
+							case "upper-alpha": num = Asc.c_oAscNumberingFormat.UpperLetter;break;
 						}
 					}
 					//Часть кода скопирована из Document.Set_ParagraphNumbering
@@ -6630,7 +6630,7 @@ PasteProcessor.prototype =
 						// Создаем нумерацию
 						var oNum = this.oLogicDocument.GetNumbering().CreateNum();
 						NumId    = oNum.GetId();
-						if (c_oAscNumberingFormat.Bullet === num)
+						if (Asc.c_oAscNumberingFormat.Bullet === num)
 						{
 							oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							var LvlText = String.fromCharCode(0x00B7);
@@ -6668,12 +6668,12 @@ PasteProcessor.prototype =
 						{
 							switch(num)
 							{
-								case c_oAscNumberingFormat.Bullet     : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
-								case c_oAscNumberingFormat.Decimal    : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.DecimalDot_Right); break;
-								case c_oAscNumberingFormat.LowerRoman : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerRomanDot_Right); break;
-								case c_oAscNumberingFormat.UpperRoman : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperRomanDot_Right); break;
-								case c_oAscNumberingFormat.LowerLetter: oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerLetterDot_Left); break;
-								case c_oAscNumberingFormat.UpperLetter: oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperLetterDot_Left); break;
+								case Asc.c_oAscNumberingFormat.Bullet     : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
+								case Asc.c_oAscNumberingFormat.Decimal    : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.DecimalDot_Right); break;
+								case Asc.c_oAscNumberingFormat.LowerRoman : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerRomanDot_Right); break;
+								case Asc.c_oAscNumberingFormat.UpperRoman : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperRomanDot_Right); break;
+								case Asc.c_oAscNumberingFormat.LowerLetter: oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerLetterDot_Left); break;
+								case Asc.c_oAscNumberingFormat.UpperLetter: oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperLetterDot_Left); break;
 							}
 						}
 						
@@ -7078,17 +7078,17 @@ PasteProcessor.prototype =
 		};
 		
 		//TODO пока делаю так, пересмотреть регулярные выражения
-		var resType = c_oAscNumberingFormat.Bullet;
+		var resType = Asc.c_oAscNumberingFormat.Bullet;
 		var number = parseInt(str);
 		var startPos = null, fullListIndex;
 		if(!isNaN(number))
 		{
-			resType = c_oAscNumberingFormat.Decimal;
+			resType = Asc.c_oAscNumberingFormat.Decimal;
 			startPos = number;
 		}
 		else if(1 === str.length && -1 !== str.indexOf("o"))
 		{
-			resType = c_oAscNumberingFormat.Bullet;
+			resType = Asc.c_oAscNumberingFormat.Bullet;
 		}
 		else
 		{
@@ -7104,7 +7104,7 @@ PasteProcessor.prototype =
 					startPos = romanToIndex(fullListIndex);
 				}
 				
-				resType = c_oAscNumberingFormat.LowerRoman;
+				resType = Asc.c_oAscNumberingFormat.LowerRoman;
 			}
 			else if(-1 !== symbolsArr[1].indexOf(firstSymbol))
 			{
@@ -7114,7 +7114,7 @@ PasteProcessor.prototype =
 					startPos = romanToIndex(fullListIndex);
 				}
 				
-				resType = c_oAscNumberingFormat.UpperRoman;
+				resType = Asc.c_oAscNumberingFormat.UpperRoman;
 			}
 			else if(-1 !== symbolsArr[2].indexOf(firstSymbol))
 			{
@@ -7124,7 +7124,7 @@ PasteProcessor.prototype =
 					startPos = latinToIndex(fullListIndex);
 				}
 				
-				resType = c_oAscNumberingFormat.LowerLetter;
+				resType = Asc.c_oAscNumberingFormat.LowerLetter;
 			}
 			else if(-1 !== symbolsArr[3].indexOf(firstSymbol))
 			{
@@ -7134,7 +7134,7 @@ PasteProcessor.prototype =
 					startPos = latinToIndex(fullListIndex);
 				}
 				
-				resType = c_oAscNumberingFormat.UpperLetter;
+				resType = Asc.c_oAscNumberingFormat.UpperLetter;
 			}
 		}
 		
@@ -7980,10 +7980,10 @@ PasteProcessor.prototype =
 					pPr.bNum = true;
 					if (PasteElementsId.g_bIsDocumentCopyPaste) {
 						if ("ul" === sNodeName) {
-							pPr.numType = c_oAscNumberingFormat.Bullet;
+							pPr.numType = Asc.c_oAscNumberingFormat.Bullet;
 						} else if ("ol" ===
 							sNodeName) {
-							pPr.numType = c_oAscNumberingFormat.Decimal;
+							pPr.numType = Asc.c_oAscNumberingFormat.Decimal;
 						}
 					} else {
 						if ("ul" === sNodeName) {
@@ -8001,10 +8001,10 @@ PasteProcessor.prototype =
 
 					if (PasteElementsId.g_bIsDocumentCopyPaste) {
 						if ("ul" === sNodeName) {
-							pPr.numType = c_oAscNumberingFormat.Bullet;
+							pPr.numType = Asc.c_oAscNumberingFormat.Bullet;
 						} else if ("ol" ===
 							sNodeName) {
-							pPr.numType = c_oAscNumberingFormat.Decimal;
+							pPr.numType = Asc.c_oAscNumberingFormat.Decimal;
 						}
 					} else {
 						if ("ul" === sNodeName) {

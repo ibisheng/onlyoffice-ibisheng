@@ -1148,6 +1148,22 @@
 		keepTextOnly: 23,
 		overwriteCells : 24
 	};
+
+	/** @enum {number} */
+	var c_oAscNumberingFormat = {
+		None        : 0x0000,
+		Bullet      : 0x1001,
+		Decimal     : 0x2002,
+		LowerRoman  : 0x2003,
+		UpperRoman  : 0x2004,
+		LowerLetter : 0x2005,
+		UpperLetter : 0x2006,
+		DecimalZero : 0x2007,
+
+
+		BulletFlag   : 0x1000,
+		NumberedFlag : 0x2000
+	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
 	var prot;
@@ -1863,6 +1879,17 @@
 	prot['keepTextOnly'] = prot.keepTextOnly;
 	prot['insertAsNestedTable'] = prot.insertAsNestedTable;
 	prot['overwriteCells'] = prot.overwriteCells;
+
+	window['Asc']['c_oAscNumberingFormat'] = window['Asc'].c_oAscNumberingFormat = c_oAscNumberingFormat;
+	prot = c_oAscNumberingFormat;
+	prot['None']        = c_oAscNumberingFormat.None;
+	prot['Bullet']      = c_oAscNumberingFormat.Bullet;
+	prot['Decimal']     = c_oAscNumberingFormat.Decimal;
+	prot['LowerRoman']  = c_oAscNumberingFormat.LowerRoman;
+	prot['UpperRoman']  = c_oAscNumberingFormat.UpperRoman;
+	prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
+	prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
+	prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
 
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =

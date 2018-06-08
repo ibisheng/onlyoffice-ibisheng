@@ -4512,7 +4512,7 @@ Asc['asc_docs_api'].prototype.UpdateParagraphProp = function(ParaPr)
             var NumFormat = Lvl.GetFormat();
             var NumText   = Lvl.GetLvlText();
 
-            if ( c_oAscNumberingFormat.Bullet === NumFormat )
+            if ( Asc.c_oAscNumberingFormat.Bullet === NumFormat )
             {
                 NumType    = 0;
                 NumSubType = 0;
@@ -4548,31 +4548,31 @@ Asc['asc_docs_api'].prototype.UpdateParagraphProp = function(ParaPr)
                 {
                     var NumVal2 = NumText[1].Value;
 
-                    if ( c_oAscNumberingFormat.Decimal === NumFormat )
+                    if ( Asc.c_oAscNumberingFormat.Decimal === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 1;
                         else if ( ")" === NumVal2 )
                             NumSubType = 2;
                     }
-                    else if ( c_oAscNumberingFormat.UpperRoman === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.UpperRoman === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 3;
                     }
-                    else if ( c_oAscNumberingFormat.UpperLetter === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.UpperLetter === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 4;
                     }
-                    else if ( c_oAscNumberingFormat.LowerLetter === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.LowerLetter === NumFormat )
                     {
                         if ( ")" === NumVal2 )
                             NumSubType = 5;
                         else if ( "." === NumVal2 )
                             NumSubType = 6;
                     }
-                    else if ( c_oAscNumberingFormat.LowerRoman === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.LowerRoman === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 7;

@@ -428,18 +428,18 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 	var oLvl = this.GetLvl(nLvl);
 	switch (oLvl.GetFormat())
 	{
-		case c_oAscNumberingFormat.Bullet:
+		case Asc.c_oAscNumberingFormat.Bullet:
 		{
 			break;
 		}
 
-		case c_oAscNumberingFormat.Decimal:
+		case Asc.c_oAscNumberingFormat.Decimal:
 		{
 			sResult = "" + nNumShift;
 			break;
 		}
 
-		case c_oAscNumberingFormat.DecimalZero:
+		case Asc.c_oAscNumberingFormat.DecimalZero:
 		{
 			sResult = "" + nNumShift;
 
@@ -448,8 +448,8 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 			break;
 		}
 
-		case c_oAscNumberingFormat.LowerLetter:
-		case c_oAscNumberingFormat.UpperLetter:
+		case Asc.c_oAscNumberingFormat.LowerLetter:
+		case Asc.c_oAscNumberingFormat.UpperLetter:
 		{
 			// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
 			var Num = nNumShift - 1;
@@ -458,7 +458,7 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 			var Ost   = Num % 26;
 
 			var Letter;
-			if (c_oAscNumberingFormat.LowerLetter === oLvl.GetFormat())
+			if (Asc.c_oAscNumberingFormat.LowerLetter === oLvl.GetFormat())
 				Letter = String.fromCharCode(Ost + 97);
 			else
 				Letter = String.fromCharCode(Ost + 65);
@@ -469,15 +469,15 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 			break;
 		}
 
-		case c_oAscNumberingFormat.LowerRoman:
-		case c_oAscNumberingFormat.UpperRoman:
+		case Asc.c_oAscNumberingFormat.LowerRoman:
+		case Asc.c_oAscNumberingFormat.UpperRoman:
 		{
 			var Num = nNumShift;
 
 			// Переводим число Num в римскую систему исчисления
 			var Rims;
 
-			if (c_oAscNumberingFormat.LowerRoman === oLvl.GetFormat())
+			if (Asc.c_oAscNumberingFormat.LowerRoman === oLvl.GetFormat())
 				Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 			else
 				Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];

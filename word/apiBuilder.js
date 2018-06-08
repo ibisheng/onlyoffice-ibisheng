@@ -3278,23 +3278,23 @@
      */
     ApiNumberingLevel.prototype.SetCustomType = function(sType, sTextFormatString, sAlign)
     {
-        var nType = c_oAscNumberingFormat.None;
+        var nType = Asc.c_oAscNumberingFormat.None;
         if ("none" === sType)
-            nType = c_oAscNumberingFormat.None;
+            nType = Asc.c_oAscNumberingFormat.None;
         else if ("bullet" === sType)
-            nType = c_oAscNumberingFormat.Bullet;
+            nType = Asc.c_oAscNumberingFormat.Bullet;
         else if ("decimal" === sType)
-            nType = c_oAscNumberingFormat.Decimal;
+            nType = Asc.c_oAscNumberingFormat.Decimal;
         else if ("lowerRoman" === sType)
-            nType = c_oAscNumberingFormat.LowerRoman;
+            nType = Asc.c_oAscNumberingFormat.LowerRoman;
         else if ("upperRoman" === sType)
-            nType = c_oAscNumberingFormat.UpperRoman;
+            nType = Asc.c_oAscNumberingFormat.UpperRoman;
         else if ("lowerLetter" === sType)
-            nType = c_oAscNumberingFormat.LowerLetter;
+            nType = Asc.c_oAscNumberingFormat.LowerLetter;
         else if ("upperLetter" === sType)
-            nType = c_oAscNumberingFormat.UpperLetter;
+            nType = Asc.c_oAscNumberingFormat.UpperLetter;
         else if ("decimalZero" === sType)
-            nType = c_oAscNumberingFormat.DecimalZero;
+            nType = Asc.c_oAscNumberingFormat.DecimalZero;
 
         var nAlign = align_Left;
         if ("left" === sAlign)

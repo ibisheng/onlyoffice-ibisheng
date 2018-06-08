@@ -4079,12 +4079,12 @@
 							var CurLvl = Text[Index].Value;
 							switch( LvlPr.Format )
 							{
-								case c_oAscNumberingFormat.Bullet:
+								case Asc.c_oAscNumberingFormat.Bullet:
 								{
 									break;
 								}
 
-								case c_oAscNumberingFormat.Decimal:
+								case Asc.c_oAscNumberingFormat.Decimal:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4099,7 +4099,7 @@
 									break;
 								}
 
-								case c_oAscNumberingFormat.DecimalZero:
+								case Asc.c_oAscNumberingFormat.DecimalZero:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4127,8 +4127,8 @@
 									break;
 								}
 
-								case c_oAscNumberingFormat.LowerLetter:
-								case c_oAscNumberingFormat.UpperLetter:
+								case Asc.c_oAscNumberingFormat.LowerLetter:
+								case Asc.c_oAscNumberingFormat.UpperLetter:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4141,7 +4141,7 @@
 										var T = "";
 
 										var Letter;
-										if ( c_oAscNumberingFormat.LowerLetter === LvlPr.Format )
+										if ( Asc.c_oAscNumberingFormat.LowerLetter === LvlPr.Format )
 											Letter = String.fromCharCode( Ost + 97 );
 										else
 											Letter = String.fromCharCode( Ost + 65 );
@@ -4159,8 +4159,8 @@
 									break;
 								}
 
-								case c_oAscNumberingFormat.LowerRoman:
-								case c_oAscNumberingFormat.UpperRoman:
+								case Asc.c_oAscNumberingFormat.LowerRoman:
+								case Asc.c_oAscNumberingFormat.UpperRoman:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4169,7 +4169,7 @@
 										// Переводим число Num в римскую систему исчисления
 										var Rims;
 
-										if ( c_oAscNumberingFormat.LowerRoman === LvlPr.Format )
+										if ( Asc.c_oAscNumberingFormat.LowerRoman === LvlPr.Format )
 											Rims = [  'm', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 										else
 											Rims = [  'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];

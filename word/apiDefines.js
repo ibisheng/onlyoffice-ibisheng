@@ -195,21 +195,6 @@ var c_oAscFootnoteRestart = {
 	EachPage   : 0x02  //section_footnote_RestartEachPage
 };
 
-var c_oAscNumberingFormat = {
-	None        : 0x0000,
-	Bullet      : 0x1001,
-	Decimal     : 0x2002,
-	LowerRoman  : 0x2003,
-	UpperRoman  : 0x2004,
-	LowerLetter : 0x2005,
-	UpperLetter : 0x2006,
-	DecimalZero : 0x2007,
-
-
-	BulletFlag   : 0x1000,
-	NumberedFlag : 0x2000
-};
-
 var c_oAscSdtLockType = {
 	ContentLocked    : 0x00,
 	SdtContentLocked : 0x01,
@@ -331,16 +316,6 @@ prot = window['Asc']['c_oAscFootnoteRestart'] = c_oAscFootnoteRestart;
 prot['Continuous'] = c_oAscFootnoteRestart.Continuous;
 prot['EachSect']   = c_oAscFootnoteRestart.EachSect;
 prot['EachPage']   = c_oAscFootnoteRestart.EachPage;
-
-prot = window['Asc']['c_oAscNumberingFormat'] = c_oAscNumberingFormat;
-prot['None']        = c_oAscNumberingFormat.None;
-prot['Bullet']      = c_oAscNumberingFormat.Bullet;
-prot['Decimal']     = c_oAscNumberingFormat.Decimal;
-prot['LowerRoman']  = c_oAscNumberingFormat.LowerRoman;
-prot['UpperRoman']  = c_oAscNumberingFormat.UpperRoman;
-prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
-prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
-prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
 
 prot = window['Asc']['c_oAscSdtLockType'] = c_oAscSdtLockType;
 prot['ContentLocked']    = c_oAscSdtLockType.ContentLocked;

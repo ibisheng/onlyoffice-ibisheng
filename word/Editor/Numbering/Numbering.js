@@ -232,17 +232,17 @@ CNumbering.prototype.GetParaPr = function(sNumId, nLvl)
  * Получаем формат заданного уровня заданной нумерации
  * @param sNumId
  * @param nLvl
- * @returns {c_oAscNumberingFormat}
+ * @returns {Asc.c_oAscNumberingFormat}
  */
 CNumbering.prototype.GetNumFormat = function(sNumId, nLvl)
 {
 	var oNum = this.GetNum(sNumId);
 	if (!oNum)
-		return c_oAscNumberingFormat.Bullet;
+		return Asc.c_oAscNumberingFormat.Bullet;
 
 	var oLvl = oNum.GetLvl(nLvl);
 	if (!oLvl)
-		return c_oAscNumberingFormat.Bullet;
+		return Asc.c_oAscNumberingFormat.Bullet;
 
 	return oLvl.Format;
 };
@@ -250,15 +250,15 @@ CNumbering.prototype.GetNumFormat = function(sNumId, nLvl)
  * Проверяем по типам Numbered и Bullet
  * @param sNumId {string}
  * @param nLvl {number}
- * @param nType {c_oAscNumberingFormat}
+ * @param nType {Asc.c_oAscNumberingFormat}
  * @returns {boolean}
  */
 CNumbering.prototype.CheckFormat = function(sNumId, nLvl, nType)
 {
 	var nFormat = this.GetNumFormat(sNumId, nLvl);
 
-	if ((c_oAscNumberingFormat.BulletFlag & nFormat && c_oAscNumberingFormat.BulletFlag & nType)
-		|| (c_oAscNumberingFormat.NumberedFlag & nFormat && c_oAscNumberingFormat.NumberedFlag & nType))
+	if ((Asc.c_oAscNumberingFormat.BulletFlag & nFormat && Asc.c_oAscNumberingFormat.BulletFlag & nType)
+		|| (Asc.c_oAscNumberingFormat.NumberedFlag & nFormat && Asc.c_oAscNumberingFormat.NumberedFlag & nType))
 		return true;
 
 	return false;

@@ -2063,14 +2063,14 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 		if (fmt) {
 			var val;
 			switch (fmt) {
-				case c_oAscNumberingFormat.None: val = 48; break;
-				case c_oAscNumberingFormat.Bullet: val = 5; break;
-				case c_oAscNumberingFormat.Decimal: val = 13; break;
-				case c_oAscNumberingFormat.LowerRoman: val = 47; break;
-				case c_oAscNumberingFormat.UpperRoman: val = 61; break;
-				case c_oAscNumberingFormat.LowerLetter: val = 46; break;
-				case c_oAscNumberingFormat.UpperLetter: val = 60; break;
-				case c_oAscNumberingFormat.DecimalZero: val = 21; break;
+				case Asc.c_oAscNumberingFormat.None: val = 48; break;
+				case Asc.c_oAscNumberingFormat.Bullet: val = 5; break;
+				case Asc.c_oAscNumberingFormat.Decimal: val = 13; break;
+				case Asc.c_oAscNumberingFormat.LowerRoman: val = 47; break;
+				case Asc.c_oAscNumberingFormat.UpperRoman: val = 61; break;
+				case Asc.c_oAscNumberingFormat.LowerLetter: val = 46; break;
+				case Asc.c_oAscNumberingFormat.UpperLetter: val = 60; break;
+				case Asc.c_oAscNumberingFormat.DecimalZero: val = 21; break;
 				default: val = 13; break;
 			}
 			this.bs.WriteItem(c_oSerNumTypes.NumFmtVal, function(){oThis.memory.WriteByte(val);});
@@ -7981,15 +7981,15 @@ function Binary_pPrReader(doc, oReadResult, stream)
 		var res = c_oSerConstants.ReadOk;
 		if (c_oSerNumTypes.NumFmtVal === type) {
 			switch (this.stream.GetByte()) {
-				case 48: props.fmt = c_oAscNumberingFormat.None; break;
-				case 5: props.fmt = c_oAscNumberingFormat.Bullet; break;
-				case 13: props.fmt = c_oAscNumberingFormat.Decimal; break;
-				case 47: props.fmt = c_oAscNumberingFormat.LowerRoman; break;
-				case 61: props.fmt = c_oAscNumberingFormat.UpperRoman; break;
-				case 46: props.fmt = c_oAscNumberingFormat.LowerLetter; break;
-				case 60: props.fmt = c_oAscNumberingFormat.UpperLetter; break;
-				case 21: props.fmt = c_oAscNumberingFormat.DecimalZero; break;
-				default: props.fmt = c_oAscNumberingFormat.Decimal; break;
+				case 48: props.fmt = Asc.c_oAscNumberingFormat.None; break;
+				case 5: props.fmt = Asc.c_oAscNumberingFormat.Bullet; break;
+				case 13: props.fmt = Asc.c_oAscNumberingFormat.Decimal; break;
+				case 47: props.fmt = Asc.c_oAscNumberingFormat.LowerRoman; break;
+				case 61: props.fmt = Asc.c_oAscNumberingFormat.UpperRoman; break;
+				case 46: props.fmt = Asc.c_oAscNumberingFormat.LowerLetter; break;
+				case 60: props.fmt = Asc.c_oAscNumberingFormat.UpperLetter; break;
+				case 21: props.fmt = Asc.c_oAscNumberingFormat.DecimalZero; break;
+				default: props.fmt = Asc.c_oAscNumberingFormat.Decimal; break;
 			}
 		} else {
 			res = c_oSerConstants.ReadUnknown;
