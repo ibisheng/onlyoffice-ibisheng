@@ -3958,7 +3958,7 @@
 			this.getRange3(r1, c1, r2, c2)._foreachNoEmpty(function(cell) {
 				if (cell.xfs && cell.xfs.border) {
 					t._getCellNoEmpty(cell.nRow + offsetRow, cell.nCol + offsetCol, function(neighbor) {
-						if (neighbor.xfs && neighbor.xfs.border) {
+						if (neighbor && neighbor.xfs && neighbor.xfs.border) {
 							var newBorder = neighbor.xfs.border.clone();
 							newBorder.intersect(cell.xfs.border, g_oDefaultFormat.BorderAbs, true);
 							borders[bRow ? cell.nCol : cell.nRow] = newBorder;
