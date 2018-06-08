@@ -1647,7 +1647,7 @@
             case "encryptData":
             case "decryptData":
             {
-                AscCommon.EncryptionWorker.receiveChanges(obj["data"]);
+                AscCommon.EncryptionWorker.receiveChanges(obj);
                 break;
             }
         }

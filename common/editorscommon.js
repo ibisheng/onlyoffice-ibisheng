@@ -3455,6 +3455,9 @@
 
         this.isExistDecryptedChanges = false; // был ли хоть один запрос на расшифровку данных (были ли чужие изменения)
 
+        this.cryptoPrefix = window["AscDesktopEditor"] ? window["AscDesktopEditor"]["GetEncryptedHeader"]() : "ENCRYPTED;";
+        this.cryptoPrefixLen = this.cryptoPrefix.length;
+
 		this.isCryptoImages = function()
 		{
             if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
@@ -3503,13 +3506,19 @@
                 for (var elem in files)
                 {
                     _files.push(window["AscDesktopEditor"]["GetImageBase64"](files[elem], true));
+                    _options.ext.push(window["AscDesktopEditor"]["GetImageFormat"](files[elem]));
                     window["AscDesktopEditor"]["RemoveFile"](files[elem]);
-                    _options.ext.push("png"); // TODO
                 }
 
                 _this.sendChanges(this, _files, AscCommon.EncryptionMessageType.Encrypt, _options);
             });
         };
+
+        this.onDecodeError = function()
+		{
+            var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			_editor.sendEvent("asc_onError", c_oAscError.ID.VKeyEncrypt, c_oAscError.Level.Critical);
+		};
 
         this.decryptImage = function(src, img, data)
         {
@@ -3526,6 +3535,11 @@
                 }
                 else if (AscCommon.EncryptionMessageType.Decrypt == type)
                 {
+                    if (this.isExistEncryptedChanges(data["changes"]))
+                    {
+                        this.onDecodeError();
+                        return;
+                    }
                     sender._onSaveChanges(data, true);
                 }
                 return;
@@ -3546,7 +3560,7 @@
 				if (this.arrData[0].options && this.arrData[0].options.isImageCrypt)
                     window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : this.arrData[0].data });
 				else
-					window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : JSON.parse(this.arrData[0].data["changes"]) });
+                    window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : JSON.parse(this.arrData[0].data["changes"]) });
             }
             else if (AscCommon.EncryptionMessageType.Decrypt == this.arrData[0].type)
             {
@@ -3554,16 +3568,24 @@
                 if (this.arrData[0].options && this.arrData[0].options.isImageDecrypt)
                     window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.arrData[0].data });
                 else
-                	window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.arrData[0].data["changes"] });
+                    window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.arrData[0].data["changes"] });
             }
         };
 
-        this.receiveChanges = function(data)
+        this.receiveChanges = function(obj)
         {
+        	var data = obj["data"];
+        	var check = obj["check"];
+        	if (!check)
+			{
+				this.onDecodeError();
+				return;
+			}
+
         	if (this.handleChangesCallback)
 			{
                 this.isExistDecryptedChanges = true;
-				//console.log(data);
+
 				if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
 				{
                     for (var i = data.length - 1; i >= 0; i--)
@@ -3633,10 +3655,52 @@
             this.sendChanges(undefined, undefined);
         };
 
+        this.isExistEncryptedChanges = function(_array)
+		{
+            var isCrypted = false;
+            if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
+            {
+                for (var i = _array.length - 1; i >= 0; i--)
+                {
+                    if (_array[i].length > this.cryptoPrefixLen)
+                    {
+                        if (this.cryptoPrefix == _array[i].substr(0, this.cryptoPrefixLen))
+                        {
+                            _array[i] = _array[i].substr(this.cryptoPrefixLen);
+                            isCrypted = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (var i = _array.length - 1; i >= 0; i--)
+                {
+                    if (_array[i].m_pData.length > this.cryptoPrefixLen)
+                    {
+                        if (this.cryptoPrefix == _array[i].m_pData.substr(0, this.cryptoPrefixLen))
+                        {
+                            _array[i] = _array[i].m_pData.substr(this.cryptoPrefixLen);
+                            isCrypted = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            return isCrypted;
+		};
+
         this.handleChanges = function(_array, _sender, _callback)
 		{
-            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length || !this.isNeedCrypt)
+            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length || !this.isNeedCrypt || !isCrypted)
 			{
+				if (this.isExistEncryptedChanges(_array))
+				{
+					this.onDecodeError();
+					return;
+				}
+
 				this.isChangesHandled = true;
 				_callback.call(_sender);
                 this.isChangesHandled = false;
@@ -3862,7 +3926,7 @@ window.openFileCryptCallback = function(_binary)
 
     if (_binary == null)
     {
-        this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
+        _editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
         return;
     }
 
