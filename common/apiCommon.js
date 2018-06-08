@@ -137,6 +137,13 @@
 		Developer: 2
 	};
 
+	var EPluginDataType = {
+		none: "none",
+		text: "text",
+		ole: "ole",
+		html: "html"
+	};
+
 	/** @constructor */
 	function asc_CSignatureLine()
 	{
@@ -3721,6 +3728,285 @@
 	]\
 	}";
 
+	// ----------------------------- plugins ------------------------------- //
+	function CPluginVariation()
+	{
+		this.description = "";
+		this.url         = "";
+		this.baseUrl     = "";
+		this.index       = 0;     // сверху не выставляем. оттуда в каком порядке пришли - в таком порядке и работают
+
+		this.icons          = ["1x", "2x"];
+		this.isViewer       = false;
+		this.EditorsSupport = ["word", "cell", "slide"];
+
+		this.isVisual     = false;      // визуальный ли
+		this.isModal      = false;      // модальное ли окно (используется только для визуального)
+		this.isInsideMode = false;      // отрисовка не в окне а внутри редактора (в панели) (используется только для визуального немодального)
+		this.isCustomWindow = false;	// ued only if this.isModal == true
+
+		this.initDataType = EPluginDataType.none;
+		this.initData     = "";
+
+		this.isUpdateOleOnResize = false;
+
+		this.buttons = [{"text" : "Ok", "primary" : true}, {"text" : "Cancel", "primary" : false}];
+
+		this.size = undefined;
+		this.initOnSelectionChanged = undefined;
+	}
+
+	CPluginVariation.prototype["get_Description"] = function()
+	{
+		return this.description;
+	};
+	CPluginVariation.prototype["set_Description"] = function(value)
+	{
+		this.description = value;
+	};
+	CPluginVariation.prototype["get_Url"]         = function()
+	{
+		return this.url;
+	};
+	CPluginVariation.prototype["set_Url"]         = function(value)
+	{
+		this.url = value;
+	};
+
+	CPluginVariation.prototype["get_Icons"] = function()
+	{
+		return this.icons;
+	};
+	CPluginVariation.prototype["set_Icons"] = function(value)
+	{
+		this.icons = value;
+	};
+
+	CPluginVariation.prototype["get_Viewer"]         = function()
+	{
+		return this.isViewer;
+	};
+	CPluginVariation.prototype["set_Viewer"]         = function(value)
+	{
+		this.isViewer = value;
+	};
+	CPluginVariation.prototype["get_EditorsSupport"] = function()
+	{
+		return this.EditorsSupport;
+	};
+	CPluginVariation.prototype["set_EditorsSupport"] = function(value)
+	{
+		this.EditorsSupport = value;
+	};
+
+
+	CPluginVariation.prototype["get_Visual"]     = function()
+	{
+		return this.isVisual;
+	};
+	CPluginVariation.prototype["set_Visual"]     = function(value)
+	{
+		this.isVisual = value;
+	};
+	CPluginVariation.prototype["get_Modal"]      = function()
+	{
+		return this.isModal;
+	};
+	CPluginVariation.prototype["set_Modal"]      = function(value)
+	{
+		this.isModal = value;
+	};
+	CPluginVariation.prototype["get_InsideMode"] = function()
+	{
+		return this.isInsideMode;
+	};
+	CPluginVariation.prototype["set_InsideMode"] = function(value)
+	{
+		this.isInsideMode = value;
+	};
+	CPluginVariation.prototype["get_CustomWindow"] = function()
+	{
+		return this.isCustomWindow;
+	};
+	CPluginVariation.prototype["set_CustomWindow"] = function(value)
+	{
+		this.isCustomWindow = value;
+	};
+
+	CPluginVariation.prototype["get_InitDataType"] = function()
+	{
+		return this.initDataType;
+	};
+	CPluginVariation.prototype["set_InitDataType"] = function(value)
+	{
+		this.initDataType = value;
+	};
+	CPluginVariation.prototype["get_InitData"]     = function()
+	{
+		return this.initData;
+	};
+	CPluginVariation.prototype["set_InitData"]     = function(value)
+	{
+		this.initData = value;
+	};
+
+	CPluginVariation.prototype["get_UpdateOleOnResize"] = function()
+	{
+		return this.isUpdateOleOnResize;
+	};
+	CPluginVariation.prototype["set_UpdateOleOnResize"] = function(value)
+	{
+		this.isUpdateOleOnResize = value;
+	};
+	CPluginVariation.prototype["get_Buttons"]           = function()
+	{
+		return this.buttons;
+	};
+	CPluginVariation.prototype["set_Buttons"]           = function(value)
+	{
+		this.buttons = value;
+	};
+	CPluginVariation.prototype["get_Size"]           = function()
+	{
+		return this.size;
+	};
+	CPluginVariation.prototype["set_Size"]           = function(value)
+	{
+		this.size = value;
+	};
+	CPluginVariation.prototype["get_InitOnSelectionChanged"]           = function()
+	{
+		return this.initOnSelectionChanged;
+	};
+	CPluginVariation.prototype["set_InitOnSelectionChanged"]           = function(value)
+	{
+		this.initOnSelectionChanged = value;
+	};
+
+	CPluginVariation.prototype["serialize"]   = function()
+	{
+		var _object            = {};
+		_object["description"] = this.description;
+		_object["url"]         = this.url;
+		_object["index"]       = this.index;
+
+		_object["icons"]          = this.icons;
+		_object["isViewer"]       = this.isViewer;
+		_object["EditorsSupport"] = this.EditorsSupport;
+
+		_object["isVisual"]     = this.isVisual;
+		_object["isModal"]      = this.isModal;
+		_object["isInsideMode"] = this.isInsideMode;
+		_object["isCustomWindow"] = this.isCustomWindow;
+
+		_object["initDataType"] = this.initDataType;
+		_object["initData"]     = this.initData;
+
+		_object["isUpdateOleOnResize"] = this.isUpdateOleOnResize;
+
+		_object["buttons"] = this.buttons;
+
+		_object["size"] = this.size;
+		_object["initOnSelectionChanged"] = this.initOnSelectionChanged;
+
+		return _object;
+	};
+	CPluginVariation.prototype["deserialize"] = function(_object)
+	{
+		this.description = (_object["description"] != null) ? _object["description"] : this.description;
+		this.url         = (_object["url"] != null) ? _object["url"] : this.url;
+		this.index       = (_object["index"] != null) ? _object["index"] : this.index;
+
+		this.icons          = (_object["icons"] != null) ? _object["icons"] : this.icons;
+		this.isViewer       = (_object["isViewer"] != null) ? _object["isViewer"] : this.isViewer;
+		this.EditorsSupport = (_object["EditorsSupport"] != null) ? _object["EditorsSupport"] : this.EditorsSupport;
+
+		this.isVisual     = (_object["isVisual"] != null) ? _object["isVisual"] : this.isVisual;
+		this.isModal      = (_object["isModal"] != null) ? _object["isModal"] : this.isModal;
+		this.isInsideMode = (_object["isInsideMode"] != null) ? _object["isInsideMode"] : this.isInsideMode;
+		this.isCustomWindow = (_object["isCustomWindow"] != null) ? _object["isCustomWindow"] : this.isCustomWindow;
+
+		this.initDataType = (_object["initDataType"] != null) ? _object["initDataType"] : this.initDataType;
+		this.initData     = (_object["initData"] != null) ? _object["initData"] : this.initData;
+
+		this.isUpdateOleOnResize = (_object["isUpdateOleOnResize"] != null) ? _object["isUpdateOleOnResize"] : this.isUpdateOleOnResize;
+
+		this.buttons = (_object["buttons"] != null) ? _object["buttons"] : this.buttons;
+
+		this.size = (_object["size"] != null) ? _object["size"] : this.size;
+		this.initOnSelectionChanged = (_object["initOnSelectionChanged"] != null) ? _object["initOnSelectionChanged"] : this.initOnSelectionChanged;
+	};
+
+	function CPlugin()
+	{
+		this.name    = "";
+		this.guid    = "";
+		this.baseUrl = "";
+
+		this.variations = [];
+	}
+
+	CPlugin.prototype["get_Name"]    = function()
+	{
+		return this.name;
+	};
+	CPlugin.prototype["set_Name"]    = function(value)
+	{
+		this.name = value;
+	};
+	CPlugin.prototype["get_Guid"]    = function()
+	{
+		return this.guid;
+	};
+	CPlugin.prototype["set_Guid"]    = function(value)
+	{
+		this.guid = value;
+	};
+	CPlugin.prototype["get_BaseUrl"] = function()
+	{
+		return this.baseUrl;
+	};
+	CPlugin.prototype["set_BaseUrl"] = function(value)
+	{
+		this.baseUrl = value;
+	};
+
+	CPlugin.prototype["get_Variations"] = function()
+	{
+		return this.variations;
+	};
+	CPlugin.prototype["set_Variations"] = function(value)
+	{
+		this.variations = value;
+	};
+
+	CPlugin.prototype["serialize"]   = function()
+	{
+		var _object           = {};
+		_object["name"]       = this.name;
+		_object["guid"]       = this.guid;
+		_object["baseUrl"]    = this.baseUrl;
+		_object["variations"] = [];
+		for (var i = 0; i < this.variations.length; i++)
+		{
+			_object["variations"].push(this.variations[i].serialize());
+		}
+		return _object;
+	};
+	CPlugin.prototype["deserialize"] = function(_object)
+	{
+		this.name       = (_object["name"] != null) ? _object["name"] : this.name;
+		this.guid       = (_object["guid"] != null) ? _object["guid"] : this.guid;
+		this.baseUrl    = (_object["baseUrl"] != null) ? _object["baseUrl"] : this.baseUrl;
+		this.variations = [];
+		for (var i = 0; i < _object["variations"].length; i++)
+		{
+			var _variation = new CPluginVariation();
+			_variation["deserialize"](_object["variations"][i]);
+			this.variations.push(_variation);
+		}
+	};
+
     /*
      * Export
      * -----------------------------------------------------------------------------
@@ -3732,6 +4018,7 @@
 
 	window["AscCommon"].CreateAscColorCustom = CreateAscColorCustom;
 	window["AscCommon"].CreateAscColor = CreateAscColor;
+	window["AscCommon"].CreateGUID = CreateGUID;
 
 	window['Asc']['c_oLicenseResult'] = window['Asc'].c_oLicenseResult = c_oLicenseResult;
 	prot = c_oLicenseResult;
@@ -3757,6 +4044,13 @@
 	prot['None'] = prot.None;
 	prot['Trial'] = prot.Trial;
 	prot['Developer'] = prot.Developer;
+
+	window["Asc"]["EPluginDataType"] = window["Asc"].EPluginDataType = EPluginDataType;
+	prot         = EPluginDataType;
+	prot['none'] = prot.none;
+	prot['text'] = prot.text;
+	prot['ole']  = prot.ole;
+	prot['html'] = prot.html;
 
 	window["AscCommon"]["asc_CSignatureLine"] = window["AscCommon"].asc_CSignatureLine = asc_CSignatureLine;
 	prot = asc_CSignatureLine.prototype;
@@ -4477,7 +4771,8 @@
     prot["get_Checked"] = prot.get_Checked;
     prot["get_Variants"] = prot.get_Variants;
 
-    window["AscCommon"].CreateGUID = CreateGUID;
-
     window["AscCommon"].CWatermarkOnDraw = CWatermarkOnDraw;
+
+	window["Asc"]["CPluginVariation"] = window["Asc"].CPluginVariation = CPluginVariation;
+	window["Asc"]["CPlugin"] = window["Asc"].CPlugin = CPlugin;
 })(window);
