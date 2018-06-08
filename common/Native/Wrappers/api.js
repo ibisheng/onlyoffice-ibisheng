@@ -2282,6 +2282,20 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
           break;
         }
 
+        case 22000: // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
+        {
+            var obj = JSON.parse(_params);
+            var type = parseInt(obj["type"]);
+            var encoding = parseInt(obj["encoding"]);
+
+            _api.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
+            _api.documentFormat = "txt";
+           
+            _api.asc_setAdvancedOptions(type, new Asc.asc_CTXTAdvancedOptions(encoding));
+            
+            break;
+        } 
+
         default:
             break;
     }
@@ -5793,7 +5807,7 @@ function NativeOpenFile3(_params, documentInfo)
         _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
-                                  stream["WriteLong"](options.asc_getOptionId());
+                                  stream["WriteString2"](JSON.stringify(options));
                                   window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
                                   });
 
