@@ -1247,8 +1247,7 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnAdd( Pos );
 
-    // Отмечаем, что надо перемерить элементы в данном ране
-    this.RecalcInfo.Measure = true;
+    this.RecalcInfo.OnAdd(Pos);
 };
 
 ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
@@ -1311,8 +1310,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnRemove( Pos, Count );
 
-    // Отмечаем, что надо перемерить элементы в данном ране
-    this.RecalcInfo.Measure = true;
+    this.RecalcInfo.OnRemove(Pos, Count);
 };
 
 /**
@@ -2485,74 +2483,86 @@ ParaRun.prototype.Remove_StartTabs = function(TabsCounter)
 // Пересчитываем размеры всех элементов
 ParaRun.prototype.Recalculate_MeasureContent = function()
 {
-    if ( false === this.RecalcInfo.Measure )
-        return;
+	if (!this.RecalcInfo.IsMeasureNeed())
+		return;
 
-    var Pr = this.Get_CompiledPr(false);
+	var oTextPr = this.Get_CompiledPr(false);
+	var oTheme  = this.Paragraph.Get_Theme();
 
-    var Theme = this.Paragraph.Get_Theme();
-    g_oTextMeasurer.SetTextPr(Pr, Theme);
-    g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+	g_oTextMeasurer.SetTextPr(oTextPr, oTheme);
+	g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
 
-    // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
-    this.TextHeight  = g_oTextMeasurer.GetHeight();
-    this.TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-    this.TextAscent  = this.TextHeight - this.TextDescent;
-    this.TextAscent2 = g_oTextMeasurer.GetAscender();
-    this.YOffset     = Pr.Position;
+	// Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
+	this.TextHeight  = g_oTextMeasurer.GetHeight();
+	this.TextDescent = Math.abs(g_oTextMeasurer.GetDescender());
+	this.TextAscent  = this.TextHeight - this.TextDescent;
+	this.TextAscent2 = g_oTextMeasurer.GetAscender();
+	this.YOffset     = oTextPr.Position;
 
-    var ContentLength = this.Content.length;
+	var oInfoMathText;
+	if (para_Math_Run == this.Type)
+	{
+		oInfoMathText = new CMathInfoTextPr({
+			TextPr      : oTextPr,
+			ArgSize     : this.Parent.Compiled_ArgSz.value,
+			bNormalText : this.IsNormalText(),
+			bEqArray    : this.Parent.IsEqArray()
+		});
+	}
 
-    var InfoMathText;
-    if(para_Math_Run == this.Type)
-    {
-        var InfoTextPr =
-        {
-            TextPr:         Pr,
-            ArgSize:        this.Parent.Compiled_ArgSz.value,
-            bNormalText:    this.IsNormalText(),
-            bEqArray:       this.Parent.IsEqArray()
-        };
-
-
-        InfoMathText = new CMathInfoTextPr(InfoTextPr);
-    }
-
-    for ( var Pos = 0; Pos < ContentLength; Pos++ )
-    {
-        var Item = this.Content[Pos];
-        var ItemType = Item.Type;
-
-        if (para_Drawing === ItemType)
-        {
-            Item.Parent          = this.Paragraph;
-            Item.DocumentContent = this.Paragraph.Parent;
-            Item.DrawingDocument = this.Paragraph.Parent.DrawingDocument;
-        }
-
-        // TODO: Как только избавимся от para_End переделать здесь
-        if ( para_End === ItemType )
+	if (this.RecalcInfo.Measure)
+	{
+		for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
 		{
-			var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
-			g_oTextMeasurer.SetTextPr(oEndTextPr, this.Paragraph.Get_Theme());
-			Item.Measure(g_oTextMeasurer, oEndTextPr);
-
-			continue;
+			this.private_MeasureElement(nPos, oTextPr, oTheme, oInfoMathText);
 		}
+	}
+	else
+	{
+		for (var nIndex = 0, nCount = this.RecalcInfo.MeasurePositions.length; nIndex < nCount; ++nIndex)
+		{
+			var nPos = this.RecalcInfo.MeasurePositions[nIndex];
+			if (!this.Content[nPos])
+				continue;
 
-        Item.Measure( g_oTextMeasurer, Pr, InfoMathText, this);
+			this.private_MeasureElement(nPos, oTextPr, oTheme, oInfoMathText);
+		}
+	}
 
+	this.RecalcInfo.Recalc = true;
+	this.RecalcInfo.ResetMeasure();
+};
+ParaRun.prototype.private_MeasureElement = function(nPos, oTextPr, oTheme, oInfoMathText)
+{
+	var oParagraph = this.GetParagraph();
 
-        if (para_Drawing === Item.Type)
-        {
-            // После автофигур надо заново выставлять настройки
-            g_oTextMeasurer.SetTextPr(Pr, Theme);
-            g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-        }
-    }
+	var oItem     = this.Content[nPos];
+	var nItemType = oItem.Type;
 
-    this.RecalcInfo.Recalc  = true;
-    this.RecalcInfo.Measure = false;
+	if (para_Drawing === nItemType && oParagraph)
+	{
+		oItem.Parent          = oParagraph;
+		oItem.DocumentContent = oParagraph.Parent;
+		oItem.DrawingDocument = oParagraph.Parent.DrawingDocument;
+	}
+
+	// TODO: Как только избавимся от para_End переделать здесь
+	if (para_End === nItemType && oParagraph)
+	{
+		var oEndTextPr = oParagraph.GetParaEndCompiledPr();
+		g_oTextMeasurer.SetTextPr(oEndTextPr, oTheme);
+		oItem.Measure(g_oTextMeasurer, oEndTextPr);
+		return;
+	}
+
+	oItem.Measure(g_oTextMeasurer, oTextPr, oInfoMathText, this);
+
+	if (para_Drawing === nItemType)
+	{
+		// После автофигур надо заново выставлять настройки
+		g_oTextMeasurer.SetTextPr(oTextPr, oTheme);
+		g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+	}
 };
 ParaRun.prototype.Recalculate_Measure2 = function(Metrics)
 {
@@ -8370,22 +8380,72 @@ function CParaRunRecalcInfo()
     this.Recalc  = true; // Нужно ли пересчитывать (только если текстовый ран)
     this.RunLen  = 0;
 
+    this.MeasurePositions = []; // Массив позиций элементов, которые нужно пересчитать
+
     // Далее идут параметры, которые выставляются после пересчета данного Range, такие как пересчитывать ли нумерацию
     this.NumberingItem = null;
     this.NumberingUse  = false; // Используется ли нумерация в данном ране
     this.NumberingAdd  = true;  // Нужно ли в следующем ране использовать нумерацию
 }
 
-CParaRunRecalcInfo.prototype =
+CParaRunRecalcInfo.prototype.Reset = function()
 {
-    Reset : function()
-    {
-        this.TextPr  = true;
-        this.Measure = true;
-        this.Recalc  = true;
-        this.RunLen  = 0;
-    }
+	this.TextPr  = true;
+	this.Measure = true;
+	this.Recalc  = true;
+	this.RunLen  = 0;
 
+	this.MeasurePositions = [];
+};
+/**
+ * Вызываем данную функцию после пересчета элементов рана
+ */
+CParaRunRecalcInfo.prototype.ResetMeasure = function()
+{
+	this.Measure          = false;
+	this.MeasurePositions = [];
+};
+/**
+ * Проверяем нужен ли пересчет элементов рана
+ * @return {boolean}
+ */
+CParaRunRecalcInfo.prototype.IsMeasureNeed = function()
+{
+	return (this.Measure || this.MeasurePositions.length > 0);
+};
+/**
+ * Регистрируем добавление элемента в ран
+ * @param nPos {number}
+ */
+CParaRunRecalcInfo.prototype.OnAdd = function(nPos)
+{
+	for (var nIndex = 0, nCount = this.MeasurePositions.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.MeasurePositions[nIndex] >= nPos)
+			this.MeasurePositions[nIndex] = nPos;
+	}
+
+	this.MeasurePositions.push(nPos);
+};
+/**
+ * Регистрируем удаление элементов из рана
+ * @param nPos {number}
+ * @param nCount {number}
+ */
+CParaRunRecalcInfo.prototype.OnRemove = function(nPos, nCount)
+{
+	for (var nIndex = 0, nCount = this.MeasurePositions.length; nIndex < nCount; ++nIndex)
+	{
+		if (nPos <= this.MeasurePositions[nIndex] && this.MeasurePositions[nIndex] <= nPos + nCount - 1)
+		{
+			this.MeasurePositions.splice(nIndex);
+			nIndex--;
+		}
+		else (this.MeasurePositions[nIndex] >= nPos + nCount)
+		{
+			this.MeasurePositions[nIndex] -= nCount;
+		}
+	}
 };
 
 function CParaRunRange(StartPos, EndPos)
