@@ -259,7 +259,6 @@
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
         "../common/Native/Wrappers/DrawingStream.js",
 		"../common/Native/Wrappers/ShapeDrawer.js",
-        "../cell/native/TextDrawer.js",
         "../cell/native/Overlay.js",
 		"../cell/native/Graphics.js",
         "../cell/native/DrawingDocument.js",
@@ -276,7 +275,6 @@
         "../common/FontsFreeType/FontManager.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../cell/model/DrawingObjects/Graphics.js",
-        "../common/Drawings/TextDrawer.js",
 		"../common/Scrolls/iscroll.js",
 		"../common/Scrolls/mobileTouchManagerBase.js",
 		"../cell/view/mobileTouch.js"

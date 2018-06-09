@@ -247,7 +247,6 @@
         "../slide/Native/Wrappers/api.js",
         "../slide/Native/Wrappers/HtmlPage.js",
         "../slide/Native/Wrappers/DrawingDocument.js",
-		"../cell/native/TextDrawer.js",
         "../slide/Native/Wrappers/native.js"
       ],
       "exclude_mobile": [
@@ -257,8 +256,7 @@
         "../slide/Drawing/DrawingDocument.js",
         "../common/FontsFreeType/FontFile.js",
         "../common/FontsFreeType/FontManager.js",
-        "../common/FontsFreeType/TextMeasurer.js",
-		"../common/Drawings/TextDrawer.js"
+        "../common/FontsFreeType/TextMeasurer.js"
       ],
       "dst": "../slide",
       "externs": [
