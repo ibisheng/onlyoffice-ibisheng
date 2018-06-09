@@ -122,7 +122,14 @@ var c_oSerNumTypes = {
 	NumFmtFormat: 26,
 	Num_LvlOverride : 27,
 	StartOverride: 28,
-	ILvl: 29
+	ILvl: 29,
+	Tentative: 30,
+	Tplc: 31,
+	IsLgl: 32,
+	LvlLegacy: 33,
+	Legacy: 34,
+	LegacyIndent: 35,
+	LegacySpace: 36
 };
 var c_oSerOtherTableTypes = {
     ImageMap:0,
@@ -4289,7 +4296,44 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap, saveP
 			this.memory.WriteByte(c_oSerPropLenType.Long);
 			this.memory.WriteLong(ILvl);
 		}
+		// if(null != lvl.Tentative)
+		// {
+		// 	this.memory.WriteByte(c_oSerNumTypes.Tentative);
+		// 	this.memory.WriteByte(c_oSerPropLenType.Byte);
+		// 	this.memory.WriteBool(lvl.Tentative);
+		// }
+		// if(null != lvl.Tplc)
+		// {
+		// 	this.memory.WriteByte(c_oSerNumTypes.Tplc);
+		// 	this.memory.WriteByte(c_oSerPropLenType.Long);
+		// 	this.memory.WriteLong(AscFonts.FT_Common.UintToInt(lvl.Tplc));
+		// }
+		// if(null != lvl.IsLgl)
+		// {
+		// 	this.memory.WriteByte(c_oSerNumTypes.IsLgl);
+		// 	this.memory.WriteByte(c_oSerPropLenType.Byte);
+		// 	this.memory.WriteBool(lvl.IsLgl);
+		// }
+		if(null != lvl.Legacy)
+		{
+			this.memory.WriteByte(c_oSerNumTypes.LvlLegacy);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function(){oThis.WriteLvlLegacy(lvl.Legacy);});
+		}
     };
+	this.WriteLvlLegacy = function(lvlLegacy)
+	{
+		var oThis = this;
+		if (null != lvlLegacy.Legacy) {
+			this.bs.WriteItem(c_oSerNumTypes.Legacy, function(){oThis.memory.WriteBool(lvlLegacy.Legacy);});
+		}
+		if (null != lvlLegacy.Indent) {
+			this.bs.WriteItem(c_oSerNumTypes.LegacyIndent, function(){oThis.memory.WriteLong(lvlLegacy.Indent);});
+		}
+		if (null != lvlLegacy.Space) {
+			this.bs.WriteItem(c_oSerNumTypes.LegacySpace, function(){oThis.memory.WriteLong(AscFonts.FT_Common.UintToInt(lvlLegacy.Space))});
+		}
+	};
     this.WriteLevelText = function(aText)
     {
         var oThis = this;
@@ -9250,10 +9294,41 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 		{
 			tmp.nLevelNum = this.stream.GetULongLE();
 		}
+		// else if ( c_oSerNumTypes.Tentative === type )
+		// {
+		// 	oNewLvl.Tentative = this.stream.GetBool();
+		// }
+		// else if ( c_oSerNumTypes.Tplc === type )
+		// {
+		// 	oNewLvl.Tplc = AscFonts.FT_Common.IntToUInt(this.stream.GetULongLE());
+		// }
+		// else if ( c_oSerNumTypes.IsLgl === type )
+		// {
+		// 	oNewLvl.IsLgl = this.stream.GetBool();
+		// }
+		else if ( c_oSerNumTypes.LvlLegacy === type )
+		{
+			oNewLvl.Legacy = new CNumberingLvlLegacy();
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.ReadLvlLegacy(t, l, oNewLvl.Legacy);
+			});
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
+	this.ReadLvlLegacy = function(type, length, lvlLegacy) {
+		var res = c_oSerConstants.ReadOk;
+		if ( c_oSerNumTypes.Legacy === type ) {
+			lvlLegacy.Legacy = this.stream.GetBool();
+		} else if ( c_oSerNumTypes.LegacyIndent === type ) {
+			lvlLegacy.Indent = this.stream.GetULongLE();
+		} else if ( c_oSerNumTypes.LegacySpace === type ) {
+			lvlLegacy.Space = AscFonts.FT_Common.IntToUInt(this.stream.GetULongLE());
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	}
     this.ReadLevelText = function(type, length, aNewText)
     {
         var oThis = this;
