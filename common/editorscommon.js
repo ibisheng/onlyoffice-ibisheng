@@ -3672,7 +3672,27 @@
 			if (0 == _array.length)
 				return false;
 
-            this.checkEditorId();
+			this.checkEditorId();
+
+			var isChangesMode = (_array[0]["change"]) ? true : false;
+
+			if (isChangesMode)
+			{
+                for (var i = _array.length - 1; i >= 0; i--)
+                {
+                    if (_array[i]["change"].length > this.cryptoPrefixLen)
+                    {
+                        if (this.cryptoPrefix == _array[i]["change"].substr(0, this.cryptoPrefixLen))
+                        {
+                            _array[i] = _array[i]["change"].substr(this.cryptoPrefixLen);
+                            isCrypted = true;
+                            break;
+                        }
+                    }
+                }
+
+                return isCrypted;
+			}
 
             var isCrypted = false;
             if (this.editorId == AscCommon.c_oEditorId.Spreadsheet)
