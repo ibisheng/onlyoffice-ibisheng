@@ -666,7 +666,7 @@
 			return;
 		}
         var mimeType = AscCommon.getExtentionByFormat(rdata["outputformat"])
-        window["session"].downloadAs(rdata["savetype"],rdata["saveindex"],mimeType,
+        window["session"]["downloadAs"](rdata["savetype"],rdata["saveindex"],mimeType,
             dataContainer.part || dataContainer.data,
             function(err,res){
                 if(err){
