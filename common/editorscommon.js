@@ -3451,24 +3451,35 @@
         this.handleChangesCallback = null;
         this.isChangesHandled = false;
 
-        this.isNeedCrypt = false;
+        this.cryptoMode = 0; // start crypto mode
 
         this.isExistDecryptedChanges = false; // был ли хоть один запрос на расшифровку данных (были ли чужие изменения)
 
-        this.cryptoPrefix = window["AscDesktopEditor"] ? window["AscDesktopEditor"]["GetEncryptedHeader"]() : "ENCRYPTED;";
+        this.cryptoPrefix = (window["AscDesktopEditor"] && window["AscDesktopEditor"]["GetEncryptedHeader"]) ? window["AscDesktopEditor"]["GetEncryptedHeader"]() : "ENCRYPTED;";
         this.cryptoPrefixLen = this.cryptoPrefix.length;
 
         this.editorId = null;
 
-		this.isCryptoImages = function()
+        this.isNeedCrypt = function()
 		{
-            if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
-            	return false;
+            if (!window.g_asc_plugins.isRunnedEncryption())
+                return false;
 
             if (!window["AscDesktopEditor"])
+                return false;
+
+            if (2 == this.cryptoMode)
+            	return true;
+
+            if (0 === window["AscDesktopEditor"]["CryptoMode"])
             	return false;
 
             return true;
+		};
+
+		this.isCryptoImages = function()
+		{
+            return this.isNeedCrypt();
 		};
 
         this.addCryproImagesFromDialog = function(callback)
@@ -3538,7 +3549,7 @@
 
         this.sendChanges = function(sender, data, type, options)
         {
-            if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
+            if (!this.isNeedCrypt())
             {
                 if (AscCommon.EncryptionMessageType.Encrypt == type)
                 {
@@ -3730,7 +3741,7 @@
 
         this.handleChanges = function(_array, _sender, _callback)
 		{
-            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length || !this.isNeedCrypt)
+            if (0 == _array.length || !this.isNeedCrypt())
 			{
 				if (this.isExistEncryptedChanges(_array))
 				{
@@ -4082,6 +4093,17 @@ window["UpdateSystemPlugins"] = function()
                 var _variation = _plugin["variations"][j];
                 if (_variation["initDataType"] == "desktop")
                 {
+                    if (_variation["initData"] == "encryption")
+                    {
+                    	var _mode = _variation["cryptoMode"];
+                    	if (!_mode)
+                    		_mode = "1";
+                    	AscCommon.EncryptionWorker.cryptoMode = parseInt(_mode);
+
+                        _array.push(_plugin);
+                        break;
+                    }
+
                     _array.push(_plugin);
                     break;
                 }

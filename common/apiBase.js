@@ -1621,8 +1621,6 @@
                     return;
                 }
 
-                AscCommon.EncryptionWorker.isNeedCrypt = true;
-                
                 var _ret = _editor.asc_nativeGetFile3();
                 window["AscDesktopEditor"]["buildCryptedStart"](_ret.data, _ret.header, obj["password"]);
                 break;
@@ -1631,8 +1629,6 @@
             {
                 if ("" != obj["password"])
                 {
-                    AscCommon.EncryptionWorker.isNeedCrypt = true;
-
                     var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
                     _editor.currentPassword = obj["password"];
 
