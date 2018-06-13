@@ -482,7 +482,7 @@
 				this.ppiY = AscCommon.AscBrowser.convertToRetinaValue(this.ppiY, true);
 			}
 		}
-		this.LastFontOriginInfo = null;
+		this.LastFontOriginInfo = undefined;
 
 		this._mct = new Matrix();  // units transform
 		this._mt = new Matrix();  // user transform
@@ -550,15 +550,8 @@
 	 * @param canvas
 	 */
 	DrawingContext.prototype.setCanvas = function (canvas) {
-		if (window["NATIVE_EDITOR_ENJINE"]) {
-			this.ctx = new NativeContext();
-			return;
-		}
-		if (null == canvas) {
-			return;
-		}
-		this.canvas = canvas;
-		this.ctx = this.canvas.getContext("2d");
+		this.canvas = canvas || null;
+		this.ctx = window["NATIVE_EDITOR_ENJINE"] ? new NativeContext() : (this.canvas && this.canvas.getContext("2d"));
 	};
 
 	/**
