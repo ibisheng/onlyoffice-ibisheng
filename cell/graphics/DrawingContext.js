@@ -469,7 +469,7 @@
 		this.ppiX = 96;
 		this.ppiY = 96;
 
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		if (window["IS_NATIVE_EDITOR"]) {
 			this.ppiX = this.ppiY = window["native"]["GetDeviceDPI"]();
 
 			//this.deviceDPI = window["native"]["GetDeviceDPI"]();
@@ -501,7 +501,7 @@
 		this.changeUnits(undefined !== settings.units ? settings.units : this.units);
 
 		this.fmgrGraphics = undefined !== settings.fmgrGraphics ? settings.fmgrGraphics : null;
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		if (window["IS_NATIVE_EDITOR"]) {
 			this.fmgrGraphics = [new NativeFontManager(), new NativeFontManager(), new NativeFontManager(), new NativeFontManager()];
 		}
 
@@ -555,7 +555,7 @@
 	 */
 	DrawingContext.prototype.setCanvas = function (canvas) {
 		this.canvas = canvas || null;
-		this.ctx = window["NATIVE_EDITOR_ENJINE"] ? new NativeContext() : (this.canvas && this.canvas.getContext("2d"));
+		this.ctx = window["IS_NATIVE_EDITOR"] ? new NativeContext() : (this.canvas && this.canvas.getContext("2d"));
 	};
 
 	/**
@@ -709,14 +709,14 @@
 	};
 
 	DrawingContext.prototype.AddClipRect = function (x, y, w, h) {
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		if (window["IS_NATIVE_EDITOR"]) {
 			return this;
 		}
 		return this.save().beginPath().rect(x, y, w, h).clip();
 	};
 
 	DrawingContext.prototype.RemoveClipRect = function () {
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		if (window["IS_NATIVE_EDITOR"]) {
 			return this;
 		}
 		return this.restore();
@@ -917,7 +917,7 @@
 		res.lineGap = factor * (fm.m_lLineHeight - fm.m_lAscender - d);
 
 		var face;
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		if (window["IS_NATIVE_EDITOR"]) {
 			face = g_oTextMeasurer.Measurer['GetFace']();
 			res.nat_scale = face[0];
 			res.nat_y1 = face[1];
@@ -950,7 +950,7 @@
 		var r;
 		this.font.copyFrom(font);
 
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		if (window["IS_NATIVE_EDITOR"]) {
 			this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor * 96.0 / 72.0;
 			// this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor * this.deviceDPI / 72.0;
 
@@ -971,7 +971,7 @@
 			fontStyle = FontStyle.FontStyleRegular;
 		}
 
-		if (window["NATIVE_EDITOR_ENJINE"]) {
+		if (window["IS_NATIVE_EDITOR"]) {
 			var fontInfo = AscFonts.g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
 			fontInfo = GetLoadInfoForMeasurer(fontInfo, fontStyle);
 
@@ -1084,7 +1084,7 @@
 			code = text.charCodeAt(i);
 			// Replace Non-breaking space(0xA0) with White-space(0x20)
 			code = 0xA0 === code ? 0x20 : code;
-			if (window["NATIVE_EDITOR_ENJINE"]) {
+			if (window["IS_NATIVE_EDITOR"]) {
 				//TODO: cache
 				// if (null != this.LastFontOriginInfo.Replace)
 				//   code = g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
