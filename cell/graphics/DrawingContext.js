@@ -417,6 +417,10 @@
 		}
 	});
 
+	NativeContext.prototype.clearRect = function (x, y, w, h) {};
+	NativeContext.prototype.getImageData = function (sx,sy,sw,sh) {};
+	NativeContext.prototype.putImageData = function (image_data,dx,dy,dirtyX,dirtyY,dirtyWidth,dirtyHeight) {};
+
 	function NativeFontManager() {
 		this.m_lUnits_Per_Em = 0;
 		this.m_lAscender = 0;
