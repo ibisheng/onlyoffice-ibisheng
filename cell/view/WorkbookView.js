@@ -294,14 +294,14 @@
 
     // Shapes
     var vector_koef = AscCommonExcel.vector_koef;
-    var canvasWidth = this.drawingGraphicCtx.canvas.width;
-    var canvasHeight = this.drawingGraphicCtx.canvas.height;
+    var canvasWidth = this.canvasGraphic.width;
+    var canvasHeight = this.canvasGraphic.height;
     this.buffers.shapeCtx = new AscCommon.CGraphics();
     this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, canvasWidth * vector_koef, canvasHeight * vector_koef);
     this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
 
-    var overlayWidth = this.overlayGraphicCtx.canvas.width;
-    var overlayHeight = this.overlayGraphicCtx.canvas.height;
+    var overlayWidth = this.canvasGraphicOverlay.width;
+    var overlayHeight = this.canvasGraphicOverlay.height;
     this.buffers.shapeOverlayCtx = new AscCommon.CGraphics();
     this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, overlayWidth, overlayHeight, overlayWidth * vector_koef, overlayHeight * vector_koef);
     this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
