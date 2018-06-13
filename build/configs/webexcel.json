@@ -251,9 +251,7 @@
 			"min": [
 			"../common/Native/Wrappers/memory.js"
 		],
-		"common": [
-			"../cell/native/DrawingContext.js"
-		]
+		"common": []
 	  },
 	  "mobile": [	 
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
@@ -267,7 +265,6 @@
       "exclude_mobile": [
         "../common/Overlay.js",
         "../common/Controls.js",
-		"../cell/graphics/DrawingContext.js",
         "../cell/model/DrawingObjects/ShapeDrawer.js",
         "../cell/model/DrawingObjects/DrawingDocument.js", 
 		"../common/FontsFreeType/font_engine.js",
