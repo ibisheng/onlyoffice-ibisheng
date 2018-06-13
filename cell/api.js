@@ -2498,6 +2498,10 @@ var editor;
 
       }, true);
     }
+    else{
+      ws.objectRender.setGraphicObjectProps(props);
+    }
+
 
   };
 
