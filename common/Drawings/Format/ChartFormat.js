@@ -5064,6 +5064,7 @@ CValAx.prototype =
         }
         c.setAxPos(this.axPos);
         c.setCrossBetween(this.crossBetween);
+        c.setCrosses(this.crosses);
         c.setCrossesAt(this.crossesAt);
         c.setDelete(this.bDelete);
         if(this.dispUnits)
