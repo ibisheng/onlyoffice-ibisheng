@@ -4429,11 +4429,10 @@ PasteProcessor.prototype =
 				var targetDocContent =  oController  && oController.getTargetDocContent();
 				if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
 				{
-					if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
-					{
-						var aNewContent = arrShapes[0].Drawing.txBody.content.Content;
-						oThis.InsertInPlacePresentation(aNewContent);
-					}
+                    //не проверяем на лок т. к. это делается в asc_docs_api.prototype.asc_PasteData.
+                    // При двух последовательных проверках в совместном редактировании вторая проверка всегда будет возвращать лок
+                    var aNewContent = arrShapes[0].Drawing.txBody.content.Content;
+                    oThis.InsertInPlacePresentation(aNewContent);
 				}
 				else
 				{
