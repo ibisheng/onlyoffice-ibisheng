@@ -4197,6 +4197,9 @@ PasteProcessor.prototype =
 
             var readLayouts = function(){
                 var loader = new AscCommon.BinaryPPTYLoader();
+				if (!(bDuplicate === true)) {
+					loader.Start_UseFullUrl();
+				}
                 loader.stream = stream;
                 loader.presentation = editor.WordControl.m_oLogicDocument;
 
@@ -4225,11 +4228,15 @@ PasteProcessor.prototype =
                     fonts.push(new CFont(i, 0, "", 0));
                 }*/
 
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
                 presentationSelectedContent.Layouts = layouts;
             };
 
             var readMasters = function(){
                 var loader = new AscCommon.BinaryPPTYLoader();
+				if (!(bDuplicate === true)) {
+					loader.Start_UseFullUrl();
+				}
                 loader.stream = stream;
                 loader.presentation = editor.WordControl.m_oLogicDocument;
 
@@ -4245,6 +4252,7 @@ PasteProcessor.prototype =
                     }
                 }
 
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
                 presentationSelectedContent.Masters = array;
             };
 
@@ -4306,6 +4314,9 @@ PasteProcessor.prototype =
 
             var readThemes = function(){
                 var loader = new AscCommon.BinaryPPTYLoader();
+				if (!(bDuplicate === true)) {
+					loader.Start_UseFullUrl();
+				}
                 loader.stream = stream;
                 loader.presentation = editor.WordControl.m_oLogicDocument;
 
@@ -4317,6 +4328,7 @@ PasteProcessor.prototype =
                     array.push(loader.ReadTheme());
                 }
 
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
                 presentationSelectedContent.Themes = array;
             };
 
