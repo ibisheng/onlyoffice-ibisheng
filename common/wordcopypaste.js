@@ -4105,7 +4105,7 @@ PasteProcessor.prototype =
 	    return AscFormat.ExecuteNoHistory(function(){
             var presentationSelectedContent = null;
             var fonts = [];
-            var arr_Images = {};
+            var arr_Images = [];
             var oThis = this;
 
             var readContent = function () {
@@ -4148,7 +4148,7 @@ PasteProcessor.prototype =
                     fonts.push(new CFont(i, 0, "", 0));
                 }
 
-                arr_Images = objects.arrImages;
+				arr_Images = arr_Images.concat(objects.arrImages);
             };
 
             var readSlideObjects = function () {
@@ -4189,7 +4189,7 @@ PasteProcessor.prototype =
                     fonts.push(new CFont(i, 0, "", 0));
                 }
 
-                var arr_Images = loader.End_UseFullUrl();
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
 
                 presentationSelectedContent.SlideObjects = slideCopyObjects;
             };
