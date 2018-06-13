@@ -165,7 +165,11 @@ CParagraphContentBase.prototype.Get_ParaPosByContentPos = function(ContentPos, D
 CParagraphContentBase.prototype.UpdateBookmarks = function(oManager)
 {
 };
-CParagraphContentBase.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+/**
+ * @param oSpellCheckerEngine {CParagraphSpellCheckerEngine}
+ * @param nDepth {number}
+ */
+CParagraphContentBase.prototype.CheckSpelling = function(oSpellCheckerEngine, nDepth)
 {
 };
 CParagraphContentBase.prototype.GetParent = function()
@@ -576,7 +580,8 @@ function CParagraphContentWithContentBase()
     //
     // Пример. 2 строки, в первой строке 3 отрезка, во второй строке 1 отрезок
     // this.Lines = [2, 0, 6, 0, 15, 15, 17, 17, 20, 20, 25];
-    this.Lines = [0];
+
+	this.Lines = [0];
 
     this.StartLine   = -1;
     this.StartRange  = -1;
@@ -595,7 +600,7 @@ CParagraphContentWithContentBase.prototype.Recalculate_Reset = function(StartRan
 
 CParagraphContentWithContentBase.prototype.protected_ClearLines = function()
 {
-    this.Lines = [0];
+	this.Lines = [0];
 };
 
 CParagraphContentWithContentBase.prototype.protected_GetRangeOffset = function(LineIndex, RangeIndex)
@@ -682,10 +687,13 @@ CParagraphContentWithContentBase.prototype.protected_FillRangeEndPos = function(
     var RangeOffset = this.protected_GetRangeOffset(LineIndex, RangeIndex);
     this.Lines[RangeOffset + 1] = EndPos;
 };
-CParagraphContentWithContentBase.prototype.protected_UpdateSpellChecking = function()
+CParagraphContentWithContentBase.prototype.private_UpdateSpellChecking = function()
 {
-    if(undefined !== this.Paragraph && null !== this.Paragraph)
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+	if (this.Paragraph)
+	{
+		this.Paragraph.SpellChecker.ClearPausedEngine();
+		this.Paragraph.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+	}
 };
 CParagraphContentWithContentBase.prototype.Is_UseInDocument = function(Id)
 {
@@ -1796,7 +1804,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Range = function
     if ( this.Paragraph !== PRS.Paragraph )
     {
         this.Paragraph = PRS.Paragraph;
-        this.protected_UpdateSpellChecking();
+        this.private_UpdateSpellChecking();
     }
 
     var CurLine  = PRS.Line - this.StartLine;
@@ -2924,17 +2932,30 @@ CParagraphContentWithParagraphLikeContent.prototype.Restart_CheckSpelling = func
         this.Content[nIndex].Restart_CheckSpelling();
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+/**
+ * @param oSpellCheckerEngine {CParagraphSpellCheckerEngine}
+ * @param nDepth {number}
+ */
+CParagraphContentWithParagraphLikeContent.prototype.CheckSpelling = function(oSpellCheckerEngine, nDepth)
 {
-    this.SpellingMarks = [];
+	if (oSpellCheckerEngine.IsExceedLimit())
+		return;
 
-    var ContentLen = this.Content.length;
-    for ( var Pos = 0; Pos < ContentLen; Pos++ )
+	var nStartPos = 0;
+	if (oSpellCheckerEngine.IsFindStart())
+		nStartPos = oSpellCheckerEngine.GetPos(nDepth);
+	else
+		this.SpellingMarks = [];
+
+    for (var nPos = nStartPos, nCount = this.Content.length; nPos < nCount; ++nPos)
     {
-        var Item = this.Content[Pos];
+    	var oItem = this.Content[nPos];
 
-        SpellCheckerEngine.ContentPos.Update( Pos, Depth );
-        Item.Check_Spelling( SpellCheckerEngine, Depth + 1 );
+    	oSpellCheckerEngine.UpdatePos(nPos, nDepth);
+        oItem.CheckSpelling(oSpellCheckerEngine, nDepth + 1);
+
+        if (oSpellCheckerEngine.IsExceedLimit())
+        	return;
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)

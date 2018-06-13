@@ -1240,7 +1240,7 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
             ContentPos.Data[Depth]++;
     }
 
-    this.protected_UpdateSpellChecking();
+    this.private_UpdateSpellChecking();
 	this.private_UpdateDocumentOutline();
     this.private_UpdateTrackRevisionOnChangeContent(true);
 
@@ -1303,7 +1303,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
             ContentPos.Data[Depth] = Math.max( 0 , Pos );
     }
 
-    this.protected_UpdateSpellChecking();
+    this.private_UpdateSpellChecking();
 	this.private_UpdateDocumentOutline();
 	this.private_UpdateTrackRevisionOnChangeContent(true);
 
@@ -2599,7 +2599,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.RecalcInfo.TextPr  = true;
         this.RecalcInfo.Measure = true;
 
-        this.protected_UpdateSpellChecking();
+        this.private_UpdateSpellChecking();
     }
 
     // Сначала измеряем элементы (можно вызывать каждый раз, внутри разруливается, чтобы измерялось 1 раз)
@@ -4471,35 +4471,60 @@ ParaRun.prototype.private_CheckInstrText = function(oItem)
 	return (oReplacement ? oReplacement : oItem);
 };
 
-ParaRun.prototype.Refresh_RecalcData = function(Data)
+ParaRun.prototype.Refresh_RecalcData = function(oData)
 {
-    var Para = this.Paragraph;
+	var oPara = this.Paragraph;
 
-    if(this.Type == para_Math_Run)
-    {
-        if(this.Parent !== null && this.Parent !== undefined)
-        {
-            this.Parent.Refresh_RecalcData();
-        }
-    }
-    else if ( -1 !== this.StartLine && undefined !== Para )
-    {
-        var CurLine = this.StartLine;
+	if (this.Type == para_Math_Run)
+	{
+		if (this.Parent !== null && this.Parent !== undefined)
+		{
+			this.Parent.Refresh_RecalcData();
+		}
+	}
+	else if (-1 !== this.StartLine && oPara)
+	{
+		var nCurLine = this.StartLine;
 
-        var PagesCount = Para.Pages.length;
-        for (var CurPage = 0 ; CurPage < PagesCount; CurPage++ )
-        {
-            var Page = Para.Pages[CurPage];
-            if ( Page.StartLine <= CurLine && Page.EndLine >= CurLine  )
-            {
-                Para.Refresh_RecalcData2(CurPage);
-                return;
-            }
+		if (oData instanceof CChangesRunAddItem || oData instanceof CChangesRunRemoveItem)
+		{
+			nCurLine = -1;
+			var nChangePos = oData.GetMinPos();
+			for (var nLine = 0, nLinesCount = this.protected_GetLinesCount(); nLine < nLinesCount; ++nLine)
+			{
+				for (var nRange = 0, nRangesCount = this.protected_GetRangesCount(nLine); nRange < nRangesCount; ++nRange)
+				{
+					var nStartPos = this.protected_GetRangeStartPos(nLine, nRange);
+					var nEndPos   = this.protected_GetRangeEndPos(nLine, nRange);
 
-        }
+					if (nStartPos <= nChangePos && nChangePos < nEndPos)
+					{
+						nCurLine = nLine + this.StartLine;
+						break;
+					}
+				}
 
-        Para.Refresh_RecalcData2(0);
-    }
+				if (-1 !== nCurLine)
+					break;
+			}
+
+			if (-1 === nCurLine)
+				nCurLine = this.StartLine + this.protected_GetLinesCount() - 1;
+		}
+
+		for (var nCurPage = 0, nPagesCount = oPara.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
+		{
+			var oPage = oPara.Pages[nCurPage];
+			if (oPage.StartLine <= nCurLine && nCurLine <= oPage.EndLine)
+			{
+				oPara.Refresh_RecalcData2(nCurPage);
+				return;
+			}
+
+		}
+
+		oPara.Refresh_RecalcData2(0);
+	}
 };
 ParaRun.prototype.Refresh_RecalcData2 = function()
 {
@@ -7066,7 +7091,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
 	History.Add(new CChangesRunTextPr(this, OldValue, TextPr, this.private_IsCollPrChangeMine()));
     this.Recalc_CompiledPr(true);
 
-    this.protected_UpdateSpellChecking();
+    this.private_UpdateSpellChecking();
     this.private_UpdateTrackRevisionOnChangeTextPr(true);
 };
 
@@ -8152,7 +8177,7 @@ ParaRun.prototype.Set_Lang2 = function(Lang)
         if ( undefined != Lang.Val )
             this.Set_Lang_Val( Lang.Val );
 
-        this.protected_UpdateSpellChecking();
+        this.private_UpdateSpellChecking();
     }
 };
 
@@ -8441,7 +8466,7 @@ CParaRunRecalcInfo.prototype.OnRemove = function(nPos, nCount)
 			this.MeasurePositions.splice(nIndex);
 			nIndex--;
 		}
-		else (this.MeasurePositions[nIndex] >= nPos + nCount)
+		else if (this.MeasurePositions[nIndex] >= nPos + nCount)
 		{
 			this.MeasurePositions[nIndex] -= nCount;
 		}

@@ -3312,6 +3312,27 @@
 		// TODO: Сюда надо бы перенести работу с ContentChanges
 		return true;
 	};
+	CChangesBaseContentChange.prototype.GetMinPos = function()
+	{
+		var nPos = null;
+		if (this.UseArray)
+		{
+			for (var nIndex = 0, nCount = this.PosArray.length; nIndex < nCount; ++nIndex)
+			{
+				if (null === nPos || nPos > this.PosArray[nIndex])
+					nPos = this.PosArray[nIndex];
+			}
+
+			if (null === nPos)
+				nPos = 0;
+		}
+		else
+		{
+			nPos = this.Pos;
+		}
+
+		return nPos;
+	};
 	window['AscDFH'].CChangesBaseContentChange = CChangesBaseContentChange;
 	/**
 	 * Базовый класс для изменения свойств.

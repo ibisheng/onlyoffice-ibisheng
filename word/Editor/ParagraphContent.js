@@ -620,7 +620,12 @@ ParaText.prototype.IsSpaceAfter = function()
 {
 	return (this.Flags & PARATEXT_FLAGS_SPACEAFTER ? true : false);
 };
-ParaText.prototype.Get_CharForSpellCheck = function(bCaps)
+/**
+ * Получаем символ для проверки орфографии
+ * @param bCaps {boolean}
+ * @return {string}
+ */
+ParaText.prototype.GetCharForSpellCheck = function(bCaps)
 {
 	// Закрывающуюся кавычку (0x2019), посылаем как апостроф
 

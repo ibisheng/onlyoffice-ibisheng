@@ -125,19 +125,19 @@ CDocumentSpelling.prototype =
         this.CheckPara[Id] = Para;
     },
     
-    Get_ErrorsCount : function()
+    GetErrorsCount : function()
     {
         var Count = 0;
         for (var Id in this.Paragraphs)
         {
             var Para = this.Paragraphs[Id];
-            Count += Para.SpellChecker.Get_ErrorsCount();
+            Count += Para.SpellChecker.GetErrorsCount();
         }     
         
         return Count;
     },
 
-    Continue_CheckSpelling : function()
+    ContinueCheckSpelling : function()
     {
         if (0 == this.TurnOn)
             return;
@@ -147,26 +147,29 @@ CDocumentSpelling.prototype =
         
         // Пока не обработались предыдущие параграфы, новые не стартуем
         if (this.WaitingParagraphsCount <= 0)
-        {
-            // Эта функция запускается в таймере, поэтому здесь сразу все параграфы не проверяем, чтобы не было
-            // притормоза большого, а запускаем по несколько штук.
+		{
+			// Эта функция запускается в таймере, поэтому здесь сразу все параграфы не проверяем, чтобы не было
+			// притормоза большого, а запускаем по несколько штук.
 
-            var Counter = 0;
-            for ( var Id in this.CheckPara )
-            {
-                var Para = this.CheckPara[Id];
-                Para.Continue_CheckSpelling();
-                delete this.CheckPara[Id];
-                Counter++;
+			var nCounter = 0;
+			for (var sId in this.CheckPara)
+			{
+				var oParagraph = this.CheckPara[sId];
 
-                if ( Counter > DOCUMENT_SPELLING_MAX_PARAGRAPHS )
-                    break;
-            }
+				if (!oParagraph.ContinueCheckSpelling(false))
+					break;
 
-            // TODO: Послать сообщение
-            if (this.Get_ErrorsCount() > DOCUMENT_SPELLING_MAX_ERRORS)
-                this.ErrorsExceed = true;
-        }
+				delete this.CheckPara[sId];
+				nCounter++;
+
+				if (nCounter > DOCUMENT_SPELLING_MAX_PARAGRAPHS)
+					break;
+			}
+
+			// TODO: Послать сообщение
+			if (this.GetErrorsCount() > DOCUMENT_SPELLING_MAX_ERRORS)
+				this.ErrorsExceed = true;
+		}
 
         for ( var Id in this.CurPara )
         {
@@ -187,7 +190,7 @@ CDocumentSpelling.prototype =
         for ( var Id in this.CheckPara )
         {
             var Para = this.CheckPara[Id];
-            Para.Continue_CheckSpelling();
+            Para.ContinueCheckSpelling(true);
             delete this.CheckPara[Id];
         }
 
@@ -268,6 +271,8 @@ function CParaSpellChecker(Paragraph)
     this.Paragraph = Paragraph;
     
     this.Words     = {};
+
+    this.Engine    = null;
 }
 
 CParaSpellChecker.prototype =
@@ -322,7 +327,7 @@ CParaSpellChecker.prototype =
         this.Elements.push( SpellCheckerEl );
     },
     
-    Get_ErrorsCount : function()
+    GetErrorsCount : function()
     {
         var ErrorsCount = 0;
         var ElementsCount = this.Elements.length;
@@ -670,6 +675,37 @@ CParaSpellChecker.prototype.GetElement = function(nIndex)
 {
 	return this.Elements[nIndex];
 };
+/**
+ * Приостанавливаем проверку орфографии, если параграф слишком большой
+ * @param {CParagraphSpellCheckerEngine} oEngine
+ */
+CParaSpellChecker.prototype.Pause = function(oEngine)
+{
+	this.Engine = oEngine;
+};
+/**
+ * Проверяем приостановлена ли проверка в данном параграфе
+ * @return {boolean}
+ */
+CParaSpellChecker.prototype.IsPaused = function()
+{
+	return !!(this.Engine);
+};
+/**
+ * Получаем класс для проверки орфографии внутри параграфа, на котором была сделана остановка
+ * @return {null|CParagraphSpellCheckerEngine}
+ */
+CParaSpellChecker.prototype.GetPausedEngine = function()
+{
+	return this.Engine;
+};
+/**
+ * Очищаем остановленное состояние
+ */
+CParaSpellChecker.prototype.ClearPausedEngine = function()
+{
+	this.Engine = null;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // CParaSpellCheckerElement
@@ -740,9 +776,9 @@ CDocument.prototype.Stop_CheckSpelling = function()
     this.Spelling.Reset();
 };
 
-CDocument.prototype.Continue_CheckSpelling = function()
+CDocument.prototype.ContinueCheckSpelling = function()
 {
-    this.Spelling.Continue_CheckSpelling();
+    this.Spelling.ContinueCheckSpelling();
 };
 
 CDocument.prototype.TurnOff_CheckSpelling = function()
@@ -879,27 +915,54 @@ Paragraph.prototype.Internal_CheckSpelling = function()
     }
 };
 
-Paragraph.prototype.Continue_CheckSpelling = function()
+/**
+ * Производим проверку орфографии.
+ * @param isForceFullCheck {boolean} принуждаем параграф проверить целиком, даже если он большой
+ * @return {boolean} true - проверка прошла до конца, false - параграф слишком большой и за один раз проверка не выполнилась
+ */
+Paragraph.prototype.ContinueCheckSpelling = function(isForceFullCheck)
 {
     var ParaForceRedraw = undefined;
     var CheckLang = false;
     if ( pararecalc_0_Spell_None === this.RecalcInfo.Recalc_0_Spell.Type )
-        return;
+        return true;
     else
     {
         var OldElements = this.SpellChecker.Elements;
 
-        this.SpellChecker.Elements = [];
-        var SpellCheckerEngine = new CParagraphSpellCheckerEngine( this.SpellChecker );
+		var oSpellCheckerEngine,
+			nStartPos = 0;
+        if (this.SpellChecker.IsPaused())
+		{
+			oSpellCheckerEngine = this.SpellChecker.GetPausedEngine();
+			oSpellCheckerEngine.SetFindStart(true);
+			oSpellCheckerEngine.ResetCheckedCounter();
 
-        var ContentLen = this.Content.length;
-        for ( var Pos = 0; Pos < ContentLen; Pos++ )
-        {
-            var Item = this.Content[Pos];
+			nStartPos = oSpellCheckerEngine.GetPos(0);
+		}
+		else
+		{
+			oSpellCheckerEngine = new CParagraphSpellCheckerEngine(this.SpellChecker, isForceFullCheck);
 
-            SpellCheckerEngine.ContentPos.Update( Pos, 0 );
-            Item.Check_Spelling( SpellCheckerEngine, 1 );
-        }
+			this.SpellChecker.Elements = [];
+		}
+
+		for (var nPos = nStartPos, nCount = this.Content.length; nPos < nCount; ++nPos)
+		{
+			var oItem = this.Content[nPos];
+
+			oSpellCheckerEngine.UpdatePos(nPos, 0);
+			oItem.CheckSpelling(oSpellCheckerEngine, 1);
+
+			if (oSpellCheckerEngine.IsExceedLimit())
+				break;
+		}
+
+		if (oSpellCheckerEngine.IsExceedLimit())
+		{
+			this.SpellChecker.Pause(oSpellCheckerEngine);
+			return false;
+		}
 
         //if ( true === this.SpellChecker.Compare_WithPrevious( OldElements ) )
         //    ParaForceRedraw = this;
@@ -915,6 +978,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
         CheckLang = false;
     }
 
+    // Специальная проверка на наличие буквицы в предыдущем параграфе. Если она есть, то первое слово мы не проверяем
     var PrevPara = this.Get_DocumentPrev();
     if ( null != PrevPara && type_Paragraph === PrevPara.GetType() && undefined != PrevPara.Get_FramePr() && undefined != PrevPara.Get_FramePr().DropCap )
     {
@@ -970,6 +1034,8 @@ Paragraph.prototype.Continue_CheckSpelling = function()
     this.SpellChecker.Check(ParaForceRedraw );
 
     this.RecalcInfo.Recalc_0_Spell.Type = pararecalc_0_Spell_None;
+
+    return true;
 };
 
 Paragraph.prototype.Add_SpellCheckerElement = function(Element)
@@ -999,76 +1065,95 @@ ParaRun.prototype.Restart_CheckSpelling = function()
     }
 };
 
-ParaRun.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+ParaRun.prototype.CheckSpelling = function(oSpellCheckerEngine, nDepth)
 {
-    this.SpellingMarks = [];
+	if (oSpellCheckerEngine.IsExceedLimit())
+		return;
 
-    // Пропускаем пустые раны
-    if ( true === this.Is_Empty() )
-        return;
+	var nStartPos = 0;
 
-    var bWord        = SpellCheckerEngine.bWord;
-    var sWord        = SpellCheckerEngine.sWord;
-    var CurLcid      = SpellCheckerEngine.CurLcid;
-    var SpellChecker = SpellCheckerEngine.SpellChecker;
-    var ContentPos   = SpellCheckerEngine.ContentPos;
+	var bWord        = oSpellCheckerEngine.bWord;
+	var sWord        = oSpellCheckerEngine.sWord;
+	var CurLcid      = oSpellCheckerEngine.CurLcid;
+	var SpellChecker = oSpellCheckerEngine.SpellChecker;
+	var ContentPos   = oSpellCheckerEngine.ContentPos;
 
-    var CurTextPr = this.Get_CompiledPr( false );
+	var oCurTextPr = this.Get_CompiledPr(false);
 
-    if ( true === bWord && CurLcid !== CurTextPr.Lang.Val )
-    {
-        bWord = false;
-        SpellChecker.Add( SpellCheckerEngine.StartPos, SpellCheckerEngine.EndPos, sWord, CurLcid );
-    }
+	if (oSpellCheckerEngine.IsFindStart())
+	{
+		nStartPos = oSpellCheckerEngine.GetPos(nDepth);
+		oSpellCheckerEngine.SetFindStart(false);
+	}
+	else
+	{
+		this.SpellingMarks = [];
 
-    CurLcid = CurTextPr.Lang.Val;
+		if (true === this.IsEmpty())
+			return;
 
-    var ContentLen = this.Content.length;
-    for ( var Pos = 0; Pos < ContentLen; Pos++ )
-    {
-        var Item = this.Content[Pos];
+		if (true === bWord && CurLcid !== oCurTextPr.Lang.Val)
+		{
+			bWord = false;
+			SpellChecker.Add(oSpellCheckerEngine.StartPos, oSpellCheckerEngine.EndPos, sWord, CurLcid);
+		}
 
-        //if ( para_Text === Item.Type && ( false === Item.Is_Punctuation() || ( true === bWord && true === this.Internal_CheckPunctuationBreak( Pos ) ) ) && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
-        if ( para_Text === Item.Get_Type() && false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
-        {
-            if ( false === bWord )
-            {
-                var StartPos = ContentPos.Copy();
-                var EndPos   = ContentPos.Copy();
+		CurLcid = oCurTextPr.Lang.Val;
+	}
 
-                StartPos.Update( Pos, Depth );
-                EndPos.Update( Pos + 1, Depth );
+    for (var nPos = nStartPos, nContentLen = this.Content.length; nPos < nContentLen; ++nPos)
+	{
+		if (oSpellCheckerEngine.IsExceedLimit())
+		{
+			oSpellCheckerEngine.UpdatePos(nPos, nDepth);
+			break;
+		}
 
-                bWord = true;
+		var oItem = this.Content[nPos];
 
-                sWord = Item.Get_CharForSpellCheck(CurTextPr.Caps);
+		//if ( para_Text === oItem.Type && ( false === oItem.Is_Punctuation() || ( true === bWord && true === this.Internal_CheckPunctuationBreak( nPos ) ) ) && false === oItem.Is_NBSP() && false === oItem.Is_Number() && false === oItem.Is_SpecialSymbol() )
+		if (para_Text === oItem.Get_Type() && false === oItem.Is_Punctuation() && false === oItem.Is_NBSP() && false === oItem.Is_Number() && false === oItem.Is_SpecialSymbol())
+		{
+			if (false === bWord)
+			{
+				var StartPos = ContentPos.Copy();
+				var EndPos   = ContentPos.Copy();
 
-                SpellCheckerEngine.StartPos = StartPos;
-                SpellCheckerEngine.EndPos   = EndPos;
-            }
-            else
-            {
-                sWord += Item.Get_CharForSpellCheck(CurTextPr.Caps);
+				StartPos.Update(nPos, nDepth);
+				EndPos.Update(nPos + 1, nDepth);
 
-                var EndPos = ContentPos.Copy();
-                EndPos.Update( Pos + 1, Depth );
+				bWord = true;
 
-                SpellCheckerEngine.EndPos = EndPos;
-            }
-        }
-        else
-        {
-            if ( true === bWord )
-            {
-                bWord = false;
-                SpellChecker.Add( SpellCheckerEngine.StartPos, SpellCheckerEngine.EndPos, sWord, CurLcid );
-            }
-        }
-    }
+				sWord = oItem.GetCharForSpellCheck(oCurTextPr.Caps);
 
-    SpellCheckerEngine.bWord   = bWord;
-    SpellCheckerEngine.sWord   = sWord;
-    SpellCheckerEngine.CurLcid = CurLcid;
+				oSpellCheckerEngine.StartPos = StartPos;
+				oSpellCheckerEngine.EndPos   = EndPos;
+			}
+			else
+			{
+				sWord += oItem.GetCharForSpellCheck(oCurTextPr.Caps);
+
+				var EndPos = ContentPos.Copy();
+				EndPos.Update(nPos + 1, nDepth);
+
+				oSpellCheckerEngine.EndPos = EndPos;
+			}
+		}
+		else
+		{
+			if (true === bWord)
+			{
+				bWord = false;
+				SpellChecker.Add(oSpellCheckerEngine.StartPos, oSpellCheckerEngine.EndPos, sWord, CurLcid);
+			}
+		}
+
+		oSpellCheckerEngine.IncreaseCheckedCounter();
+	}
+
+	oSpellCheckerEngine.bWord   = bWord;
+	oSpellCheckerEngine.sWord   = sWord;
+	oSpellCheckerEngine.CurLcid = CurLcid;
 };
 
 ParaRun.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
@@ -1110,10 +1195,6 @@ ParaComment.prototype.Restart_CheckSpelling = function()
 {
 };
 
-ParaComment.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
-{
-};
-
 ParaComment.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
 {
 };
@@ -1132,13 +1213,16 @@ ParaMath.prototype.Restart_CheckSpelling = function()
 {
 };
 
-ParaMath.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+ParaMath.prototype.CheckSpelling = function(oSpellCheckerEngine, nDepth)
 {
-    if ( true === SpellCheckerEngine.bWord )
-    {
-        SpellCheckerEngine.bWord = false;
-        SpellCheckerEngine.SpellChecker.Add( SpellCheckerEngine.StartPos, SpellCheckerEngine.EndPos, SpellCheckerEngine.sWord, SpellCheckerEngine.CurLcid );
-    }
+	if (oSpellCheckerEngine.IsExceedLimit())
+		return;
+
+	if (true === oSpellCheckerEngine.bWord)
+	{
+		oSpellCheckerEngine.bWord = false;
+		oSpellCheckerEngine.SpellChecker.Add(oSpellCheckerEngine.StartPos, oSpellCheckerEngine.EndPos, oSpellCheckerEngine.sWord, oSpellCheckerEngine.CurLcid);
+	}
 };
 
 ParaMath.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
@@ -1159,13 +1243,16 @@ ParaField.prototype.Restart_CheckSpelling = function()
 {
 };
 
-ParaField.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
+ParaField.prototype.CheckSpelling = function(oSpellCheckerEngine, nDepth)
 {
-    if ( true === SpellCheckerEngine.bWord )
-    {
-        SpellCheckerEngine.bWord = false;
-        SpellCheckerEngine.SpellChecker.Add( SpellCheckerEngine.StartPos, SpellCheckerEngine.EndPos, SpellCheckerEngine.sWord, SpellCheckerEngine.CurLcid );
-    }
+	if (oSpellCheckerEngine.IsExceedLimit())
+		return;
+
+	if (true === oSpellCheckerEngine.bWord)
+	{
+		oSpellCheckerEngine.bWord = false;
+		oSpellCheckerEngine.SpellChecker.Add(oSpellCheckerEngine.StartPos, oSpellCheckerEngine.EndPos, oSpellCheckerEngine.sWord, oSpellCheckerEngine.CurLcid);
+	}
 };
 
 ParaField.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
@@ -1182,17 +1269,80 @@ ParaField.prototype.Clear_SpellingMarks = function()
 
 
 
-function CParagraphSpellCheckerEngine(SpellChecker)
+function CParagraphSpellCheckerEngine(oSpellChecker, isForceFullCheck)
 {
     this.ContentPos   = new CParagraphContentPos();
-    this.SpellChecker = SpellChecker;
+    this.SpellChecker = oSpellChecker;
 
     this.CurLcid    = -1;
     this.bWord      = false;
     this.sWord      = "";
     this.StartPos   = null; // CParagraphContentPos
     this.EndPos     = null; // CParagraphContentPos
+
+
+	// Защита от проверки орфографии в большом параграфе
+	this.CheckedCounter = 0;
+	this.CheckedLimit   = 2000;
+	this.FindStart      = false;
+	this.ForceFullCheck = !!isForceFullCheck;
 }
+/**
+ * Обновляем текущую позицию на заданной глубине
+ * @param nPos {number}
+ * @param nDepth {number}
+ */
+CParagraphSpellCheckerEngine.prototype.UpdatePos = function(nPos, nDepth)
+{
+	this.ContentPos.Update(nPos, nDepth);
+};
+/**
+ * Получаем текущую позицию на заданном уровне
+ * @param nDepth
+ * @return {number}
+ */
+CParagraphSpellCheckerEngine.prototype.GetPos = function(nDepth)
+{
+	return this.ContentPos.Get(nDepth);
+};
+/**
+ * Проверяем превышен ли лимит возможнных проверок в параграфе за один проход таймера
+ * @return {boolean}
+ */
+CParagraphSpellCheckerEngine.prototype.IsExceedLimit = function()
+{
+	return (!this.ForceFullCheck && this.CheckedCounter >= this.CheckedLimit);
+};
+/**
+ * Увеличиваем счетчик проверенных элементов
+ */
+CParagraphSpellCheckerEngine.prototype.IncreaseCheckedCounter = function()
+{
+	this.CheckedCounter++;
+};
+/**
+ * Перестартовываем счетчик
+ */
+CParagraphSpellCheckerEngine.prototype.ResetCheckedCounter = function()
+{
+	this.CheckedCounter = 0;
+};
+/**
+ * Если проверка была приостановлена и сейчас мы ищем начальную позицию
+ * @return {boolean}
+ */
+CParagraphSpellCheckerEngine.prototype.IsFindStart = function()
+{
+	return this.FindStart;
+};
+/**
+ * Выставляем ищем ли мы место, где закончили проверку прошлый раз
+ * @param isFind {boolean}
+ */
+CParagraphSpellCheckerEngine.prototype.SetFindStart = function(isFind)
+{
+	this.FindStart = isFind;
+};
 
 function CParagraphSpellingMark(SpellCheckerElement, Start, Depth)
 {

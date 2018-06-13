@@ -3435,7 +3435,7 @@ function CEditorPage(api)
 			_c.m_oDrawingDocument.CheckFontCache();
 		}
 
-		oThis.m_oLogicDocument.Continue_CheckSpelling();
+		oThis.m_oLogicDocument.ContinueCheckSpelling();
 		oThis.m_oLogicDocument.Continue_TrackRevisions();
 	};
 	this.OnScroll       = function()

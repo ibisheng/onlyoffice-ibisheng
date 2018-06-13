@@ -1760,7 +1760,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if( this.Paragraph !== PRS.Paragraph )
     {
         this.Paragraph = PRS.Paragraph;
-        this.protected_UpdateSpellChecking();
+        this.private_UpdateSpellChecking();
     }
 
     var Para         = PRS.Paragraph;

@@ -847,9 +847,9 @@ CPresentation.prototype =
         this.Spelling.Reset();
     },
 
-    Continue_CheckSpelling: function()
+    ContinueCheckSpelling: function()
     {
-        this.Spelling.Continue_CheckSpelling();
+        this.Spelling.ContinueCheckSpelling();
     },
 
     TurnOff_CheckSpelling: function()
