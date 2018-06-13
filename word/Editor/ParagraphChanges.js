@@ -339,6 +339,9 @@ CChangesParagraphAddItem.prototype.Redo = function()
 		oItem.Parent = this.Class;
 		if (oItem.SetParagraph)
 			oItem.SetParagraph(this.Class);
+
+		if (oItem.Recalc_RunsCompiledPr)
+			oItem.Recalc_RunsCompiledPr();
 	}
 };
 CChangesParagraphAddItem.prototype.private_WriteItem = function(Writer, Item)
@@ -445,6 +448,9 @@ CChangesParagraphRemoveItem.prototype.Undo = function()
 		oItem.Parent = this.Class;
 		if (oItem.SetParagraph)
 			oItem.SetParagraph(this.Class);
+
+		if (oItem.Recalc_RunsCompiledPr)
+			oItem.Recalc_RunsCompiledPr();
 	}
 };
 CChangesParagraphRemoveItem.prototype.Redo = function()
