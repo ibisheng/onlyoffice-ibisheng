@@ -39,7 +39,6 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var FontStyle = AscFonts.FontStyle;
-	var g_fontApplication = AscFonts.g_fontApplication;
 
 	var asc = window["Asc"];
 	var asc_round = asc.round;
@@ -360,6 +359,90 @@
 		return res;
 	};
 
+	function NativeContext() {
+		this.ctx = window["native"];
+	}
+
+	NativeContext.prototype.save = function () {
+		this.ctx["PD_Save"]();
+	};
+	NativeContext.prototype.restore = function () {
+		this.ctx["PD_Restore"]();
+	};
+	NativeContext.prototype.rect = function (x, y, w, h) {
+		this.ctx["PD_rect"](x, y, w, h);
+	};
+	NativeContext.prototype.clip = function () {
+		this.ctx["PD_clip"]();
+	};
+	NativeContext.prototype.fill = function () {
+		this.ctx["PD_Fill"]();
+	};
+	NativeContext.prototype.stroke = function () {
+		this.ctx["PD_Stroke"]();
+	};
+	NativeContext.prototype.fillRect = function (x, y, w, h) {
+		this.rect(x, y, w, h);
+		this.fill();
+	};
+	NativeContext.prototype.strokeRect = function (x, y, w, h) {
+		this.rect(x, y, w, h);
+		this.stroke();
+	};
+	NativeContext.prototype.beginPath = function () {
+		this.ctx["PD_PathStart"]();
+	};
+	NativeContext.prototype.closePath = function () {
+		this.ctx["PD_PathClose"]();
+	};
+	NativeContext.prototype.moveTo = function (x, y) {
+		this.ctx["PD_PathMoveTo"](x, y);
+	};
+	NativeContext.prototype.lineTo = function (x, y) {
+		this.ctx["PD_PathLineTo"](x, y);
+	};
+	NativeContext.prototype.bezierCurveTo = function (x1, y1, x2, y2, x3, y3) {
+		this.ctx["PD_PathCurveTo"](x1, y1, x2, y2, x3, y3);
+	};
+	NativeContext.prototype.setStrokeStyle = function (r, g, b, a) {
+		this.ctx["PD_p_color"](r, g, b, a * 255);
+	};
+	NativeContext.prototype.setFillStyle = function (r, g, b, a) {
+		this.ctx["PD_b_color1"](r, g, b, a * 255);
+	};
+
+	Object.defineProperty(NativeContext.prototype, "lineWidth", {
+		set: function (value) {
+			this.ctx["PD_p_width"](value);
+		}
+	});
+
+	function NativeFontManager() {
+		this.m_lUnits_Per_Em = 0;
+		this.m_lAscender = 0;
+		this.m_lDescender = 0;
+		this.m_lLineHeight = 0;
+	}
+
+	NativeFontManager.prototype.init = function (fontInfo) {
+		this.m_lUnits_Per_Em = fontInfo[3];
+		this.m_lAscender = fontInfo[0];
+		this.m_lDescender = fontInfo[2];
+		this.m_lLineHeight = fontInfo[2];
+	};
+	NativeFontManager.prototype.MeasureChar = function (lUnicode) {
+		var bounds = g_oTextMeasurer.Measurer["GetDrawingBox"](lUnicode);
+		return {
+			fAdvanceX: bounds[0], oBBox: {
+				fMinX: bounds[1], fMaxX: bounds[2], fMinY: bounds[3], fMaxY: bounds[4]
+			}
+		};
+	};
+	NativeFontManager.prototype.SetTextMatrix = function (fA, fB, fC, fD, fE, fF) {
+		window["native"]["PD_transform"](fA, fB, fC, fD, fE, fF);
+	};
+
+
 
 	/**
 	 * Emulates scalable canvas context
@@ -382,10 +465,24 @@
 		this.ppiX = 96;
 		this.ppiY = 96;
 
-		if (AscCommon.AscBrowser.isRetina) {
-			this.ppiX = AscCommon.AscBrowser.convertToRetinaValue(this.ppiX, true);
-			this.ppiY = AscCommon.AscBrowser.convertToRetinaValue(this.ppiY, true);
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			this.ppiX = this.ppiY = window["native"]["GetDeviceDPI"]();
+
+			//this.deviceDPI = window["native"]["GetDeviceDPI"]();
+			//this.deviceScale = window["native"]["GetDeviceScale"]();
+
+			//this.ppiX = 96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
+			//this.ppiY = 96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
+
+			//this.ppiX = this.deviceDPI; //96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
+			//this.ppiY = this.deviceDPI; //96.0 * this.deviceScale * (96.0 / (this.deviceDPI * this.deviceScale));
+		} else {
+			if (AscCommon.AscBrowser.isRetina) {
+				this.ppiX = AscCommon.AscBrowser.convertToRetinaValue(this.ppiX, true);
+				this.ppiY = AscCommon.AscBrowser.convertToRetinaValue(this.ppiY, true);
+			}
 		}
+		this.LastFontOriginInfo = null;
 
 		this._mct = new Matrix();  // units transform
 		this._mt = new Matrix();  // user transform
@@ -400,6 +497,10 @@
 		this.changeUnits(undefined !== settings.units ? settings.units : this.units);
 
 		this.fmgrGraphics = undefined !== settings.fmgrGraphics ? settings.fmgrGraphics : null;
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			this.fmgrGraphics = [new NativeFontManager(), new NativeFontManager(), new NativeFontManager(), new NativeFontManager()];
+		}
+
 		if (null === this.fmgrGraphics) {
 			throw "Can not set graphics in DrawingContext";
 		}
@@ -449,6 +550,10 @@
 	 * @param canvas
 	 */
 	DrawingContext.prototype.setCanvas = function (canvas) {
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			this.ctx = new NativeContext();
+			return;
+		}
 		if (null == canvas) {
 			return;
 		}
@@ -607,10 +712,16 @@
 	};
 
 	DrawingContext.prototype.AddClipRect = function (x, y, w, h) {
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			return this;
+		}
 		return this.save().beginPath().rect(x, y, w, h).clip();
 	};
 
 	DrawingContext.prototype.RemoveClipRect = function () {
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			return this;
+		}
 		return this.restore();
 	};
 
@@ -698,7 +809,11 @@
 		var _b = val.getB();
 		var _a = val.getA();
 		this.fillColor = new AscCommon.CColor(_r, _g, _b, _a);
-		this.ctx.fillStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
+		if (this.ctx.fillStyle) {
+			this.ctx.fillStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
+		} else {
+			this.ctx.setFillStyle(_r, _g, _b, _a);
+		}
 		return this;
 	};
 
@@ -716,7 +831,11 @@
 		var _g = val.getG();
 		var _b = val.getB();
 		var _a = val.getA();
-		this.ctx.strokeStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
+		if (this.ctx.strokeStyle) {
+			this.ctx.strokeStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
+		} else {
+			this.ctx.setStrokeStyle(_r, _g, _b, _a);
+		}
 		return this;
 	};
 
@@ -736,10 +855,9 @@
 	};
 
 	DrawingContext.prototype.setLineDash = function (segments) {
-		if (!this.ctx.setLineDash) {
-			return;
+		if (this.ctx.setLineDash) {
+			this.ctx.setLineDash(segments);
 		}
-		this.ctx.setLineDash(segments);
 		return this;
 	};
 
@@ -801,15 +919,22 @@
 		res.descender = factor * d;
 		res.lineGap = factor * (fm.m_lLineHeight - fm.m_lAscender - d);
 
-		var face = fm.m_pFont.m_pFace;
-		res.nat_scale = face.header.Units_Per_EM;
-
-		if (face.os2) {
-			res.nat_y1 = face.os2.usWinAscent;
-			res.nat_y2 = -face.os2.usWinDescent;
+		var face;
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			face = g_oTextMeasurer.Measurer['GetFace']();
+			res.nat_scale = face[0];
+			res.nat_y1 = face[1];
+			res.nat_y2 = face[2];
 		} else {
-			res.nat_y1 = face.header.yMax;
-			res.nat_y2 = face.header.yMin;
+			face = fm.m_pFont.m_pFace;
+			res.nat_scale = face.header.Units_Per_EM;
+			if (face.os2) {
+				res.nat_y1 = face.os2.usWinAscent;
+				res.nat_y2 = -face.os2.usWinDescent;
+			} else {
+				res.nat_y1 = face.header.yMax;
+				res.nat_y2 = face.header.yMin;
+			}
 		}
 
 		res.nat_y1 *= r2;
@@ -824,38 +949,78 @@
 	 * @returns {DrawingContext}
 	 */
 	DrawingContext.prototype.setFont = function (font, angle) {
-		var italic, bold, fontStyle, r;
 
+		var r;
 		this.font.copyFrom(font);
 
-		italic = true === font.Italic;
-		bold = true === font.Bold;
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor * 96.0 / 72.0;
+			// this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor * this.deviceDPI / 72.0;
 
-		fontStyle = FontStyle.FontStyleRegular;
-		if (!italic && bold) {
-			fontStyle = FontStyle.FontStyleBold;
-		} else if (italic && !bold) {
-			fontStyle = FontStyle.FontStyleItalic;
-		} else if (italic && bold) {
-			fontStyle = FontStyle.FontStyleBoldItalic;
+			// this.font.FontSize = this.font.FontSize * 2.54 * this.scaleFactor *
+			//     this.deviceScale * this.deviceDPI / 96.0 * (96.0 / (this.deviceDPI * this.deviceScale));
 		}
 
-		if (angle && 0 != angle) {
-			r = g_fontApplication.LoadFont(font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[1],
-				font.FontSize, fontStyle, this.ppiX, this.ppiY);
-
-			this.fmgrGraphics[1].SetTextMatrix(this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx,
-				this._mt.ty);
+		var italic = true === this.font.Italic;
+		var bold = true === this.font.Bold;
+		var fontStyle;
+		if (italic && bold) {
+			fontStyle = FontStyle.FontStyleBoldItalic;
+		} else if (italic) {
+			fontStyle = FontStyle.FontStyleItalic;
+		} else if (bold) {
+			fontStyle = FontStyle.FontStyleBold;
 		} else {
+			fontStyle = FontStyle.FontStyleRegular;
+		}
 
-			r = g_fontApplication.LoadFont(font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[0],
-				font.FontSize, fontStyle, this.ppiX, this.ppiY);
-			g_fontApplication.LoadFont(font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[3],
-				font.FontSize, fontStyle, this.ppiX, this.ppiY);
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			var fontInfo = AscFonts.g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
+			fontInfo = GetLoadInfoForMeasurer(fontInfo, fontStyle);
+
+			var flag = 0;
+			if (fontInfo.NeedBold) {
+				flag |= 0x01;
+			}
+			if (fontInfo.NeedItalic) {
+				flag |= 0x02;
+			}
+			if (fontInfo.SrcBold) {
+				flag |= 0x04;
+			}
+			if (fontInfo.SrcItalic) {
+				flag |= 0x08;
+			}
+
+			if (!angle) {
+				window["native"]["PD_LoadFont"](fontInfo.Path, fontInfo.FaceIndex, this.font.FontSize, flag);
+			}
+			fontInfo = g_oTextMeasurer.Measurer["LoadFont"](fontInfo.Path, fontInfo.FaceIndex, this.font.FontSize, flag);
+			if (angle) {
+				this.fmgrGraphics[1].init(fontInfo);
+			} else {
+				this.fmgrGraphics[0].init(fontInfo);
+				this.fmgrGraphics[3].init(fontInfo);
+			}
+			r = true;
+		} else {
+			if (angle) {
+				r = AscFonts.g_fontApplication.LoadFont(this.font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[1],
+					this.font.FontSize, fontStyle, this.ppiX, this.ppiY);
+			} else {
+				r = AscFonts.g_fontApplication.LoadFont(this.font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[0],
+					this.font.FontSize, fontStyle, this.ppiX, this.ppiY);
+				AscFonts.g_fontApplication.LoadFont(this.font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[3],
+					this.font.FontSize, fontStyle, this.ppiX, this.ppiY);
+			}
+		}
+
+		if (angle) {
+			this.fmgrGraphics[1].SetTextMatrix(this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
 		}
 
 		if (r === false) {
-			throw "Can not use " + font.FontFamily.Name + " font. (Check whether font file is loaded)";
+			throw "Can not use " + this.font.FontFamily.Name + " font. (Check whether font file is loaded)";
 		}
 
 		return this;
@@ -911,7 +1076,7 @@
 	};
 
 	DrawingContext.prototype.fillText = function (text, x, y, maxWidth, charWidths, angle) {
-		var code;
+		var code, pGlyph;
 		var manager = angle ? this.fmgrGraphics[1] : this.fmgrGraphics[0];
 
 		var _x = this._mift.transformPointX(x, y);
@@ -919,19 +1084,25 @@
 
 		var length = text.length;
 		for (var i = 0; i < length; ++i) {
-			try {
-				code = text.charCodeAt(i);
-				// Replace Non-breaking space(0xA0) with White-space(0x20)
-				_x = asc_round(manager.LoadString4C(0xA0 === code ? 0x20 : code, _x, _y));
-			} catch (err) {
-				// do nothing
-			}
-			var pGlyph = manager.m_oGlyphString.m_pGlyphsBuffer[0];
-			if (null === pGlyph || null === pGlyph.oBitmap) {
-				continue;
-			}
+			code = text.charCodeAt(i);
+			// Replace Non-breaking space(0xA0) with White-space(0x20)
+			code = 0xA0 === code ? 0x20 : code;
+			if (window["NATIVE_EDITOR_ENJINE"]) {
+				//TODO: cache
+				// if (null != this.LastFontOriginInfo.Replace)
+				//   code = g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
 
-			this.fillGlyph(pGlyph, manager);
+				window["native"]["PD_FillText"](_x, _y, code);
+				_x += Asc.round(g_oTextMeasurer.Measurer["MeasureChar"](code));
+			} else {
+				_x = asc_round(manager.LoadString4C(code, _x, _y));
+				pGlyph = manager.m_oGlyphString.m_pGlyphsBuffer[0];
+				if (null === pGlyph || null === pGlyph.oBitmap) {
+					continue;
+				}
+
+				this.fillGlyph(pGlyph, manager);
+			}
 		}
 
 		return this;
@@ -1178,7 +1349,6 @@
 	};
 
 	// Private methods
-
 	DrawingContext.prototype._calcRect = function (x, y, w, h) {
 		var wh = w !== undefined && h !== undefined, x2 = x + w, y2 = y + h, _x = this._mft.transformPointX(x,
 			y), _y = this._mft.transformPointY(x, y);
