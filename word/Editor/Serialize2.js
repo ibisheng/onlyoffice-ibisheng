@@ -9668,13 +9668,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         var oCurContainer = oParStruct.getElem();
         if (c_oSerParType.Run === type)
         {
-            var oNewRun = new ParaRun(oParStruct.paragraph);
-            var oRes = { bRes: true };
+			oParStruct.addElemToContentStart();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadRun(t, l, oNewRun, oParStruct, oRes);
+                return oThis.ReadRun(t, l, oParStruct);
             });
-            //if (oRes.bRes && oNewRun.Content.length > 0)
-                oParStruct.addToContent(oNewRun);
+			oParStruct.addElemToContentFinish();
         }
 		else if (c_oSerParType.CommentStart === type)
         {
@@ -9862,12 +9860,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         return res;
     };
 	
-	this.ReadFldChar = function (type, length, oPos) {
+	this.ReadFldChar = function (type, length, oParStruct) {
 		var res = c_oSerConstants.ReadOk;
 		var oThis = this;
 		if (c_oSer_FldSimpleType.CharType === type) {
-			oPos.run.Add_ToContent(oPos.pos, new ParaFieldChar(this.stream.GetUChar(), this.oReadResult.logicDocument), false);
-			oPos.pos++;
+			oParStruct.addElemToContent(new ParaFieldChar(this.stream.GetUChar(), this.oReadResult.logicDocument));
 		} else
 			res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -10047,28 +10044,27 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
             res = c_oSerConstants.ReadUnknown;
         return res;
 	};
-	this.ReadRun = function (type, length, oRunObject, oParStruct, oRes)
+	this.ReadRun = function (type, length, oParStruct)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if (c_oSerRunType.rPr === type)
         {
-            var rPr = oRunObject.Pr;
-            res = this.brPrr.Read(length, rPr, oRunObject);
-            oRunObject.Set_Pr(rPr);
+            var rPr = oParStruct.curRun.Pr;
+            res = this.brPrr.Read(length, rPr, oParStruct.curRun);
+			oParStruct.curRun.Set_Pr(rPr);
         }
         else if (c_oSerRunType.Content === type)
         {
-            var oPos = { run: oRunObject , pos: 0};
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadRunContent(t, l, oPos, oParStruct, oRes);
+                return oThis.ReadRunContent(t, l, oParStruct);
             });
         }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadText = function(text, oPos, isInstrText){
+	this.ReadText = function(text, oParStruct, isInstrText){
 		for (var i = 0; i < text.length; ++i)
 		{
 			var nUnicode = null;
@@ -10087,14 +10083,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 
 			if (null !== nUnicode) {
 				if (0x20 !== nUnicode || isInstrText)
-					oPos.run.AddToContent(oPos.pos, isInstrText ? new ParaInstrText(nUnicode) : new ParaText(nUnicode), false);
+					oParStruct.addElemToContent(isInstrText ? new ParaInstrText(nUnicode) : new ParaText(nUnicode));
 				else
-					oPos.run.AddToContent(oPos.pos, new ParaSpace(), false);
-				oPos.pos++;
+					oParStruct.addElemToContent(new ParaSpace());
 			}
 		}
 	};
-	this.ReadRunContent = function (type, length, oPos, oParStruct, oRes)
+	this.ReadRunContent = function (type, length, oParStruct)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -10114,7 +10109,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 					this.oCurComments[i] += text;
 			}
 
-			this.ReadText(text, oPos, false);
+			this.ReadText(text, oParStruct, false);
         }
         else if (c_oSerRunType.tab === type)
         {
@@ -10178,7 +10173,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         }
 		else if(c_oSerRunType.fldstart_deprecated === type)
         {
-            oRes.bRes = false;
 			var sField = this.stream.GetString2LE(length);
 			var oField = this.parseField(sField, oParStruct.paragraph);
 			if (null != oField) {
@@ -10188,7 +10182,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         }
 		else if(c_oSerRunType.fldend_deprecated === type)
         {
-            oRes.bRes = false;
 			var elem = this.aFields.pop();
 			if (elem) {
                 oParStruct.commitElem();
@@ -10197,12 +10190,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		else if(c_oSerRunType.fldChar === type)
 		{
 			res = this.bcr.Read1(length, function(t, l){
-				return oThis.ReadFldChar(t,l,oPos);
+				return oThis.ReadFldChar(t,l,oParStruct);
 			});
 		}
 		else if(c_oSerRunType.instrText === type || c_oSerRunType.delInstrText === type)
 		{
-			this.ReadText(this.stream.GetString2LE(length), oPos, true);
+			this.ReadText(this.stream.GetString2LE(length), oParStruct, true);
 		}
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
@@ -10267,8 +10260,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
             res = c_oSerConstants.ReadUnknown;
         if (null != oNewElem)
         {
-            oPos.run.Add_ToContent(oPos.pos, oNewElem, false);
-            oPos.pos++;
+			oParStruct.addElemToContent(oNewElem);
         }
         return res;
     };
@@ -14744,6 +14736,7 @@ function OpenParStruct(oContainer, paragraph) {
     this.paragraph = paragraph;
     this.cur = { pos: 0, elem: oContainer };
     this.stack = [this.cur];
+	this.curRun = null;
 }
 OpenParStruct.prototype = {
     _addToContent: function (elem, pos, oItem) {
@@ -14767,6 +14760,21 @@ OpenParStruct.prototype = {
         if (elem.Remove_FromContent)
             elem.Remove_FromContent(pos, count);
     },
+	addElemToContentStart: function () {
+		this.curRun = new ParaRun(this.paragraph);
+	},
+	addElemToContent: function (elem) {
+		if (this.curRun.GetElementsCount() > Asc.c_dMaxParaRunContentLength) {
+			this.addToContent(this.curRun);
+			var textPr = this.curRun.Get_TextPr();
+			this.curRun = new ParaRun(this.paragraph);
+			this.curRun.Set_Pr(textPr);
+		}
+		this.curRun.Add_ToContent(this.curRun.GetElementsCount(), elem, false);
+	},
+	addElemToContentFinish: function () {
+		this.addToContent(this.curRun);
+	},
     addToContent: function (oItem) {
 		if(null != this.cur.elem)
 			this.cur.pos = this._addToContent(this.cur.elem, this.cur.pos, oItem);

@@ -63,8 +63,6 @@ var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscShdNil = Asc.c_oAscShdNil;
 var c_oAscXAlign = Asc.c_oAscXAlign;
 
-var c_dMaxParaRunContentLength = 1000;
-
 function CDocumentReaderMode()
 {
     this.DefaultFontSize = 12;
@@ -7183,7 +7181,7 @@ PasteProcessor.prototype =
                 this._CommitElemToParagraph(elem);
             }
             else {
-				if(this.oCurRun.Content.length === c_dMaxParaRunContentLength) {
+				if(this.oCurRun.Content.length === Asc.c_dMaxParaRunContentLength) {
 					//создаём новый paraRun и выставляем ему настройки предыдущего
 					//сделано для того, чтобы избежать большого количества данных в paraRun
 					this._Set_Run_Pr(this.oCurRun.Pr);
