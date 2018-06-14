@@ -3975,7 +3975,9 @@ CChartSpace.prototype.recalculateReferences = function()
                         oAxis.numFmt.setFormatCode(aPoints[0].formatCode);
                     }
                     else{
-                        oAxis.numFmt.setFormatCode("General");
+                        if(oAxis.numFmt.formatCode === null || oAxis.numFmt.formatCode === ""){
+                            oAxis.numFmt.setFormatCode("General");
+                        }
                     }
                 }
             }
@@ -11090,9 +11092,9 @@ CChartSpace.prototype.recalculateDLbls = function()
 
             var series = aCharts[t].series;
             var nDefaultPosition;
-            if(this.chart.plotArea.charts[0].getDefaultDataLabelsPosition)
+            if(aCharts[t].getDefaultDataLabelsPosition)
             {
-                nDefaultPosition = this.chart.plotArea.charts[0].getDefaultDataLabelsPosition();
+                nDefaultPosition = aCharts[t].getDefaultDataLabelsPosition();
             }
 
             var default_lbl = new AscFormat.CDLbl();
