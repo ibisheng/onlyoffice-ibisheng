@@ -34,6 +34,7 @@
 (function(window, builder)
 {
     /**
+     * Base class
      * @global
      * @class
      * @name Api
@@ -618,10 +619,10 @@
         return new ApiParagraph(new Paragraph(private_GetDrawingDocument(), private_GetLogicDocument()));
     };
     /**
-     * Create a new table.
+     * Create a new table with a specified number of rows and columns.
      * @memberof Api
-     * @param {number} nCols
-     * @param {number} nRows
+     * @param {number} nCols - Number of columns.
+     * @param {number} nRows - Number of rows.
      * @returns {ApiTable}
      */
     Api.prototype.CreateTable = function(nCols, nRows)
@@ -636,7 +637,7 @@
         return new ApiTable(oTable);
     };
     /**
-     * Create a new text block.
+     * Create a new smaller text block to be inserted to the current paragraph or table.
      * @memberof Api
      * @returns {ApiRun}
      */
@@ -646,11 +647,11 @@
     };
 
     /**
-     * Create a image.
+     * Create an image with the parameters specified.
      * @memberof Api
-     * @param {string} sImageSrc
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
+     * @param {string} sImageSrc - The image source where the image to be inserted should be taken from (currently only internet URL or Base64 encoded images are supported).
+     * @param {EMU} nWidth - The image width in English measure units.
+     * @param {EMU} nHeight - The image height in English measure units.
      * @returns {ApiImage}
      */
     Api.prototype.CreateImage = function(sImageSrc, nWidth, nHeight)
@@ -666,13 +667,13 @@
     };
 
     /**
-     * Create a shape.
+     * Create a shape with the parameters specified.
      * @memberof Api
-     * @param {ShapeType} [sType="rect"]
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
-     * @param {ApiFill} oFill
-     * @param {ApiStroke} oStroke
+     * @param {ShapeType} [sType="rect"] - The shape type which specifies the preset shape geometry.
+     * @param {EMU} nWidth - The shape width in English measure units.
+     * @param {EMU} nHeight - The shape height in English measure units.
+     * @param {ApiFill} oFill - The color or pattern used to fill the shape.
+     * @param {ApiStroke} oStroke - The stroke used to create the element shadow.
      * @returns {ApiShape}
      * */
     Api.prototype.CreateShape = function(sType, nWidth, nHeight, oFill, oStroke)
@@ -694,15 +695,15 @@
     };
 
     /**
-     * Create a chart.
+     * Create a chart with the parameters specified.
      * @memberof Api
-     * @param {ChartType} [sType="bar"]
-     * @param {Array} aSeries
-     * @param {Array} aSeriesNames
-     * @param {Array} aCatNames
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
-     * @param {number} nStyleIndex
+     * @param {ChartType} [sType="bar"] - The chart type used for the chart display.
+     * @param {Array} aSeries - The array of the data used to build the chart from.
+     * @param {Array} aSeriesNames - The array of the names (the source table column names) used for the data which the chart will be build from.
+     * @param {Array} aCatNames - The array of the names (the source table row names) used for the data which the chart will be build from.
+     * @param {EMU} nWidth - The chart width in English measure units.
+     * @param {EMU} nHeight - The chart height in English measure units.
+     * @param {number} nStyleIndex - The chart color style index (can be 1 - 48, as described in OOXML specification).
      * @returns {ApiChart}
      * */
     Api.prototype.CreateChart = function(sType, aSeries, aSeriesNames, aCatNames, nWidth, nHeight, nStyleIndex)
@@ -896,11 +897,11 @@
     };
 
     /**
-     * Create a RGB color
+     * Create an RGB color setting the appropriate values for the red, green and blue color components.
      * @memberof Api
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      * @returns {ApiRGBColor}
      */
     Api.prototype.CreateRGBColor = function(r, g, b)
@@ -909,9 +910,9 @@
     };
 
     /**
-     * Create a scheme color
+     * Create a complex color scheme selecting from one of the available schemes.
      * @memberof Api
-     * @param {SchemeColorId} sSchemeColorId
+     * @param {SchemeColorId} sSchemeColorId - The color scheme identifier.
      * @returns {ApiSchemeColor}
      */
     Api.prototype.CreateSchemeColor = function(sSchemeColorId)
@@ -920,9 +921,9 @@
     };
 
     /**
-     * Create preset color
+     * Create a color selecting it from one of the available color presets.
      * @memberof Api
-     * @param {PresetColor} sPresetColor
+     * @param {PresetColor} sPresetColor - A preset selected from the list of the available color preset names.
      * @returns {ApiPresetColor};
      * */
     Api.prototype.CreatePresetColor = function(sPresetColor)
@@ -931,9 +932,9 @@
     };
 
     /**
-     * Create a solid fill
+     * Create a solid fill which allows to fill the object using a selected solid color as the object background.
      * @memberof Api
-     * @param {ApiUniColor} oUniColor
+     * @param {ApiUniColor} oUniColor - The color used for the element fill.
      * @returns {ApiFill}
      * */
     Api.prototype.CreateSolidFill = function(oUniColor)
@@ -942,10 +943,10 @@
     };
 
     /**
-     * Create a linear gradient fill
+     * Create a linear gradient fill which allows to fill the object using a selected linear gradient as the object background.
      * @memberof Api
-     * @param {Array} aGradientStop
-     * @param {PositiveFixedAngle} Angle
+     * @param {Array} aGradientStop - The angle measured in 60000th of a degree that will define the gradient direction.
+     * @param {PositiveFixedAngle} Angle - The angle measured in 60000th of a degree that will define the gradient direction.
      * @returns {ApiFill}
      */
     Api.prototype.CreateLinearGradientFill = function(aGradientStop, Angle)
@@ -955,9 +956,9 @@
 
 
     /**
-     * Create a radial gradient fill
+     * Create a radial gradient fill which allows to fill the object using a selected radial gradient as the object background.
      * @memberof Api
-     * @param {Array} aGradientStop
+     * @param {Array} aGradientStop - The array of gradient color stops measured in 1000th of percent.
      * @returns {ApiFill}
      */
     Api.prototype.CreateRadialGradientFill = function(aGradientStop)
@@ -966,11 +967,11 @@
     };
 
     /**
-     * Create a pattern fill
+     * Create a pattern fill which allows to fill the object using a selected pattern as the object background.
      * @memberof Api
-     * @param {PatternType} sPatternType
-     * @param {ApiUniColor} BgColor
-     * @param {ApiUniColor} FgColor
+     * @param {PatternType} sPatternType - The pattern type used for the fill selected from one of the available pattern types.
+     * @param {ApiUniColor} BgColor - The background color used for the pattern creation.
+     * @param {ApiUniColor} FgColor - The foreground color used for the pattern creation.
      * @returns {ApiFill}
      */
     Api.prototype.CreatePatternFill = function(sPatternType, BgColor, FgColor)
@@ -979,10 +980,10 @@
     };
 
     /**
-     * Create a blip fill
+     * Create a blip fill which allows to fill the object using a selected image as the object background.
      * @memberof Api
-     * @param {string} sImageUrl
-     * @param {BlipFillType} sBlipFillType
+     * @param {string} sImageUrl - The path to the image used for the blip fill (currently only internet URL or Base64 encoded images are supported).
+     * @param {BlipFillType} sBlipFillType - The type of the fill used for the blip fill (tile or stretch).
      * @returns {ApiFill}
      * */
     Api.prototype.CreateBlipFill = function(sImageUrl, sBlipFillType)
@@ -991,7 +992,7 @@
     };
 
     /**
-     * Create no fill
+     * Create no fill and remove the fill from the element.
      * @memberof Api
      * @returns {ApiFill}
      * */
@@ -1001,10 +1002,10 @@
     };
 
     /**
-     * Create a stroke
+     * Create a stroke adding shadows to the element.
      * @memberof Api
-     * @param {EMU} nWidth
-     * @param {ApiFill} oFill
+     * @param {EMU} nWidth - The width of the shadow measured in English measure units.
+     * @param {ApiFill} oFill - The fill type used to create the shadow.
      * @returns {ApiStroke}
      * */
     Api.prototype.CreateStroke = function(nWidth, oFill)
@@ -1013,10 +1014,10 @@
     };
 
     /**
-     * Create a stroke
+     * Create a gradient stop used for different types of gradients.
      * @memberof Api
-     * @param {ApiUniColor} oUniColor
-     * @param {PositivePercentage} nPos
+     * @param {ApiUniColor} oUniColor - The color used for the gradient stop.
+     * @param {PositivePercentage} nPos - The position of the gradient stop measured in 1000th of percent.
      * @returns {ApiGradientStop}
      * */
     Api.prototype.CreateGradientStop = function(oUniColor, nPos)
@@ -1025,8 +1026,9 @@
     };
 
     /**
-     * Create a new bullet
+     * Create a bullet for a paragraph with the character or symbol specified with the sBullet parameter.
      * @memberof Api
+     * @param {string} sSymbol - The type of the fill used for the blip fill (tile or stretch).
      * @returns {ApiBullet}
      * */
     Api.prototype.CreateBullet = function(sSymbol){
@@ -1149,7 +1151,7 @@
         return "documentContent";
     };
     /**
-     * Get the number of elements.
+     * Get the number of elements in the current document.
      * @returns {number}
      */
     ApiDocumentContent.prototype.GetElementsCount = function()
@@ -1157,7 +1159,7 @@
         return this.Document.Content.length;
     };
     /**
-     * Get element by position
+     * Get the element by its position in the document.
      * @returns {?DocumentElement}
      */
     ApiDocumentContent.prototype.GetElement = function(nPos)
@@ -1176,9 +1178,9 @@
         return null;
     };
     /**
-     * Add paragraph or table by position
-     * @param {number} nPos
-     * @param {DocumentElement} oElement
+     * Add paragraph or table using its position in the document.
+     * @param {number} nPos - The position where the current element will be added.
+     * @param {DocumentElement} oElement - The document element which will be added at the current position.
      */
     ApiDocumentContent.prototype.AddElement = function(nPos, oElement)
     {
@@ -1188,8 +1190,8 @@
         }
     };
     /**
-     * Push paragraph or table
-     * @param {DocumentElement} oElement
+     * Push a paragraph or a table to actually add it to the document.
+     * @param {DocumentElement} oElement - The type of the element which will be pushed to the document.
      */
     ApiDocumentContent.prototype.Push = function(oElement)
     {
@@ -1202,15 +1204,15 @@
         return false;
     };
     /**
-     * Remove all elements from the current document.
+     * Remove all elements from the current document or from the current document element.
      */
     ApiDocumentContent.prototype.RemoveAllElements = function()
     {
         this.Document.Internal_Content_Remove(0, this.Document.Content.length);
     };
     /**
-     * Remove element by specified position.
-     * @param {number} nPos
+     * Remove element using the position specified.
+     * @param {number} nPos - The element number (position) in the document or inside other element.
      */
     ApiDocumentContent.prototype.RemoveElement = function(nPos)
     {
@@ -1242,8 +1244,8 @@
         this.Document.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApiBuilder);
     };
     /**
-     * Get style by style name
-     * @param {string} sStyleName
+     * Get a style by the style name.
+     * @param {string} sStyleName - The name using which it is possible to address the style.
      * @returns {?ApiStyle}
      */
     ApiDocument.prototype.GetStyle = function(sStyleName)
@@ -1253,10 +1255,10 @@
         return new ApiStyle(oStyles.Get(oStyleId));
     };
     /**
-     * Create a new style with the specified type and name. If there is a style with the same name it will be replaced
+     * Create a new style with the specified type and name. If there is a style with the same name it will be replaced with a new one.
      * with a new one.
-     * @param {string} sStyleName
-     * @param {StyleType} [sType="paragraph"]
+     * @param {string} sStyleName - The name of the style which will be created.
+     * @param {StyleType} [sType="paragraph"] - The document element which the style will be applied to.
      * @returns {ApiStyle}
      */
     ApiDocument.prototype.CreateStyle = function(sStyleName, sType)
@@ -1290,8 +1292,8 @@
         return new ApiStyle(oStyle);
     };
     /**
-     * Get the default style for the specified style type.
-     * @param {StyleType} sStyleType
+     * Get the default style parameters for the specified document element.
+     * @param {StyleType} sStyleType - The document element which we want to get the style for.
      * @returns {?ApiStyle}
      */
     ApiDocument.prototype.GetDefaultStyle = function(sStyleType)
@@ -1310,7 +1312,7 @@
         return null;
     };
     /**
-     * A set of default run properties for the current document.
+     * Get a set of default properties for the text run in the current document.
      * @returns {ApiTextPr}
      */
     ApiDocument.prototype.GetDefaultTextPr = function()
@@ -1319,7 +1321,7 @@
         return new ApiTextPr(this, oStyles.Get_DefaultTextPr().Copy());
     };
     /**
-     * A set of default paragraph properties for the current document.
+     * Get a set of default paragraph properties in the current document.
      * @returns {ApiParaPr}
      */
     ApiDocument.prototype.GetDefaultParaPr = function()
@@ -1336,8 +1338,9 @@
         return new ApiSection(this.Document.SectPr);
     };
     /**
-     * Create a new section of the document, which ends at the specified paragraph.
-     * @param {ApiParagraph} oParagraph
+     * Create a new document section which ends at the specified paragraph. Allows to set local parameters for the current
+     * section - page size, footer, header, columns, etc.
+     * @param {ApiParagraph} oParagraph - The paragraph after which the new document section will be inserted.
      * @returns {ApiSection}
      */
     ApiDocument.prototype.CreateSection = function(oParagraph)
@@ -1349,18 +1352,19 @@
         oParagraph.private_GetImpl().Set_SectionPr(oSectPr);
         return new ApiSection(oSectPr);
     };
+
     /**
-     * Specifies whether sections in this document shall have different headers and footers for even and odd pages
-     * (an odd page header/footer and an even page header/footer).
-     * @param {boolean} isEvenAndOdd
+     * Specify whether sections in this document will have different headers and footers for even and
+     * odd pages (one header/footer for odd pages and another header/footer for even pages).
+     * @param {boolean} isEvenAndOdd - If true the header/footer will be different for odd and even pages, if false they will be the same.
      */
     ApiDocument.prototype.SetEvenAndOddHdrFtr = function(isEvenAndOdd)
     {
         this.Document.Set_DocumentEvenAndOddHeaders(isEvenAndOdd);
     };
     /**
-     * Creating an abstract multilevel numbering with specified type.
-     * @param {("bullet" | "numbered")} [sType="bullet"]
+     * Create an abstract multilevel numbering with a specified type.
+     * @param {("bullet" | "numbered")} [sType="bullet"] - The type of the numbering which will be created.
      * @returns {ApiNumbering}
      */
     ApiDocument.prototype.CreateNumbering = function(sType)
@@ -1427,7 +1431,7 @@
     };
 
     /**
-     * Receive a report about all comments collected in the document.
+     * Get a report about all the comments added to the document.
 	 * @returns {object}
      */
     ApiDocument.prototype.GetCommentsReport = function()
@@ -1470,7 +1474,7 @@
     };
 
 	/**
-	 * Receive a report about every change which was made in review mode in the document.
+	 * Get a report about every change which was made to the document in the review mode.
 	 * @returns {object}
 	 */
 	ApiDocument.prototype.GetReviewReport = function()
@@ -1638,8 +1642,8 @@
         return "paragraph";
     };
     /**
-     * Add text
-     * @param {string} [sText=""]
+     * Add some text to the element.
+     * @param {string} [sText=""] - The text that we want to insert into the current document element.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddText = function(sText)
@@ -1655,7 +1659,7 @@
         return new ApiRun(oRun);
     };
     /**
-     * Add page break.
+     * Add page break and start the next element from the next page.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddPageBreak = function()
@@ -1666,7 +1670,7 @@
         return new ApiRun(oRun);
     };
     /**
-     * Add line break.
+     * Add line break to the current position and start the next element from a new line.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddLineBreak = function()
@@ -1676,8 +1680,9 @@
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
     };
+
     /**
-     * Add column break.
+     * Add column break to the current position and start the next element from a new column.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddColumnBreak = function()
@@ -1688,7 +1693,8 @@
         return new ApiRun(oRun);
     };
 	/**
-	 * Add a page number field to this paragraph.
+	 * Insert the number of the current document page into the paragraph.
+     * <note>This method works for the paragraphs in the document header/footer only.</note>
 	 * @returns {ApiRun}
 	 */
 	ApiParagraph.prototype.AddPageNumber = function()
@@ -1699,7 +1705,8 @@
 		return new ApiRun(oRun);
 	};
 	/**
-	 * Add a pages count field to this paragraph.
+	 * Insert the number of pages in the current document into the paragraph.
+     * <note>This method works for the paragraphs in the document header/footer only.</note>
 	 * @returns {ApiRun}
 	 */
 	ApiParagraph.prototype.AddPagesCount = function()
@@ -1710,7 +1717,8 @@
 		return new ApiRun(oRun);
 	};
     /**
-     * Get text properties of the paragraph mark.
+     * Get the text properties of the paragraph mark which is used to mark the paragraph end. The mark can also acquire
+     * common text properties like bold, italic, underline, etc.
      * @returns {ApiTextPr}
      */
     ApiParagraph.prototype.GetParagraphMarkTextPr = function()
@@ -1726,7 +1734,7 @@
         return new ApiParaPr(this, this.Paragraph.Pr.Copy());
     };
     /**
-     * Get a numbering definition and numbering level.
+     * Get a numbering definition and numbering level for the numbered list.
      * @returns {?ApiNumberingLevel}
      */
     ApiParagraph.prototype.GetNumbering = function()
@@ -1765,8 +1773,8 @@
         return this.Paragraph.Content.length - 1;
     };
     /**
-     * Get the element of the paragraph content by specified position.
-     * @param {number} nPos
+     * Get the element of the paragraph using the position specified.
+     * @param {number} nPos - The position where the element which content we want to get must be located.
      * @returns {?ParagraphContent}
      */
     ApiParagraph.prototype.GetElement = function(nPos)
@@ -1778,8 +1786,8 @@
 		return private_GetSupportedParaElement(this.Paragraph.Content[nPos]);
     };
     /**
-     * Remove element by specified position.
-     * @param {number} nPos
+     * Remove the element using the position specified.
+     * @param {number} nPos - The position of the element which we want to remove in the paragraph.
      */
     ApiParagraph.prototype.RemoveElement = function(nPos)
     {
@@ -1789,7 +1797,7 @@
         this.Paragraph.Remove_FromContent(nPos, 1);
     };
     /**
-     * Remove all elements.
+     * Remove all elements from the current paragraph.
      */
     ApiParagraph.prototype.RemoveAllElements = function()
     {
@@ -1797,9 +1805,11 @@
             this.Paragraph.Remove_FromContent(0, this.Paragraph.Content.length - 1);
     };
     /**
-     * Add an element to paragraph content.
-     * @param {ParagraphContent} oElement
-     * @param {number} [nPos] If this value is not specified then element will be added to the end of this paragraph.
+     * Add an element to the current paragraph.
+     * @param {ParagraphContent} The document element which will be added at the current position. Returns false if the
+     * type of oElement is not supported by a paragraph.
+     * @param {number} [nPos] The number of the paragraph where the current element will be added. If this value is not
+     * specified then the element will be added at the end of the current paragraph.
      * @returns {boolean} Returns <code>false</code> if the type of <code>oElement</code> is not supported by paragraph
      * content.
      */
@@ -1822,7 +1832,7 @@
         return true;
     };
     /**
-     * Add a tab stop.
+     * Add a tab stop to the current paragraph.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddTabStop = function()
@@ -1833,8 +1843,8 @@
         return new ApiRun(oRun);
     };
     /**
-     * Add a drawing.
-     * @param {ApiDrawing} oDrawing
+     * Add an object (image, shape or chart) to the current paragraph.
+     * @param {ApiDrawing} oDrawing - The object which will be added to the current paragraph.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddDrawing = function(oDrawing)
@@ -1896,8 +1906,8 @@
         this.Run.Remove_FromContent(0, this.Run.Content.length);
     };
     /**
-     * Add text to this run.
-     * @param {string} sText
+     * Add some text to this run.
+     * @param {string} sText - The text which will be added to the current run.
      */
     ApiRun.prototype.AddText = function(sText)
     {
@@ -1907,36 +1917,36 @@
         this.Run.AddText(sText);
     };
     /**
-     * Add a page break.
+     * Add a page break and start the next element from a new page.
      */
     ApiRun.prototype.AddPageBreak = function()
     {
         this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Page));
     };
     /**
-     * Add a line break.
+     * Add a line break to the current run position and start the next element from a new line.
      */
     ApiRun.prototype.AddLineBreak = function()
     {
         this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Line));
     };
     /**
-     * Add a column break.
+     * Add a column break to the current run position and start the next element from a new column.
      */
     ApiRun.prototype.AddColumnBreak = function()
     {
         this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Column));
     };
     /**
-     * Add a tab stop.
+     * Add a tab stop to the current run.
      */
     ApiRun.prototype.AddTabStop = function()
     {
         this.Run.Add_ToContent(this.Run.Content.length, new ParaTab());
     };
     /**
-     * Add a drawing.
-     * @param {ApiDrawing} oDrawing
+     * Add an object (image, shape or chart) to the current text run.
+     * @param {ApiDrawing} oDrawing - The object which will be added to the current run.
      */
     ApiRun.prototype.AddDrawing = function(oDrawing)
     {
@@ -1963,17 +1973,17 @@
     };
     /**
      * Specify the section type of the current section. The section type specifies how the contents of the current
-     * section shall be placed relative to the previous section.
+     * section shall be placed relative to the previous section.<br/>
      * WordprocessingML supports five distinct types of section breaks:<br/>
-     *   <b>Next page</b> section breaks (the default if type is not specified), which begin the new section on the
+     *   * <b>Next page</b> section breaks (the default if type is not specified), which begin the new section on the
      *   following page.<br/>
-     *   <b>Odd</b> page section breaks, which begin the new section on the next odd-numbered page.<br/>
-     *   <b>Even</b> page section breaks, which begin the new section on the next even-numbered page.<br/>
-     *   <b>Continuous</b> section breaks, which begin the new section on the following paragraph. This means that
+     *   * <b>Odd</b> page section breaks, which begin the new section on the next odd-numbered page.<br/>
+     *   * <b>Even</b> page section breaks, which begin the new section on the next even-numbered page.<br/>
+     *   * <b>Continuous</b> section breaks, which begin the new section on the following paragraph. This means that
      *   continuous section breaks might not specify certain page-level section properties, since they shall be
      *   inherited from the following section. These breaks, however, can specify other section properties, such
      *   as line numbering and footnote/endnote settings.<br/>
-     *   <b>Column</b> section breaks, which begin the new section on the next column on the page.
+     *   * <b>Column</b> section breaks, which begin the new section on the next column on the page.
      * @param {("nextPage" | "oddPage" | "evenPage" | "continuous" | "nextColumn")} sType - Type of the section break
      */
     ApiSection.prototype.SetType = function(sType)
@@ -1990,9 +2000,9 @@
             this.Section.Set_Type(c_oAscSectionBreakType.NextPage);
     };
     /**
-     * Specify all text columns in the current section are of equal width.
-     * @param {number} nCount - Number of columns
-     * @param {twips} nSpace - Distance between columns
+     * Specify that all text columns in the current section are of equal width.
+     * @param {number} nCount - Number of columns.
+     * @param {twips} nSpace - Distance between columns measured in twentieths of a point (1/1440 of an inch).
      */
     ApiSection.prototype.SetEqualColumns = function(nCount, nSpace)
     {
@@ -2004,8 +2014,8 @@
      * Set all columns of this section are of different widths. Count of columns are equal length of
      * <code>aWidth</code> array. The length of <code>aSpaces</code> array <b>MUST BE</b> (<code>aWidth.length -
      * 1</code>).
-     * @param {twips[]} aWidths - An array of column width
-     * @param {twips[]} aSpaces - An array of distances between the columns
+     * @param {twips[]} aWidths - An array of column width values measured in twentieths of a point (1/1440 of an inch).
+     * @param {twips[]} aSpaces - An array of distances values between the columns measured in twentieths of a point (1/1440 of an inch).
      */
     ApiSection.prototype.SetNotEqualColumns = function(aWidths, aSpaces)
     {
@@ -2027,9 +2037,9 @@
     };
     /**
      * Specify the properties (size and orientation) for all pages in the current section.
-     * @param {twips} nWidth - width
-     * @param {twips} nHeight - height
-     * @param {boolean} [isPortrait=false] - Specifies the orientation of all pages in this section.
+     * @param {twips} nWidth - The page width measured in twentieths of a point (1/1440 of an inch).
+     * @param {twips} nHeight - The page height measured in twentieths of a point (1/1440 of an inch).
+     * @param {boolean} [isPortrait=false] - Specifies the orientation of all pages in this section (if set to true then the portrait orientation is chosen).
      */
     ApiSection.prototype.SetPageSize = function(nWidth, nHeight, isPortrait)
     {
@@ -2038,37 +2048,38 @@
     };
     /**
      * Specify the page margins for all pages in this section.
-     * @param {twips} nLeft - Left margin
-     * @param {twips} nTop - Top margin
-     * @param {twips} nRight - Right margin
-     * @param {twips} nBottom - Bottom margin
+     * @param {twips} nLeft - The left margin width measured in twentieths of a point (1/1440 of an inch).
+     * @param {twips} nTop - The top margin height measured in twentieths of a point (1/1440 of an inch).
+     * @param {twips} nRight - The right margin width measured in twentieths of a point (1/1440 of an inch).
+     * @param {twips} nBottom - The bottom margin height measured in twentieths of a point (1/1440 of an inch).
      */
     ApiSection.prototype.SetPageMargins = function(nLeft, nTop, nRight, nBottom)
     {
         this.Section.Set_PageMargins(private_Twips2MM(nLeft), private_Twips2MM(nTop), private_Twips2MM(nRight), private_Twips2MM(nBottom));
     };
     /**
-     * Specifies the distance (in twentieths of a point) from the top edge of the page to the top edge of the header.
-     * @param {twips} nDistance
+     * Specify the distance from the top edge of the page to the top edge of the header.
+     * @param {twips} nDistance - The distance from the top edge of the page to the top edge of the header measured in twentieths of a point (1/1440 of an inch).
      */
     ApiSection.prototype.SetHeaderDistance = function(nDistance)
     {
         this.Section.Set_PageMargins_Header(private_Twips2MM(nDistance));
     };
     /**
-     * Specifies the distance (in twentieths of a point) from the bottom edge of the page to the bottom edge of the
+     * Specify the distance from the bottom edge of the page to the bottom edge of the footer.
      * footer.
-     * @param {twips} nDistance
+     * @param {twips} nDistance - The distance from the bottom edge of the page to the bottom edge of the footer measured
+     * in twentieths of a point (1/1440 of an inch).
      */
     ApiSection.prototype.SetFooterDistance = function(nDistance)
     {
         this.Section.Set_PageMargins_Footer(private_Twips2MM(nDistance));
     };
     /**
-     * Get the content for the specified type of header.
-     * @param {HdrFtrType} sType - Type of header.
-     * @param {boolean} [isCreate=false] - Create a header or not if there is no header with specified type in the
-     *     current section.
+     * Get the content for the specified header type.
+     * @param {HdrFtrType} sType - Type of header to get the content from.
+     * @param {boolean} [isCreate=false] - Whether to create a new header or not with the specified header type in case
+     * no header with such a type could be found in the current section.
      * @returns {?ApiDocumentContent}
      */
     ApiSection.prototype.GetHeader = function(sType, isCreate)
@@ -2101,10 +2112,9 @@
         return new ApiDocumentContent(oHeader.Get_DocumentContent());
     };
     /**
-     * Remove a header of the specified type from the current section. After removing the header will be inherited from
-     * the previous section or, if this is the first section in the document, there won't be no header of the specified
-     * type.
-     * @param {HdrFtrType} sType - Type of header.
+     * Remove the header of the specified type from the current section. After removal the header will be inherited from
+     * the previous section or, if this is the first section in the document, no header of the specified type will be present.
+     * @param {HdrFtrType} sType - Type of header to be removed.
      */
     ApiSection.prototype.RemoveHeader = function(sType)
     {
@@ -2116,10 +2126,10 @@
             this.Section.Set_Header_Default(null);
     };
     /**
-     * Get the content for the specified type of footer.
-     * @param {HdrFtrType} sType - Type of footer.
-     * @param {boolean} [isCreate=false] - Create a footer or not if there is no footer with specified type in the
-     *     current section.
+     * Get the content for the specified footer type.
+     * @param {HdrFtrType} sType - Type of footer to get the content from.
+     * @param {boolean} [isCreate=false] - Whether to create a new footer or not with the specified footer type in case
+     * no footer with such a type could be found in the current section.
      * @returns {?ApiDocumentContent}
      */
     ApiSection.prototype.GetFooter = function(sType, isCreate)
@@ -2165,9 +2175,8 @@
             this.Section.Set_Footer_Default(null);
     };
     /**
-     * Specifies whether the current section in this document shall have a different header and footer for its first
-     * page.
-     * @param {boolean} isTitlePage
+     * Specify whether the current section in this document have different header and footer for the section first page.
+     * @param {boolean} isTitlePage - If true the first page of the section will have header and footer that will differ from the other pages of the same section.
      */
     ApiSection.prototype.SetTitlePage = function(isTitlePage)
     {
@@ -2196,8 +2205,8 @@
         return this.Table.Content.length;
     };
     /**
-     * Get table row by position.
-     * @param {number} nPos
+     * Get the table row by its position in the table.
+     * @param {number} nPos - The row position within the tabl
      * @returns {ApiTableRow}
      */
     ApiTable.prototype.GetRow = function(nPos)
@@ -2209,7 +2218,7 @@
     };
     /**
      * Merge array of cells. If merge was done successfully it will return merged cell, otherwise "null".
-     * <b>Warning</b>: The number of cells in any row and the numbers of rows in the current table may be changed.
+     * <note><b>Please note</b>: the number of cells in any row and the number of rows in the current table may be changed.</note>
      * @param {ApiTableCell[]} aCells
      * @returns {?ApiTableCell}
      */
@@ -2283,16 +2292,12 @@
      *
      * The default setting is to apply the row and column banding formatting, but not the first row, last row, first
      * column, or last column formatting.
-     * @param {boolean} isFirstColumn - Specifies that the first column conditional formatting shall be applied to the
-     *     table.
-     * @param {boolean} isFirstRow - Specifies that the first row conditional formatting shall be applied to the table.
-     * @param {boolean} isLastColumn - Specifies that the last column conditional formatting shall be applied to the
-     *     table.
-     * @param {boolean} isLastRow - Specifies that the last row conditional formatting shall be applied to the table.
-     * @param {boolean} isHorBand - Specifies that the horizontal banding conditional formatting shall not be applied
-     *     to the table.
-     * @param {boolean} isVerBand - Specifies that the vertical banding conditional formatting shall not be applied to
-     *     the table.
+     * @param {boolean} isFirstColumn - Specifies that the first column conditional formatting will be applied to the table.
+     * @param {boolean} isFirstRow - Specifies that the first row conditional formatting will be applied to the table.
+     * @param {boolean} isLastColumn - Specifies that the last column conditional formatting will be applied to the table.
+     * @param {boolean} isLastRow - Specifies that the last row conditional formatting will be applied to the table.
+     * @param {boolean} isHorBand - Specifies that the horizontal banding conditional formatting will not be applied to the table.
+     * @param {boolean} isVerBand - Specifies that the vertical banding conditional formatting will not be applied to the table.
      */
     ApiTable.prototype.SetTableLook = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
     {
@@ -2306,9 +2311,10 @@
     };
     /**
      * Add a new row to the current table.
-     * @param {ApiTableCell} [oCell] - If not specified a new row will be added to the end of the table.
-     * @param {boolean} [isBefore=false] - Add a new row before or after the specified cell. If no cell is specified
-     * then this parameter will be ignored.
+     * @param {ApiTableCell} [oCell] - The cell after which the new row will be added. If not specified the new row will
+     * be added at the end of the table.
+     * @param {boolean} [isBefore=false] - Add a new row before or after the specified cell. If no cell is specified then
+     * this parameter will be ignored.
      * @returns {ApiTableRow}
      */
     ApiTable.prototype.AddRow = function(oCell, isBefore)
@@ -2337,8 +2343,8 @@
         return new ApiTableRow(this.Table.Content[nRowIndex]);
     };
     /**
-     * Add a new column to the end of the current table.
-     * @param {ApiTableCell} [oCell] - If not specified a new column will be added to the end of the table.
+     * Add a new column to the current table.
+     * @param {ApiTableCell} [oCell] - The cell after which the new column will be added. If not specified the new column will be added at the end of the table.
      * @param {boolean} [isBefore=false] - Add a new column before or after the specified cell. If no cell is specified
      * then this parameter will be ignored.
      */
@@ -2366,7 +2372,7 @@
     };
     /**
      * Remove the table row with a specified cell.
-     * @param {ApiTableCell} oCell
+     * @param {ApiTableCell} oCell - The cell which is present in the row that will be removed.
      * @returns {boolean} Is the table empty after removing.
      */
     ApiTable.prototype.RemoveRow = function(oCell)
@@ -2386,7 +2392,7 @@
     };
     /**
      * Remove the table column with a specified cell.
-     * @param {ApiTableCell} oCell
+     * @param {ApiTableCell} oCell - The cell which is present in the column that will be removed.
      * @returns {boolean} Is the table empty after removing.
      */
     ApiTable.prototype.RemoveColumn = function(oCell)
@@ -2428,8 +2434,8 @@
         return this.Row.Content.length;
     };
     /**
-     * Get cell by position.
-     * @param {number} nPos
+     * Get the cell by its position.
+     * @param {number} nPos - The cell position in the current table.
      * @returns {ApiTableCell}
      */
     ApiTableRow.prototype.GetCell = function(nPos)
@@ -2487,7 +2493,7 @@
     };
     /**
      * Set the name of the current style.
-     * @param {string} sStyleName
+     * @param {string} sStyleName - The name which will be used for the current style.
      */
     ApiStyle.prototype.SetName = function(sStyleName)
     {
@@ -2564,8 +2570,8 @@
         return new ApiTableCellPr(this, this.Style.TableCellPr.Copy());
     };
     /**
-     * Specifies the reference of the parent style from which this style inherits in the style inheritance.
-     * @param {ApiStyle} oStyle
+     * Specify the reference to the parent style which this style inherits from in the style hierarchy.
+     * @param {ApiStyle} oStyle - The parent style which the style inherits properties from.
      */
     ApiStyle.prototype.SetBasedOn = function(oStyle)
     {
@@ -2577,7 +2583,7 @@
     /**
      * Get a set of formatting properties which shall be conditionally applied to the parts of a table which match the
      * requirement specified on the <code>sType</code> parameter.
-     * @param {TableStyleOverrideType} [sType="wholeTable"]
+     * @param {TableStyleOverrideType} [sType="wholeTable"] - The part of the table which the formatting properties must be applied to.
      * @returns {ApiTableStylePr}
      */
     ApiStyle.prototype.GetConditionalTableStyle = function(sType)
@@ -2628,8 +2634,10 @@
         return "textPr";
     };
     /**
-     * Specifies the character style.
-     * @param {ApiStyle} oStyle
+     * The text style base method.
+     * <note>This method is not used by itself, as it only forms the basis for the ApiRun.SetStyle method which sets
+     * the selected or created style for the text.</note>
+     * @param {ApiStyle} oStyle - The style which must be applied to the text character.
      */
     ApiTextPr.prototype.SetStyle = function(oStyle)
     {
@@ -2640,8 +2648,8 @@
         this.private_OnChange();
     };
     /**
-     * Set the bold property.
-     * @param {boolean} isBold
+     * Set the bold property to the text character.
+     * @param {boolean} isBold - Specifies that the contents of this run are displayed bold.
      */
     ApiTextPr.prototype.SetBold = function(isBold)
     {
@@ -2649,8 +2657,8 @@
         this.private_OnChange();
     };
     /**
-     * Set the italic property.
-     * @param {boolean} isItalic
+     * Set the italic property to the text character.
+     * @param {boolean} isItalic - Specifies that the contents of the current run are displayed italicized.
      */
     ApiTextPr.prototype.SetItalic = function(isItalic)
     {
@@ -2658,9 +2666,8 @@
         this.private_OnChange();
     };
     /**
-     * Specify that the contents of this run shall be displayed with a single horizontal line through the center of
-     * the line.
-     * @param {boolean} isStrikeout
+     * Specify that the contents of this run are displayed with a single horizontal line through the center of the line.
+     * @param {boolean} isStrikeout - Specifies that the contents of the current run are displayed struck through.
      */
     ApiTextPr.prototype.SetStrikeout = function(isStrikeout)
     {
@@ -2668,9 +2675,9 @@
         this.private_OnChange();
     };
     /**
-     * Specify that the contents of this run should be displayed along with an underline appearing directly below the
-     * character height (less all spacing above and below the characters on the line).
-     * @param {boolean} isUnderline
+     * Specify that the contents of this run are displayed along with a line appearing directly below the character
+     * (less than all the spacing above and below the characters on the line).
+     * @param {boolean} isUnderline - Specifies that the contents of the current run are displayed underlined.
      */
     ApiTextPr.prototype.SetUnderline = function(isUnderline)
     {
@@ -2679,7 +2686,7 @@
     };
     /**
      * Set all 4 font slots with the specified font family.
-     * @param {string} sFontFamily
+     * @param {string} sFontFamily - The font family or families used for the current text run.
      */
     ApiTextPr.prototype.SetFontFamily = function(sFontFamily)
     {
@@ -2687,8 +2694,8 @@
         this.private_OnChange();
     };
     /**
-     * Set the font size.
-     * @param {hps} nSize
+     * Set the font size for the characters of the current text run.
+     * @param {hps} nSize - The text size value measured in half-points (1/144 of an inch).
      */
     ApiTextPr.prototype.SetFontSize = function(nSize)
     {
@@ -2696,11 +2703,11 @@
         this.private_OnChange();
     };
     /**
-     * Set text color in the rgb format.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isAuto=false]
+     * Set the text color for the current text run in the RGB format.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
+     * @param {boolean} [isAuto=false] - If this parameter is set to "true", then r,g,b parameters will be ignored.
      */
     ApiTextPr.prototype.SetColor = function(r, g, b, isAuto)
     {
@@ -2708,9 +2715,11 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the alignment which shall be applied to the contents of this run in relation to the default
-     * appearance of the run's text.
-     * @param {("baseline" | "subscript" | "superscript")} sType
+     * Specify the alignment which will be applied to the contents of this run in relation to the default appearance of the run text:
+     * * <b>"baseline"</b> - the characters in the current text run will be aligned by the default text baseline.
+     * * <b>"subscript"</b> - the characters in the current text run will be aligned below the default text baseline.
+     * * <b>"superscript"</b> - the characters in the current text run will be aligned above the default text baseline.
+     * @param {("baseline" | "subscript" | "superscript")} sType - The vertical alignment type applied to the text contents.
      */
     ApiTextPr.prototype.SetVertAlign = function(sType)
     {
@@ -2724,11 +2733,11 @@
         this.private_OnChange();
     };
     /**
-     * Specify a highlighting color which is applied as a background behind the contents of this run.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isNone=false] If this parameter is true, then parameters r,g,b will be ignored.
+     * Specify a highlighting color in the RGB format which is applied as a background for the contents of the current run.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
+     * @param {boolean} [isNone=false] If this parameter is set to "true", then r,g,b parameters will be ignored.
      */
     ApiTextPr.prototype.SetHighlight = function(r, g, b, isNone)
     {
@@ -2743,8 +2752,8 @@
         this.private_OnChange();
     };
     /**
-     * Set text spacing.
-     * @param {twips} nSpacing
+     * Set text spacing measured in twentieths of a point.
+     * @param {twips} nSpacing - The value of the text spacing measured in twentieths of a point (1/1440 of an inch).
      */
     ApiTextPr.prototype.SetSpacing = function(nSpacing)
     {
@@ -2752,9 +2761,8 @@
         this.private_OnChange();
     };
     /**
-     * Specify that the contents of this run shall be displayed with two horizontal lines through each character
-     * displayed on the line.
-     * @param {boolean} isDoubleStrikeout
+     * Specify that the contents of this run is displayed with two horizontal lines through each character displayed on the line.
+     * @param {boolean} isDoubleStrikeout - Specifies that the contents of the current run are displayed double struck through.
      */
     ApiTextPr.prototype.SetDoubleStrikeout = function(isDoubleStrikeout)
     {
@@ -2762,9 +2770,8 @@
         this.private_OnChange();
     };
     /**
-     * Specify that any lowercase characters in this text run shall be formatted for display only as their capital
-     * letter character equivalents.
-     * @param {boolean} isCaps
+     * Specify that any lowercase characters in this text run are formatted for display only as their capital letter character equivalents.
+     * @param {boolean} isCaps - Specifies that the contents of the current run are displayed capitalized.
      */
     ApiTextPr.prototype.SetCaps = function(isCaps)
     {
@@ -2772,9 +2779,9 @@
         this.private_OnChange();
     };
     /**
-     * Specify that all small letter characters in this text run shall be formatted for display only as their capital
+     * Specify that all small letter characters in this text run are formatted for display only as their capital
      * letter character equivalents in a font size two points smaller than the actual font size specified for this text.
-     * @param {boolean} isSmallCaps
+     * @param {boolean} isSmallCaps - Specifies that the contents of the current run are displayed capitalized two points smaller.
      */
     ApiTextPr.prototype.SetSmallCaps = function(isSmallCaps)
     {
@@ -2782,9 +2789,10 @@
         this.private_OnChange();
     };
     /**
-     * Specify the amount by which text shall be raised or lowered for this run in relation to the default baseline of
-     * the surrounding non-positioned text.
-     * @param {hps} nPosition - Specifies a positive or negative measurement in half-points (1/144 of an inch).
+     * Specify the amount by which text is raised or lowered for this run in relation to the default
+     * baseline of the surrounding non-positioned text.
+     * @param {hps} nPosition - Specifies a positive (raised text) or negative (lowered text)
+     * measurement in half-points (1/144 of an inch).
      */
     ApiTextPr.prototype.SetPosition = function(nPosition)
     {
@@ -2792,10 +2800,10 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the languages which shall be used to check spelling and grammar (if requested) when processing the
-     * contents of this run.
-     * @param {string} sLangId - The possible values for this parameter is a language identifier as defined by RFC
-     *     4646/BCP 47. Example: "en-CA".
+     * Specify the languages which will be used to check spelling and grammar (if requested) when processing
+     * the contents of this text run.
+     * @param {string} sLangId - The possible value for this parameter is a language identifier as defined by
+     * RFC 4646/BCP 47. Example: "en-CA".
      */
     ApiTextPr.prototype.SetLanguage = function(sLangId)
     {
@@ -2807,11 +2815,11 @@
         }
     };
     /**
-     * Specifies the shading applied to the contents of the run.
-     * @param {ShdType} sType
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Specify the shading applied to the contents of the current text run.
+     * @param {ShdType} sType - The shading type applied to the contents of the current text run.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTextPr.prototype.SetShd = function(sType, r, g, b)
     {
@@ -2846,8 +2854,9 @@
         return "paraPr";
     };
     /**
-     * Set paragraph style.
-     * @param {ApiStyle} oStyle
+     * The paragraph style base method.
+     * <note>This method is not used by itself, as it only forms the basis for the {@link ApiParagraph#SetStyle} method which sets the selected or created style for the paragraph.</note>
+     * @param {ApiStyle} oStyle - The style of the paragraph to be set.
      */
     ApiParaPr.prototype.SetStyle = function(oStyle)
     {
@@ -2861,7 +2870,7 @@
      * Specifies that any space specified before or after this paragraph, specified using the spacing element
      * {@link ApiParaPr#SetSpacingBefore}{@link ApiParaPr#SetSpacingAfter}, should not be applied when the preceding and
      * following paragraphs are of the same paragraph style, affecting the top and bottom spacing respectively.
-     * @param {boolean} isContextualSpacing
+     * @param {boolean} isContextualSpacing - The true value will enable the paragraph contextual spacing.
      */
     ApiParaPr.prototype.SetContextualSpacing = function(isContextualSpacing)
     {
@@ -2869,8 +2878,8 @@
         this.private_OnChange();
     };
     /**
-     * Set left indentation.
-     * @param {twips} nValue
+     * Set the paragraph left side indentation.
+     * @param {twips} nValue - The paragraph left side indentation value measured in twentieths of a point (1/1440 of an inch).
      */
     ApiParaPr.prototype.SetIndLeft = function(nValue)
     {
@@ -2878,8 +2887,8 @@
         this.private_OnChange();
     };
     /**
-     * Set right indentation.
-     * @param {twips} nValue
+     * Set the paragraph right side indentation.
+     * @param {twips} nValue - The paragraph right side indentation value measured in twentieths of a point (1/1440 of an inch).
      */
     ApiParaPr.prototype.SetIndRight = function(nValue)
     {
@@ -2887,8 +2896,8 @@
         this.private_OnChange();
     };
     /**
-     * Set first line indentation.
-     * @param {twips} nValue
+     * Set the paragraph first line indentation.
+     * @param {twips} nValue - The paragraph first line indentation value measured in twentieths of a point (1/1440 of an inch).
      */
     ApiParaPr.prototype.SetIndFirstLine = function(nValue)
     {
@@ -2896,8 +2905,9 @@
         this.private_OnChange();
     };
     /**
-     * Set paragraph justification
-     * @param {("left" | "right" | "both" | "center")} sJc
+     * Set paragraph contents justification.
+     * @param {("left" | "right" | "both" | "center")} sJc - The parameters will define the justification type that
+     * will be applied to the paragraph contents.
      */
     ApiParaPr.prototype.SetJc = function(sJc)
     {
@@ -2905,9 +2915,8 @@
         this.private_OnChange();
     };
     /**
-     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
-     * maintained on a single page whenever possible.
-     * @param {boolean} isKeepLines
+     * Specify that when rendering this document using a page view, all lines of this paragraph are maintained on a single page whenever possible.
+     * @param {boolean} isKeepLines - The true value will enable the option to keep lines of the paragraph on a single page.
      */
     ApiParaPr.prototype.SetKeepLines = function(isKeepLines)
     {
@@ -2915,9 +2924,10 @@
         this.private_OnChange();
     };
     /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are at least partly rendered on the same page as the following paragraph whenever possible.
-     * @param {boolean} isKeepNext
+     * Specify that when rendering this document using a paginated view, the contents of this paragraph are at least
+     * partly rendered on the same page as the following paragraph whenever possible.
+     * @param {boolean} isKeepNext - The true value will enable the option to keep lines of the paragraph on the same
+     * page as the following paragraph.
      */
     ApiParaPr.prototype.SetKeepNext = function(isKeepNext)
     {
@@ -2925,9 +2935,10 @@
         this.private_OnChange();
     };
     /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are rendered on the start of a new page in the document.
-     * @param {boolean} isPageBreakBefore
+     * Specify that when rendering this document using a paginated view, the contents of this paragraph are rendered at
+     * the beginning of a new page in the document.
+     * @param {boolean} isPageBreakBefore - The true value will enable the option to render the contents of the paragraph
+     * at the beginning of the a new page in the document.
      */
     ApiParaPr.prototype.SetPageBreakBefore = function(isPageBreakBefore)
     {
@@ -2940,8 +2951,8 @@
      * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
      * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the
      * <code>nLine</code> attribute shall be interpreted as 240ths of a line.
-     * @param {(twips | line240)} nLine
-     * @param {("auto" | "atLeast" | "exact")} sLineRule
+     * @param {(twips | line240)} nLine - The line spacing value measured either in twentieths of a point (1/1440 of an inch) or in 240ths of a line.
+     * @param {("auto" | "atLeast" | "exact")} sLineRule - The rule that determines the measuring units of the nLine parameter.
      */
     ApiParaPr.prototype.SetSpacingLine = function(nLine, sLineRule)
     {
@@ -2971,8 +2982,8 @@
      * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
      * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then
      * it will be interpreted as <code>false</code>.
-     * @param {twips} nBefore
-     * @param {boolean} [isBeforeAuto=false]
+     * @param {twips} nBefore - The value of the spacing before the current paragraph measured in twentieths of a point (1/1440 of an inch).
+     * @param {boolean} [isBeforeAuto=false] - The true value will disable the nBefore parameter.
      */
     ApiParaPr.prototype.SetSpacingBefore = function(nBefore, isBeforeAuto)
     {
@@ -2988,8 +2999,8 @@
      * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
      * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
      * will be interpreted as <code>false</code>.
-     * @param {twips} nAfter
-     * @param {boolean} [isAfterAuto=false]
+     * @param {twips} nAfter - The value of the spacing after the current paragraph measured in twentieths of a point (1/1440 of an inch).
+     * @param {boolean} [isAfterAuto=false] - The true value will disable the nAfter parameter.
      */
     ApiParaPr.prototype.SetSpacingAfter = function(nAfter, isAfterAuto)
     {
@@ -3002,12 +3013,12 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the shading applied to the contents of the paragraph.
-     * @param {ShdType} sType
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isAuto=false]
+     * Specify the shading applied to the contents of the paragraph.
+     * @param {ShdType} sType - The shading type which will be applied to the contents of the current paragraph.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
+     * @param {boolean} [isAuto=false] - The true value will disable paragraph contents shading.
      */
     ApiParaPr.prototype.SetShd = function(sType, r, g, b, isAuto)
     {
@@ -3015,14 +3026,15 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border
-     * settings.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Specify the border which will be displayed below a set of paragraphs which have the same paragraph border settings.
+     * <note>The paragraphs of the same style going one by one are considered as a single block, so the border is added
+     * to the whole block rather than to every paragraph in this block.</note>
+     * @param {BorderType} sType - The border style.
+     * @param {pt_8} nSize - The width of the current bottom border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset below the paragraph measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiParaPr.prototype.SetBottomBorder = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3030,13 +3042,13 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the border which shall be displayed on the left side of the page around the specified paragraph.
+     * Specify the border which will be displayed at the left side of the page around the specified paragraph.
      * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * @param {pt_8} nSize - The width of the current left border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset to the left of the paragraph measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiParaPr.prototype.SetLeftBorder = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3044,13 +3056,13 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the border which shall be displayed on the right side of the page around the specified paragraph.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Specify the border which will be displayed at the right side of the page around the specified paragraph.
+     * @param {BorderType} sType - The border style.
+     * @param {pt_8} nSize - The width of the current right border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset to the right of the paragraph measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiParaPr.prototype.SetRightBorder = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3058,14 +3070,14 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the border which shall be displayed above a set of paragraphs which have the same set of paragraph
-     * border settings.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Specify the border which will be displayed above a set of paragraphs which have the same set of paragraph border settings.
+     * <note>The paragraphs of the same style going one by one are considered as a single block, so the border is added to the whole block rather than to every paragraph in this block.</note>
+     * @param {BorderType} sType - The border style.
+     * @param {pt_8} nSize - The width of the current top border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset above the paragraph measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiParaPr.prototype.SetTopBorder = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3073,14 +3085,13 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the border which shall be displayed between each paragraph in a set of paragraphs which have the same
-     * set of paragraph border settings.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Specify the border which will be displayed between each paragraph in a set of paragraphs which have the same set of paragraph border settings.
+     * @param {BorderType} sType - The border style.
+     * @param {pt_8} nSize - The width of the current border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset between the paragraphs measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiParaPr.prototype.SetBetweenBorder = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3088,9 +3099,8 @@
         this.private_OnChange();
     };
     /**
-     * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
-     * a separate page from the remaining content at display time by moving the line onto the following page.
-     * @param {boolean} isWidowControl
+     * Specify whether a single line of this paragraph will be prevented from being displayed on a separate page from the remaining content at display time by moving the line onto the following page.
+     * @param {boolean} isWidowControl - The true value will enable the SetWidowControl method use.
      */
     ApiParaPr.prototype.SetWidowControl = function(isWidowControl)
     {
@@ -3100,9 +3110,8 @@
     /**
      * Specifies a sequence of custom tab stops which shall be used for any tab characters in the current paragraph.
      * <b>Warning</b>: The lengths of aPos array and aVal array <b>MUST BE</b> equal.
-     * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins.
-     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab
-     *     stop and the alignment which shall be applied to text entered at the current custom tab stop.
+     * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins measured in twentieths of a point (1/1440 of an inch).
+     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab stop and the alignment which will be applied to text entered at the current custom tab stop.
      */
     ApiParaPr.prototype.SetTabs = function(aPos, aVal)
     {
@@ -3118,11 +3127,11 @@
         this.private_OnChange();
     };
     /**
-     * Specifies that the current paragraph references a numbering definition instance in the current document.
+     * Specify that the current paragraph references a numbering definition instance in the current document.
      * @param {ApiNumbering} oNumPr - Specifies a numbering definition.
-     * @param {number} [nLvl=0] - Specifies a numbering level reference. If the current instance of the class ApiParaPr
-     *     is direct formatting of a paragraph, then this parameter <b>MUST BE</b> specified. Otherwise if the current
-     *     instance of the class ApiParaPr is the part of ApiStyle properties, then this parameter will be ignored.
+     * @param {number} [nLvl=0] - Specifies a numbering level reference. If the current instance of the ApiParaPr class is direct
+     * formatting of a paragraph, then this parameter MUST BE specified. Otherwise if the current instance of the ApiParaPr class
+     * is the part of ApiStyle properties, this parameter will be ignored.
      */
     ApiParaPr.prototype.SetNumPr = function(oNumPr, nLvl)
     {
@@ -3172,7 +3181,7 @@
     };
     /**
      * Get the specified level of the current numbering.
-     * @param {number} nLevel - Index of the numbering level. This value MUST BE from 0 to 8.
+     * @param {number} nLevel - The numbering level index. This value MUST BE from 0 to 8.
      * @returns {ApiNumberingLevel}
      */
     ApiNumbering.prototype.GetLevel = function(nLevel)
@@ -3195,7 +3204,7 @@
         return "numberingLevel";
     };
     /**
-     * Get a numbering defenition.
+     * Get the numbering definition.
      * @returns {ApiNumbering}
      */
     ApiNumberingLevel.prototype.GetNumbering = function()
@@ -3211,7 +3220,8 @@
         return this.Lvl;
     };
     /**
-     * Specifies the run properties which shall be applied to the numbering level's text.
+     * Specify the text properties which will be applied to the text in the current numbering level itself, not to the text in the subsequent paragraph.
+     * <note>To change the text style for the paragraph, a style must be applied to it using the ApiRun.SetStyle method.</note>
      * @returns {ApiTextPr}
      */
     ApiNumberingLevel.prototype.GetTextPr = function()
@@ -3219,8 +3229,7 @@
         return new ApiTextPr(this, this.Num.GetLvl(this.Lvl).TextPr.Copy());
     };
     /**
-     * This paragraph properties are applied to any numbered paragraph that references the given numbering definition
-     * and numbering level.
+     * The paragraph properties which are applied to any numbered paragraph that references the given numbering definition and numbering level.
      * @returns {ApiParaPr}
      */
     ApiNumberingLevel.prototype.GetParaPr = function()
@@ -3228,9 +3237,9 @@
         return new ApiParaPr(this, this.Num.GetLvl(this.Lvl).ParaPr.Copy());
     };
     /**
-     * Set one of the predefined numbering templates.
-     * @param {("none" | "bullet" | "1)" | "1." | "I." | "A." | "a)" | "a." | "i." )} sType - Type of the numbering
-     * @param {string} [sSymbol=""] - This parameter have a meaning only if <code>sType="bullet"</code>
+     * Set one of the existing predefined numbering templates.
+     * @param {("none" | "bullet" | "1)" | "1." | "I." | "A." | "a)" | "a." | "i." )} sType - Set one of the existing predefined numbering templates.
+     * @param {string} [sSymbol=""] - The symbol used for the list numbering. This parameter have a meaning only if the sType="bullet" property is selected.
      */
     ApiNumberingLevel.prototype.SetTemplateType = function(sType, sSymbol)
     {
@@ -3266,15 +3275,12 @@
         }
     };
     /**
-     * Set the custom type of the numbering.
+     * Set your own customized numbering type.
      * @param {("none" | "bullet" | "decimal" | "lowerRoman" | "upperRoman" | "lowerLetter" | "upperLetter" |
-     *     "decimalZero")} sType
-     * @param {string} sTextFormatString - All text in this parameter shall be taken as literal text to be repeated in
-     * each instance of this numbering level, except for any use of the percent symbol (%) followed by a number,
-     * which shall be used to indicate the one-based index of the number to be used at this level. Any number of a
-     *     level
+     *     "decimalZero")} sType - The custom numbering type used for the current numbering definition.
+     * @param {string} sTextFormatString - Any text in this parameter will be taken as literal text to be repeated in each instance of this numbering level, except for any use of the percent symbol (%) followed by a number, which will be used to indicate the one-based index of the number to be used at this level. Any number of a level higher than this level will be ignored.
      * higher than this level shall be ignored.
-     * @param {("left" | "right" | "center")} sAlign - Type of justification used on a numbering level's text.
+     * @param {("left" | "right" | "center")} sAlign - Type of justification applied to the text run in the current numbering level.
      */
     ApiNumberingLevel.prototype.SetCustomType = function(sType, sTextFormatString, sAlign)
     {
@@ -3307,28 +3313,24 @@
         this.Num.SetLvlByFormat(this.Lvl, nType, sTextFormatString, nAlign);
     };
     /**
-     * This element specifies a one-based index which determines when a numbering level should restart to its start
-     * value. A numbering level restarts when an instance of the specified numbering level, which shall be
-     * higher (earlier than the this level) is used in the given document's contents. By default this value is true.
-     * @param {boolean} isRestart
+     * Specify a one-based index which determines when a numbering level should restart to its starting value. A numbering level restarts when an instance of the specified numbering level, which will be higher (earlier than the this level) is used in the given document contents. By default this value is true.
+     * @param {boolean} isRestart - The true value will enable the SetRestart method use.
      */
     ApiNumberingLevel.prototype.SetRestart = function(isRestart)
     {
         this.Num.SetLvlRestart(this.Lvl, private_GetBoolean(isRestart, true));
     };
     /**
-     * This element specifies the starting value for the numbering used by the parent numbering level within a given
-     * numbering level definition. By default this value is 1.
-     * @param {number} nStart
+     * Specify the starting value for the numbering used by the parent numbering level within a given numbering level definition. By default this value is 1.
+     * @param {number} nStart -
      */
     ApiNumberingLevel.prototype.SetStart = function(nStart)
     {
         this.Num.SetLvlStart(this.Lvl, private_GetInt(nStart));
     };
     /**
-     * Specifies the content which shall be added between a given numbering level's text and the text of every numbered
-     * paragraph which references that numbering level. By default this value is "tab".
-     * @param {("space" | "tab" | "none")} sType
+     * Specify the content which will be added between a given numbering level text and the text of every numbered paragraph which references that numbering level. By default this value is "tab".
+     * @param {("space" | "tab" | "none")} sType - The content added between the numbering level text and the text in the numbered paragraph.
      */
     ApiNumberingLevel.prototype.SetSuff = function(sType)
     {
@@ -3355,8 +3357,8 @@
         return "tablePr";
     };
     /**
-     * Specifies the number of columns which shall comprise each a table style column band for this table style.
-     * @param {number} nCount
+     * Specify the number of columns which will comprise each table column band for this table style.
+     * @param {number} nCount - The number of columns measured in positive integers.
      */
     ApiTablePr.prototype.SetStyleColBandSize = function(nCount)
     {
@@ -3364,8 +3366,8 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the number of rows which shall comprise each a table style row band for this table style.
-     * @param {number} nCount
+     * Specify the number of rows which will comprise each table row band for this table style.
+     * @param {number} nCount - The number of rows measured in positive integers.
      */
     ApiTablePr.prototype.SetStyleRowBandSize = function(nCount)
     {
@@ -3373,8 +3375,8 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the alignment of the current table with respect to the text margins in the current section.
-     * @param {("left" | "right" | "center")} sJcType
+     * Specify the alignment of the current table with respect to the text margins in the current section.
+     * @param {("left" | "right" | "center")} sJcType - The alignment type used for the current table placement.
      */
     ApiTablePr.prototype.SetJc = function(sJcType)
     {
@@ -3387,12 +3389,12 @@
         this.private_OnChange();
     };
     /**
-     * Specify the shading which shall be applied to the extents of the current table.
-     * @param {ShdType} sType
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isAuto=false]
+     * Specify the shading which is applied to the extents of the current table.
+     * @param {ShdType} sType - The shading type applied to the extents of the current table.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
+     * @param {boolean} [isAuto=false] - The true value will disable the SetShd method use.
      */
     ApiTablePr.prototype.SetShd = function(sType, r, g, b, isAuto)
     {
@@ -3400,13 +3402,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed at the top of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed at the top of the current table.
+     * @param {BorderType} sType - The top border style.
+     * @param {pt_8} nSize - The width of the current top border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the top part of the table measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTablePr.prototype.SetTableBorderTop = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3414,13 +3416,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed at the bottom of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed at the bottom of the current table.
+     * @param {BorderType} sType - The bottom border style.
+     * @param {pt_8} nSize - The width of the current bottom border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the bottom part of the table measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTablePr.prototype.SetTableBorderBottom = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3428,13 +3430,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed on the left of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed on the left of the current table.
+     * @param {BorderType} sType - The left border style.
+     * @param {pt_8} nSize - The width of the current left border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the left part of the table measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTablePr.prototype.SetTableBorderLeft = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3442,13 +3444,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed on the right of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed on the right of the current table.
+     * @param {BorderType} sType - The right border style.
+     * @param {pt_8} nSize - The width of the current right border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the right part of the table measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTablePr.prototype.SetTableBorderRight = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3456,14 +3458,14 @@
         this.private_OnChange();
     };
     /**
-     * Specify the border which shall be displayed on all horizontal table cell borders which are not on
-     * an outmost edge of the parent table (all horizontal borders which are not the topmost or bottommost border).
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Specify the border which will be displayed on all horizontal table cell borders which are not on an outmost edge
+     * of the parent table (all horizontal borders which are not the topmost or bottommost border).
+     * @param {BorderType} sType - The horizontal table cell border style.
+     * @param {pt_8} nSize - The width of the current border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the horizontal table cells of the table measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTablePr.prototype.SetTableBorderInsideH = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3471,14 +3473,14 @@
         this.private_OnChange();
     };
     /**
-     * Specify the border which shall be displayed on all vertical table cell borders which are not on an
-     * outmost edge of the parent table (all horizontal borders which are not the leftmost or rightmost border).
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Specify the border which will be displayed on all vertical table cell borders which are not on an outmost edge
+     * of the parent table (all vertical borders which are not the leftmost or rightmost border).
+     * @param {BorderType} sType - The vertical table cell border style.
+     * @param {pt_8} nSize - The width of the current border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the vertical table cells of the table measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTablePr.prototype.SetTableBorderInsideV = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3487,9 +3489,10 @@
     };
 
     /**
-     * Specifies the amount of space which shall be left between the bottom extent of the cell contents and the border
+     * Specify the amount of space which will be left between the bottom extent of the cell contents and the border
      * of all table cells within the parent table (or table row).
-     * @param {twips} nValue
+     * @param {twips} nValue - The value for the amount of space below the bottom extent of the cell measured in
+     * twentieths of a point (1/1440 of an inch).
      */
     ApiTablePr.prototype.SetTableCellMarginBottom = function(nValue)
     {
@@ -3497,9 +3500,9 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the amount of space which shall be present between the left extent of the cell contents and the left
-     * border of all table cells within the parent table (or table row) .
-     * @param {twips} nValue
+     * Specify the amount of space which will be present between the left extent of the cell contents and the left
+     * border of all table cells within the parent table (or table row).
+     * @param {twips} nValue - The value for the amount of space to the left extent of the cell measured in twentieths of a point (1/1440 of an inch).
      */
     ApiTablePr.prototype.SetTableCellMarginLeft = function(nValue)
     {
@@ -3507,9 +3510,9 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the amount of space which shall be present between the right extent of the cell contents and the right
-     * border of all table cells within the parent table (or table row) .
-     * @param {twips} nValue
+     * Specify the amount of space which will be present between the right extent of the cell contents and the right
+     * border of all table cells within the parent table (or table row).
+     * @param {twips} nValue - The value for the amount of space to the right extent of the cell measured in twentieths of a point (1/1440 of an inch).
      */
     ApiTablePr.prototype.SetTableCellMarginRight = function(nValue)
     {
@@ -3517,9 +3520,9 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the amount of space which shall be present between the top extent of the cell contents and the top
-     * border of all table cells within the parent table (or table row) .
-     * @param {twips} nValue
+     * Specify the amount of space which will be present between the top extent of the cell contents and the top border
+     * of all table cells within the parent table (or table row).
+     * @param {twips} nValue - The value for the amount of space above the top extent of the cell measured in twentieths of a point (1/1440 of an inch).
      */
     ApiTablePr.prototype.SetTableCellMarginTop = function(nValue)
     {
@@ -3527,8 +3530,8 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the default table cell spacing (the spacing between adjacent cells and the edges of the table).
-     * @param {?twips} nValue - Value of the spacing. Null mean no spacing.
+     * Specify the default table cell spacing (the spacing between adjacent cells and the edges of the table).
+     * @param {?twips} nValue - Spacing value measured in twentieths of a point (1/1440 of an inch). <code>"Null"</code> means no spacing will be applied.
      */
     ApiTablePr.prototype.SetCellSpacing = function(nValue)
     {
@@ -3539,9 +3542,9 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the indentation which shall be added before the leading edge of the current table in the document (the
-     * left edge in a left-to-right table, and the right edge in a right-to-left table).
-     * @param {twips} nValue
+     * Specify the indentation which will be added before the leading edge of the current table in the document
+     * (the left edge in a left-to-right table, and the right edge in a right-to-left table).
+     * @param {twips} nValue - The indentation value measured in twentieths of a point (1/1440 of an inch).
      */
     ApiTablePr.prototype.SetTableInd = function(nValue)
     {
@@ -3550,8 +3553,9 @@
     };
     /**
      * Set the preferred width for this table.
-     * @param {TableWidth} sType - Type of the width value
-     * @param {number} [nValue]
+     * <note>Tables are created with the ApiTable.SetWidth method properties set by default, which always override the {@link ApiTablePr#SetWidth} method properties. That is why there is no use to try and apply ApiTablePr.SetWidth, we recommend that you use the  {@link ApiTablePr#SetWidth}  method instead.</node>
+     * @param {TableWidth} sType - Type of the width value from one of the available width values types.
+     * @param {number} [nValue] - The table width value measured in positive integers.
      */
     ApiTablePr.prototype.SetWidth = function(sType, nValue)
     {
@@ -3559,8 +3563,8 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the algorithm which shall be used to lay out the contents of this table within the document.
-     * @param {("autofit" | "fixed")} sType
+     * Specify the algorithm which will be used to lay out the contents of this table within the document.
+     * @param {("autofit" | "fixed")} sType - The type of the table layout in the document.
      */
     ApiTablePr.prototype.SetTableLayout = function(sType)
     {
@@ -3587,9 +3591,8 @@
         return "tableRowPr";
     };
     /**
-     * Set the height of the current table row within the current table.
-     * @param {("auto" | "atLeast")} sHRule - Specifies the meaning of the height specified for this table row.
-     * @param {twips} [nValue] - This value will be ignored if <code>sHRule="auto"</code>.
+     * @param {("auto" | "atLeast")} sHRule - The rule to either apply or ignore the height value to the current table row. Use the <code>"atLeast"</code> value to enable the <code>SetHeight</code> method use.
+     * @param {twips} [nValue] - The height for the current table row measured in twentieths of a point (1/1440 of an inch). This value will be ignored if <code>sHRule="auto"<code>.
      */
     ApiTableRowPr.prototype.SetHeight = function(sHRule, nValue)
     {
@@ -3601,10 +3604,8 @@
         this.private_OnChange();
     };
     /**
-     * Specifies that the current table row shall be repeated at the top of each new page on which part of this table
-     * is displayed. This gives this table row the behavior of a 'header' row on each of these pages. This element can
-     * be applied to any number of rows at the top of the table structure in order to generate multi-row table headers.
-     * @param {boolean} isHeader
+     * Specify that all the current table rows will be styled as its header row.
+     * @param {boolean} isHeader - The true value will enable the SetTableHeader method use.
      */
     ApiTableRowPr.prototype.SetTableHeader = function(isHeader)
     {
@@ -3627,12 +3628,12 @@
         return "tableCellPr";
     };
     /**
-     * Specify the shading which shall be applied to the extents of the current table cell.
-     * @param {ShdType} sType
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isAuto=false]
+     * Specify the shading applied to the contents of the table cell.
+     * @param {ShdType} sType - The shading type which will be applied to the contents of the current table cell.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
+     * @param {boolean} [isAuto=false] - The true value will disable table cell contents shading.
      */
     ApiTableCellPr.prototype.SetShd = function(sType, r, g, b, isAuto)
     {
@@ -3640,10 +3641,11 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the amount of space which shall be left between the bottom extent of the cell contents and the border
+     * Specify the amount of space which will be left between the bottom extent of the cell contents and the border
      * of a specific table cell within a table.
-     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
-     * otherwise override the table cell bottom margin with specified value for the current cell.
+     * @param {?twips} nValue - The value for the amount of space below the bottom extent of the cell measured in twentieths
+     * of a point (1/1440 of an inch). If this value is <code>null</code>, then default table cell bottom margin will be used, otherwise
+     * the table cell bottom margin will be overridden with the specified value for the current cell.
      */
     ApiTableCellPr.prototype.SetCellMarginBottom = function(nValue)
     {
@@ -3665,10 +3667,11 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the amount of space which shall be left between the left extent of the current cell contents and the
-     * left edge border of a specific individual table cell within a table.
-     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
-     * otherwise override the table cell bottom margin with specified value for the current cell.
+     * Specifies the amount of space which shall be left between the right extent of the current cell contents and the
+     * right edge border of a specific individual table cell within a table.
+     * @param {?twips} nValue - The value for the amount of space to the left extent of the cell measured in twentieths
+     * of a point (1/1440 of an inch). If this value is <code>null<c/ode>, then default table cell left margin will be used, otherwise
+     * the table cell left margin will be overridden with the specified value for the current cell.
      */
     ApiTableCellPr.prototype.SetCellMarginLeft = function(nValue)
     {
@@ -3690,10 +3693,10 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the amount of space which shall be left between the right extent of the current cell contents and the
-     * right edge border of a specific individual table cell within a table.
-     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
-     * otherwise override the table cell bottom margin with specified value for the current cell.
+     * Specify the amount of space which will be left between the right extent of the cell contents and the border of a specific table cell within a table.
+     * @param {?twips} nValue - The value for the amount of space to the right extent of the cell measured in twentieths
+     * of a point (1/1440 of an inch). If this value is <code>null</code>, then default table cell right margin will be used, otherwise
+     * the table cell right margin will be overridden with the specified value for the current cell.
      */
     ApiTableCellPr.prototype.SetCellMarginRight = function(nValue)
     {
@@ -3715,10 +3718,11 @@
         this.private_OnChange();
     };
     /**
-     * Specifies the amount of space which shall be left between the top extent of the current cell contents and the
-     * top edge border of a specific individual table cell within a table.
-     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
-     * otherwise override the table cell bottom margin with specified value for the current cell.
+     * Specify the amount of space which will be left between the upper extent of the cell contents
+     * and the border of a specific table cell within a table.
+     * @param {?twips} nValue - The value for the amount of space above the upper extent of the cell measured in twentieths
+     * of a point (1/1440 of an inch). If this value is <code>null</code>, then default table cell top margin will be used, otherwise
+     * the table cell top margin will be overridden with the specified value for the current cell.
      */
     ApiTableCellPr.prototype.SetCellMarginTop = function(nValue)
     {
@@ -3740,13 +3744,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed at the bottom of the current table cell.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed at the bottom of the current table cell.
+     * @param {BorderType} sType - The cell bottom border style.
+     * @param {pt_8} nSize - The width of the current cell bottom border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the bottom part of the table cell measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTableCellPr.prototype.SetCellBorderBottom = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3754,13 +3758,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed on the left edge of the current table cell.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed to the left of the current table cell.
+     * @param {BorderType} sType - The cell left border style.
+     * @param {pt_8} nSize - The width of the current cell left border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the left part of the table cell measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTableCellPr.prototype.SetCellBorderLeft = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3768,13 +3772,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed on the right edge of the current table cell.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed to the right of the current table cell.
+     * @param {BorderType} sType - The cell right border style.
+     * @param {pt_8} nSize - The width of the current cell right border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the right part of the table cell measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTableCellPr.prototype.SetCellBorderRight = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3782,13 +3786,13 @@
         this.private_OnChange();
     };
     /**
-     * Set the border which shall be displayed at the top of the current table cell.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
+     * Set the border which will be displayed at the top of the current table cell.
+     * @param {BorderType} sType - The cell top border style.
+     * @param {pt_8} nSize - The width of the current cell top border measured in eighths of a point.
+     * @param {pt} nSpace - The spacing offset in the top part of the table cell measured in points used to place this border.
+     * @param {byte} r - Red color component value.
+     * @param {byte} g - Green color component value.
+     * @param {byte} b - Blue color component value.
      */
     ApiTableCellPr.prototype.SetCellBorderTop = function(sType, nSize, nSpace, r, g, b)
     {
@@ -3796,9 +3800,9 @@
         this.private_OnChange();
     };
     /**
-     * Set the preferred width for this cell.
-     * @param {TableWidth} sType - Specifies the meaning of the width value.
-     * @param {number} [nValue]
+     * Set the preferred width for the current table cell.
+     * @param {TableWidth} sType - Type of the width value from one of the available width values types.
+     * @param {number} [nValue] - The table cell width value measured in positive integers.
      */
     ApiTableCellPr.prototype.SetWidth = function(sType, nValue)
     {
@@ -3806,8 +3810,8 @@
         this.private_OnChange();
     };
     /**
-     * Specify the vertical alignment for text within the current table cell.
-     * @param {("top" | "center" | "bottom")} sType
+     * Specify the vertical alignment for text contents within the current table cell.
+     * @param {("top" | "center" | "bottom")} sType - The available types of the vertical alignment for the text contents of the current table cell.
      */
     ApiTableCellPr.prototype.SetVerticalAlign = function(sType)
     {
@@ -3822,7 +3826,9 @@
     };
     /**
      * Specify the direction of the text flow for this table cell.
-     * @param {("lrtb" | "tbrl" | "btlr")} sType
+     * @param {("lrtb" | "tbrl" | "btlr")} sType - The available types of the text direction in the table cell: <code>"lrtb"</code>
+     * - text direction left-to-right moving from top to bottom, <code>"tbrl"</code> - text direction top-to-bottom moving from right
+     * to left, <code>"btlr"</code> - text direction bottom-to-top moving from left to right.
      */
     ApiTableCellPr.prototype.SetTextDirection = function(sType)
     {
@@ -3836,10 +3842,9 @@
         this.private_OnChange();
     };
     /**
-     * Specifies how this table cell shall be laid out when the parent table is displayed in a document. This setting
-     * only affects the behavior of the cell when the table layout for this table {@link ApiTablePr#SetTableLayout} is
-     * set to use the <code>"autofit"</code> algorithm.
-     * @param {boolean} isNoWrap
+     * Specify how this table cell is laid out when the parent table is displayed in a document. This setting
+     * only affects the behavior of the cell when the {@link ApiTablePr#SetTableLayout} table layout for this table is set to use the <code>"autofit"</code> algorithm.
+     * @param {boolean} isNoWrap - The true value will enable the <code>SetNoWrap</code> method use.
      */
     ApiTableCellPr.prototype.SetNoWrap = function(isNoWrap)
     {
@@ -3862,7 +3867,7 @@
         return "tableStylePr";
     };
     /**
-     * Get the type of the current conditional style.
+     * Get the type of the current table conditional style.
      * @returns {TableStyleOverrideType}
      */
     ApiTableStylePr.prototype.GetType = function()
@@ -3870,8 +3875,7 @@
         return this.Type;
     };
     /**
-     * Get the set of run properties which shall be applied to all runs within a table which match the conditional
-     * formatting type.
+     Get the set of the text run properties which will be applied to all the text runs within the table which match the conditional formatting type.
      * @returns {ApiTextPr}
      */
     ApiTableStylePr.prototype.GetTextPr = function()
@@ -3879,8 +3883,7 @@
         return new ApiTextPr(this, this.TableStylePr.TextPr);
     };
     /**
-     * Get the set of paragraph properties which shall be applied to all paragraphs within a table which match the
-     * conditional formatting type.
+     * Get the set of the paragraph properties which will be applied to all the paragraphs within a table which match the conditional formatting type.
      * @returns {ApiParaPr}
      */
     ApiTableStylePr.prototype.GetParaPr = function()
@@ -3888,8 +3891,7 @@
         return new ApiParaPr(this, this.TableStylePr.ParaPr);
     };
     /**
-     * Get the set of table properties which shall be applied to all regions within a table which match the conditional
-     * formatting type.
+     * Get the set of the table properties which will be applied to all the regions within a table which match the conditional formatting type.
      * @returns {ApiTablePr}
      */
     ApiTableStylePr.prototype.GetTablePr = function()
@@ -3897,8 +3899,7 @@
         return new ApiTablePr(this, this.TableStylePr.TablePr);
     };
     /**
-     * Get  the set of table row properties which shall be applied to all rows within a table which match the
-     * conditional formatting type.
+     * Get the set of the table row properties which will be applied to all the rows within a table which match the conditional formatting type.
      * @returns {ApiTableRowPr}
      */
     ApiTableStylePr.prototype.GetTableRowPr = function()
@@ -3906,8 +3907,7 @@
         return new ApiTableRowPr(this, this.TableStylePr.TableRowPr);
     };
     /**
-     * Get the set of table cell properties which shall be applied to all regions within a table which match the
-     * conditional formatting type.
+     * Get the set of the table cell properties which will be applied to all the cells within a table which match the conditional formatting type.
      * @returns {ApiTableCellPr}
      */
     ApiTableStylePr.prototype.GetTableCellPr = function()
@@ -3922,7 +3922,7 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Get the type of this class.
+     * Get the type of the class based on this base class.
      * @returns {"drawing"}
      */
     ApiDrawing.prototype.GetClassType = function()
@@ -3930,9 +3930,9 @@
         return "drawing";
     };
     /**
-     * Set the size of the bounding box.
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
+     * Set the size of the object (image, shape, chart) bounding box.
+     * @param {EMU} nWidth - The object width measured in English measure units.
+     * @param {EMU} nHeight - The object height measured in English measure units.
      */
     ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
     {
@@ -3946,7 +3946,15 @@
         }
     };
     /**
-     * Set the wrapping type of this drawing object.
+     * Set the wrapping type of this object (image, shape, chart). One of the following wrapping style types can be set:
+     * * <b>"inline"</b> - the object is considered to be a part of the text, like a character, so when the text moves, the object moves as well. In this case the positioning options are inaccessible.
+     * If one of the following styles is selected, the object can be moved independently of the text and positioned on the page exactly:
+     * * <b>"square"</b> - the text wraps the rectangular box that bounds the object.
+     * * <b>"tight"</b> - the text wraps the actual object edges.
+     * * <b>"through"</b> - the text wraps around the object edges and fills in the open white space within the object.
+     * * <b>"topAndBottom"</b> - the text is only above and below the object.
+     * * <b>"behind"</b> - the text overlaps the object.
+     * * <b>"inFront"</b> - the object overlaps the text.
      * @param {"inline" | "square" | "tight" | "through" | "topAndBottom" | "behind" | "inFront"} sType
      */
     ApiDrawing.prototype.SetWrappingStyle = function(sType)
@@ -4004,9 +4012,9 @@
     };
 
     /**
-     * Specifies how a floating object shall be horizontally aligned.
-     * @param {RelFromH} [sRelativeFrom="page"]
-     * @param {("left" | "right" | "center")} [sAlign="left"]
+     * Specify how the floating object will be horizontally aligned.
+     * @param {RelFromH} [sRelativeFrom="page"] - The document element which will be taken as a countdown point for the object horizontal alignment.
+     * @param {("left" | "right" | "center")} [sAlign="left"] - The alingment type which will be used for the object horizontal alignment.
      */
     ApiDrawing.prototype.SetHorAlign = function(sRelativeFrom, sAlign)
     {
@@ -4015,9 +4023,9 @@
         this.Drawing.Set_PositionH(nRelativeFrom, true, nAlign, false);
     };
     /**
-     * Specifies how a floating object shall be vertically aligned.
-     * @param {RelFromV} [sRelativeFrom="page"]
-     * @param {("top" | "bottom" | "center")} [sAlign="top"]
+     * Specify how the floating object will be vertically aligned.
+     * @param {RelFromV} [sRelativeFrom="page"] - The document element which will be taken as a countdown point for the object vertical alignment.
+     * @param {("top" | "bottom" | "center")} [sAlign="top"] - The alingment type which will be used for the object vertical alignment.
      */
     ApiDrawing.prototype.SetVerAlign = function(sRelativeFrom, sAlign)
     {
@@ -4026,9 +4034,9 @@
         this.Drawing.Set_PositionV(nRelativeFrom, true, nAlign, false);
     };
     /**
-     * Set an absolute measurement for the horizontal positioning of a floating object.
-     * @param {RelFromH} sRelativeFrom
-     * @param {EMU} nDistance
+     * Set an absolute measurement for the horizontal positioning of the floating object.
+     * @param {RelFromH} sRelativeFrom - The document element which will be taken as a countdown point for the object horizontal alignment.
+     * @param {EMU} nDistance - The distance from the right side of the document element to the floating object measured in English measure units.
      */
     ApiDrawing.prototype.SetHorPosition = function(sRelativeFrom, nDistance)
     {
@@ -4037,9 +4045,9 @@
         this.Drawing.Set_PositionH(nRelativeFrom, false, nValue, false);
     };
     /**
-     * Set an absolute measurement for the vertical positioning of a floating object.
-     * @param {RelFromH} sRelativeFrom
-     * @param {EMU} nDistance
+     * Set an absolute measurement for the vertical positioning of the floating object.
+     * @param {RelFromH} sRelativeFrom - The document element which will be taken as a countdown point for the object vertical alignment.
+     * @param {EMU} nDistance - The distance from the bottom part of the document element to the floating object measured in English measure units.
      */
     ApiDrawing.prototype.SetVerPosition = function(sRelativeFrom, nDistance)
     {
@@ -4048,12 +4056,12 @@
         this.Drawing.Set_PositionV(nRelativeFrom, false, nValue, false);
     };
     /**
-     * Specifies the minimum distance which shall be maintained between the edges of this drawing object and any
+     * Specify the minimum distance which will be maintained between the edges of this drawing object and any
      * subsequent text.
-     * @param {EMU} nLeft
-     * @param {EMU} nTop
-     * @param {EMU} nRight
-     * @param {EMU} nBottom
+     * @param {EMU} nLeft - The distance from the left side of the current object and the subsequent text run measured in English measure units.
+     * @param {EMU} nTop - The distance from the top side of the current object and the preceding text run measured in English measure units.
+     * @param {EMU} nRight - The distance from the right side of the current object and the subsequent text run measured in English measure units.
+     * @param {EMU} nBottom - The distance from the bottom side of the current object and the subsequent text run measured in English measure units.
      */
     ApiDrawing.prototype.SetDistances = function(nLeft, nTop, nRight, nBottom)
     {
@@ -4093,7 +4101,7 @@
 
 
     /**
-     * Get content of this shape.
+     * Get the shape inner contents where a paragraph or text runs can be inserted.
      * @returns {?ApiDocumentContent}
      */
     ApiShape.prototype.GetDocContent = function()
@@ -4106,8 +4114,8 @@
     };
 
     /**
-     * Set shape's content vertical align
-     * @param {VerticalTextAlign} VerticalAlign
+     * Set the vertical alignment for the shape content where a paragraph or text runs can be inserted.
+     * @param {VerticalTextAlign} VerticalAlign - The type of the vertical alignment for the shape inner contents.
      */
     ApiShape.prototype.SetVerticalTextAlign = function(VerticalAlign)
     {
@@ -4135,8 +4143,8 @@
     };
 
 
-	
-	
+
+
     /**
      * Set text paddings
      * @param {?EMU} nLeft
@@ -4158,7 +4166,7 @@
     };
 
 
-	
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiChart
@@ -4198,8 +4206,8 @@
 
     /**
      *  Specifies a chart title
-     *  @param {string} sTitle
-     *  @param {hps} nFontSize
+     *  @param {string} sTitle - The title which will be displayed for the current chart.
+     *  @param {hps} nFontSize - The text size value measured in points.
      *  @param {?bool} bIsBold
      */
     ApiChart.prototype.SetTitle = function (sTitle, nFontSize, bIsBold)
@@ -4209,8 +4217,8 @@
 
     /**
      *  Specifies a horizontal axis title
-     *  @param {string} sTitle
-     *  @param {hps} nFontSize
+     *  @param {string} sTitle - The title which will be displayed for the horizontal axis of the current chart.
+     *  @param {hps} nFontSize - The text size value measured in points.
      *  @param {?bool} bIsBold
      * */
     ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize, bIsBold)
@@ -4220,8 +4228,8 @@
 
     /**
      *  Specifies a vertical axis title
-     *  @param {string} sTitle
-     *  @param {hps} nFontSize
+     *  @param {string} sTitle - The title which will be displayed for the vertical axis of the current chart.
+     *  @param {hps} nFontSize - The text size value measured in points.
      *  @param {?bool} bIsBold
      * */
     ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize, bIsBold)
@@ -4247,7 +4255,7 @@
 
     /**
      * Specifies a legend position
-     * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos
+     * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos - The position of the chart legend inside the chart window.
      * */
     ApiChart.prototype.SetLegendPos = function(sLegendPos)
     {
@@ -4313,11 +4321,11 @@
     };
 
     /**
-     * Spicifies a show options for data labels
-     * @param {boolean} bShowSerName
-     * @param {boolean} bShowCatName
-     * @param {boolean} bShowVal
-     * @param {boolean} bShowPercent
+     * Specifies which chart data labels are shown for the chart.
+     * @param {boolean} bShowSerName - Whether to show or hide the source table column names used for the data which the chart will be build from.
+     * @param {boolean} bShowCatName - Whether to show or hide the source table row names used for the data which the chart will be build from.
+     * @param {boolean} bShowVal - Whether to show or hide the chart data values.
+     * @param {boolean} bShowPercent - Whether to show or hide the percent for the data values (works with stacked chart types).
      * */
     ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
     {
@@ -4495,7 +4503,7 @@
     //
     //------------------------------------------------------------------------------------------------------------------
     /**
-     * Get the type of this class.
+     * Get the type of the class based on this base class.
      * @returns {"uniColor"}
      */
     ApiUniColor.prototype.GetClassType = function ()
