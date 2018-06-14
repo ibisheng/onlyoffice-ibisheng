@@ -3238,6 +3238,11 @@ CFootnotesController.prototype.GetStyleFromFormatting = function()
 
 	return null;
 };
+CFootnotesController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	if (this.CurFootnote)
+		this.CurFootnote.GetSimilarNumbering(oEngine);
+};
 
 
 function CFootEndnotePageColumn()

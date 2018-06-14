@@ -747,6 +747,25 @@ CNumberingLvl.prototype.ResetNumberedText = function(nLvl)
 			this.LvlText[nIndex].Value = nLvl;
 	}
 };
+/**
+ * Проверяем, совпадает ли тип и текст в заданных нумерациях
+ * @param oLvl {CNumberingLvl}
+ * @returns {boolean}
+ */
+CNumberingLvl.prototype.IsSimilar = function(oLvl)
+{
+	if (this.Format !== oLvl.Format || this.LvlText.length !== oLvl.LvlText.length)
+		return false;
+
+	for (var nIndex = 0, nCount = this.LvlText.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.LvlText[nIndex].Type !== oLvl.LvlText[nIndex].Type
+			|| this.LvlText[nIndex].Value !== oLvl.LvlText[nIndex].Value)
+			return false;
+	}
+
+	return true;
+};
 CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 {
 	// Long               : Jc

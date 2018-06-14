@@ -12711,6 +12711,23 @@ CTable.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 		}
 	}
 };
+CTable.prototype.GetSimilarNumbering = function(oContinueNumbering)
+{
+	if (oContinueNumbering.IsFound())
+		return;
+
+	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.GetRow(nCurRow);
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			oRow.GetCell(nCurCell).GetContent().GetSimilarNumbering(oContinueNumbering);
+
+			if (oContinueNumbering.IsFound())
+				break;
+		}
+	}
+};
 CTable.prototype.UpdateBookmarks = function(oManager)
 {
 	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)

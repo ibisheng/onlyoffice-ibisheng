@@ -1289,3 +1289,18 @@ CDocumentContentBase.prototype.CalculateNumberingValues = function(oPara, oNumPr
 
 	return oTopDocument.GetNumberingInfo(null, oPara, oNumPr);
 };
+/**
+ * Вплоть до заданного параграфа ищем последнюю похожую нумерацию
+ * @param oContinueEngine {CDocumentNumberingContinueEngine}
+ */
+CDocumentContentBase.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetSimilarNumbering(oContinueEngine);
+
+		if (oContinueEngine.IsFound())
+			break;
+	}
+};
+

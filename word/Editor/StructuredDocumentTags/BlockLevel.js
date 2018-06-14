@@ -1030,6 +1030,13 @@ CBlockLevelSdt.prototype.UpdateBookmarks = function(oManager)
 {
 	this.Content.UpdateBookmarks(oManager);
 };
+CBlockLevelSdt.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	if (oContinueNumbering.IsFound())
+		return;
+
+	this.Content.GetSimilarNumbering(oContinueEngine);
+};
 CBlockLevelSdt.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 {
 	if (this.IsBuiltInTableOfContents() && (!isUnique || this.IsBuiltInUnique()))

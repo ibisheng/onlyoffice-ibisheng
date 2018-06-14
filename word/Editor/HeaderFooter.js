@@ -2557,6 +2557,11 @@ CHeaderFooterController.prototype.GetStyleFromFormatting = function()
 
     return null;
 };
+CHeaderFooterController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	if (this.CurHdrFtr)
+		this.CurHdrFtr.Content.GetSimilarNumbering(oEngine)
+};
 CHeaderFooterController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
     if (null !== this.CurHdrFtr)

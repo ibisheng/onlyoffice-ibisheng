@@ -918,6 +918,16 @@ CDocumentContentElementBase.prototype.GetPrevParagraph = function()
 CDocumentContentElementBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
 };
+/**
+ * Вплоть до заданного параграфа ищем последнюю похожую нумерацию
+ * @param oContinueEngine {CDocumentNumberingContinueEngine}
+ * @returns {CNumPr | null}
+ */
+CDocumentContentElementBase.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	return null;
+};
+
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

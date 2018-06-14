@@ -533,3 +533,7 @@ CDrawingsController.prototype.GetStyleFromFormatting = function()
 {
 	return this.DrawingObjects.GetStyleFromFormatting();
 };
+CDrawingsController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	// TODO: Реализовать
+};

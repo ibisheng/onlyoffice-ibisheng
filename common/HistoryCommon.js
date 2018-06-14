@@ -1064,6 +1064,9 @@
 			case AscDFH.historydescription_Document_RemoveBookmark:
 				sString = "Document_RemoveBookmark";
 				break;
+			case AscDFH.historydescription_Document_ContinueNumbering:
+				sString = "Document_ContinueNumbering";
+				break;
 		}
 		return sString;
 	}
@@ -3011,6 +3014,7 @@
 	window['AscDFH'].historydescription_Document_SectionStartPage                   = 0x0150;
 	window['AscDFH'].historydescription_Document_DistributeTableCells               = 0x0151;
 	window['AscDFH'].historydescription_Document_RemoveBookmark                     = 0x0152;
+	window['AscDFH'].historydescription_Document_ContinueNumbering                  = 0x0153;
 
 
 

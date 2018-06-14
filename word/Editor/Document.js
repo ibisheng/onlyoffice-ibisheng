@@ -7954,16 +7954,18 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-	// else if (e.KeyCode === 112 && true === e.CtrlKey)
-	// {
-	// 	// TODO: Добавлено для теста
-	//
-	// 	this.Create_NewHistoryPoint();
-	// 	this.AddField(fieldtype_TOC);
-	// 	this.Recalculate();
-	//
-	// 	bRetValue = keydownresult_PreventAll;
-	// }
+	else if (e.KeyCode === 112 && true === e.CtrlKey)
+	{
+		// TODO: Добавлено для теста
+		//
+		// this.Create_NewHistoryPoint();
+		// this.AddField(fieldtype_TOC);
+		// this.Recalculate();
+
+		this.ContinueNumbering();
+
+		bRetValue = keydownresult_PreventAll;
+	}
 	// else if (e.KeyCode === 113 && true === e.CtrlKey)
 	// {
 	// 	// TODO: Добавлено для теста
@@ -16012,6 +16014,10 @@ CDocument.prototype.controller_GetStyleFromFormatting = function()
 		return this.Content[this.CurPos.ContentPos].GetStyleFromFormatting();
 	}
 };
+CDocument.prototype.controller_GetSimilarNumbering = function(oContinueEngine)
+{
+	this.GetSimilarNumbering(oContinueEngine);
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -16856,6 +16862,78 @@ CDocument.prototype.GetSelectedNum = function()
 		return null;
 
 	return oCurrentPara.GetNumPr();
+};
+/**
+ * Продолжаем нумерацию в текущем параграфе
+ * @returns {boolean}
+ */
+CDocument.prototype.ContinueNumbering = function()
+{
+	var oParagraph = this.GetCurrentParagraph(true);
+	if (!oParagraph || !oParagraph.GetNumPr() || this.IsSelectionUse())
+		return false;
+
+	var oNumPr = oParagraph.GetNumPr();
+
+	var oEngine = new CDocumentNumberingContinueEngine(oParagraph, oNumPr, this.GetNumbering());
+	this.Controller.GetSimilarNumbering(oEngine);
+	var oSimilarNumPr = oEngine.GetNumPr();
+	if (!oSimilarNumPr || oSimilarNumPr.NumId === oNumPr.NumId)
+		return false;
+
+	var bFind                 = false;
+	var arrParagraphs         = this.GetAllParagraphsByNumbering(new CNumPr(oNumPr.NumId, null));
+	var arrParagraphsToChange = [];
+
+	var isRelated = this.GetNumbering().GetNum(oNumPr.NumId).IsHaveRelatedLvlText();
+
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		var oPara = arrParagraphs[nIndex];
+
+		if (!bFind && oPara === oParagraph)
+			bFind = true;
+
+		if (bFind)
+		{
+			var oCurNumPr = oPara.GetNumPr();
+			if (!oCurNumPr)
+				continue;
+
+			if (!isRelated)
+			{
+				if (oCurNumPr.Lvl < oNumPr.Lvl)
+					break;
+				else if (oCurNumPr.Lvl > oNumPr.Lvl)
+					continue;
+			}
+
+			arrParagraphsToChange.push(oPara);
+		}
+	}
+
+	if (!this.Document_Is_SelectionLocked(changestype_None, {
+			Type      : changestype_2_ElementsArray_and_Type,
+			Elements  : arrParagraphsToChange,
+			CheckType : AscCommon.changestype_Paragraph_Properties
+		}))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_ContinueNumbering);
+
+		for (var nIndex = 0, nCount = arrParagraphsToChange.length; nIndex < nCount; ++nIndex)
+		{
+			var oPara     = arrParagraphsToChange[nIndex];
+			var oCurNumPr = oPara.GetNumPr();
+
+			oPara.SetNumPr(oSimilarNumPr.NumId, oCurNumPr.Lvl);
+		}
+
+		this.Recalculate();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+	}
+
+	return true;
 };
 
 
@@ -17973,6 +18051,73 @@ CDocumentFootnotesRangeEngine.prototype.GetRefs = function()
 	return this.m_arrRefs;
 };
 
+/**
+ * Класс для поиска подходящей нумерации в документе
+ * @param oParagraph {Paragraph}
+ * @param oNumPr {CNumPr}
+ * @param oNumbering {CNumbering}
+ */
+function CDocumentNumberingContinueEngine(oParagraph, oNumPr, oNumbering)
+{
+	this.Paragraph = oParagraph;
+	this.NumPr     = oNumPr;
+	this.Numbering = oNumbering;
+
+	this.Found        = false;
+	this.SimilarNumPr = null;
+	this.LastNumPr    = null; // Для случая нулевого уровня, когда не получилось подобрать подходящий
+}
+/**
+ * Проверем, дошли ли мы до заданного параграфа
+ * @returns {boolean}
+ */
+CDocumentNumberingContinueEngine.prototype.IsFound = function()
+{
+	return this.Found;
+};
+/**
+ * Проверяем параграф на совпадение нумераций
+ * @param oParagraph {Paragraph}
+ */
+CDocumentNumberingContinueEngine.prototype.CheckParagraph = function(oParagraph)
+{
+	if (this.IsFound())
+		return;
+
+	if (oParagraph === this.Paragraph)
+	{
+		this.Found = true;
+	}
+	else
+	{
+		var oNumPr = oParagraph.GetNumPr();
+		if (oNumPr && oNumPr.Lvl === this.NumPr.Lvl)
+		{
+			if (oNumPr.Lvl > 0)
+			{
+				this.SimilarNumPr = new CNumPr(oNumPr.NumId, this.NumPr.Lvl);
+			}
+			else
+			{
+				var oCurLvl = this.Numbering.GetNum(oNumPr.NumId).GetLvl(0);
+				var oLvl    = this.Numbering.GetNum(this.NumPr.NumId).GetLvl(0);
+
+				if (oCurLvl.IsSimilar(oLvl) || (oCurLvl.GetFormat() === oLvl.GetFormat() && Asc.c_oAscNumberingFormat.Bullet === oCurLvl.GetFormat()))
+					this.SimilarNumPr = new CNumPr(oNumPr.NumId, 0);
+			}
+
+			this.LastNumPr = new CNumPr(oNumPr.NumId, this.NumPr.Lvl);
+		}
+	}
+};
+/**
+ * Получаем подходящую нумерацию
+ * @returns {?CNumPr}
+ */
+CDocumentNumberingContinueEngine.prototype.GetNumPr = function()
+{
+	return this.SimilarNumPr ? this.SimilarNumPr : this.LastNumPr;
+};
 
 //-------------------------------------------------------------export---------------------------------------------------
 window['Asc'] = window['Asc'] || {};

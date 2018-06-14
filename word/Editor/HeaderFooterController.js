@@ -501,3 +501,7 @@ CHdrFtrController.prototype.GetStyleFromFormatting = function()
 {
 	return this.HdrFtr.GetStyleFromFormatting();
 };
+CHdrFtrController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	this.HdrFtr.GetSimilarNumbering(oEngine)
+};

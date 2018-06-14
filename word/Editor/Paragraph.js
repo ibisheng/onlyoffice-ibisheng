@@ -422,7 +422,7 @@ Paragraph.prototype.GetAllParagraphs = function(Props, ParaArray)
 		if (Props.NumPr instanceof CNumPr)
 		{
 			var oNumPr = Props.NumPr;
-			if (oCurNumPr.NumId === oNumPr.NumId && (oCurNumPr.Lvl === oNumPr.Lvl || undefined === oNumPr.Lvl))
+			if (oCurNumPr.NumId === oNumPr.NumId && (oCurNumPr.Lvl === oNumPr.Lvl || undefined === oNumPr.Lvl || null === oNumPr.Lvl))
 				ParaArray.push(this);
 		}
 		else if (Props.NumPr instanceof Array)
@@ -430,7 +430,7 @@ Paragraph.prototype.GetAllParagraphs = function(Props, ParaArray)
 			for (var nIndex = 0, nCount = Props.NumPr.length; nIndex < nCount; ++nIndex)
 			{
 				var oNumPr = Props.NumPr[nIndex];
-				if (oCurNumPr.NumId === oNumPr.NumId && (oCurNumPr.Lvl === oNumPr.Lvl || undefined === oNumPr.Lvl))
+				if (oCurNumPr.NumId === oNumPr.NumId && (oCurNumPr.Lvl === oNumPr.Lvl || undefined === oNumPr.Lvl || null === oNumPr.Lvl))
 				{
 					ParaArray.push(this);
 					break;
@@ -12770,6 +12770,13 @@ Paragraph.prototype.UpdateBookmarks = function(oManager)
 	{
 		this.Content[nIndex].UpdateBookmarks(oManager);
 	}
+};
+Paragraph.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	if (oContinueEngine.IsFound())
+		return;
+
+	oContinueEngine.CheckParagraph(this);
 };
 Paragraph.prototype.private_CheckUpdateBookmarks = function(Items)
 {

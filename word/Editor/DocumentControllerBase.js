@@ -756,7 +756,7 @@ CDocumentControllerBase.prototype.RestoreDocumentStateAfterLoadChanges = functio
 CDocumentControllerBase.prototype.GetColumnSize = function(){return {W : 0, H : 0};};
 /**
  * Получаем настройки текущей секции
- * @returns {CSectionPr?}
+ * @returns {?CSectionPr}
  */
 CDocumentControllerBase.prototype.GetCurrentSectionPr = function(){return null;};
 /**
@@ -771,3 +771,8 @@ CDocumentControllerBase.prototype.AddContentControl = function(nContentControlTy
  * Получаем стиль по выделенному фрагменту
  */
 CDocumentControllerBase.prototype.GetStyleFromFormatting = function(){return null;};
+/**
+ * Вплоть до заданного параграфа ищем последнюю похожую нумерацию
+ * @param oContinueEngine {CDocumentNumberingContinueEngine}
+ */
+CDocumentControllerBase.prototype.GetSimilarNumbering = function(oContinueEngine){};

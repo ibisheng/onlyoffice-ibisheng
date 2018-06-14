@@ -396,3 +396,7 @@ CLogicDocumentController.prototype.GetStyleFromFormatting = function()
 {
 	return this.LogicDocument.controller_GetStyleFromFormatting();
 };
+CLogicDocumentController.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	this.LogicDocument.controller_GetSimilarNumbering(oContinueEngine);
+};
