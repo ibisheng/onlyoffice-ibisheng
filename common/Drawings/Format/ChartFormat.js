@@ -1685,7 +1685,21 @@ CDLbl.prototype =
     getDefaultTextForTxBody: function()
     {
         var compiled_string = "";
-        var separator = typeof this.separator === "string" ? this.separator +" " : "\n";
+        var separator;
+        if(typeof this.separator === "string"){
+            separator = this.separator + " ";
+        }
+        else if(this.series.getObjectType() === AscDFH.historyitem_type_PieSeries){
+            if(this.showPercent && this.showCatName && !this.showSerName && !this.showVal){
+                separator = "\n";
+            }
+            else{
+                separator = ", "
+            }
+        }
+        else{
+            separator = ", "
+        }
         if(this.showSerName)
         {
             compiled_string += this.series.getSeriesName();
