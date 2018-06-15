@@ -4860,19 +4860,25 @@ PasteProcessor.prototype =
 			var pos = oIterator.position();
 			var _char = text.charAt(pos);
 			var _charCode = oIterator.value();
-
+			var newParaRun;
 			if(0x0A === _charCode ||  pos === Count - 1){
 				if(pos === Count - 1 && 0x0A !== _charCode){
 					insertText += _char;
 				}
 				
-				var newParaRun = getNewParaRun();
+				newParaRun = getNewParaRun();
 				addTextIntoRun(newParaRun, insertText);
 				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 				this.aContent.push(newParagraph);
 
 				insertText = "";
 				newParagraph = getNewParagraph();
+			} else if(insertText.length === Asc.c_dMaxParaRunContentLength){//max run length
+				insertText += _char;
+				newParaRun = getNewParaRun();
+				addTextIntoRun(newParaRun, insertText);
+				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
+				insertText = "";
 			} else if(13 === _charCode){
 				continue;
 			} else {
@@ -7184,7 +7190,9 @@ PasteProcessor.prototype =
 				if(this.oCurRun.Content.length === Asc.c_dMaxParaRunContentLength) {
 					//создаём новый paraRun и выставляем ему настройки предыдущего
 					//сделано для того, чтобы избежать большого количества данных в paraRun
-					this._Set_Run_Pr(this.oCurRun.Pr);
+					if(this.oCurRun && this.oCurRun.Pr && this.oCurRun.Pr.Copy) {
+						this._Set_Run_Pr(this.oCurRun.Pr.Copy());
+					}
 				}
 
 				this.oCurRun.Add_ToContent(this.oCurRunContentPos, elem, false);

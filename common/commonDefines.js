@@ -46,7 +46,7 @@
 	var c_nMaxConversionTime  = 900000;//depends on config
 	var c_nMaxDownloadTitleLen= 255;
 	var c_nVersionNoBase64 = 10;
-	var c_dMaxParaRunContentLength = 1000;
+	var c_dMaxParaRunContentLength = 256;
 
 	//files type for Saving & DownloadAs
 	var c_oAscFileType = {
