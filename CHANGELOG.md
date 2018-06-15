@@ -8,7 +8,8 @@ Ability to work with bookmarks
 Ability to add/change hyperlinks anchored to bookmarks/headings
 Add support east asian punctuation and line breaks with hieroglyphs
 Add support for characters that can't be placed at the beginning/end of the line
-Implement the function to continue the numbering
+Implement the function to continue a numbering
+Implement the function to separate a numbering
 
 ### Spreadsheet Editor
 * Add support comment mode

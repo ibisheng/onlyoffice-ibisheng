@@ -3511,6 +3511,22 @@ background-repeat: no-repeat;\
 			fCallback();
 		}
 	};
+	asc_docs_api.prototyoe.asc_ContinueNumbering = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		oLogicDocument.ContinueNumbering();
+	};
+	asc_docs_api.prototype.asc_RestartNumbering = function(nRestartValue)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		oLogicDocument.RestartNumbering(nRestartValue);
+	};
 	asc_docs_api.prototype.put_Style    = function(sName)
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
@@ -9172,6 +9188,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['put_PrAlign']                               = asc_docs_api.prototype.put_PrAlign;
 	asc_docs_api.prototype['put_TextPrBaseline']                        = asc_docs_api.prototype.put_TextPrBaseline;
 	asc_docs_api.prototype['put_ListType']                              = asc_docs_api.prototype.put_ListType;
+	asc_docs_api.prototype['asc_ContinueNumbering']                     = asc_docs_api.prototype.asc_ContinueNumbering;
+	asc_docs_api.prototype['asc_RestartNumbering']                      = asc_docs_api.prototype.asc_RestartNumbering;
 	asc_docs_api.prototype['put_Style']                                 = asc_docs_api.prototype.put_Style;
 	asc_docs_api.prototype['SetDeviceInputHelperId']                    = asc_docs_api.prototype.SetDeviceInputHelperId;
 	asc_docs_api.prototype['put_ShowSnapLines']                         = asc_docs_api.prototype.put_ShowSnapLines;
