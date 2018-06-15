@@ -4304,7 +4304,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         if(typeof oLit.formatCode === "string" && oLit.formatCode.length > 0){
                             oLitFormat = oNumFormatCache.get(oLit.formatCode);
                         }
-                        if(nAxisType === AscDFH.historyitem_type_DateAx && oAxis.numFmt && typeof oAxis.numFmt.formatCode === "string" && oAxis.numFmt.formatCode.length > 0){
+                        if(/*nAxisType === AscDFH.historyitem_type_DateAx && */oAxis.numFmt && typeof oAxis.numFmt.formatCode === "string" && oAxis.numFmt.formatCode.length > 0){
                             oLitFormat = oNumFormatCache.get(oAxis.numFmt.formatCode);
                         }
                         nPtsLen = oLit.ptCount;
@@ -4516,7 +4516,14 @@ CChartSpace.prototype.getValAxisCrossType = function()
 
             var bCrossAt = false;
             if(AscFormat.isRealNumber(oCurAxis.crossesAt) && oCrossAxis.scale[0] <= oCurAxis.crossesAt && oCrossAxis.scale[oCrossAxis.scale.length - 1] >= oCurAxis.crossesAt){
-                fCrossValue = oCurAxis.crossesAt - 1;
+
+                if(oCrossAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
+                    fCrossValue = oCurAxis.crossesAt;
+                }
+                else{
+                    fCrossValue = oCurAxis.crossesAt - 1;
+                }
+
                 bCrossAt = true;
             }
             else{
