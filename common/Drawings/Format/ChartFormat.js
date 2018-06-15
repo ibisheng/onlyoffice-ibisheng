@@ -12469,6 +12469,13 @@ CTitle.prototype =
 
     getDefaultTextForTxBody: function()
     {
+        var oStrCache = AscFormat.getStringPointsFromCat(this.tx);
+        if(oStrCache){
+            var oPoint = oStrCache.getPtByIndex(0);
+            if(oPoint && oPoint.val){
+                return oPoint.val;
+            }
+        }
         var key = 'Axis Title';
         if(this.parent)
         {

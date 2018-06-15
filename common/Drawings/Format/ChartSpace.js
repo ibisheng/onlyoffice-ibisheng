@@ -3955,6 +3955,11 @@ CChartSpace.prototype.recalculateReferences = function()
         // }
     }
 
+    var aTitles = this.getAllTitles();
+    for(i = 0; i < aTitles.length; ++i){
+        var oTitle = aTitles[i];
+        this.checkCatByNumRef(this, oTitle, oTitle.tx, undefined);
+    }
     var aAxis = this.chart.plotArea.axId;
     for(i = 0; i < aAxis.length; ++i){
         var oAxis = aAxis[i];
@@ -12502,15 +12507,21 @@ function getPtsFromSeries(ser)
     
 function getCatStringPointsFromSeries(ser)
 {
-    if(ser && ser.cat)
-    {
-        if(ser.cat.strRef && ser.cat.strRef.strCache)
+    if(!ser){
+        return null;
+    }
+    return getStringPointsFromCat(ser.cat);
+}
+
+function getStringPointsFromCat(oCat){
+    if(oCat){
+        if(oCat.strRef && oCat.strRef.strCache)
         {
-            return ser.cat.strRef.strCache;
+            return oCat.strRef.strCache;
         }
-        else if(ser.cat.strLit)
+        else if(oCat.strLit)
         {
-            return ser.cat.strLit;
+            return oCat.strLit;
         }
     }
     return null;
@@ -14959,4 +14970,5 @@ function checkBlipFillRasterImages(sp)
     window['AscFormat'].getArrayFillsFromBase = getArrayFillsFromBase;
     window['AscFormat'].getMaxIdx = getMaxIdx;
     window['AscFormat'].CreateSurfaceChart = CreateSurfaceChart;
+    window['AscFormat'].getStringPointsFromCat = getStringPointsFromCat;
 })(window);
