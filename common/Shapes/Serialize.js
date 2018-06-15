@@ -372,6 +372,8 @@ function BinaryPPTYLoader()
 
         this.LoadDocument();
 
+        AscFormat.checkPlaceholdersText();
+
         this.ImageMapChecker = null;
     }
 
