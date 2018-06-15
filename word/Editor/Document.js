@@ -7966,15 +7966,17 @@ CDocument.prototype.OnKeyDown = function(e)
 
 		bRetValue = keydownresult_PreventAll;
 	}
-	// else if (e.KeyCode === 113 && true === e.CtrlKey)
-	// {
-	// 	// TODO: Добавлено для теста
-	// 	var arrFields = this.GetComplexFieldsByContentPos(this.GetContentPosition(false));
-	// 	if (arrFields && arrFields.length > 0)
-	// 		this.UpdateComplexField(arrFields[arrFields.length - 1]);
-	//
-	// 	bRetValue = keydownresult_PreventAll;
-	// }
+	else if (e.KeyCode === 113 && true === e.CtrlKey)
+	{
+		// TODO: Добавлено для теста
+		// var arrFields = this.GetComplexFieldsByContentPos(this.GetContentPosition(false));
+		// if (arrFields && arrFields.length > 0)
+		// 	this.UpdateComplexField(arrFields[arrFields.length - 1]);
+
+		this.RestartNumbering(3);
+
+		bRetValue = keydownresult_PreventAll;
+	}
 	// else if (e.KeyCode === 114 && true === e.CtrlKey)
 	// {
 	// 	this.Create_NewHistoryPoint();
@@ -16931,6 +16933,122 @@ CDocument.prototype.ContinueNumbering = function()
 		this.Recalculate();
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateSelectionState();
+	}
+
+	return true;
+};
+/**
+ * Начинаем нумерацию занового с текущего параграфа с заданного значения
+ * @param [nRestartValue=1] {number}
+ * @returns {boolean}
+ */
+CDocument.prototype.RestartNumbering = function(nRestartValue)
+{
+	if (undefined === nRestartValue || null === nRestartValue)
+		nRestartValue = 1;
+
+	var oParagraph = this.GetCurrentParagraph(true);
+	if (!oParagraph || !oParagraph.GetNumPr() || this.IsSelectionUse())
+		return false;
+
+	var oNumPr = oParagraph.GetNumPr();
+
+	var bFind                 = false;
+	var nPrevLvl              = null;
+	var isFirstParaOnLvl      = false;
+	var arrParagraphs         = this.GetAllParagraphsByNumbering(new CNumPr(oNumPr.NumId, null));
+	var arrParagraphsToChange = [];
+	var isRelated             = this.Numbering.GetNum(oNumPr.NumId).IsHaveRelatedLvlText();
+
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		var oPara = arrParagraphs[nIndex];
+
+		if (!bFind && oPara === oParagraph)
+		{
+			bFind = true;
+
+			if (null === nPrevLvl || nPrevLvl < oNumPr.Lvl)
+				isFirstParaOnLvl = true;
+		}
+
+		var oCurNumPr = oPara.GetNumPr();
+
+		if (bFind)
+		{
+			if (!oCurNumPr)
+				continue;
+
+			if (0 !== oNumPr.Lvl && !isRelated)
+			{
+				if (oCurNumPr.Lvl < oNumPr.Lvl)
+					break;
+				else if (oCurNumPr.Lvl > oNumPr.Lvl)
+					continue;
+			}
+
+			arrParagraphsToChange.push(oPara);
+		}
+
+		if (oCurNumPr)
+			nPrevLvl = oCurNumPr.Lvl;
+	}
+
+	var oNum = this.Numbering.GetNum(oNumPr.NumId);
+	if (isFirstParaOnLvl)
+	{
+		if (Asc.c_oAscNumberingFormat.Bullet === oNum.GetLvl(oNumPr.Lvl).GetFormat())
+			return;
+
+		if (!this.Document_Is_SelectionLocked(changestype_None, {
+				Type      : changestype_2_ElementsArray_and_Type,
+				Elements  : [oNum],
+				CheckType : AscCommon.changestype_Paragraph_Properties
+			}))
+		{
+			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RestartNumbering);
+
+			var oLvl   = oNum.GetLvl(oNumPr.Lvl).Copy();
+			oLvl.Start = nRestartValue;
+			oNum.SetLvl(oLvl, oNumPr.Lvl);
+
+			this.Recalculate();
+			this.Document_UpdateInterfaceState();
+			this.Document_UpdateSelectionState();
+		}
+	}
+	else
+	{
+		if (!this.Document_Is_SelectionLocked(changestype_None, {
+				Type      : changestype_2_ElementsArray_and_Type,
+				Elements  : arrParagraphsToChange,
+				CheckType : AscCommon.changestype_Paragraph_Properties
+			}))
+		{
+			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RestartNumbering);
+
+			var oNewNum = oNum.Copy();
+			if (Asc.c_oAscNumberingFormat.Bullet !== oNum.GetLvl(oNumPr.Lvl).GetFormat())
+			{
+				var oLvl   = oNewNum.GetLvl(oNumPr.Lvl).Copy();
+				oLvl.Start = nRestartValue;
+				oNewNum.SetLvl(oLvl, oNumPr.Lvl);
+			}
+
+			var sNewId = oNewNum.GetId();
+
+			for (var nIndex = 0, nCount = arrParagraphsToChange.length; nIndex < nCount; ++nIndex)
+			{
+				var oPara     = arrParagraphsToChange[nIndex];
+				var oCurNumPr = oPara.GetNumPr();
+
+				oPara.SetNumPr(sNewId, oCurNumPr.Lvl);
+			}
+
+			this.Recalculate();
+			this.Document_UpdateInterfaceState();
+			this.Document_UpdateSelectionState();
+		}
 	}
 
 	return true;

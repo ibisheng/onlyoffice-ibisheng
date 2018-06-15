@@ -200,6 +200,10 @@ if(typeof CHeaderFooterController !== "undefined")
     };
 }
 
+CNum.prototype.Document_Is_SelectionLocked = function(nCheckType)
+{
+	return this.IsSelectionLocked(nCheckType);
+};
 CNum.prototype.IsSelectionLocked = function(nCheckType)
 {
 	switch (nCheckType)
@@ -224,6 +228,10 @@ CNum.prototype.IsSelectionLocked = function(nCheckType)
 	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
 	if (oAbstractNum)
 		oAbstractNum.IsSelectionLocked(nCheckType);
+};
+CAbstractNum.prototype.Document_Is_SelectionLocked = function(nCheckType)
+{
+	return this.IsSelectionLocked(nCheckType);
 };
 CAbstractNum.prototype.IsSelectionLocked = function(nCheckType)
 {

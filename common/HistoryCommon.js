@@ -1067,6 +1067,9 @@
 			case AscDFH.historydescription_Document_ContinueNumbering:
 				sString = "Document_ContinueNumbering";
 				break;
+			case AscDFH.historydescription_Document_RestartNumbering:
+				sString = "Document_RestartNumbering";
+				break;
 		}
 		return sString;
 	}
@@ -3015,6 +3018,7 @@
 	window['AscDFH'].historydescription_Document_DistributeTableCells               = 0x0151;
 	window['AscDFH'].historydescription_Document_RemoveBookmark                     = 0x0152;
 	window['AscDFH'].historydescription_Document_ContinueNumbering                  = 0x0153;
+	window['AscDFH'].historydescription_Document_RestartNumbering                   = 0x0154;
 
 
 
