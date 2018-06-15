@@ -3511,7 +3511,7 @@ background-repeat: no-repeat;\
 			fCallback();
 		}
 	};
-	asc_docs_api.prototyoe.asc_ContinueNumbering = function()
+	asc_docs_api.prototype.asc_ContinueNumbering = function()
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (!oLogicDocument)
