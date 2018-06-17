@@ -2949,6 +2949,12 @@
 									filter.TableColumns[j - tableRange.c1].Name = val;
 									if(!bUndo)
 									{
+										//если пытаемся вбить формулу в заголовок - оставляем только результат
+										//ms в данном случае генерирует новое имя, начинающееся с 0
+										//считаю, что результат формулы добавлять более логично
+										if(cell.isFormula()) {
+											cell.setValue(val);
+										}
 										cell.setType(CellValueType.String);
 									}
 									newVal = val;
