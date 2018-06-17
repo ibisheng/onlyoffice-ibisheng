@@ -2148,9 +2148,12 @@
   };
 
 	WorkbookView.prototype.hideSpecialPasteButton = function() {
-		if (!this.getCellEditMode()) {
+		//TODO пересмотреть!
+		//сейчас сначала добавляются данные в историю, потом идет закрытие редактора ячейки
+		//следовательно убираю проверку на редактирование ячейки
+		/*if (!this.getCellEditMode()) {*/
 			this.handlers.trigger("hideSpecialPasteOptions");
-		}
+		//}
 	};
 
   WorkbookView.prototype.selectionCut = function() {
