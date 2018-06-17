@@ -8725,6 +8725,10 @@
         }
 
         t.model.workbook.dependencyFormulas.unlockRecal();
+		//добавил для случая, когда вставка формулы проиходит в заголовок таблицы
+		if(arrFormula && arrFormula.length) {
+			t.model.autoFilters.renameTableColumn(t.model.selectionRange.getLast());
+		}
 
 		//for special paste
 		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
