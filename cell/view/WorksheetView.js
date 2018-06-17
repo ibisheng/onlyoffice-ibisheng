@@ -11256,13 +11256,13 @@
 			c.setValue2(val);
 			// Вызываем функцию пересчета для заголовков форматированной таблицы
 			this.model.autoFilters.renameTableColumn(bbox);
+		}
 
-			var api = window["Asc"]["editor"];
-			var bFast = api.collaborativeEditing.m_bFast;
-			var bIsSingleUser = !api.collaborativeEditing.getCollaborativeEditing();
-			if (!(bFast && !bIsSingleUser)) {
-				oAutoExpansionTable = this.model.autoFilters.checkTableAutoExpansion(bbox);
-			}
+		var api = window["Asc"]["editor"];
+		var bFast = api.collaborativeEditing.m_bFast;
+		var bIsSingleUser = !api.collaborativeEditing.getCollaborativeEditing();
+		if (!(bFast && !bIsSingleUser)) {
+			oAutoExpansionTable = this.model.autoFilters.checkTableAutoExpansion(bbox);
 		}
 
 		if (!isFormula) {
