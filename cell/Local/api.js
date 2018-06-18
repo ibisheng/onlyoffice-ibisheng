@@ -237,7 +237,7 @@ var c_oAscError = Asc.c_oAscError;
 	window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
 	{
 		window.doadssIsSaveAs = isSaveAs;
-		if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
+		if (true !== isForce && window.g_asc_plugins && AscCommon.EncryptionWorker.isNeedCrypt())
 		{
 			window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
 			return;

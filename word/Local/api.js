@@ -225,7 +225,7 @@ Asc['asc_docs_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
 {
 	window.doadssIsSaveAs = isSaveAs;
-	if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
+	if (true !== isForce && window.g_asc_plugins && AscCommon.EncryptionWorker.isNeedCrypt())
 	{
 		window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
 		return;
