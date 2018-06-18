@@ -1563,7 +1563,8 @@
 	//------------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Get the type of this class.
+	 * Get the type of the class based on this base class.
+     * @typeofeditors ["CSE"]
 	 * @returns {"drawing"}
 	 */
 	ApiDrawing.prototype.GetClassType = function()
@@ -1572,9 +1573,10 @@
 	};
 
 	/**
-	 * Set the size of the bounding box.
-	 * @param {EMU} nWidth
-	 * @param {EMU} nHeight
+	 * Set the size of the object (image, shape, chart) bounding box.
+     * @typeofeditors ["CSE"]
+	 * @param {EMU} nWidth - The object width measured in English measure units.
+	 * @param {EMU} nHeight - The object height measured in English measure units.
 	 */
 	ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
 	{
@@ -1590,11 +1592,14 @@
 	};
 
 	/**
-	 * Set drawing's position
-	 * @param {number} nFromCol
-	 * @param {EMU} nColOffset
-	 * @param {number} nFromRow
-	 * @param {EMU} nRowOffset
+	 * Change the position for the drawing object.
+     * <note>Please note, that the horizontal nColOffset and vertical nRowOffset offsets are calculated within the limits of
+     * the specified nFromCol column and nFromRow row cell only. If this value exceeds the cell width or height, another vertical/horizontal position will be set.</note>
+     * @typeofeditors ["CSE"]
+	 * @param {number} nFromCol - The number of the column where the beginning of the drawing object will be placed.
+	 * @param {EMU} nColOffset - The offset from the nFromCol column to the left part of the drawing object measured in English measure units.
+	 * @param {number} nFromRow - The number of the row where the beginning of the drawing object will be placed.
+	 * @param {EMU} nRowOffset - The offset from the nFromRow row to the upper part of the drawing object measured in English measure units.
 	* */
 	ApiDrawing.prototype.SetPosition = function(nFromCol, nColOffset, nFromRow, nRowOffset){
 		var extX = null, extY = null;
@@ -1938,6 +1943,7 @@
 
 	/**
 	 * Get the type of this class.
+     * @typeofeditors ["CSE"]
 	 * @returns {"color"}
 	 */
 	ApiColor.prototype.GetClassType = function () {

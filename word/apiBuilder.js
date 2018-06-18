@@ -1165,7 +1165,7 @@
 
     /**
      * Get the type of this class.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {"documentContent"}
      */
     ApiDocumentContent.prototype.GetClassType = function()
@@ -1174,7 +1174,7 @@
     };
     /**
      * Get the number of elements in the current document.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {number}
      */
     ApiDocumentContent.prototype.GetElementsCount = function()
@@ -1183,7 +1183,7 @@
     };
     /**
      * Get the element by its position in the document.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {?DocumentElement}
      */
     ApiDocumentContent.prototype.GetElement = function(nPos)
@@ -1203,7 +1203,7 @@
     };
     /**
      * Add paragraph or table using its position in the document.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {number} nPos - The position where the current element will be added.
      * @param {DocumentElement} oElement - The document element which will be added at the current position.
      */
@@ -1216,7 +1216,7 @@
     };
     /**
      * Push a paragraph or a table to actually add it to the document.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {DocumentElement} oElement - The type of the element which will be pushed to the document.
      */
     ApiDocumentContent.prototype.Push = function(oElement)
@@ -1231,7 +1231,7 @@
     };
     /**
      * Remove all elements from the current document or from the current document element.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      */
     ApiDocumentContent.prototype.RemoveAllElements = function()
     {
@@ -1239,7 +1239,7 @@
     };
     /**
      * Remove element using the position specified.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {number} nPos - The element number (position) in the document or inside other element.
      */
     ApiDocumentContent.prototype.RemoveElement = function(nPos)
