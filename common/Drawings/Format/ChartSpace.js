@@ -4772,6 +4772,30 @@ CChartSpace.prototype.getValAxisCrossType = function()
         return _ret;
     };
 
+
+    CChartSpace.prototype.getReplaceAxis = function(oAxis){
+        var aAxes = this.chart.plotArea.axId;
+        if(oAxis.bDelete && oAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
+            var bHorizontal = (oAxis.axPos === AscFormat.AX_POS_T || oAxis.axPos === AscFormat.AX_POS_B);
+            for(var j = 0; j < aAxes.length; ++j){
+                var oCheckAxis = aAxes[j];
+                if(!oCheckAxis.bDelete){
+                    if(bHorizontal){
+                        if(oCheckAxis.axPos === AscFormat.AX_POS_T || oCheckAxis.axPos === AscFormat.AX_POS_B){
+                            return oCheckAxis;
+                        }
+                    }
+                    else{
+                        if(oCheckAxis.axPos === AscFormat.AX_POS_R || oCheckAxis.axPos === AscFormat.AX_POS_L){
+                            return oCheckAxis;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
     CChartSpace.prototype.recalculateAxes = function(){
         this.plotAreaRect = null;
         this.bEmptySeries = this.checkEmptySeries();
@@ -4779,12 +4803,43 @@ CChartSpace.prototype.getValAxisCrossType = function()
             if(!this.chartObj){
                 this.chartObj = new AscFormat.CChartsDrawer()
             }
-            this.chartObj.preCalculateData(this);
             var i, j;
+            var aCharts = this.chart.plotArea.charts, oChart;
+            var oCurAxis, oCurAxis2, aCurAxesSet;
+            //temporary add axes to charts with deleted axes
+            var oChartsToAxesCount = {};
+            var bAdd, nAxesCount;
+            var oReplaceAxis;
+            for(i = 0; i < aCharts.length; ++i){
+                bAdd = false;
+                oChart = aCharts[i];
+                if(oChart.axId){
+                    nAxesCount = oChart.axId.length;
+                    for(j = nAxesCount - 1; j > -1; --j){
+                        oCurAxis = oChart.axId[j];
+                        oReplaceAxis = this.getReplaceAxis(oCurAxis);
+                        if(oReplaceAxis){
+                            bAdd = true;
+                            oChart.axId.push(oReplaceAxis);
+                        }
+                    }
+                    if(bAdd){
+                        oChartsToAxesCount[oChart.Id] = nAxesCount;
+                    }
+                }
+            }
+            this.chartObj.preCalculateData(this);
+            for(i in oChartsToAxesCount){
+                if(oChartsToAxesCount.hasOwnProperty(i)){
+                    oChart = AscCommon.g_oTableId.Get_ById(i);
+                    if(oChart){
+                        oChart.axId.length = oChartsToAxesCount[i]
+                    }
+                }
+            }
             var oPlotArea = this.chart.plotArea;
             var aAxes = [].concat(oPlotArea.axId);
             var aAllAxes = [];//array of axes sets
-            var oCurAxis, oCurAxis2, aCurAxesSet;
 
             while(aAxes.length > 0){
                 oCurAxis = aAxes.splice(0, 1)[0];
@@ -4901,24 +4956,14 @@ CChartSpace.prototype.getValAxisCrossType = function()
             var oCheckAxis;
             for(i = 0; i < aAxes.length; ++i){
                 oCurAxis = aAxes[i];
-                if(oCurAxis.bDelete && oCurAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
-                    var bHorizontal = (oCurAxis.axPos === AscFormat.AX_POS_T || oCurAxis.axPos === AscFormat.AX_POS_B);
-                    for(j = 0; j < aAxes.length; ++j){
-                        oCheckAxis = aAxes[j];
-                        if(!oCheckAxis.bDelete){
-                            if(bHorizontal){
-                                if(oCheckAxis.axPos === AscFormat.AX_POS_T || oCheckAxis.axPos === AscFormat.AX_POS_B){
-                                    oCurAxis.xPoints = oCheckAxis.xPoints;
-                                    break;
-                                }
-                            }
-                            else{
-                                if(oCheckAxis.axPos === AscFormat.AX_POS_R || oCheckAxis.axPos === AscFormat.AX_POS_L){
-                                    oCurAxis.yPoints = oCheckAxis.yPoints;
-                                    break;
-                                }
-                            }
-                        }
+                var bHorizontal = (oCurAxis.axPos === AscFormat.AX_POS_T || oCurAxis.axPos === AscFormat.AX_POS_B);
+                oReplaceAxis = this.getReplaceAxis(oCurAxis);
+                if(oReplaceAxis){
+                    if(bHorizontal){
+                        oCurAxis.xPoints = oReplaceAxis.xPoints;
+                    }
+                    else{
+                        oCurAxis.yPoints = oReplaceAxis.yPoints;
                     }
                 }
             }
