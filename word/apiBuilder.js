@@ -4778,6 +4778,7 @@
 
     /**
      * Get the type of this class.
+     * @typeofeditors ["CSE"]
      * @returns {"bullet"}
      */
     ApiBullet.prototype.GetClassType = function()

@@ -1701,7 +1701,8 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-	 * @returns {"chart"}
+     * @typeofeditors ["CSE"]
+     * @returns {"chart"}
 	 */
 	ApiChart.prototype.GetClassType = function()
 	{
@@ -1710,8 +1711,9 @@
 
 	/**
 	 *  Specifies a chart title
-	 *  @param {string} sTitle
-	 *  @param {hps} nFontSize
+     *  @typeofeditors ["CSE"]
+     *  @param {string} sTitle - The title which will be displayed for the current chart.
+	 *  @param {hps} nFontSize - The text size value measured in points.
 	 *  @param {?bool} bIsBold
 	 */
 	ApiChart.prototype.SetTitle = function (sTitle, nFontSize, bIsBold)
@@ -1720,9 +1722,10 @@
 	};
 
 	/**
-	 *  Specifies a horizontal axis title
-	 *  @param {string} sTitle
-	 *  @param {hps} nFontSize
+	 *  Specify the horizontal axis chart title.
+     *  @typeofeditors ["CSE"]
+     *  @param {string} sTitle - The title which will be displayed for the horizontal axis of the current chart.
+	 *  @param {hps} nFontSize - The text size value measured in points.
      *  @param {?bool} bIsBold
 	 * */
 	ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize, bIsBold)
@@ -1731,9 +1734,10 @@
 	};
 
 	/**
-	 *  Specifies a vertical axis title
-	 *  @param {string} sTitle
-	 *  @param {hps} nFontSize
+	 *  Specify the vertical axis chart title.
+     *  @typeofeditors ["CSE"]
+     *  @param {string} sTitle - The title which will be displayed for the vertical axis of the current chart.
+	 *  @param {hps} nFontSize - The text size value measured in points.
 	 *  @param {?bool} bIsBold
 	 * */
 	ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize, bIsBold)
@@ -1743,8 +1747,10 @@
 
 
 	/**
-	 * Specifies a  vertical axis orientation
-	 * @param {bool} bIsMinMax
+	 * Specifies the direction of the data displayed on the vertical axis.
+     * @typeofeditors ["CSE"]
+     * @param {bool} bIsMinMax - The <code>true</code> value will set the normal data direction for the vertical axis (from minimum to maximum).
+     * The <code>false</code> value will set the inverted data direction for the vertical axis (from maximum to minimum).
 	 * */
 	ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
 		AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
@@ -1785,8 +1791,10 @@
 	};
 
 	/**
-	 * Specifies a  horizontal axis orientation
-	 * @param {bool} bIsMinMax
+	 * Specifies the direction of the data displayed on the horizontal axis.
+     * @typeofeditors ["CSE"]
+     * @param {bool} bIsMinMax - The <code>true</code> value will set the normal data direction for the horizontal axis
+     * (from minimum to maximum). The <code>false</code> value will set the inverted data direction for the horizontal axis (from maximum to minimum).
 	 * */
 	ApiChart.prototype.SetHorAxisOrientation = function(bIsMinMax){
 		AscFormat.builder_SetChartHorAxisOrientation(this.Chart, bIsMinMax);
@@ -1794,7 +1802,8 @@
 
 	/**
 	 * Specifies a legend position
-	 * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos
+     * @typeofeditors ["CSE"]
+     * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos - The position of the chart legend inside the chart window.
 	 * */
 	ApiChart.prototype.SetLegendPos = function(sLegendPos)
 	{
@@ -1811,11 +1820,12 @@
 	};
 
 	/**
-	 * Spicifies a show options for data labels
-	 * @param {boolean} bShowSerName
-	 * @param {boolean} bShowCatName
-	 * @param {boolean} bShowVal
-	 * @param {boolean} bShowPercent
+	 * Specifies which chart data labels are shown for the chart.
+     * @typeofeditors ["CSE"]
+     * @param {boolean} bShowSerName - Whether to show or hide the source table column names used for the data which the chart will be build from.
+	 * @param {boolean} bShowCatName - Whether to show or hide the source table row names used for the data which the chart will be build from.
+	 * @param {boolean} bShowVal - Whether to show or hide the chart data values.
+	 * @param {boolean} bShowPercent - Whether to show or hide the percent for the data values (works with stacked chart types).
 	 * */
 	ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
 	{
@@ -1837,16 +1847,18 @@
     };
 
 	/**
-	 * Spicifies tick labels position vertical axis
-	 * @param {TickLabelPosition} sTickLabelPosition
+	 * Set the possible values for the position of the chart tick labels in relation to the main vertical label or the values of the chart data.
+     * @typeofeditors ["CSE"]
+	 * @param {TickLabelPosition} sTickLabelPosition - Set the position of the chart vertical tick labels.
 	 * */
 	ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
 	{
 		AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
 	};
 	/**
-	 * Spicifies tick labels position horizontal axis
-	 * @param {TickLabelPosition} sTickLabelPosition
+	 * Set the possible values for the position of the chart tick labels in relation to the main horizontal label or the values of the chart data.
+     * @typeofeditors ["CSE"]
+     * @param {TickLabelPosition} sTickLabelPosition - Set the position of the chart horizontal tick labels.
 	 * */
 	ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
 	{
