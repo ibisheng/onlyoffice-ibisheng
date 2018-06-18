@@ -7887,6 +7887,15 @@ PasteProcessor.prototype =
 			{
 				value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '');
 				value = value.replace(/(\r|\t|\n)/g, ' ');
+
+				//TODO проверить в каких случаях пробелы учитываются, в каких игнорируются
+				//пока делаю проверку на div с пробелами
+				if(node && node.parentNode && "div" === node.parentNode.nodeName.toLowerCase()) {
+					var checkSpaces = value.replace(/(\s)/g, '');
+					if(checkSpaces === "") {
+						value = "";
+					}
+				}
 			}
 
 			var Item;
