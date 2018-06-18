@@ -194,8 +194,9 @@
 	});
 
 	/**
-	 * Returns an object that represents the active sheet
+	 * Get the object that represents the active sheet.
 	 * @memberof Api
+	 * @typeofeditors ["CSE"]
 	 * @returns {ApiWorksheet}
 	 */
 	Api.prototype.GetActiveSheet = function () {
@@ -221,8 +222,9 @@
 	};
 
 	/**
-	 * Returns an object that represents the active sheet
+	 * Get the list of all available theme colors for the spreadsheet.
 	 * @memberof Api
+     * @typeofeditors ["CSE"]
 	 * @returns {array}
 	 */
 	Api.prototype.GetThemesColors = function () {
@@ -235,9 +237,10 @@
 	};
 
 	/**
-	 * Set theme colors
+	 * Set the theme colors to the current spreadsheet.
 	 * @memberof Api
-	 * @param {string | number} theme
+     * @typeofeditors ["CSE"]
+	 * @param {string | number} theme - The list of theme colors that will be used to select the color scheme to be set to the current spreadsheet.
 	 */
 	Api.prototype.SetThemeColors = function (theme) {
 		if ('string' === typeof theme) {
@@ -258,11 +261,11 @@
 	};
 
 	/**
-	 * Create a RGB color
+	 * Create an RGB color setting the appropriate values for the red, green and blue color components.
 	 * @memberof Api
-	 * @param {byte} r
-	 * @param {byte} g
-	 * @param {byte} b
+	 * @param {byte} r - Red color component value.
+	 * @param {byte} g - Green color component value.
+	 * @param {byte} b - Blue color component value.
 	 * @returns {ApiColor}
 	 */
 	Api.prototype.CreateColorFromRGB = function (r, g, b) {
@@ -270,9 +273,10 @@
 	};
 
 	/**
-	 * Create a RGB color
+	 * Create a color selecting it from one of the available color presets.
 	 * @memberof Api
-	 * @param {PresetColor} presetColor
+	 * @typeofeditors ["CSE"]
+	 * @param {PresetColor} presetColor - A preset selected from the list of the available color preset names.
 	 * @returns {ApiColor}
 	 */
 	Api.prototype.CreateColorByName = function (presetColor) {
