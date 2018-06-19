@@ -981,7 +981,8 @@
 	 */
 
 	/**
-	 * Get cell row
+	 * Get the number of the row for the selected cell.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @returns {Number}
 	 */
@@ -994,7 +995,8 @@
 		}
 	});
 	/**
-	 * Get cell column
+	 * Get the number of the column for the selected cell.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @returns {Number}
 	 */
@@ -1090,9 +1092,10 @@
 		return this.range.getValue();
 	};
 	/**
-	 * Set cell value
+	 * Set the value for the current cell or a cell range.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {string} value
+	 * @param {string} value - The general value for the cell or cell range in string format.
 	 */
 	ApiRange.prototype.SetValue = function (value) {
 		this.range.setValue(checkFormat(value).getValue());
@@ -1107,9 +1110,10 @@
 	});
 
 	/**
-	 * Set text color in the rgb format.
+	 * Set the text color for the current cell range with the previously created color object.
 	 * @memberof ApiRange
-	 * @param {ApiColor} color
+     * @typeofeditors ["CSE"]
+	 * @param {ApiColor} color - The color object previously created to set the color to the text in the cell/cell range.
 	 */
 	ApiRange.prototype.SetFontColor = function (color) {
 		this.range.setFontcolor(color.color);
@@ -1246,9 +1250,10 @@
    	});
 
 	/**
-	 * Set font size
+	 * Set the font size for the characters of the current cell range.
 	 * @memberof ApiRange
-	 * @param {number} size
+     * @typeofeditors ["CSE"]
+	 * @param {number} size - The font size value measured in points.
 	 */
 	ApiRange.prototype.SetFontSize = function (size) {
 		this.range.setFontsize(size);
@@ -1260,9 +1265,10 @@
 	});
 
 	/**
-	 * Set font name
-	 * @memberof ApiRange
-	 * @param {string} name
+	 * Set the specified font family as the font name for the current cell range.
+     * @typeofeditors ["CSE"]
+     * @memberof ApiRange
+	 * @param {string} name - The font family name used for the current cell range.
 	 */
 	ApiRange.prototype.SetFontName = function (name) {
 		this.range.setFontname(name);
@@ -1274,9 +1280,10 @@
 	});
 
 	/**
-	 * Set align vertical
+	 * Set the vertical alignment of the text in the current cell range.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {'center' | 'bottom' | 'top'} value
+	 * @param {'center' | 'bottom' | 'top'} value - The parameters will define the vertical alignment that will be applied to the cell contents.
 	 */
 	ApiRange.prototype.SetAlignVertical = function (value) {
 		switch(value)
@@ -1305,8 +1312,9 @@
 	});
 
 	/**
-	 * Set align horizontal
-	 * @param {'left' | 'right' | 'center' | 'justify'} value
+	 * Set the horizontal alignment of the text in the current cell range.
+     * @typeofeditors ["CSE"]
+	 * @param {'left' | 'right' | 'center' | 'justify'} value - Set the horizontal alignment of the text in the current cell range.
 	 */
 	ApiRange.prototype.SetAlignHorizontal = function (value) {
 		switch(value)
@@ -1340,9 +1348,9 @@
 	});
 
 	/**
-	 * Set bold
+	 * Set the bold property to the text characters in the current cell or cell range.
 	 * @memberof ApiRange
-	 * @param {bool} value
+	 * @param {bool} value - Specifies that the contents of this cell/cell range are displayed bold.
 	 */
 	ApiRange.prototype.SetBold = function (value) {
 		this.range.setBold(!!value);
@@ -1354,9 +1362,10 @@
 	});
 
 	/**
-	 * Set italic
+	 * Set the italic property to the text characters in the current cell or cell range.
 	 * @memberof ApiRange
-	 * @param {bool} value
+     * @typeofeditors ["CSE"]
+	 * @param {bool} value - Specifies that the contents of this cell/cell range are displayed italicized.
 	 */
 	ApiRange.prototype.SetItalic = function (value) {
 		this.range.setItalic(!!value);
@@ -1368,9 +1377,16 @@
 	});
 
 	/**
-	 * Set underline
+	 * Specify that the contents of this cell/cell range are displayed along with a line appearing directly below the character.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {'none' | 'single' | 'singleAccounting' | 'double' | 'doubleAccounting'} value
+	 * @param {'none' | 'single' | 'singleAccounting' | 'double' | 'doubleAccounting'} value - Specifies the type of the
+     * line displayed under the characters. The following values are available:
+     * * <b>"none"</b> - for no underlining;
+     * * <b>"single"</b> - for the single line underlining the cell contents;
+     * * <b>"singleAccounting"</b> - for the single line underlining the cell contents but not protruding beyond the cell borders;
+     * * <b>"double"</b> - for the double line underlining the cell contents;
+     * * <b>"doubleAccounting"</b> - for the double line underlining the cell contents but not protruding beyond the cell borders.
 	 */
 	ApiRange.prototype.SetUnderline = function (value) {
 		var val;
@@ -1401,9 +1417,10 @@
 	});
 
 	/**
-	 * Set strikeout
+	 * Specify that the contents of the cell/cell range are displayed with a single horizontal line through the center of the line.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {bool} value
+	 * @param {bool} value - Specifies that the contents of the current cell/cell range are displayed struck through.
 	 */
 	ApiRange.prototype.SetStrikeout = function (value) {
 		this.range.setStrikeout(!!value);
@@ -1415,9 +1432,10 @@
 	});
 
 	/**
-	 * Set wrap
+	 * Specifies whether the words in the cell must be wrapped to fit the cell size or not.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {bool} value
+	 * @param {bool} value - When set to <b>true</b> the words in the cell will be wrapped to fit the cell size.
 	 */
 	ApiRange.prototype.SetWrap = function (value) {
 		this.range.setWrap(!!value);
@@ -1435,9 +1453,10 @@
 	});
 
 	/**
-	 * Set fill color in the rgb format.
+	 * Set the background color for the current cell range with the previously created color object.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {ApiColor} color
+	 * @param {ApiColor} color - The color object previously created to set the color to the background in the cell/cell range.
 	 */
 	ApiRange.prototype.SetFillColor = function (color) {
 		this.range.setFill(color.color);
@@ -1449,9 +1468,10 @@
 	});
 
 	/**
-	 * Set the number format.
+	 * Specifies whether the number in the cell should be treated like number, currency, date, time, etc. or just like text.
 	 * @memberof ApiRange
-	 * @param {string} value
+     * @typeofeditors ["CSE"]
+	 * @param {string} value - Specifies the mask applied to the number in the cell.
 	 */
 	ApiRange.prototype.SetNumberFormat = function (value) {
 		this.range.setNumFormat(value);
@@ -1463,11 +1483,12 @@
 	});
 
 	/**
-	 * Set border properties.
+	 * Set the border to the cell/cell range with the parameters specified.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {BordersIndex} bordersIndex
-	 * @param {LineStyle} lineStyle
-	 * @param {ApiColor} color
+	 * @param {BordersIndex} bordersIndex - Specifies the cell border position.
+	 * @param {LineStyle} lineStyle - Specifies the line style used to form the cell border.
+	 * @param {ApiColor} color - The color object previously created to set the color to the cell border.
 	 */
 	ApiRange.prototype.SetBorders = function (bordersIndex, lineStyle, color) {
 		var borders = new AscCommonExcel.Border();
@@ -1503,9 +1524,11 @@
 	};
 
 	/**
-	 * Creates a merged cell from the specified Range.
+	 * Merge the selected cell range into a single cell or a cell row.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
-	 * @param {bool} across
+	 * @param {bool} across - When set to <b>true</b>, the cells within the selected range will be merged along the rows,
+     * but remain split in the columns. When set to <b>false</b>, the whole selected range of cells will be merged into a single cell.
 	 */
 	ApiRange.prototype.Merge = function (across) {
 		if (across) {
@@ -1520,7 +1543,8 @@
 	};
 
 	/**
-	 * Separates a merged area into individual cells.
+	 * Split the selected merged cell range into single cells.
+     * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 */
 	ApiRange.prototype.UnMerge = function () {

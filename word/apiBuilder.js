@@ -2970,7 +2970,7 @@
 
     /**
      * Get the type of this class.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {"paraPr"}
      */
     ApiParaPr.prototype.GetClassType = function()
