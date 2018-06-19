@@ -3952,14 +3952,14 @@
 })(window);
 
 // ONLYPASS
-window["asc_initAdvancedOptions"] = function(_code, _file_hash)
+window["asc_initAdvancedOptions"] = function(_code, _file_hash, _docInfo)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
     if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption() && !window.checkPasswordFromPlugin)
     {
     	window.checkPasswordFromPlugin = true;
-        window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash });
+        window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash, "docinfo" : _docInfo });
         return;
     }
 

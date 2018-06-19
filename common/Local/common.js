@@ -609,7 +609,7 @@ _proto.prototype["pluginMethod_OnEncryption"] = function(obj)
 				return;
 			}
 
-			window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true);
+			window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true, obj["docinfo"] ? obj["docinfo"] : "");
 			break;
 		}
 		case "getPasswordByFile":
