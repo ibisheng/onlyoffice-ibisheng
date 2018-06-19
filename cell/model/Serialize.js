@@ -3580,7 +3580,7 @@
                     si = row[colIndex];
                     if (undefined === si) {
                         row[colIndex] = si = this.sharedFormulasIndex++;
-                        if (0 !== rowIndex || 0 !== colIndex) {
+                        if (!(cell.nRow === shared.base.nRow && cell.nCol === shared.base.nCol)) {
                             cell.processFormula(function(parsed) {
                                 formula = parsed.getFormula();
                             });
