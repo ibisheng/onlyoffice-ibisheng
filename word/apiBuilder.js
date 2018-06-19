@@ -1951,7 +1951,7 @@
     };
     /**
      * Get the text properties of the current run.
-     *
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {ApiTextPr}
      */
     ApiRun.prototype.GetTextPr = function()
@@ -1960,7 +1960,7 @@
     };
     /**
      * Remove all content from the current run.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      */
     ApiRun.prototype.ClearContent = function()
     {
@@ -1968,7 +1968,7 @@
     };
     /**
      * Add some text to this run.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {string} sText - The text which will be added to the current run.
      */
     ApiRun.prototype.AddText = function(sText)
@@ -1988,7 +1988,7 @@
     };
     /**
      * Add a line break to the current run position and start the next element from a new line.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      */
     ApiRun.prototype.AddLineBreak = function()
     {
@@ -2004,7 +2004,7 @@
     };
     /**
      * Add a tab stop to the current run.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      */
     ApiRun.prototype.AddTabStop = function()
     {
@@ -2756,7 +2756,7 @@
     };
     /**
      * Set the bold property to the text character.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {boolean} isBold - Specifies that the contents of this run are displayed bold.
      */
     ApiTextPr.prototype.SetBold = function(isBold)
@@ -2766,7 +2766,7 @@
     };
     /**
      * Set the italic property to the text character.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {boolean} isItalic - Specifies that the contents of the current run are displayed italicized.
      */
     ApiTextPr.prototype.SetItalic = function(isItalic)
@@ -2776,7 +2776,7 @@
     };
     /**
      * Specify that the contents of this run are displayed with a single horizontal line through the center of the line.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {boolean} isStrikeout - Specifies that the contents of the current run are displayed struck through.
      */
     ApiTextPr.prototype.SetStrikeout = function(isStrikeout)
@@ -2787,7 +2787,7 @@
     /**
      * Specify that the contents of this run are displayed along with a line appearing directly below the character
      * (less than all the spacing above and below the characters on the line).
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {boolean} isUnderline - Specifies that the contents of the current run are displayed underlined.
      */
     ApiTextPr.prototype.SetUnderline = function(isUnderline)
@@ -2797,7 +2797,7 @@
     };
     /**
      * Set all 4 font slots with the specified font family.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {string} sFontFamily - The font family or families used for the current text run.
      */
     ApiTextPr.prototype.SetFontFamily = function(sFontFamily)
@@ -2807,7 +2807,7 @@
     };
     /**
      * Set the font size for the characters of the current text run.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {hps} nSize - The text size value measured in half-points (1/144 of an inch).
      */
     ApiTextPr.prototype.SetFontSize = function(nSize)
@@ -2833,7 +2833,7 @@
      * * <b>"baseline"</b> - the characters in the current text run will be aligned by the default text baseline.
      * * <b>"subscript"</b> - the characters in the current text run will be aligned below the default text baseline.
      * * <b>"superscript"</b> - the characters in the current text run will be aligned above the default text baseline.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {("baseline" | "subscript" | "superscript")} sType - The vertical alignment type applied to the text contents.
      */
     ApiTextPr.prototype.SetVertAlign = function(sType)
@@ -2869,7 +2869,7 @@
     };
     /**
      * Set text spacing measured in twentieths of a point.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {twips} nSpacing - The value of the text spacing measured in twentieths of a point (1/1440 of an inch).
      */
     ApiTextPr.prototype.SetSpacing = function(nSpacing)
@@ -2879,7 +2879,7 @@
     };
     /**
      * Specify that the contents of this run is displayed with two horizontal lines through each character displayed on the line.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {boolean} isDoubleStrikeout - Specifies that the contents of the current run are displayed double struck through.
      */
     ApiTextPr.prototype.SetDoubleStrikeout = function(isDoubleStrikeout)
@@ -2889,7 +2889,7 @@
     };
     /**
      * Specify that any lowercase characters in this text run are formatted for display only as their capital letter character equivalents.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {boolean} isCaps - Specifies that the contents of the current run are displayed capitalized.
      */
     ApiTextPr.prototype.SetCaps = function(isCaps)
@@ -2900,7 +2900,7 @@
     /**
      * Specify that all small letter characters in this text run are formatted for display only as their capital
      * letter character equivalents in a font size two points smaller than the actual font size specified for this text.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {boolean} isSmallCaps - Specifies that the contents of the current run are displayed capitalized two points smaller.
      */
     ApiTextPr.prototype.SetSmallCaps = function(isSmallCaps)
@@ -2952,8 +2952,9 @@
 
 
     /**
-     * Set fill of run
-     * @param {ApiFill} oApiFill
+     * Set the text color for the current text run.
+     * @typeofeditors ["CSE"]
+     * @param {ApiFill} oApiFill - The color or pattern used to fill the text color.
      */
     ApiTextPr.prototype.SetFill = function(oApiFill)
     {
@@ -4743,7 +4744,7 @@
     //------------------------------------------------------------------------------------------------------------------
     /**
      * Get the type of this class.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {"rgbColor"}
      */
     ApiRGBColor.prototype.GetClassType = function ()
