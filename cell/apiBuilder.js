@@ -105,32 +105,32 @@
 
 	/**
 	 * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" |
-     *     "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate"
-     *     | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" |
-     *     "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" |
-     *     "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" |
-     *     "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" |
-     *     "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" |
-     *     "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" |
-     *     "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" |
-     *     "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" |
-     *     "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" |
-     *     "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" |
-     *     "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" |
-     *     "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" |
-     *     "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" |
-     *     "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey"|
-     *     "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" |
-     *     "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" |
-     *     "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" |
-     *     "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" |
-     *     "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" |
-     *     "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip"|
-     *     "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" |
-     *     "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" |
-     *     "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" |
-     *     "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" |
-     *     "yellowGreen")} PresetColor
+	 *     "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate"
+	 *     | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" |
+	 *     "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" |
+	 *     "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" |
+	 *     "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" |
+	 *     "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" |
+	 *     "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" |
+	 *     "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" |
+	 *     "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" |
+	 *     "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" |
+	 *     "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" |
+	 *     "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" |
+	 *     "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" |
+	 *     "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" |
+	 *     "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey"|
+	 *     "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" |
+	 *     "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" |
+	 *     "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" |
+	 *     "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" |
+	 *     "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" |
+	 *     "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip"|
+	 *     "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" |
+	 *     "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" |
+	 *     "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" |
+	 *     "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" |
+	 *     "yellowGreen")} PresetColor
 	 * */
 
 	/**
@@ -224,7 +224,7 @@
 	/**
 	 * Get the list of all available theme colors for the spreadsheet.
 	 * @memberof Api
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @returns {array}
 	 */
 	Api.prototype.GetThemesColors = function () {
@@ -239,7 +239,7 @@
 	/**
 	 * Set the theme colors to the current spreadsheet.
 	 * @memberof Api
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {string | number} theme - The list of theme colors that will be used to select the color scheme to be set to the current spreadsheet.
 	 */
 	Api.prototype.SetThemeColors = function (theme) {
@@ -263,6 +263,7 @@
 	/**
 	 * Create an RGB color setting the appropriate values for the red, green and blue color components.
 	 * @memberof Api
+	 * @typeofeditors ["CSE"]
 	 * @param {byte} r - Red color component value.
 	 * @param {byte} g - Green color component value.
 	 * @param {byte} b - Blue color component value.
@@ -427,9 +428,10 @@
 	};
 
 	/**
-	 * Set sheet name
+	 * Set a name to the current active sheet.
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiWorksheet
-	 * @param {string} name
+	 * @param {string} name - The name which will be displayed for the current sheet at the sheet tab.
 	 */
 	ApiWorksheet.prototype.SetName = function (name) {
 		this.worksheet.setName(name);
@@ -458,9 +460,11 @@
 	});
 
 	/**
-	 * Returns an object that represents the range
+	 * Returns an object that represents the selected range of the current sheet. Can be a single cell - <b>A1</b>, or cells
+	 * from a single row - <b>A1:E1</b>, or cells from a single column - <b>A1:A10</b>, or cells from several rows and columns - <b>A1:E10</b>.
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiWorksheet
-	 * @param {string} sRange
+	 * @param {string} sRange - The range of cells from the current sheet.
 	 * @returns {ApiRange}
 	 */
 	ApiWorksheet.prototype.GetRange = function (sRange) {
@@ -468,10 +472,10 @@
 	};
 
 	/**
-	 * Returns an object that represents the range
+	 * Returns an object that represents the selected range of the current sheet using the <b>row/column</b> coordinates for the cell selection.
 	 * @memberof ApiWorksheet
-	 * @param {Number} row
-	 * @param {Number} col
+	 * @param {Number} row - The number of the row to set the cell coordinates.
+	 * @param {Number} col - The number of the column to set the cell coordinates.
 	 * @returns {ApiRange}
 	 */
 	ApiWorksheet.prototype.GetRangeByNumber = function (row, col) {
@@ -479,19 +483,23 @@
 	};
 
 	/**
-	 * Format as table
+	 * Format the selected range of cells from the current sheet as a table (with the first row formatted as a header).
+	 * <note>As the first row is always formatted as a table header, you need to select at least two rows for the table to be formed correctly.</note>
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiWorksheet
-	 * @param {string} sRange
+	 * @param {string} sRange - The range of cells from the current sheet which will be formatted as a table.
 	 */
 	ApiWorksheet.prototype.FormatAsTable = function (sRange) {
 		this.worksheet.autoFilters.addAutoFilter('TableStyleLight9', AscCommonExcel.g_oRangeCache.getAscRange(sRange));
 	};
 
 	/**
-	 * Set column width
+	 * Set the width to the selected column of the current active sheet. The width is equal to the set number multiplied
+	 * by 7 pixels - so if you set the width to 10 it will be equal to 70 pixels.
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiWorksheet
-	 * @param {number} column
-	 * @param {number} width
+	 * @param {number} column - The number of the column to set the width to.
+	 * @param {number} width - The width of the column divided by 7 pixels.
 	 */
 	ApiWorksheet.prototype.SetColumnWidth = function (column, width) {
 		this.worksheet.setColWidth(width, column, column);
@@ -508,18 +516,20 @@
 	};
 
 	/**
-	 * Set displayed gridlines
+	 * Specifies whether the current sheet gridlines must be displayed or not.
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiWorksheet
-	 * @param {bool} value
+	 * @param {bool} value - Specifies whether the current sheet gridlines must be displayed or not. The default value is <b>true</b>.
 	 */
 	ApiWorksheet.prototype.SetDisplayGridlines = function (value) {
 		this.worksheet.setDisplayGridlines(!!value);
 	};
 
 	/**
-	 * Set displayed headings
+	 * Specifies whether the current sheet row/column headers must be displayed or not.
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiWorksheet
-	 * @param {bool} value
+	 * @param {bool} value - Specifies whether the current sheet row/column headers must be displayed or not. The default value is <b>true</b>.
 	 */
 	ApiWorksheet.prototype.SetDisplayHeadings = function (value) {
 		this.worksheet.setDisplayHeadings(!!value);
@@ -679,19 +689,22 @@
 	});
 
 	/**
-	 * Set column width
+	 * Create a chart of the set type from the selected data range of the current sheet.
 	 * @memberof ApiWorksheet
-	 * @param {string} sDataRange
-	 * @param {bool} bInRows
-	 * @param {ChartType} sType
-	 * @param {number} nStyleIndex
-	 * @param {EMU} nExtX
-	 * @param {EMU} nExtY
-	 * @param {number} nFromCol
-	 * @param {EMU} nColOffset
-	 * @param {number} nFromRow
-	 * @param {EMU} nRowOffset
-     * @returns {ApiChart}
+	 * @typeofeditors ["CSE"]
+	 * <note>Please note, that the horizontal nColOffset and vertical nRowOffset offsets are calculated within the limits of the specified nFromCol column and nFromRow
+	 * row cell only. If this value exceeds the cell width or height, another vertical/horizontal position will be set.</note>
+	 * @param {string} sDataRange - The selected cell range which will be used to get the data for the chart, formed specifically and including the sheet name.
+	 * @param {bool} bInRows - Specifies whether to take the data from the rows or from the columns. If true the data from the rows will be used.
+	 * @param {ChartType} sType - The chart type used for the chart display.
+	 * @param {number} nStyleIndex - The chart color style index (can be <b>1 - 48</b>, as described in OOXML specification).
+	 * @param {EMU} nExtX - The chart width in English measure units
+	 * @param {EMU} nExtY - The chart height in English measure units.
+	 * @param {number} nFromCol - The number of the column where the beginning of the chart will be placed.
+	 * @param {EMU} nColOffset - The offset from the nFromCol column to the left part of the chart measured in English measure units.
+	 * @param {number} nFromRow - The number of the row where the beginning of the chart will be placed.
+	 * @param {EMU} nRowOffset - The offset from the nFromRow row to the upper part of the chart measured in English measure units.
+	 * @returns {ApiChart}
 	 */
 	ApiWorksheet.prototype.AddChart =
 		function (sDataRange, bInRows, sType, nStyleIndex, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset) {
@@ -840,22 +853,26 @@
 			if (AscFormat.isRealNumber(nStyleIndex)) {
 				oChart.setStyle(nStyleIndex);
 			}
-            return new ApiChart(oChart);
+			return new ApiChart(oChart);
 		};
 
 
 	/**
-	 * Create a shape.
+	 * Adds the shape to the current sheet with the parameters specified.
+	 * <note>Please note, that the horizontal <code>nColOffset</code> and vertical <code>nRowOffset</code> offsets are
+	 * calculated within the limits of the specified <code>nFromCol</code> column and <code>nFromRow</code> row cell
+	 * only. If this value exceeds the cell width or height, another vertical/horizontal position will be set.</note>
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiWorksheet
-	 * @param {ShapeType} [sType="rect"]
-	 * @param {EMU} nWidth
-	 * @param {EMU} nHeight
-	 * @param {ApiFill} oFill
-	 * @param {ApiStroke} oStroke
-	 * @param {number} nFromCol
-	 * @param {EMU} nColOffset
-	 * @param {number} nFromRow
-	 * @param {EMU} nRowOffset
+	 * @param {ShapeType} [sType="rect"] - The shape type which specifies the preset shape geometry.
+	 * @param {EMU} nWidth - The shape width in English measure units.
+	 * @param {EMU} nHeight - The shape height in English measure units.
+	 * @param {ApiFill} oFill - The color or pattern used to fill the shape.
+	 * @param {ApiStroke} oStroke - The stroke used to create the element shadow.
+	 * @param {number} nFromCol - The number of the column where the beginning of the image will be placed.
+	 * @param {EMU} nColOffset - The offset from the <code>nFromCol</code> column to the left part of the shape measured in English measure units.
+	 * @param {number} nFromRow - The number of the row where the beginning of the image will be placed.
+	 * @param {EMU} nRowOffset - The offset from the <code>nFromRow</code> row to the upper part of the shape measured in English measure units.
 	 * @returns {ApiShape}
 	 * */
 	ApiWorksheet.prototype.AddShape = function(sType, nWidth, nHeight, oFill, oStroke, nFromCol, nColOffset, nFromRow, nRowOffset){
@@ -866,15 +883,15 @@
 
 
 	/**
-	 * Create a image.
+	 * Adds the image to the current sheet with the parameters specified.
 	 * @memberof ApiWorksheet
-	 * @param {string} sImageSrc
-	 * @param {EMU} nWidth
-	 * @param {EMU} nHeight
-	 * @param {number} nFromCol
-	 * @param {EMU} nColOffset
-	 * @param {number} nFromRow
-	 * @param {EMU} nRowOffset
+	 * @param {string} sImageSrc - The image source where the image to be inserted should be taken from (currently only internet URL or Base64 encoded images are supported).
+	 * @param {EMU} nWidth - The image width in English measure units.
+	 * @param {EMU} nHeight - The image height in English measure units.
+	 * @param {number} nFromCol - The number of the column where the beginning of the image will be placed.
+	 * @param {EMU} nColOffset - The offset from the <code>nFromCol</code> column to the left part of the image measured in English measure units.
+	 * @param {number} nFromRow - The number of the row where the beginning of the image will be placed.
+	 * @param {EMU} nRowOffset - The offset from the <code>nFromRow</code> row to the upper part of the image measured in English measure units.
 	 * @returns {ApiImage}
 	 */
 	ApiWorksheet.prototype.AddImage = function(sImageSrc, nWidth, nHeight, nFromCol, nColOffset, nFromRow, nRowOffset){
@@ -887,87 +904,87 @@
 	 */
 	ApiWorksheet.prototype.ReplaceCurrentImage = function(sImageUrl, Width, Height){
 
-        var oWorksheet = Asc['editor'].wb.getWorksheet();
-        if(oWorksheet && oWorksheet.objectRender && oWorksheet.objectRender.controller){
+		var oWorksheet = Asc['editor'].wb.getWorksheet();
+		if(oWorksheet && oWorksheet.objectRender && oWorksheet.objectRender.controller){
 
-            var oController = oWorksheet.objectRender.controller;
-            var _w = Width/36000.0;
-            var _h = Height/36000.0;
-            var oImage = oController.createImage(sImageUrl, 0, 0, _w, _h);
-            oImage.setWorksheet(oWorksheet.model);
-            var selectedObjects, spTree;
-            if(oController.selection.groupSelection){
-                selectedObjects = oController.selection.groupSelection.selectedObjects;
-            }
-            else{
-                selectedObjects = oController.selectedObjects;
-            }
-            if(selectedObjects.length > 0){
-                if(selectedObjects[0].group){
-                    spTree = selectedObjects[0].group.spTree;
-                }
-                else{
+			var oController = oWorksheet.objectRender.controller;
+			var _w = Width/36000.0;
+			var _h = Height/36000.0;
+			var oImage = oController.createImage(sImageUrl, 0, 0, _w, _h);
+			oImage.setWorksheet(oWorksheet.model);
+			var selectedObjects, spTree;
+			if(oController.selection.groupSelection){
+				selectedObjects = oController.selection.groupSelection.selectedObjects;
+			}
+			else{
+				selectedObjects = oController.selectedObjects;
+			}
+			if(selectedObjects.length > 0){
+				if(selectedObjects[0].group){
+					spTree = selectedObjects[0].group.spTree;
+				}
+				else{
 					spTree = oController.getDrawingArray();
-                }
+				}
 
-                for(var i = 0; i < spTree.length; ++i){
-                    if(spTree[i] === selectedObjects[0]){
-                    	if(spTree[i].getObjectType() === AscDFH.historyitem_type_ImageShape){
-                            spTree[i].setBlipFill(AscFormat.CreateBlipFillRasterImageId(sImageUrl));
-                            if(selectedObjects[0].group){
-                                oController.selection.groupSelection.resetInternalSelection();
-                                selectedObjects[0].group.selectObject(spTree[i], 0);
-                            }
-                            else{
-                                oController.resetSelection();
-                                oController.selectObject(spTree[i], 0);
-                            }
+				for(var i = 0; i < spTree.length; ++i){
+					if(spTree[i] === selectedObjects[0]){
+						if(spTree[i].getObjectType() === AscDFH.historyitem_type_ImageShape){
+							spTree[i].setBlipFill(AscFormat.CreateBlipFillRasterImageId(sImageUrl));
+							if(selectedObjects[0].group){
+								oController.selection.groupSelection.resetInternalSelection();
+								selectedObjects[0].group.selectObject(spTree[i], 0);
+							}
+							else{
+								oController.resetSelection();
+								oController.selectObject(spTree[i], 0);
+							}
 						}
 						else{
-                            var _xfrm = spTree[i].spPr && spTree[i].spPr.xfrm;
-                            var _xfrm2 = oImage.spPr.xfrm;
-                            if(_xfrm){
-                                _xfrm2.setOffX(_xfrm.offX);
-                                _xfrm2.setOffY(_xfrm.offY);
-                            }
-                            else{
-                                if(AscFormat.isRealNumber(spTree[i].x) && AscFormat.isRealNumber(spTree[i].y)){
-                                    _xfrm2.setOffX(spTree[i].x);
-                                    _xfrm2.setOffY(spTree[i].y);
-                                }
-                            }
-                            if(selectedObjects[0].group){
-                                var _group = selectedObjects[0].group;
-                                _group.removeFromSpTreeByPos(i);
-                                _group.addToSpTree(i, oImage);
-                                oImage.setGroup(_group);
-                                oController.selection.groupSelection.resetInternalSelection();
-                                _group.selectObject(oImage, 0);
-                            }
-                            else{
-                                var _object = spTree[i];
-                                _object.deleteDrawingBase();
-                                oImage.setBDeleted(false);
-                                oImage.setWorksheet(oWorksheet.model);
-                                oImage.setBFromSerialize(true);
-                                oImage.addToDrawingObjects(i);
-                                oImage.setDrawingBaseType(AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
-                                oImage.setDrawingBaseCoords(0, 0, 0, 0, 0, 0, 0, 0, _object.x, _object.y, oImage.spPr.xfrm.extX, oImage.spPr.xfrm.extY);
-                                oImage.setDrawingBaseExt(oImage.spPr.xfrm.extX, oImage.spPr.xfrm.extY);
-                                oController.resetSelection();
-                                oController.selectObject(oImage, 0);
-                            }
+							var _xfrm = spTree[i].spPr && spTree[i].spPr.xfrm;
+							var _xfrm2 = oImage.spPr.xfrm;
+							if(_xfrm){
+								_xfrm2.setOffX(_xfrm.offX);
+								_xfrm2.setOffY(_xfrm.offY);
+							}
+							else{
+								if(AscFormat.isRealNumber(spTree[i].x) && AscFormat.isRealNumber(spTree[i].y)){
+									_xfrm2.setOffX(spTree[i].x);
+									_xfrm2.setOffY(spTree[i].y);
+								}
+							}
+							if(selectedObjects[0].group){
+								var _group = selectedObjects[0].group;
+								_group.removeFromSpTreeByPos(i);
+								_group.addToSpTree(i, oImage);
+								oImage.setGroup(_group);
+								oController.selection.groupSelection.resetInternalSelection();
+								_group.selectObject(oImage, 0);
+							}
+							else{
+								var _object = spTree[i];
+								_object.deleteDrawingBase();
+								oImage.setBDeleted(false);
+								oImage.setWorksheet(oWorksheet.model);
+								oImage.setBFromSerialize(true);
+								oImage.addToDrawingObjects(i);
+								oImage.setDrawingBaseType(AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
+								oImage.setDrawingBaseCoords(0, 0, 0, 0, 0, 0, 0, 0, _object.x, _object.y, oImage.spPr.xfrm.extX, oImage.spPr.xfrm.extY);
+								oImage.setDrawingBaseExt(oImage.spPr.xfrm.extX, oImage.spPr.xfrm.extY);
+								oController.resetSelection();
+								oController.selectObject(oImage, 0);
+							}
 						}
-                        return;
-                    }
-                }
-            }
-            var cell = this.worksheet.selectionRange.activeCell;
-            private_SetCoords(oImage, oWorksheet.model, Width, Height, cell ? cell.col : 0, 0,  cell ? cell.row : 0, 0, undefined);
-            oController.resetSelection();
-            oController.selectObject(oImage, 0);
+						return;
+					}
+				}
+			}
+			var cell = this.worksheet.selectionRange.activeCell;
+			private_SetCoords(oImage, oWorksheet.model, Width, Height, cell ? cell.col : 0, 0,  cell ? cell.row : 0, 0, undefined);
+			oController.resetSelection();
+			oController.selectObject(oImage, 0);
 			oWorksheet.isSelectOnShape = true;
-        }
+		}
 	};
 
 	/**
@@ -982,7 +999,7 @@
 
 	/**
 	 * Get the number of the row for the selected cell.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @returns {Number}
 	 */
@@ -996,7 +1013,7 @@
 	});
 	/**
 	 * Get the number of the column for the selected cell.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @returns {Number}
 	 */
@@ -1093,7 +1110,7 @@
 	};
 	/**
 	 * Set the value for the current cell or a cell range.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {string} value - The general value for the cell or cell range in string format.
 	 */
@@ -1112,7 +1129,7 @@
 	/**
 	 * Set the text color for the current cell range with the previously created color object.
 	 * @memberof ApiRange
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {ApiColor} color - The color object previously created to set the color to the text in the cell/cell range.
 	 */
 	ApiRange.prototype.SetFontColor = function (color) {
@@ -1221,38 +1238,38 @@
 	 */
 	ApiRange.prototype.GetRowHeight = function () {
 		return this.range.worksheet.getRowHeight(this.range.bbox.r1);
-   	};
-   	/**
+	};
+	/**
 	* Set rows height value
 	* @memberof ApiRange
 	* @param {number} height
 	 */
-   	ApiRange.prototype.SetRowHeight = function (height) {
+	ApiRange.prototype.SetRowHeight = function (height) {
 		this.range.worksheet.setRowHeight(height, this.range.bbox.r1, this.range.bbox.r2, false);
-   	};
-   	Object.defineProperty(ApiRange.prototype, "RowHeight", {
-	   	get: function () {
+	};
+	Object.defineProperty(ApiRange.prototype, "RowHeight", {
+		get: function () {
 			return this.GetRowHeight();
-	   	},
-	   	set: function (height) {
+		},
+		set: function (height) {
 			this.SetRowHeight(height);
-	   	}
-  	});
-   	Object.defineProperty(ApiRange.prototype, "Height", {
-	   	get: function () {
+		}
+	});
+	Object.defineProperty(ApiRange.prototype, "Height", {
+		get: function () {
 			var max = this.range.bbox.r2 - this.range.bbox.r1;
 			var sum = 0;
 			for (var i = 0; i <= max; i++) {
 				sum += this.range.worksheet.getRowHeight(i);
-		   	}
-		   	return sum;
-	   	}
-   	});
+			}
+			return sum;
+		}
+	});
 
 	/**
 	 * Set the font size for the characters of the current cell range.
 	 * @memberof ApiRange
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {number} size - The font size value measured in points.
 	 */
 	ApiRange.prototype.SetFontSize = function (size) {
@@ -1266,8 +1283,8 @@
 
 	/**
 	 * Set the specified font family as the font name for the current cell range.
-     * @typeofeditors ["CSE"]
-     * @memberof ApiRange
+	 * @typeofeditors ["CSE"]
+	 * @memberof ApiRange
 	 * @param {string} name - The font family name used for the current cell range.
 	 */
 	ApiRange.prototype.SetFontName = function (name) {
@@ -1281,7 +1298,7 @@
 
 	/**
 	 * Set the vertical alignment of the text in the current cell range.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {'center' | 'bottom' | 'top'} value - The parameters will define the vertical alignment that will be applied to the cell contents.
 	 */
@@ -1313,7 +1330,7 @@
 
 	/**
 	 * Set the horizontal alignment of the text in the current cell range.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {'left' | 'right' | 'center' | 'justify'} value - Set the horizontal alignment of the text in the current cell range.
 	 */
 	ApiRange.prototype.SetAlignHorizontal = function (value) {
@@ -1350,6 +1367,7 @@
 	/**
 	 * Set the bold property to the text characters in the current cell or cell range.
 	 * @memberof ApiRange
+	 * @typeofeditors ["CSE"]
 	 * @param {bool} value - Specifies that the contents of this cell/cell range are displayed bold.
 	 */
 	ApiRange.prototype.SetBold = function (value) {
@@ -1364,7 +1382,7 @@
 	/**
 	 * Set the italic property to the text characters in the current cell or cell range.
 	 * @memberof ApiRange
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {bool} value - Specifies that the contents of this cell/cell range are displayed italicized.
 	 */
 	ApiRange.prototype.SetItalic = function (value) {
@@ -1378,15 +1396,15 @@
 
 	/**
 	 * Specify that the contents of this cell/cell range are displayed along with a line appearing directly below the character.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {'none' | 'single' | 'singleAccounting' | 'double' | 'doubleAccounting'} value - Specifies the type of the
-     * line displayed under the characters. The following values are available:
-     * * <b>"none"</b> - for no underlining;
-     * * <b>"single"</b> - for the single line underlining the cell contents;
-     * * <b>"singleAccounting"</b> - for the single line underlining the cell contents but not protruding beyond the cell borders;
-     * * <b>"double"</b> - for the double line underlining the cell contents;
-     * * <b>"doubleAccounting"</b> - for the double line underlining the cell contents but not protruding beyond the cell borders.
+	 * line displayed under the characters. The following values are available:
+	 * * <b>"none"</b> - for no underlining;
+	 * * <b>"single"</b> - for the single line underlining the cell contents;
+	 * * <b>"singleAccounting"</b> - for the single line underlining the cell contents but not protruding beyond the cell borders;
+	 * * <b>"double"</b> - for the double line underlining the cell contents;
+	 * * <b>"doubleAccounting"</b> - for the double line underlining the cell contents but not protruding beyond the cell borders.
 	 */
 	ApiRange.prototype.SetUnderline = function (value) {
 		var val;
@@ -1418,7 +1436,7 @@
 
 	/**
 	 * Specify that the contents of the cell/cell range are displayed with a single horizontal line through the center of the line.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {bool} value - Specifies that the contents of the current cell/cell range are displayed struck through.
 	 */
@@ -1433,7 +1451,7 @@
 
 	/**
 	 * Specifies whether the words in the cell must be wrapped to fit the cell size or not.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {bool} value - When set to <b>true</b> the words in the cell will be wrapped to fit the cell size.
 	 */
@@ -1454,7 +1472,7 @@
 
 	/**
 	 * Set the background color for the current cell range with the previously created color object.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {ApiColor} color - The color object previously created to set the color to the background in the cell/cell range.
 	 */
@@ -1470,7 +1488,7 @@
 	/**
 	 * Specifies whether the number in the cell should be treated like number, currency, date, time, etc. or just like text.
 	 * @memberof ApiRange
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {string} value - Specifies the mask applied to the number in the cell.
 	 */
 	ApiRange.prototype.SetNumberFormat = function (value) {
@@ -1484,7 +1502,7 @@
 
 	/**
 	 * Set the border to the cell/cell range with the parameters specified.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {BordersIndex} bordersIndex - Specifies the cell border position.
 	 * @param {LineStyle} lineStyle - Specifies the line style used to form the cell border.
@@ -1525,10 +1543,10 @@
 
 	/**
 	 * Merge the selected cell range into a single cell or a cell row.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 * @param {bool} across - When set to <b>true</b>, the cells within the selected range will be merged along the rows,
-     * but remain split in the columns. When set to <b>false</b>, the whole selected range of cells will be merged into a single cell.
+	 * but remain split in the columns. When set to <b>false</b>, the whole selected range of cells will be merged into a single cell.
 	 */
 	ApiRange.prototype.Merge = function (across) {
 		if (across) {
@@ -1544,7 +1562,7 @@
 
 	/**
 	 * Split the selected merged cell range into single cells.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @memberof ApiRange
 	 */
 	ApiRange.prototype.UnMerge = function () {
@@ -1588,7 +1606,7 @@
 
 	/**
 	 * Get the type of the class based on this base class.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @returns {"drawing"}
 	 */
 	ApiDrawing.prototype.GetClassType = function()
@@ -1598,7 +1616,7 @@
 
 	/**
 	 * Set the size of the object (image, shape, chart) bounding box.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {EMU} nWidth - The object width measured in English measure units.
 	 * @param {EMU} nHeight - The object height measured in English measure units.
 	 */
@@ -1617,9 +1635,9 @@
 
 	/**
 	 * Change the position for the drawing object.
-     * <note>Please note, that the horizontal nColOffset and vertical nRowOffset offsets are calculated within the limits of
-     * the specified nFromCol column and nFromRow row cell only. If this value exceeds the cell width or height, another vertical/horizontal position will be set.</note>
-     * @typeofeditors ["CSE"]
+	 * <note>Please note, that the horizontal nColOffset and vertical nRowOffset offsets are calculated within the limits of
+	 * the specified nFromCol column and nFromRow row cell only. If this value exceeds the cell width or height, another vertical/horizontal position will be set.</note>
+	 * @typeofeditors ["CSE"]
 	 * @param {number} nFromCol - The number of the column where the beginning of the drawing object will be placed.
 	 * @param {EMU} nColOffset - The offset from the nFromCol column to the left part of the drawing object measured in English measure units.
 	 * @param {number} nFromRow - The number of the row where the beginning of the drawing object will be placed.
@@ -1657,7 +1675,7 @@
 
 	/**
 	 * Get the type of this class.
-     * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE"]
 	 * @returns {"image"}
 	 */
 	ApiImage.prototype.GetClassType = function()
@@ -1731,8 +1749,8 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-     * @typeofeditors ["CSE"]
-     * @returns {"chart"}
+	 * @typeofeditors ["CSE"]
+	 * @returns {"chart"}
 	 */
 	ApiChart.prototype.GetClassType = function()
 	{
@@ -1741,8 +1759,8 @@
 
 	/**
 	 *  Specifies a chart title
-     *  @typeofeditors ["CSE"]
-     *  @param {string} sTitle - The title which will be displayed for the current chart.
+	 *  @typeofeditors ["CSE"]
+	 *  @param {string} sTitle - The title which will be displayed for the current chart.
 	 *  @param {hps} nFontSize - The text size value measured in points.
 	 *  @param {?bool} bIsBold
 	 */
@@ -1753,10 +1771,10 @@
 
 	/**
 	 *  Specify the horizontal axis chart title.
-     *  @typeofeditors ["CSE"]
-     *  @param {string} sTitle - The title which will be displayed for the horizontal axis of the current chart.
+	 *  @typeofeditors ["CSE"]
+	 *  @param {string} sTitle - The title which will be displayed for the horizontal axis of the current chart.
 	 *  @param {hps} nFontSize - The text size value measured in points.
-     *  @param {?bool} bIsBold
+	 *  @param {?bool} bIsBold
 	 * */
 	ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize, bIsBold)
 	{
@@ -1765,8 +1783,8 @@
 
 	/**
 	 *  Specify the vertical axis chart title.
-     *  @typeofeditors ["CSE"]
-     *  @param {string} sTitle - The title which will be displayed for the vertical axis of the current chart.
+	 *  @typeofeditors ["CSE"]
+	 *  @param {string} sTitle - The title which will be displayed for the vertical axis of the current chart.
 	 *  @param {hps} nFontSize - The text size value measured in points.
 	 *  @param {?bool} bIsBold
 	 * */
@@ -1778,9 +1796,9 @@
 
 	/**
 	 * Specifies the direction of the data displayed on the vertical axis.
-     * @typeofeditors ["CSE"]
-     * @param {bool} bIsMinMax - The <code>true</code> value will set the normal data direction for the vertical axis (from minimum to maximum).
-     * The <code>false</code> value will set the inverted data direction for the vertical axis (from maximum to minimum).
+	 * @typeofeditors ["CSE"]
+	 * @param {bool} bIsMinMax - The <code>true</code> value will set the normal data direction for the vertical axis (from minimum to maximum).
+	 * The <code>false</code> value will set the inverted data direction for the vertical axis (from maximum to minimum).
 	 * */
 	ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
 		AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
@@ -1793,14 +1811,14 @@
 	 * */
 
 	ApiChart.prototype.SetHorAxisMajorTickMark = function(sTickMark){
-        AscFormat.builder_SetChartHorAxisMajorTickMark(this.Chart, sTickMark);
+		AscFormat.builder_SetChartHorAxisMajorTickMark(this.Chart, sTickMark);
 	};/**
 	 * Specifies minor tick mark for horizontal axis
 	 * @param {TickMark} sTickMark
 	 * */
 
 	ApiChart.prototype.SetHorAxisMinorTickMark = function(sTickMark){
-        AscFormat.builder_SetChartHorAxisMinorTickMark(this.Chart, sTickMark);
+		AscFormat.builder_SetChartHorAxisMinorTickMark(this.Chart, sTickMark);
 	};
 
 	/**
@@ -1809,7 +1827,7 @@
 	 * */
 
 	ApiChart.prototype.SetVertAxisMajorTickMark = function(sTickMark){
-        AscFormat.builder_SetChartVerAxisMajorTickMark(this.Chart, sTickMark);
+		AscFormat.builder_SetChartVerAxisMajorTickMark(this.Chart, sTickMark);
 	};
 
 	/**
@@ -1817,14 +1835,14 @@
 	 * @param {TickMark} sTickMark
 	 * */
 	ApiChart.prototype.SetVertAxisMinorTickMark = function(sTickMark){
-        AscFormat.builder_SetChartVerAxisMinorTickMark(this.Chart, sTickMark);
+		AscFormat.builder_SetChartVerAxisMinorTickMark(this.Chart, sTickMark);
 	};
 
 	/**
 	 * Specifies the direction of the data displayed on the horizontal axis.
-     * @typeofeditors ["CSE"]
-     * @param {bool} bIsMinMax - The <code>true</code> value will set the normal data direction for the horizontal axis
-     * (from minimum to maximum). The <code>false</code> value will set the inverted data direction for the horizontal axis (from maximum to minimum).
+	 * @typeofeditors ["CSE"]
+	 * @param {bool} bIsMinMax - The <code>true</code> value will set the normal data direction for the horizontal axis
+	 * (from minimum to maximum). The <code>false</code> value will set the inverted data direction for the horizontal axis (from maximum to minimum).
 	 * */
 	ApiChart.prototype.SetHorAxisOrientation = function(bIsMinMax){
 		AscFormat.builder_SetChartHorAxisOrientation(this.Chart, bIsMinMax);
@@ -1832,8 +1850,8 @@
 
 	/**
 	 * Specifies a legend position
-     * @typeofeditors ["CSE"]
-     * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos - The position of the chart legend inside the chart window.
+	 * @typeofeditors ["CSE"]
+	 * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos - The position of the chart legend inside the chart window.
 	 * */
 	ApiChart.prototype.SetLegendPos = function(sLegendPos)
 	{
@@ -1851,8 +1869,8 @@
 
 	/**
 	 * Specifies which chart data labels are shown for the chart.
-     * @typeofeditors ["CSE"]
-     * @param {boolean} bShowSerName - Whether to show or hide the source table column names used for the data which the chart will be build from.
+	 * @typeofeditors ["CSE"]
+	 * @param {boolean} bShowSerName - Whether to show or hide the source table column names used for the data which the chart will be build from.
 	 * @param {boolean} bShowCatName - Whether to show or hide the source table row names used for the data which the chart will be build from.
 	 * @param {boolean} bShowVal - Whether to show or hide the chart data values.
 	 * @param {boolean} bShowPercent - Whether to show or hide the percent for the data values (works with stacked chart types).
@@ -1862,23 +1880,23 @@
 		AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
 	};
 
-    /**
-     * Spicifies a show options for data labels
+	/**
+	 * Spicifies a show options for data labels
 	 * @param {number} nSeriesIndex
 	 * @param {number} nPointIndex
-     * @param {boolean} bShowSerName
-     * @param {boolean} bShowCatName
-     * @param {boolean} bShowVal
-     * @param {boolean} bShowPercent
-     * */
-    ApiChart.prototype.SetShowPointDataLabel = function(nSeriesIndex, nPointIndex, bShowSerName, bShowCatName, bShowVal, bShowPercent)
-    {
-        AscFormat.builder_SetShowPointDataLabel(this.Chart, nSeriesIndex, nPointIndex, bShowSerName, bShowCatName, bShowVal, bShowPercent);
-    };
+	 * @param {boolean} bShowSerName
+	 * @param {boolean} bShowCatName
+	 * @param {boolean} bShowVal
+	 * @param {boolean} bShowPercent
+	 * */
+	ApiChart.prototype.SetShowPointDataLabel = function(nSeriesIndex, nPointIndex, bShowSerName, bShowCatName, bShowVal, bShowPercent)
+	{
+		AscFormat.builder_SetShowPointDataLabel(this.Chart, nSeriesIndex, nPointIndex, bShowSerName, bShowCatName, bShowVal, bShowPercent);
+	};
 
 	/**
 	 * Set the possible values for the position of the chart tick labels in relation to the main vertical label or the values of the chart data.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @param {TickLabelPosition} sTickLabelPosition - Set the position of the chart vertical tick labels.
 	 * */
 	ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
@@ -1887,8 +1905,8 @@
 	};
 	/**
 	 * Set the possible values for the position of the chart tick labels in relation to the main horizontal label or the values of the chart data.
-     * @typeofeditors ["CSE"]
-     * @param {TickLabelPosition} sTickLabelPosition - Set the position of the chart horizontal tick labels.
+	 * @typeofeditors ["CSE"]
+	 * @param {TickLabelPosition} sTickLabelPosition - Set the position of the chart horizontal tick labels.
 	 * */
 	ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
 	{
@@ -1899,76 +1917,76 @@
 	 * Specifies major vertical gridline's visual properties
 	 * @param {?ApiStroke} oStroke
 	 * */
-    ApiChart.prototype.SetMajorVerticalGridlines = function(oStroke)
-    {
-        AscFormat.builder_SetVerAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
-    };
+	ApiChart.prototype.SetMajorVerticalGridlines = function(oStroke)
+	{
+		AscFormat.builder_SetVerAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+	};
 
 	/**
 	 * Specifies minor vertical gridline's visual properties
 	 * @param {?ApiStroke} oStroke
 	 * */
-    ApiChart.prototype.SetMinorVerticalGridlines = function(oStroke)
-    {
-        AscFormat.builder_SetVerAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
-    };
+	ApiChart.prototype.SetMinorVerticalGridlines = function(oStroke)
+	{
+		AscFormat.builder_SetVerAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+	};
 
 
 	/**
 	 * Specifies major horizontal gridline's visual properties
 	 * @param {?ApiStroke} oStroke
 	 * */
-    ApiChart.prototype.SetMajorHorizontalGridlines = function(oStroke)
-    {
-        AscFormat.builder_SetHorAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
-    };
+	ApiChart.prototype.SetMajorHorizontalGridlines = function(oStroke)
+	{
+		AscFormat.builder_SetHorAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+	};
 
 	/**
 	 * Specifies minor vertical gridline's visual properties
 	 * @param {?ApiStroke} oStroke
 	 */
-    ApiChart.prototype.SetMinorHorizontalGridlines = function(oStroke)
-    {
-        AscFormat.builder_SetHorAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
-    };
+	ApiChart.prototype.SetMinorHorizontalGridlines = function(oStroke)
+	{
+		AscFormat.builder_SetHorAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+	};
 
 
-    /**
+	/**
 	 * Specifies font size for labels of horizontal axis
 	 * @param {number} nFontSize
-    */
+	*/
 	ApiChart.prototype.SetHorAxisLablesFontSize = function(nFontSize){
-        AscFormat.builder_SetHorAxisFontSize(this.Chart, nFontSize);
+		AscFormat.builder_SetHorAxisFontSize(this.Chart, nFontSize);
 	};
 
-    /**
+	/**
 	 * Specifies font size for labels of vertical axis
 	 * @param {number} nFontSize
-    */
+	*/
 	ApiChart.prototype.SetVertAxisLablesFontSize = function(nFontSize){
-        AscFormat.builder_SetVerAxisFontSize(this.Chart, nFontSize);
+		AscFormat.builder_SetVerAxisFontSize(this.Chart, nFontSize);
 	};
-    /**
+	/**
 	 * Apply set of visual settings for chart
 	 * @param {number} nStyleIndex
-    */
+	*/
 	ApiChart.prototype.ApplyChartStyle = function(nStyleIndex){
 		if(this.Chart){
-            var chart = this.Chart.chart;
-            var plot_area = chart.plotArea;
-            var oCurChartSettings = AscFormat.DrawingObjectsController.prototype.getPropsFromChart.call(AscFormat.DrawingObjectsController.prototype, this.Chart);
-            var _cur_type = oCurChartSettings.type;
-            if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][nStyleIndex]){
-                plot_area.removeCharts(1, plot_area.charts.length - 1);
-                AscFormat.ApplyPresetToChartSpace(this.Chart, AscCommon.g_oChartPresets[_cur_type][nStyleIndex], false);
-            }
+			var chart = this.Chart.chart;
+			var plot_area = chart.plotArea;
+			var oCurChartSettings = AscFormat.DrawingObjectsController.prototype.getPropsFromChart.call(AscFormat.DrawingObjectsController.prototype, this.Chart);
+			var _cur_type = oCurChartSettings.type;
+			if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][nStyleIndex]){
+				plot_area.removeCharts(1, plot_area.charts.length - 1);
+				AscFormat.ApplyPresetToChartSpace(this.Chart, AscCommon.g_oChartPresets[_cur_type][nStyleIndex], false);
+			}
 		}
 	};
 
 
 	/**
 	 * Get the type of this class.
-     * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE"]
 	 * @returns {"color"}
 	 */
 	ApiColor.prototype.GetClassType = function () {
@@ -2083,16 +2101,16 @@
 
 
 
-    ApiChart.prototype["SetMajorVerticalGridlines"]  =  ApiChart.prototype.SetMajorVerticalGridlines;
-    ApiChart.prototype["SetMinorVerticalGridlines"]  =  ApiChart.prototype.SetMinorVerticalGridlines;
-    ApiChart.prototype["SetMajorHorizontalGridlines"]  =  ApiChart.prototype.SetMajorHorizontalGridlines;
-    ApiChart.prototype["SetMinorHorizontalGridlines"]  =  ApiChart.prototype.SetMinorHorizontalGridlines;
-    ApiChart.prototype["SetHorAxisLablesFontSize"]   =  ApiChart.prototype.SetHorAxisLablesFontSize;
-    ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
-    ApiChart.prototype["ApplyChartStyle"]            =  ApiChart.prototype.ApplyChartStyle;
+	ApiChart.prototype["SetMajorVerticalGridlines"]  =  ApiChart.prototype.SetMajorVerticalGridlines;
+	ApiChart.prototype["SetMinorVerticalGridlines"]  =  ApiChart.prototype.SetMinorVerticalGridlines;
+	ApiChart.prototype["SetMajorHorizontalGridlines"]  =  ApiChart.prototype.SetMajorHorizontalGridlines;
+	ApiChart.prototype["SetMinorHorizontalGridlines"]  =  ApiChart.prototype.SetMinorHorizontalGridlines;
+	ApiChart.prototype["SetHorAxisLablesFontSize"]   =  ApiChart.prototype.SetHorAxisLablesFontSize;
+	ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
+	ApiChart.prototype["ApplyChartStyle"]            =  ApiChart.prototype.ApplyChartStyle;
 
 
-    ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
+	ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
 
 
 	function private_SetCoords(oDrawing, oWorksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset, pos){
