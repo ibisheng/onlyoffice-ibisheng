@@ -3530,7 +3530,7 @@
         this.onDecodeError = function()
 		{
             var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-			_editor.sendEvent("asc_onError", c_oAscError.ID.VKeyEncrypt, c_oAscError.Level.Critical);
+			_editor.sendEvent("asc_onError", Asc.c_oAscError.ID.VKeyEncrypt, Asc.c_oAscError.Level.Critical);
 		};
 
         this.checkEditorId = function()
