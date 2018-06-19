@@ -1434,7 +1434,8 @@ CChartsDrawer.prototype =
 		var arrayValues;
 		if(AscDFH.historyitem_type_CatAx === axis.getObjectType()) {
 			arrayValues = [];
-			for(var i = axis.min; i <= axis.max; i++) {
+			var max = axis.min === 0 ? axis.max - 1 : axis.max;
+			for(var i = axis.min; i <= max; i++) {
 				arrayValues.push(i);
 			}
 			return arrayValues;
@@ -4732,7 +4733,7 @@ drawLineChart.prototype = {
 				//рассчитываем значения
 				val = this._getYVal(n, i);
 
-				x = xPoints[n].pos;
+				x = this.catAx ? this.cChartDrawer.getYPosition(n, this.catAx) : xPoints[n].pos;
 				y = this.cChartDrawer.getYPosition(val, this.valAx);
 
 				if (!this.paths.points) {
