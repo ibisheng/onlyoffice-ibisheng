@@ -1333,7 +1333,7 @@
 
     /**
      * Create CacheColumn
-     * @param {Number} w  Ширина столбца в символах
+     * @param {Number} w  Ширина столбца в px
      * @returns {CacheColumn}
      */
 	WorksheetView.prototype._createCacheColumn = function (w) {
@@ -4140,19 +4140,18 @@
         return undefined;
     };
 
-    WorksheetView.prototype._changeColWidth = function (col, width, pad) {
+    WorksheetView.prototype._changeColWidth = function (col, width) {
+		var oldColWidth = this.getColumnWidthInSymbols(col);
+        var pad = this.settings.cells.padding * 2 + 1;
         var cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
-        var modelw = this.model.charCountToModelColWidth(cc);
-        var newCol = this._createCacheColumn(modelw);
 
-        if (newCol.width > this.cols[col].width) {
-            this.cols[col].width = newCol.width;
-            this.cols[col].innerWidth = newCol.innerWidth;
+        if (cc > oldColWidth) {
 
             History.Create_NewPoint();
             History.StartTransaction();
             // Выставляем, что это bestFit
-            this.model.setColBestFit(true, modelw, col, col);
+            this.model.setColBestFit(true, this.model.charCountToModelColWidth(cc), col, col);
+			this._calcColWidth(this.cols[col].left, col);
             History.EndTransaction();
 
             this._updateColumnPositions();
@@ -4267,7 +4266,7 @@
             stm = this._roundTextMetrics(this.stringRender.measureString(sstr, sfl, colWidth));
             // Если целая часть числа не убирается в ячейку, то расширяем столбец
             if (stm.width > colWidth) {
-                this._changeColWidth(col, stm.width, pad);
+                this._changeColWidth(col, stm.width);
             }
             // Обновленная ячейка
             dDigitsCount = this.getColumnWidthInSymbols(col);
@@ -4284,7 +4283,7 @@
                 });
                 stm = this._roundTextMetrics(this.stringRender.measureString(sstr, fl, colWidth));
                 if (stm.width > colWidth) {
-                    this._changeColWidth(col, stm.width, pad);
+                    this._changeColWidth(col, stm.width);
                     // Обновленная ячейка
                     dDigitsCount = this.getColumnWidthInSymbols(col);
                     colWidth = this.cols[col].innerWidth;
@@ -10661,7 +10660,6 @@
         } else {
             cc = this.defaultColWidthChars;
         }
-		cw = this.model.charCountToModelColWidth(cc);
 
         if (cc === oldColWidth || (onlyIfMore && cc < oldColWidth)) {
             return -1;
@@ -10679,6 +10677,7 @@
         }
         History.StartTransaction();
         // Выставляем, что это bestFit
+		cw = this.model.charCountToModelColWidth(cc);
         this.model.setColBestFit(true, cw, col, col);
         History.EndTransaction();
         return oldColWidth !== cc ? cw : -1;
