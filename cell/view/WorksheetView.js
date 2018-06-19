@@ -615,15 +615,17 @@
         return null;
     };
 
+	WorksheetView.prototype.getColumnWidthInSymbols = function (index) {
+		var c = this.model._getColNoEmptyWithAll(index);
+		var charCount = c ? c.charCount : null;
+		return null === charCount ? charCount : this.defaultColWidthChars;
+	};
+
     WorksheetView.prototype.getSelectedColumnWidthInSymbols = function () {
-        var i, c, charCount, res = null;
+        var i, charCount, res = null;
         var range = this.model.selectionRange.getLast();
         for (i = range.c1; i <= range.c2 && i < this.cols.length; ++i) {
-			c = this.model._getColNoEmptyWithAll(i);
-			charCount = c ? c.charCount : null;
-			if (null === charCount) {
-				charCount = this.defaultColWidthChars;
-            }
+			charCount = this.getColumnWidthInSymbols(i);
             if (null === res) {
                 res = charCount;
             } else if (res !== charCount) {
@@ -655,6 +657,7 @@
         }
         return null;
     };
+
 
     WorksheetView.prototype.getSelectedRange = function () {
         // ToDo multiselect ?
@@ -4267,11 +4270,11 @@
                 this._changeColWidth(col, stm.width, pad);
             }
             // Обновленная ячейка
-            dDigitsCount = this.cols[col].charCount;
+            dDigitsCount = this.getColumnWidthInSymbols(col);
             colWidth = this.cols[col].innerWidth;
         } else if (null === mc) {
             // Обычная ячейка
-            dDigitsCount = this.cols[col].charCount;
+            dDigitsCount = this.getColumnWidthInSymbols(col);
             colWidth = this.cols[col].innerWidth;
             // подбираем ширину
             if (!this.cols[col].isCustomWidth && !fMergedColumns && !fl.wrapText &&
@@ -4283,7 +4286,7 @@
                 if (stm.width > colWidth) {
                     this._changeColWidth(col, stm.width, pad);
                     // Обновленная ячейка
-                    dDigitsCount = this.cols[col].charCount;
+                    dDigitsCount = this.getColumnWidthInSymbols(col);
                     colWidth = this.cols[col].innerWidth;
                 }
             }
@@ -4291,7 +4294,7 @@
             // Замерженная ячейка, нужна сумма столбцов
             for (var i = mc.c1; i <= mc.c2 && i < this.cols.length; ++i) {
                 colWidth += this.cols[i].width;
-                dDigitsCount += this.cols[i].charCount;
+                dDigitsCount += this.getColumnWidthInSymbols(i);
             }
             colWidth -= pad;
         }
@@ -8252,6 +8255,7 @@
             History.StartTransaction();
 
             checkRange.forEach(function (item, i) {
+                var c;
                 var range = t.model.getRange3(item.r1, item.c1, item.r2, item.c2);
                 var isLargeRange = t._isLargeRange(range.bbox);
                 var canChangeColWidth = c_oAscCanChangeColWidth.none;
@@ -8433,10 +8437,10 @@
                         break;
 
                     case "changeDigNum":
-                        res = t.cols.slice(arn.c1, arn.c2 + 1).reduce(function (r, c) {
-                            r.push(c.charCount);
-                            return r;
-                        }, []);
+                        res = [];
+                        for (c = item.c1; c < item.c2; ++c) {
+							res.push(t.getColumnWidthInSymbols(c));
+                        }
                         range.shiftNumFormat(val, res);
                         canChangeColWidth = c_oAscCanChangeColWidth.numbers;
                         break;
@@ -10595,7 +10599,7 @@
             r2 = this.rows.length - 1;
         }
 
-        oldColWidth = this.cols[col].charCount;
+        oldColWidth = this.getColumnWidthInSymbols(col);
 
         this.cols[col].isCustomWidth = false;
         for (row = r1; row <= r2; ++row) {

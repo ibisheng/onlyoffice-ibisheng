@@ -8403,7 +8403,7 @@
 		History.Create_NewPoint();
 		var bRes = false;
 		this._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
-			bRes |= cell.shiftNumFormat(nShift, aDigitsCount[nCol0 - nColStart] || 8);
+			bRes |= cell.shiftNumFormat(nShift, aDigitsCount[nCol0 - nColStart]);
 		});
 		return bRes;
 	};
