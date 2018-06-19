@@ -1633,6 +1633,7 @@
 
 	/**
 	 * Get the type of this class.
+     * @typeofeditors ["CDE", "CSE"]
 	 * @returns {"image"}
 	 */
 	ApiImage.prototype.GetClassType = function()

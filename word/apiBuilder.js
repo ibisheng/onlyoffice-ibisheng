@@ -1675,7 +1675,7 @@
     };
     /**
      * Get the type of this class.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {"document"}
      */
     ApiParagraph.prototype.GetClassType = function()
@@ -1684,7 +1684,7 @@
     };
     /**
      * Add some text to the element.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {string} [sText=""] - The text that we want to insert into the current document element.
      * @returns {ApiRun}
      */
@@ -1714,7 +1714,7 @@
     };
     /**
      * Add line break to the current position and start the next element from a new line.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddLineBreak = function()
@@ -1775,7 +1775,7 @@
     };
     /**
      * Get paragraph properties.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {ApiParaPr}
      */
     ApiParagraph.prototype.GetParaPr = function()
@@ -1816,7 +1816,7 @@
     };
     /**
      * Get the number of elements in the current paragraph.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {number}
      */
     ApiParagraph.prototype.GetElementsCount = function()
@@ -1826,6 +1826,7 @@
     };
     /**
      * Get the element of the paragraph using the position specified.
+     * @typeofeditors ["CDE", "CSE"]
      * @param {number} nPos - The position where the element which content we want to get must be located.
      * @returns {?ParagraphContent}
      */
@@ -1839,7 +1840,7 @@
     };
     /**
      * Remove the element using the position specified.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {number} nPos - The position of the element which we want to remove in the paragraph.
      */
     ApiParagraph.prototype.RemoveElement = function(nPos)
@@ -1851,7 +1852,7 @@
     };
     /**
      * Remove all elements from the current paragraph.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      */
     ApiParagraph.prototype.RemoveAllElements = function()
     {
@@ -1860,8 +1861,8 @@
     };
     /**
      * Add an element to the current paragraph.
-     * @typeofeditors ["CDE"]
-     * @param {ParagraphContent} The document element which will be added at the current position. Returns false if the
+     * @typeofeditors ["CDE", "CSE"]
+     * @param {ParagraphContent} oElement - The document element which will be added at the current position. Returns false if the
      * type of oElement is not supported by a paragraph.
      * @param {number} [nPos] The number of the paragraph where the current element will be added. If this value is not
      * specified then the element will be added at the end of the current paragraph.
@@ -1888,7 +1889,7 @@
     };
     /**
      * Add a tab stop to the current paragraph.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddTabStop = function()
@@ -3004,7 +3005,7 @@
     };
     /**
      * Set the paragraph left side indentation.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {twips} nValue - The paragraph left side indentation value measured in twentieths of a point (1/1440 of an inch).
      */
     ApiParaPr.prototype.SetIndLeft = function(nValue)
@@ -3014,7 +3015,7 @@
     };
     /**
      * Set the paragraph right side indentation.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {twips} nValue - The paragraph right side indentation value measured in twentieths of a point (1/1440 of an inch).
      */
     ApiParaPr.prototype.SetIndRight = function(nValue)
@@ -3024,7 +3025,7 @@
     };
     /**
      * Set the paragraph first line indentation.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {twips} nValue - The paragraph first line indentation value measured in twentieths of a point (1/1440 of an inch).
      */
     ApiParaPr.prototype.SetIndFirstLine = function(nValue)
@@ -3034,7 +3035,7 @@
     };
     /**
      * Set paragraph contents justification.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {("left" | "right" | "both" | "center")} sJc - The parameters will define the justification type that
      * will be applied to the paragraph contents.
      */
@@ -3083,7 +3084,7 @@
      * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
      * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the
      * <code>nLine</code> attribute shall be interpreted as 240ths of a line.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {(twips | line240)} nLine - The line spacing value measured either in twentieths of a point (1/1440 of an inch) or in 240ths of a line.
      * @param {("auto" | "atLeast" | "exact")} sLineRule - The rule that determines the measuring units of the nLine parameter.
      */
@@ -3115,7 +3116,7 @@
      * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
      * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then
      * it will be interpreted as <code>false</code>.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @param {twips} nBefore - The value of the spacing before the current paragraph measured in twentieths of a point (1/1440 of an inch).
      * @param {boolean} [isBeforeAuto=false] - The true value will disable the nBefore parameter.
      */
@@ -3133,6 +3134,7 @@
      * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
      * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
      * will be interpreted as <code>false</code>.
+     * @typeofeditors ["CDE", "CSE"]
      * @param {twips} nAfter - The value of the spacing after the current paragraph measured in twentieths of a point (1/1440 of an inch).
      * @param {boolean} [isAfterAuto=false] - The true value will disable the nAfter parameter.
      */
@@ -3251,9 +3253,11 @@
     /**
      * Specifies a sequence of custom tab stops which shall be used for any tab characters in the current paragraph.
      * <b>Warning</b>: The lengths of aPos array and aVal array <b>MUST BE</b> equal.
-     * @typeofeditors ["CDE"]
-     * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins measured in twentieths of a point (1/1440 of an inch).
-     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab stop and the alignment which will be applied to text entered at the current custom tab stop.
+     * @typeofeditors ["CDE", "CSE"]
+     * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins
+     * measured in twentieths of a point (1/1440 of an inch).
+     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab
+     * stop and the alignment which will be applied to text entered at the current custom tab stop.
      */
     ApiParaPr.prototype.SetTabs = function(aPos, aVal)
     {
@@ -3294,9 +3298,10 @@
 
 
     /**
-    * Specifies paragraph bullet
-    * @param {?ApiBullet} oBullet
-    * */
+     * Set the bullet or numbering to the current paragraph.
+     * @typeofeditors ["CSE"]
+     * @param {?ApiBullet} oBullet - The bullet object created using either the {@link Api#CreateBullet} or {@link Api#CreateNumbering} method.
+     */
     ApiParaPr.prototype.SetBullet = function(oBullet){
         if(oBullet){
             this.ParaPr.Bullet = oBullet.Bullet;
@@ -4679,7 +4684,7 @@
     //------------------------------------------------------------------------------------------------------------------
     /**
      * Get the type of this class.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {"fill"}
      */
     ApiFill.prototype.GetClassType = function()
@@ -4709,7 +4714,7 @@
     //------------------------------------------------------------------------------------------------------------------
     /**
      * Get the type of this class.
-     * @typeofeditors ["CDE"]
+     * @typeofeditors ["CDE", "CSE"]
      * @returns {"gradientStop"}
      */
     ApiGradientStop.prototype.GetClassType = function ()
