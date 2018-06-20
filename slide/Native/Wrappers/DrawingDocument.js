@@ -735,15 +735,15 @@ CDrawingDocument.prototype.OnMouseUp = function(e)
 // collaborative targets
 CDrawingDocument.prototype.Collaborative_UpdateTarget = function(_id, _x, _y, _size, _page, _transform, is_from_paint)
 {
-    this.Native["DD_Collaborative_UpdateTarget"](_id, _x, _y, _size, _page, _transform, is_from_paint);
+    //this.Native["DD_Collaborative_UpdateTarget"](_id, _x, _y, _size, _page, _transform, is_from_paint);
 };
 CDrawingDocument.prototype.Collaborative_RemoveTarget = function(_id)
 {
-    this.Native["DD_Collaborative_RemoveTarget"](_id);
+    //this.Native["DD_Collaborative_RemoveTarget"](_id);
 };
 CDrawingDocument.prototype.Collaborative_TargetsUpdate = function(bIsChangePosition)
 {
-    this.Native["DD_Collaborative_TargetsUpdate"](bIsChangePosition);
+ //   this.Native["DD_Collaborative_TargetsUpdate"](bIsChangePosition);
 };
 
 
