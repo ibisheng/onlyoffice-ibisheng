@@ -263,6 +263,95 @@ Asc['asc_docs_api'].prototype["GetNativePageMeta"] = function(pageIndex)
 };
 
 
+
+window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, version)
+{
+    this.SpellCheckUrl = '';
+
+    this.WordControl.m_bIsRuler = false;
+    this.WordControl.Init();
+
+    this.InitEditor();
+
+    g_oIdCounter.Set_Load(true);
+
+    var _loader = new AscCommon.BinaryPPTYLoader();
+    _loader.Api = this;
+
+    _loader.Load(base64File, this.WordControl.m_oLogicDocument);
+    _loader.Check_TextFit();
+
+    this.LoadedObject = 1;
+    g_oIdCounter.Set_Load(false);
+};
+
+Asc['asc_docs_api'].prototype.openDocument = function(sData)
+{
+    _api.asc_nativeOpenFile2(sData.data);
+
+
+    var _presentation = _api.WordControl.m_oLogicDocument;
+
+    var nSlidesCount = _presentation.Slides.length;
+    var dPresentationWidth = _presentation.Width;
+    var dPresentationHeight = _presentation.Height;
+
+    var aTimings = [];
+    var slides = _presentation.Slides;
+    for(var i = 0; i < slides.length; ++i){
+        aTimings.push(slides[i].timing.ToArray());
+    }
+    var _result =  [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
+
+
+    if (!sdkCheck) {
+
+        console.log("OPEN FILE ONLINE READ MODE");
+
+        if (_api.NativeAfterLoad)
+            _api.NativeAfterLoad();
+
+        this.ImageLoader.bIsLoadDocumentFirst = true;
+
+        // if (null != _api.WordControl.m_oLogicDocument)
+        // {
+        //     _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
+        // }
+
+        window["native"]["onEndLoadingFile"](_result);
+
+        return;
+    }
+
+
+    if (_api.NativeAfterLoad)
+        _api.NativeAfterLoad();
+
+    //console.log("ImageMap : " + JSON.stringify(this.WordControl.m_oLogicDocument));
+
+    this.ImageLoader.bIsLoadDocumentFirst = true;
+    this.ImageLoader.LoadDocumentImages(this.WordControl.m_oLogicDocument.ImageMap, true);
+
+    this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
+
+    //this.asyncFontsDocumentEndLoaded();
+    //
+    // if (null != _api.WordControl.m_oLogicDocument)
+    // {
+    //     _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
+    // }
+
+    window["native"]["onEndLoadingFile"](_result);
+
+    this.WordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(true);
+
+    var t = this;
+    setInterval(function() {
+        t._autoSave();
+    }, 40);
+};
+
+
 Asc['asc_docs_api'].prototype.Update_ParaInd = function( Ind )
 {
    // this.WordControl.m_oDrawingDocument.Update_ParaInd(Ind);
