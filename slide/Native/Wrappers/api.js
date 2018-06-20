@@ -373,6 +373,8 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
 
     this.InitEditor();
 
+    this.DocumentType   = 2;
+
     AscCommon.g_oIdCounter.Set_Load(true);
 
     var _loader = new AscCommon.BinaryPPTYLoader();
