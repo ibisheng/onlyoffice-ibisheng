@@ -1415,7 +1415,7 @@ CChartsDrawer.prototype =
 		}
 
 		//пересчёт данных для накопительных диаграмм
-		if ("stackedPer" === grouping || "stacked" === grouping) {
+		if (AscDFH.historyitem_type_ValAx === axis.getObjectType() && ("stackedPer" === grouping || "stacked" === grouping)) {
 			if (newArr) {
 				arrValues = newArr;
 			}
