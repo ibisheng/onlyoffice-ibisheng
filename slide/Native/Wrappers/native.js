@@ -101,6 +101,56 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             break;
         }
 
+
+        case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
+        {
+            _api.CoAuthoringApi._CoAuthoringApi._onServerOpen();
+            break;
+        }
+
+        case 10010: // ASC_SOCKET_EVENT_TYPE_ON_CLOSE
+        {
+
+            break;
+        }
+
+        case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
+        {
+            _api.CoAuthoringApi._CoAuthoringApi._onServerMessage(_params);
+            break;
+        }
+
+        case 11010: // ASC_SOCKET_EVENT_TYPE_ON_DISCONNECT
+        {
+            break;
+        }
+
+        case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
+        {
+            _api.CoAuthoringApi._CoAuthoringApi._reconnect();
+            break;
+        }
+
+        case 21000: // ASC_COAUTH_EVENT_TYPE_INSERT_URL_IMAGE
+        {
+            break;
+        }
+
+        case 21001: // ASC_COAUTH_EVENT_TYPE_LOAD_URL_IMAGE
+        {
+            _api.WordControl.m_oDrawingDocument.ClearCachePages();
+            _api.WordControl.m_oDrawingDocument.FirePaint();
+
+            break;
+        }
+
+        case 22001: // ASC_MENU_EVENT_TYPE_SET_PASSWORD
+        {
+            _api.asc_setDocumentPassword(_params[0]);
+            break;
+        }
+
+
         default:
             break;
     }

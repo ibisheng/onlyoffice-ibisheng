@@ -472,6 +472,20 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_SelectAll = function()
     this.WordControl.m_oLogicDocument.SelectAll();
 };
 
+Asc['asc_docs_api'].prototype.asc_setDocumentPassword = function(password)
+{
+    var v = {
+        "id": this.documentId,
+        "userid": this.documentUserId,
+        "format": this.documentFormat,
+        "c": "reopen",
+        "url": this.documentUrl,
+        "title": this.documentTitle,
+        "password": password
+    };
+
+    AscCommon.sendCommand(this, null, v);
+};
 
 if(!window.native){
 	if(_private_NativeObject){
