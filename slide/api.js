@@ -7080,8 +7080,11 @@ background-repeat: no-repeat;\
 		this.ShowParaMarks   = false;
 
 		var presentation = this.WordControl.m_oLogicDocument;
-		presentation.Recalculate({Drawings : {All : true, Map : {}}});
-		presentation.DrawingDocument.OnEndRecalculate();
+		if(presentation){
+			presentation.Recalculate({Drawings : {All : true, Map : {}}});
+			presentation.DrawingDocument.OnEndRecalculate();
+		}
+
 	};
 
 	window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)

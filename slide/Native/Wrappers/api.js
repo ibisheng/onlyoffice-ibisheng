@@ -302,8 +302,6 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
         aTimings.push(slides[i].timing.ToArray());
     }
     var _result =  [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
-
-
     if (!sdkCheck) {
 
         console.log("OPEN FILE ONLINE READ MODE");
@@ -322,8 +320,7 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
 
         return;
     }
-
-
+    _api.asc_nativeCalculateFile();
     if (_api.NativeAfterLoad)
         _api.NativeAfterLoad();
 
