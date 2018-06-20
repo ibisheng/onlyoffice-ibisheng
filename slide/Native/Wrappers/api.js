@@ -56,6 +56,103 @@ window["use_native_fonts_only"] = true;
 // declarate unused methods and objects
 window["ftm"] = FT_Memory;
 
+function asc_menu_WriteColor(_type, _color, _stream)
+{
+    if (!_color)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_color.type !== undefined && _color.type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_color.type);
+    }
+    if (_color.r !== undefined && _color.r !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteByte"](_color.r);
+    }
+    if (_color.g !== undefined && _color.g !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteByte"](_color.g);
+    }
+    if (_color.b !== undefined && _color.b !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteByte"](_color.b);
+    }
+    if (_color.a !== undefined && _color.a !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteByte"](_color.a);
+    }
+    if (_color.Auto !== undefined && _color.Auto !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_color.Auto);
+    }
+    if (_color.value !== undefined && _color.value !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteLong"](_color.value);
+    }
+    if (_color.ColorSchemeId !== undefined && _color.ColorSchemeId !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](_color.ColorSchemeId);
+    }
+    if (_color.Mods !== undefined && _color.Mods !== null)
+    {
+        _stream["WriteByte"](8);
+
+        var _len = _color.Mods.length;
+        _stream["WriteLong"](_len);
+
+        for (var i = 0; i < _len; i++)
+        {
+            _stream["WriteString1"](_color.Mods[i].name);
+            _stream["WriteLong"](_color.Mods[i].val);
+        }
+    }
+
+    _stream["WriteByte"](255);
+}
+
+function asc_WriteUsers(c, s) {
+    if (!c) return;
+
+    var len = 0, name, user;
+    for (name in c) {
+        if (undefined !== name) {
+            len++;
+        }
+    }
+
+    s["WriteLong"](len);
+
+    for (name in c) {
+        if (undefined !== name) {
+            user = c[name];
+            if (user) {
+                s['WriteString2'](user.asc_getId());
+                s['WriteString2'](user.asc_getFirstName() === undefined ? "" : user.asc_getFirstName());
+                s['WriteString2'](user.asc_getLastName() === undefined ? "" : user.asc_getLastName());
+                s['WriteString2'](user.asc_getUserName() === undefined ? "" : user.asc_getUserName());
+                s['WriteBool'](user.asc_getView());
+
+                var color = new Asc.asc_CColor();
+
+                color.r = (user.color >> 16) & 255;
+                color.g = (user.color >> 8 ) & 255;
+                color.b = (user.color      ) & 255;
+
+                asc_menu_WriteColor(0, color, s);
+            }
+        }
+    }
+}
 
 function NativeOpenFileP(_params, documentInfo){
     window["CreateMainTextMeasurerWrapper"]();
@@ -307,11 +404,7 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
     var _result =  [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
     if (!sdkCheck) {
 
-        console.log("OPEN FILE ONLINE READ MODE");
-
-        if (_api.NativeAfterLoad)
-            _api.NativeAfterLoad();
-
+        this.WordControl.m_oDrawingDocument.AfterLoad();
         this.ImageLoader.bIsLoadDocumentFirst = true;
 
         // if (null != _api.WordControl.m_oLogicDocument)
@@ -323,9 +416,10 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
 
         return;
     }
+
+    this.WordControl.m_oDrawingDocument.AfterLoad();
+   
     _api.asc_nativeCalculateFile();
-    if (_api.NativeAfterLoad)
-        _api.NativeAfterLoad();
 
     //console.log("ImageMap : " + JSON.stringify(this.WordControl.m_oLogicDocument));
 
