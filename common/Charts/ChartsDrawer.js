@@ -430,7 +430,8 @@ CChartsDrawer.prototype =
 					break;
 				}
 				case AscDFH.historyitem_type_ValAx:
-				case AscDFH.historyitem_type_CatAx: {
+				case AscDFH.historyitem_type_CatAx:
+				case AscDFH.historyitem_type_DateAx: {
 					pos = this._calculatePositionAxisTitle(obj);
 					break;
 				}
@@ -1220,7 +1221,7 @@ CChartsDrawer.prototype =
 
 			if(isStackedType) {
 				//для случая 100% stacked - если макс/мин равно определенному делению, большие/меньшие - убираем
-				if(axObj.min === axObj.scale[1]) {
+				if(axObj.scale[0] !== 0 && axObj.min === axObj.scale[1]) {
 					axObj.scale.splice(0, 1);
 				}
 				if(axObj.max === axObj.scale[axObj.scale.length - 2]) {
@@ -1432,7 +1433,7 @@ CChartsDrawer.prototype =
 	_getAxisValues2: function (axis, chartSpace, isStackedType) {
 		//для оси категорий берем интервал 1
 		var arrayValues;
-		if(AscDFH.historyitem_type_CatAx === axis.getObjectType()) {
+		if(AscDFH.historyitem_type_CatAx === axis.getObjectType() || AscDFH.historyitem_type_DateAx === axis.getObjectType()) {
 			arrayValues = [];
 			var max = axis.min === 0 ? axis.max - 1 : axis.max;
 			for(var i = axis.min; i <= max; i++) {
