@@ -2413,9 +2413,14 @@ CChartsDrawer.prototype =
 		return {val: val, numPow: numPow};
 	},
 	
-	getIdxPoint: function(seria, val)
+	getIdxPoint: function(seria, val, bXVal)
 	{
-		var seriaVal = seria.val ? seria.val :  seria.yVal;
+		var seriaVal;
+		if(bXVal) {
+			seriaVal = seria.val ? seria.val :  seria.xVal;
+		} else {
+			seriaVal = seria.val ? seria.val :  seria.yVal;
+		}
 		
 		if(!seriaVal)
 			return null;
@@ -9870,7 +9875,7 @@ drawScatterChart.prototype = {
 		var yPoints = this.valAx.yPoints;
 		var betweenAxisCross = this.valAx.crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN;
 
-		var seria, yVal, xVal, points, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol, idxPoint;
+		var seria, yVal, xVal, points, yNumCache, compiledMarkerSize, compiledMarkerSymbol, yPoint, idx, xPoint;
 		for (var i = 0; i < this.chart.series.length; i++) {
 			seria = this.chart.series[i];
 			yNumCache = this.cChartDrawer.getNumCache(seria.yVal);
@@ -9880,12 +9885,20 @@ drawScatterChart.prototype = {
 			}
 
 			for (var n = 0; n < yNumCache.ptCount; n++) {
-				yVal = this._getYVal(n, i);
+				//idx - индекс точки по оси OY
+				idx = yNumCache.pts && undefined !== yNumCache.pts[n] ? yNumCache.pts[n].idx : null;
+				if(null === idx) {
+					continue;
+				}
 
-				xNumCache = this.cChartDrawer.getNumCache(seria.xVal);
-				if (xNumCache && xNumCache.pts[n]) {
-					if (!isNaN(parseFloat(xNumCache.pts[n].val))) {
-						xVal = parseFloat(xNumCache.pts[n].val);
+				//вычисляем yVal
+				//пытаемся вычислить xVal  в зависимости от idx точки по OY
+				yVal = this._getYVal(n, i);
+				xPoint = this.cChartDrawer.getIdxPoint(seria, idx, true);
+				if (xPoint) {
+					xVal = xPoint.val;
+					if (!isNaN(parseFloat(xVal))) {
+						xVal = parseFloat(xVal);
 					} else {
 						xVal = n + 1;
 					}
@@ -9895,9 +9908,9 @@ drawScatterChart.prototype = {
 				}
 
 
-				idxPoint = this.cChartDrawer.getIdxPoint(seria, n);
-				compiledMarkerSize = idxPoint && idxPoint.compiledMarker ? idxPoint.compiledMarker.size : null;
-				compiledMarkerSymbol = idxPoint && idxPoint.compiledMarker ? idxPoint.compiledMarker.symbol : null;
+				yPoint = this.cChartDrawer.getIdxPoint(seria, idx);
+				compiledMarkerSize = yPoint && yPoint.compiledMarker ? yPoint.compiledMarker.size : null;
+				compiledMarkerSymbol = yPoint && yPoint.compiledMarker ? yPoint.compiledMarker.symbol : null;
 
 
 				if (!this.paths.points) {
