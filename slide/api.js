@@ -5082,6 +5082,7 @@ background-repeat: no-repeat;\
 
 				presentation.DrawingDocument.OnEndRecalculate();
 
+
 				this.asc_registerCallback('asc_doubleClickOnChart', function(){
 					// next tick
 					setTimeout(function() {
@@ -5089,15 +5090,17 @@ background-repeat: no-repeat;\
 					}, 0);
 				});
 
-				this.WordControl.m_oLayoutDrawer.IsRetina = this.WordControl.bIsRetinaSupport;
+				if(!window["NATIVE_EDITOR_ENJINE"]){
 
-				this.WordControl.m_oLayoutDrawer.WidthMM  = presentation.Width;
-				this.WordControl.m_oLayoutDrawer.HeightMM = presentation.Height;
-				this.WordControl.m_oMasterDrawer.WidthMM  = presentation.Width;
-				this.WordControl.m_oMasterDrawer.HeightMM = presentation.Height;
+					this.WordControl.m_oLayoutDrawer.IsRetina = this.WordControl.bIsRetinaSupport;
 
-				this.WordControl.m_oLogicDocument.SendThemesThumbnails();
+					this.WordControl.m_oLayoutDrawer.WidthMM  = presentation.Width;
+					this.WordControl.m_oLayoutDrawer.HeightMM = presentation.Height;
+					this.WordControl.m_oMasterDrawer.WidthMM  = presentation.Width;
+					this.WordControl.m_oMasterDrawer.HeightMM = presentation.Height;
 
+					this.WordControl.m_oLogicDocument.SendThemesThumbnails();
+				}
 
 				this.sendEvent("asc_onPresentationSize", presentation.Width, presentation.Height);
 
