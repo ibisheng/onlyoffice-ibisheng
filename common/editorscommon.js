@@ -3547,6 +3547,13 @@
             this.sendChanges(this, [data], AscCommon.EncryptionMessageType.Decrypt, { isImageDecrypt: true, src: src, img : img });
         };
 
+        this.nextChanges = function()
+		{
+			setTimeout(function() {
+				AscCommon.EncryptionWorker.sendChanges(undefined, undefined);
+			}, 10);
+		};
+
         this.sendChanges = function(sender, data, type, options)
         {
             if (!this.isNeedCrypt())
@@ -3628,7 +3635,7 @@
                 this.isChangesHandled = false;
 				this.handleChangesCallback = null;
 
-                this.sendChanges(undefined, undefined);
+                this.nextChanges();
 				return;
 			}
 
@@ -3675,7 +3682,7 @@
                 }
             }
 
-            this.sendChanges(undefined, undefined);
+            this.nextChanges();
         };
 
         this.isExistEncryptedChanges = function(_array)
