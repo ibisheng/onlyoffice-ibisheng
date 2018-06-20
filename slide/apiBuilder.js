@@ -255,6 +255,8 @@
      * */
 
     /**
+     * Get the main presentation.
+     * @typeofeditors ["CPE"]
      * @memberof Api
      * @returns {ApiPresentation}
      */
@@ -267,6 +269,7 @@
 
     /**
      * Create a new slide.
+     * @typeofeditors ["CPE"]
      * @memberof Api
      * @returns {ApiSlide}
      */
@@ -280,11 +283,13 @@
     };
 
     /**
-     * Create a image.
+     * Create an image with the parameters specified.
      * @memberof Api
-     * @param {string} sImageSrc
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
+     * @typeofeditors ["CPE"]
+     * @param {string} sImageSrc - The image source where the image to be inserted should be taken from (currently
+     * only internet URL or Base64 encoded images are supported).
+     * @param {EMU} nWidth - The image width in English measure units.
+     * @param {EMU} nHeight - The image height in English measure units.
      * @returns {ApiImage}
      */
     Api.prototype.CreateImage = function(sImageSrc, nWidth, nHeight){
@@ -294,13 +299,14 @@
     };
 
     /**
-     * Create a shape.
+     * Create a shape with the parameters specified.
      * @memberof Api
-     * @param {ShapeType} [sType="rect"]
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
-     * @param {ApiFill} oFill
-     * @param {ApiStroke} oStroke
+     * @typeofeditors ["CPE"]
+     * @param {ShapeType} [sType="rect"] - The shape type which specifies the preset shape geometry.
+     * @param {EMU} nWidth - The shape width in English measure units.
+     * @param {EMU} nHeight - The shape height in English measure units.
+     * @param {ApiFill} oFill - The color or pattern used to fill the shape.
+     * @param {ApiStroke} oStroke - The stroke used to create the element shadow.
      * @returns {ApiShape}
      * */
     Api.prototype.CreateShape = function(sType, nWidth, nHeight, oFill, oStroke){
@@ -310,15 +316,16 @@
     };
 
     /**
-     * Create a chart.
+     * Create a chart with the parameters specified.
      * @memberof Api
-     * @param {ChartType} [sType="bar"]
-     * @param {Array} aSeries
-     * @param {Array} aSeriesNames
-     * @param {Array} aCatNames
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
-     * @param {number} nStyleIndex
+     * @typeofeditors ["CPE"]
+     * @param {ChartType} [sType="bar"] - The chart type used for the chart display.
+     * @param {Array} aSeries - The array of the data used to build the chart from.
+     * @param {Array} aSeriesNames - The array of the names (the source table column names) used for the data which the chart will be build from.
+     * @param {Array} aCatNames - The array of the names (the source table row names) used for the data which the chart will be build from.
+     * @param {EMU} nWidth - The chart width in English measure units.
+     * @param {EMU} nHeight - 	The chart height in English measure units.
+     * @param {number} nStyleIndex - 	The chart color style index (can be <b>1 - 48</b>, as described in OOXML specification).
      * @returns {ApiChart}
      * */
     Api.prototype.CreateChart = function(sType, aSeries, aSeriesNames, aCatNames, nWidth, nHeight, nStyleIndex)
@@ -370,6 +377,7 @@
     /**
      * Create a new paragraph.
      * @memberof Api
+     * @typeofeditors ["CPE"]
      * @returns {ApiParagraph}
      */
     Api.prototype.CreateParagraph = function()

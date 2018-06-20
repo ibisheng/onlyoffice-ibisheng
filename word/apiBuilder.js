@@ -642,7 +642,7 @@
 	/**
 	 * Create a new smaller text block to be inserted to the current paragraph or table.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {ApiRun}
 	 */
 	Api.prototype.CreateRun = function()
@@ -906,7 +906,7 @@
 	/**
 	 * Create an RGB color setting the appropriate values for the red, green and blue color components.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {byte} r - Red color component value.
 	 * @param {byte} g - Green color component value.
 	 * @param {byte} b - Blue color component value.
@@ -920,7 +920,7 @@
 	/**
 	 * Create a complex color scheme selecting from one of the available schemes.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {SchemeColorId} sSchemeColorId - The color scheme identifier.
 	 * @returns {ApiSchemeColor}
 	 */
@@ -932,7 +932,7 @@
 	/**
 	 * Create a color selecting it from one of the available color presets.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {PresetColor} sPresetColor - A preset selected from the list of the available color preset names.
 	 * @returns {ApiPresetColor};
 	 * */
@@ -944,7 +944,7 @@
 	/**
 	 * Create a solid fill which allows to fill the object using a selected solid color as the object background.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {ApiUniColor} oUniColor - The color used for the element fill.
 	 * @returns {ApiFill}
 	 * */
@@ -956,7 +956,7 @@
 	/**
 	 * Create a linear gradient fill which allows to fill the object using a selected linear gradient as the object background.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {Array} aGradientStop - The angle measured in 60000th of a degree that will define the gradient direction.
 	 * @param {PositiveFixedAngle} Angle - The angle measured in 60000th of a degree that will define the gradient direction.
 	 * @returns {ApiFill}
@@ -970,7 +970,7 @@
 	/**
 	 * Create a radial gradient fill which allows to fill the object using a selected radial gradient as the object background.
 	 * @memberof Api
-	 * @typeofeditors ["CDE"]
+	 * @typeofeditors ["CDE", "CPE"]
 	 * @param {Array} aGradientStop - The array of gradient color stops measured in 1000th of percent.
 	 * @returns {ApiFill}
 	 */
@@ -982,7 +982,7 @@
 	/**
 	 * Create a pattern fill which allows to fill the object using a selected pattern as the object background.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {PatternType} sPatternType - The pattern type used for the fill selected from one of the available pattern types.
 	 * @param {ApiUniColor} BgColor - The background color used for the pattern creation.
 	 * @param {ApiUniColor} FgColor - The foreground color used for the pattern creation.
@@ -996,7 +996,7 @@
 	/**
 	 * Create a blip fill which allows to fill the object using a selected image as the object background.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {string} sImageUrl - The path to the image used for the blip fill (currently only internet URL or Base64 encoded images are supported).
 	 * @param {BlipFillType} sBlipFillType - The type of the fill used for the blip fill (tile or stretch).
 	 * @returns {ApiFill}
@@ -1009,7 +1009,7 @@
 	/**
 	 * Create no fill and remove the fill from the element.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {ApiFill}
 	 * */
 	Api.prototype.CreateNoFill = function()
@@ -1020,7 +1020,7 @@
 	/**
 	 * Create a stroke adding shadows to the element.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {EMU} nWidth - The width of the shadow measured in English measure units.
 	 * @param {ApiFill} oFill - The fill type used to create the shadow.
 	 * @returns {ApiStroke}
@@ -1033,7 +1033,7 @@
 	/**
 	 * Create a gradient stop used for different types of gradients.
 	 * @memberof Api
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {ApiUniColor} oUniColor - The color used for the gradient stop.
 	 * @param {PositivePercentage} nPos - The position of the gradient stop measured in 1000th of percent.
 	 * @returns {ApiGradientStop}
@@ -1046,7 +1046,7 @@
 	/**
 	 * Create a bullet for a paragraph with the character or symbol specified with the sBullet parameter.
 	 * @memberof Api
-	 * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE", "CPE"]
 	 * @param {string} sSymbol - The character or symbol which will be used to create the bullet for the paragraph.
 	 * @returns {ApiBullet}
 	 * */
@@ -1066,7 +1066,7 @@
 	/**
 	 * Create a bullet for a paragraph with the character or symbol specified with the sType parameter.
 	 * @memberof Api
-	 * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE", "CPE"]
 	 * @param {BulletType} sType - The numbering type the paragraphs will be numbered with.
 	 * @param {number} nStartAt - The number the first numbered paragraph will start with.
 	 * @returns {ApiBullet}
