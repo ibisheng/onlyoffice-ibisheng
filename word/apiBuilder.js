@@ -1165,7 +1165,7 @@
 
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"documentContent"}
 	 */
 	ApiDocumentContent.prototype.GetClassType = function()
@@ -1174,7 +1174,7 @@
 	};
 	/**
 	 * Get the number of elements in the current document.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {number}
 	 */
 	ApiDocumentContent.prototype.GetElementsCount = function()
@@ -1183,7 +1183,7 @@
 	};
 	/**
 	 * Get the element by its position in the document.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {?DocumentElement}
 	 */
 	ApiDocumentContent.prototype.GetElement = function(nPos)
@@ -1203,7 +1203,7 @@
 	};
 	/**
 	 * Add paragraph or table using its position in the document.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {number} nPos - The position where the current element will be added.
 	 * @param {DocumentElement} oElement - The document element which will be added at the current position.
 	 */
@@ -1216,7 +1216,7 @@
 	};
 	/**
 	 * Push a paragraph or a table to actually add it to the document.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {DocumentElement} oElement - The type of the element which will be pushed to the document.
 	 */
 	ApiDocumentContent.prototype.Push = function(oElement)
@@ -1231,7 +1231,9 @@
 	};
 	/**
 	 * Remove all elements from the current document or from the current document element.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * <note>When all elements are removed, a new empty paragraph is automatically created. If you want to add
+	 * content to this paragraph, use the ApiDocumentContent.GetElement method.</note>
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 */
 	ApiDocumentContent.prototype.RemoveAllElements = function()
 	{
@@ -1239,7 +1241,7 @@
 	};
 	/**
 	 * Remove element using the position specified.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {number} nPos - The element number (position) in the document or inside other element.
 	 */
 	ApiDocumentContent.prototype.RemoveElement = function(nPos)
@@ -1675,7 +1677,7 @@
 	};
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"document"}
 	 */
 	ApiParagraph.prototype.GetClassType = function()
@@ -1684,7 +1686,7 @@
 	};
 	/**
 	 * Add some text to the element.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {string} [sText=""] - The text that we want to insert into the current document element.
 	 * @returns {ApiRun}
 	 */
@@ -1714,7 +1716,7 @@
 	};
 	/**
 	 * Add line break to the current position and start the next element from a new line.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {ApiRun}
 	 */
 	ApiParagraph.prototype.AddLineBreak = function()
@@ -1775,7 +1777,7 @@
 	};
 	/**
 	 * Get paragraph properties.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {ApiParaPr}
 	 */
 	ApiParagraph.prototype.GetParaPr = function()
@@ -1816,7 +1818,7 @@
 	};
 	/**
 	 * Get the number of elements in the current paragraph.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {number}
 	 */
 	ApiParagraph.prototype.GetElementsCount = function()
@@ -1826,7 +1828,7 @@
 	};
 	/**
 	 * Get the element of the paragraph using the position specified.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {number} nPos - The position where the element which content we want to get must be located.
 	 * @returns {?ParagraphContent}
 	 */
@@ -1840,7 +1842,7 @@
 	};
 	/**
 	 * Remove the element using the position specified.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {number} nPos - The position of the element which we want to remove in the paragraph.
 	 */
 	ApiParagraph.prototype.RemoveElement = function(nPos)
@@ -1852,7 +1854,7 @@
 	};
 	/**
 	 * Remove all elements from the current paragraph.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 */
 	ApiParagraph.prototype.RemoveAllElements = function()
 	{
@@ -1861,7 +1863,7 @@
 	};
 	/**
 	 * Add an element to the current paragraph.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {ParagraphContent} oElement - The document element which will be added at the current position. Returns false if the
 	 * type of oElement is not supported by a paragraph.
 	 * @param {number} [nPos] The number of the paragraph where the current element will be added. If this value is not
@@ -1889,7 +1891,7 @@
 	};
 	/**
 	 * Add a tab stop to the current paragraph.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {ApiRun}
 	 */
 	ApiParagraph.prototype.AddTabStop = function()
@@ -1942,7 +1944,7 @@
 
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE"]
+	 * @typeofeditors ["CDE", "CPE"]
 	 * @returns {"run"}
 	 */
 	ApiRun.prototype.GetClassType = function()
@@ -1951,7 +1953,7 @@
 	};
 	/**
 	 * Get the text properties of the current run.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {ApiTextPr}
 	 */
 	ApiRun.prototype.GetTextPr = function()
@@ -1960,7 +1962,7 @@
 	};
 	/**
 	 * Remove all content from the current run.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 */
 	ApiRun.prototype.ClearContent = function()
 	{
@@ -1968,7 +1970,7 @@
 	};
 	/**
 	 * Add some text to this run.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {string} sText - The text which will be added to the current run.
 	 */
 	ApiRun.prototype.AddText = function(sText)
@@ -1988,7 +1990,7 @@
 	};
 	/**
 	 * Add a line break to the current run position and start the next element from a new line.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 */
 	ApiRun.prototype.AddLineBreak = function()
 	{
@@ -2004,7 +2006,7 @@
 	};
 	/**
 	 * Add a tab stop to the current run.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 */
 	ApiRun.prototype.AddTabStop = function()
 	{
@@ -2732,7 +2734,7 @@
 
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"textPr"}
 	 */
 	ApiTextPr.prototype.GetClassType = function()
@@ -2756,7 +2758,7 @@
 	};
 	/**
 	 * Set the bold property to the text character.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {boolean} isBold - Specifies that the contents of this run are displayed bold.
 	 */
 	ApiTextPr.prototype.SetBold = function(isBold)
@@ -2766,7 +2768,7 @@
 	};
 	/**
 	 * Set the italic property to the text character.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {boolean} isItalic - Specifies that the contents of the current run are displayed italicized.
 	 */
 	ApiTextPr.prototype.SetItalic = function(isItalic)
@@ -2776,7 +2778,7 @@
 	};
 	/**
 	 * Specify that the contents of this run are displayed with a single horizontal line through the center of the line.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {boolean} isStrikeout - Specifies that the contents of the current run are displayed struck through.
 	 */
 	ApiTextPr.prototype.SetStrikeout = function(isStrikeout)
@@ -2787,7 +2789,7 @@
 	/**
 	 * Specify that the contents of this run are displayed along with a line appearing directly below the character
 	 * (less than all the spacing above and below the characters on the line).
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {boolean} isUnderline - Specifies that the contents of the current run are displayed underlined.
 	 */
 	ApiTextPr.prototype.SetUnderline = function(isUnderline)
@@ -2797,7 +2799,7 @@
 	};
 	/**
 	 * Set all 4 font slots with the specified font family.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {string} sFontFamily - The font family or families used for the current text run.
 	 */
 	ApiTextPr.prototype.SetFontFamily = function(sFontFamily)
@@ -2807,7 +2809,7 @@
 	};
 	/**
 	 * Set the font size for the characters of the current text run.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {hps} nSize - The text size value measured in half-points (1/144 of an inch).
 	 */
 	ApiTextPr.prototype.SetFontSize = function(nSize)
@@ -2833,7 +2835,7 @@
 	 * * <b>"baseline"</b> - the characters in the current text run will be aligned by the default text baseline.
 	 * * <b>"subscript"</b> - the characters in the current text run will be aligned below the default text baseline.
 	 * * <b>"superscript"</b> - the characters in the current text run will be aligned above the default text baseline.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {("baseline" | "subscript" | "superscript")} sType - The vertical alignment type applied to the text contents.
 	 */
 	ApiTextPr.prototype.SetVertAlign = function(sType)
@@ -2869,7 +2871,7 @@
 	};
 	/**
 	 * Set text spacing measured in twentieths of a point.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {twips} nSpacing - The value of the text spacing measured in twentieths of a point (1/1440 of an inch).
 	 */
 	ApiTextPr.prototype.SetSpacing = function(nSpacing)
@@ -2879,7 +2881,7 @@
 	};
 	/**
 	 * Specify that the contents of this run is displayed with two horizontal lines through each character displayed on the line.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {boolean} isDoubleStrikeout - Specifies that the contents of the current run are displayed double struck through.
 	 */
 	ApiTextPr.prototype.SetDoubleStrikeout = function(isDoubleStrikeout)
@@ -2889,7 +2891,7 @@
 	};
 	/**
 	 * Specify that any lowercase characters in this text run are formatted for display only as their capital letter character equivalents.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {boolean} isCaps - Specifies that the contents of the current run are displayed capitalized.
 	 */
 	ApiTextPr.prototype.SetCaps = function(isCaps)
@@ -2900,7 +2902,7 @@
 	/**
 	 * Specify that all small letter characters in this text run are formatted for display only as their capital
 	 * letter character equivalents in a font size two points smaller than the actual font size specified for this text.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {boolean} isSmallCaps - Specifies that the contents of the current run are displayed capitalized two points smaller.
 	 */
 	ApiTextPr.prototype.SetSmallCaps = function(isSmallCaps)
@@ -2953,7 +2955,7 @@
 
 	/**
 	 * Set the text color for the current text run.
-	 * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE", "CPE"]
 	 * @param {ApiFill} oApiFill - The color or pattern used to fill the text color.
 	 */
 	ApiTextPr.prototype.SetFill = function(oApiFill)
@@ -2971,7 +2973,7 @@
 
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"paraPr"}
 	 */
 	ApiParaPr.prototype.GetClassType = function()
@@ -3006,7 +3008,7 @@
 	};
 	/**
 	 * Set the paragraph left side indentation.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {twips} nValue - The paragraph left side indentation value measured in twentieths of a point (1/1440 of an inch).
 	 */
 	ApiParaPr.prototype.SetIndLeft = function(nValue)
@@ -3016,7 +3018,7 @@
 	};
 	/**
 	 * Set the paragraph right side indentation.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {twips} nValue - The paragraph right side indentation value measured in twentieths of a point (1/1440 of an inch).
 	 */
 	ApiParaPr.prototype.SetIndRight = function(nValue)
@@ -3026,7 +3028,7 @@
 	};
 	/**
 	 * Set the paragraph first line indentation.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {twips} nValue - The paragraph first line indentation value measured in twentieths of a point (1/1440 of an inch).
 	 */
 	ApiParaPr.prototype.SetIndFirstLine = function(nValue)
@@ -3036,7 +3038,7 @@
 	};
 	/**
 	 * Set paragraph contents justification.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {("left" | "right" | "both" | "center")} sJc - The parameters will define the justification type that
 	 * will be applied to the paragraph contents.
 	 */
@@ -3085,7 +3087,7 @@
 	 * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
 	 * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the
 	 * <code>nLine</code> attribute shall be interpreted as 240ths of a line.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {(twips | line240)} nLine - The line spacing value measured either in twentieths of a point (1/1440 of an inch) or in 240ths of a line.
 	 * @param {("auto" | "atLeast" | "exact")} sLineRule - The rule that determines the measuring units of the nLine parameter.
 	 */
@@ -3117,7 +3119,7 @@
 	 * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
 	 * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then
 	 * it will be interpreted as <code>false</code>.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {twips} nBefore - The value of the spacing before the current paragraph measured in twentieths of a point (1/1440 of an inch).
 	 * @param {boolean} [isBeforeAuto=false] - The true value will disable the nBefore parameter.
 	 */
@@ -3135,7 +3137,7 @@
 	 * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
 	 * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
 	 * will be interpreted as <code>false</code>.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {twips} nAfter - The value of the spacing after the current paragraph measured in twentieths of a point (1/1440 of an inch).
 	 * @param {boolean} [isAfterAuto=false] - The true value will disable the nAfter parameter.
 	 */
@@ -3254,7 +3256,7 @@
 	/**
 	 * Specifies a sequence of custom tab stops which shall be used for any tab characters in the current paragraph.
 	 * <b>Warning</b>: The lengths of aPos array and aVal array <b>MUST BE</b> equal.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins
 	 * measured in twentieths of a point (1/1440 of an inch).
 	 * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab
@@ -3300,7 +3302,7 @@
 
 	/**
 	 * Set the bullet or numbering to the current paragraph.
-	 * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE", "CPE"]
 	 * @param {?ApiBullet} oBullet - The bullet object created using either the {@link Api#CreateBullet} or {@link Api#CreateNumbering} method.
 	 */
 	ApiParaPr.prototype.SetBullet = function(oBullet){
@@ -4127,7 +4129,7 @@
 
 	/**
 	 * Get the type of the class based on this base class.
-	 * @typeofeditors ["CDE"]
+	 * @typeofeditors ["CDE", "CPE"]
 	 * @returns {"drawing"}
 	 */
 	ApiDrawing.prototype.GetClassType = function()
@@ -4289,7 +4291,7 @@
 
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE"]
+	 * @typeofeditors ["CDE", "CPE"]
 	 * @returns {"image"}
 	 */
 	ApiImage.prototype.GetClassType = function()
@@ -4685,7 +4687,7 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"fill"}
 	 */
 	ApiFill.prototype.GetClassType = function()
@@ -4700,7 +4702,7 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"stroke"}
 	 */
 	ApiStroke.prototype.GetClassType = function()
@@ -4715,7 +4717,7 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"gradientStop"}
 	 */
 	ApiGradientStop.prototype.GetClassType = function ()
@@ -4729,7 +4731,7 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of the class based on this base class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"uniColor"}
 	 */
 	ApiUniColor.prototype.GetClassType = function ()
@@ -4744,7 +4746,7 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"rgbColor"}
 	 */
 	ApiRGBColor.prototype.GetClassType = function ()
@@ -4759,7 +4761,7 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE", "CSE"]
+	 * @typeofeditors ["CDE", "CSE", "CPE"]
 	 * @returns {"schemeColor"}
 	 */
 	ApiSchemeColor.prototype.GetClassType = function ()
@@ -4774,7 +4776,7 @@
 	//------------------------------------------------------------------------------------------------------------------
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CDE"]
+	 * @typeofeditors ["CDE", "CPE"]
 	 * @returns {"presetColor"}
 	 */
 	ApiPresetColor.prototype.GetClassType = function ()
@@ -4784,7 +4786,7 @@
 
 	/**
 	 * Get the type of this class.
-	 * @typeofeditors ["CSE"]
+	 * @typeofeditors ["CSE", "CPE"]
 	 * @returns {"bullet"}
 	 */
 	ApiBullet.prototype.GetClassType = function()

@@ -404,6 +404,7 @@
 
     /**
      * Get the type of this class.
+     * @typeofeditors ["CPE"]
      * @returns {"presentation"}
      */
     ApiPresentation.prototype.GetClassType = function()
@@ -412,7 +413,8 @@
     };
 
     /**
-     * Returns current slide index
+     * Get the index for the current slide.
+     * @typeofeditors ["CPE"]
      * @memberof ApiPresentation
      * @returns {number}
      */
@@ -425,9 +427,9 @@
 
 
     /**
-     * Returns slide by index
+     * Get the slide by its position in the presentation.
      * @memberof ApiPresentation
-     * @param {number} nIndex
+     * @param {number} nIndex - The slide number (position) in the presentation.
      * @returns {?ApiSlide}
      */
     ApiPresentation.prototype.GetSlideByIndex = function(nIndex){
@@ -438,7 +440,8 @@
     };
 
     /**
-     * Returns current slide
+     * Get the current slide.
+     * @typeofeditors ["CPE"]
      * @memberof ApiPresentation
      * @returns {?ApiSlide}
      */
@@ -448,9 +451,10 @@
 
 
     /**
-     * Adds slide to end
+     * Append a new slide to the end of the presentation.
+     * @typeofeditors ["CPE"]
      * @memberof ApiPresentation
-     * @param {ApiSlide} oSlide
+     * @param {ApiSlide} oSlide - The slide created using the {@link Api#CreateSlide} method.
      */
     ApiPresentation.prototype.AddSlide = function(oSlide) {
         if(this.Presentation){
@@ -462,10 +466,11 @@
 
 
     /**
-     * Set presentation size
+     * Set the size for the current presentation.
+     * @typeofeditors ["CPE"]
      * @memberof ApiPresentation
-     /* {EMU} nWidth
-     /* {EMU} nHeight
+     /* {EMU} nWidth - The presentation width in English measure units.
+     /* {EMU} nHeight - The presentation height in English measure units.
      */
     ApiPresentation.prototype.SetSizes = function(nWidth, nHeight) {
         if(this.Presentation){
@@ -568,6 +573,7 @@
 
     /**
      * Get the type of this class.
+     * @typeofeditors ["CPE"]
      * @returns {"slide"}
      */
     ApiSlide.prototype.GetClassType = function()
@@ -578,7 +584,8 @@
 
 
     /**
-     * Removes all objects from slide
+     * Remove all the objects from the current slide.
+     * @typeofeditors ["CPE"]
      * @memberof ApiSlide
      */
     ApiSlide.prototype.RemoveAllObjects =  function(){
@@ -591,8 +598,10 @@
     };
 
     /**
-     * Add object on slide. Returns position
+     * Add an object (image, shape or chart) to the current presentation slide.
+     * @typeofeditors ["CPE"]
      * @memberof ApiSlide
+     * @param {ApiDrawing} oDrawing - The object which will be added to the current presentation slide.
      */
     ApiSlide.prototype.AddObject = function(oDrawing){
         if(this.Slide){
@@ -602,9 +611,10 @@
     };
 
     /**
-     * Spicifies slide's background
+     * Set the background to the current presentation slide.
      * @memberOf ApiSlide
-     * @param {ApiFill} oApiFill
+     * @typeofeditors ["CPE"]
+     * @param {ApiFill} oApiFill - The color or pattern used to fill the presentation slide background.
      * */
     ApiSlide.prototype.SetBackground = function(oApiFill){
         if(this.Slide){
@@ -617,7 +627,8 @@
 
 
     /**
-     * Getting slide width
+     * Get the slide width in English measure units.
+     * @typeofeditors ["CPE"]
      * @returns {EMU}
      * */
     ApiSlide.prototype.GetWidth = function(){
@@ -628,7 +639,8 @@
     };
 
     /**
-     * Getting slide height
+     * Get the slide height in English measure units.
+     * @typeofeditors ["CPE"]
      * @returns {EMU}
      * */
     ApiSlide.prototype.GetHeight = function(){
@@ -654,9 +666,9 @@
         return "drawing";
     };
     /**
-     * Set the size of the bounding box.
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
+     * Set the size of the object (image, shape, chart) bounding box.
+     * @param {EMU} nWidth - The object width measured in English measure units.
+     * @param {EMU} nHeight - The object height measured in English measure units.
      */
     ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
     {
@@ -670,9 +682,9 @@
     };
 
     /**
-     * Set the size of the bounding box.
-     * @param {EMU} nPosX
-     * @param {EMU} nPosY
+     * Set the position of the drawing on the slide.
+     * @param {EMU} nPosX - The distance from the left side of the slide to left side of the drawing measured in English measure units.
+     * @param {EMU} nPosY - The distance from the top side of the slide to the upper side of the drawing measured in English measure units.
      */
     ApiDrawing.prototype.SetPosition = function(nPosX, nPosY)
     {
@@ -709,6 +721,7 @@
 
     /**
      * Get the type of this class.
+     * @typeofeditors ["CPE"]
      * @returns {"shape"}
      */
     ApiShape.prototype.GetClassType = function()
@@ -719,6 +732,7 @@
 
     /**
      * Get content of this shape.
+     * @typeofeditors ["CPE"]
      * @returns {?ApiDocumentContent}
      */
     ApiShape.prototype.GetDocContent = function()
@@ -733,6 +747,7 @@
 
     /**
      * Set shape's content vertical align
+     * @typeofeditors ["CPE"]
      * @param {VerticalTextAlign} VerticalAlign
      */
     ApiShape.prototype.SetVerticalTextAlign = function(VerticalAlign)
@@ -767,6 +782,7 @@
     //------------------------------------------------------------------------------------------------------------------
     /**
      * Get the type of this class.
+     * @typeofeditors ["CPE"]
      * @returns {"chart"}
      */
     ApiChart.prototype.GetClassType = function()
@@ -776,8 +792,9 @@
 
     /**
      *  Specifies a chart title
-     *  @param {string} sTitle
-     *  @param {hps} nFontSize
+     *  @typeofeditors ["CPE"]
+     *  @param {string} sTitle - The title which will be displayed for the current chart.
+     *  @param {hps} nFontSize - 	The text size value measured in points.
      *  @param {?bool} bIsBold
      */
     ApiChart.prototype.SetTitle = function (sTitle, nFontSize, bIsBold)
@@ -787,8 +804,9 @@
 
     /**
      *  Specifies a horizontal axis title
-     *  @param {string} sTitle
-     *  @param {hps} nFontSize
+     *  @typeofeditors ["CPE"]
+     *  @param {string} sTitle - The title which will be displayed for the horizontal axis of the current chart.
+     *  @param {hps} nFontSize - The text size value measured in points.
      *  @param {?bool} bIsBold
      * */
     ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize, bIsBold)
@@ -798,8 +816,9 @@
 
     /**
      *  Specifies a vertical axis title
-     *  @param {string} sTitle
-     *  @param {hps} nFontSize
+     *  @typeofeditors ["CPE"]
+     *  @param {string} sTitle - The title which will be displayed for the vertical axis of the current chart.
+     *  @param {hps} nFontSize - The text size value measured in points.
      *  @param {?bool} bIsBold
      * */
     ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize, bIsBold)
@@ -809,7 +828,8 @@
 
     /**
      * Specifies a legend position
-     * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos
+     * @typeofeditors ["CPE"]
+     * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos - The position of the chart legend inside the chart window.
      * */
     ApiChart.prototype.SetLegendPos = function(sLegendPos)
     {
@@ -843,10 +863,11 @@
 
     /**
      * Spicifies a show options for data labels
-     * @param {boolean} bShowSerName
-     * @param {boolean} bShowCatName
-     * @param {boolean} bShowVal
-     * @param {boolean} bShowPercent
+     * @typeofeditors ["CPE"]
+     * @param {boolean} bShowSerName - Whether to show or hide the source table column names used for the data which the chart will be build from.
+     * @param {boolean} bShowCatName - Whether to show or hide the source table row names used for the data which the chart will be build from.
+     * @param {boolean} bShowVal - Whether to show or hide the chart data values.
+     * @param {boolean} bShowPercent - Whether to show or hide the percent for the data values (works with stacked chart types).
      * */
     ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
     {
