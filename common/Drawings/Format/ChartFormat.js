@@ -7796,7 +7796,7 @@ CLegend.prototype =
     },
     draw: function(g)
     {
-        g.bDrawSmart = false;
+        g.bDrawSmart = true;
         CShape.prototype.draw.call(this, g);
         for(var i = 0; i < this.calcEntryes.length; ++i)
         {
