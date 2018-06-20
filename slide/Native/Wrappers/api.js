@@ -31,8 +31,10 @@
  */
 
 var global_memory_stream_menu = CreateNativeMemoryStream();
+var sdkCheck = true;
 // endsectionPr -----------------------------------------------------------------------------------------
 
+window['SockJS'] = createSockJS();
 
 // font engine -------------------------------------
 var FontStyle =
@@ -52,7 +54,7 @@ window["use_native_fonts_only"] = true;
 window["ftm"] = FT_Memory;
 
 
-function NativeOpenFileP(_params){
+function NativeOpenFileP(_params, documentInfo){
     window["CreateMainTextMeasurerWrapper"]();
     window.g_file_path = "native_open_file";
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
@@ -60,25 +62,106 @@ function NativeOpenFileP(_params){
     if ("presentation" !== window.NATIVE_DOCUMENT_TYPE){
         return;
     }
+
+    sdkCheck = documentInfo["sdkCheck"];
     _api = new window["Asc"]["asc_docs_api"]("");
+    AscCommon.g_clipboardBase.Init(_api);
     _api.Native_Editor_Initialize_Settings(_params);
-    _api.asc_nativeOpenFile(doc_bin);
-    _api.documentId = "1";
-    _api.WordControl.m_oDrawingDocument.AfterLoad();
-    Api = _api;
+    window.documentInfo = documentInfo;
+    var userInfo = new Asc.asc_CUserInfo();
+    userInfo.asc_putId(window.documentInfo["docUserId"]);
+    userInfo.asc_putFullName(window.documentInfo["docUserName"]);
+    userInfo.asc_putFirstName(window.documentInfo["docUserFirstName"]);
+    userInfo.asc_putLastName(window.documentInfo["docUserLastName"]);
 
-    var _presentation = _api.WordControl.m_oLogicDocument;
+    var docInfo = new Asc.asc_CDocInfo();
+    docInfo.put_Id(window.documentInfo["docKey"]);
+    docInfo.put_Url(window.documentInfo["docURL"]);
+    docInfo.put_Format("pptx");
+    docInfo.put_UserInfo(userInfo);
+    docInfo.put_Token(window.documentInfo["token"]);
 
-    var nSlidesCount = _presentation.Slides.length;
-    var dPresentationWidth = _presentation.Width;
-    var dPresentationHeight = _presentation.Height;
-
-    var aTimings = [];
-    var slides = _presentation.Slides;
-    for(var i = 0; i < slides.length; ++i){
-        aTimings.push(slides[i].timing.ToArray());
+    var permissions = window.documentInfo["permissions"];
+    if (undefined != permissions && null != permissions && permissions.length > 0) {
+        docInfo.put_Permissions(JSON.parse(permissions));
     }
-    return [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
+    _api.asc_setDocInfo(docInfo);
+    // _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
+    //     var stream = global_memory_stream_menu;
+    //     stream["ClearNoAttack"]();
+    //     stream["WriteString2"](JSON.stringify(options));
+    //     window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
+    // });
+    //
+    // _api.asc_registerCallback("asc_onSendThemeColorSchemes", function(schemes) {
+    //     var stream = global_memory_stream_menu;
+    //     stream["ClearNoAttack"]();
+    //     asc_WriteColorSchemes(schemes, stream);
+    //     window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
+    // });
+
+
+    if (window.documentInfo["iscoauthoring"]) {
+        _api.isSpellCheckEnable = false;
+        _api.asc_setAutoSaveGap(1);
+        _api._coAuthoringInit();
+        _api.asc_SetFastCollaborative(true);
+        _api.SetCollaborativeMarksShowType(Asc.c_oAscCollaborativeMarksShowType.None);
+        window["native"]["onTokenJWT"](_api.CoAuthoringApi.get_jwt());
+
+        _api.asc_registerCallback("asc_onAuthParticipantsChanged", function(users) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteUsers(users, stream);
+            window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+        });
+
+        _api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteUsers(users, stream);
+            window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+        });
+
+        _api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
+
+            var rData = {
+                "c"             : "open",
+                "id"            : window.documentInfo["docKey"],
+                "userid"        : window.documentInfo["docUserId"],
+                "format"        : "pptx",
+                "vkey"          : undefined,
+                "url"           : window.documentInfo["docURL"],
+                "title"         : this.documentTitle,
+                "nobase64"      : true};
+
+            _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
+        });
+
+        _api.asc_registerCallback("asc_onDocumentUpdateVersion", function(callback) {
+            var me = this;
+            me.needToUpdateVersion = true;
+            if (callback) callback.call(me);
+        });
+    } else {
+        _api.asc_nativeOpenFile(doc_bin);
+        _api.documentId = "1";
+        _api.WordControl.m_oDrawingDocument.AfterLoad();
+        Api = _api;
+
+        var _presentation = _api.WordControl.m_oLogicDocument;
+
+        var nSlidesCount = _presentation.Slides.length;
+        var dPresentationWidth = _presentation.Width;
+        var dPresentationHeight = _presentation.Height;
+
+        var aTimings = [];
+        var slides = _presentation.Slides;
+        for(var i = 0; i < slides.length; ++i){
+            aTimings.push(slides[i].timing.ToArray());
+        }
+        return [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
+    }
 }
 
 

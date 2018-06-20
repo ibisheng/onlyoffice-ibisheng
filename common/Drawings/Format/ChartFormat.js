@@ -2430,7 +2430,9 @@ CPlotArea.prototype =
                 if(aAxes[j] === oAxis){
                     aSeries = oChart.series;
                     for(var k = 0; k < aSeries.length; ++k){
-                        if(oRet === null || aSeries[k].idx < oRet.idx){
+                        if(oRet === null
+                            || aSeries[k].cat && !oRet.cat
+                            || aSeries[k].idx < oRet.idx && aSeries[k].cat && oRet.cat){
                             oRet = aSeries[k];
                         }
                     }
@@ -7794,7 +7796,7 @@ CLegend.prototype =
     },
     draw: function(g)
     {
-        g.bDrawSmart = true;
+        g.bDrawSmart = false;
         CShape.prototype.draw.call(this, g);
         for(var i = 0; i < this.calcEntryes.length; ++i)
         {
