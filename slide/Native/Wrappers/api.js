@@ -276,7 +276,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
 
     this.InitEditor();
 
-    g_oIdCounter.Set_Load(true);
+    AscCommon.g_oIdCounter.Set_Load(true);
 
     var _loader = new AscCommon.BinaryPPTYLoader();
     _loader.Api = this;
@@ -285,7 +285,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
     _loader.Check_TextFit();
 
     this.LoadedObject = 1;
-    g_oIdCounter.Set_Load(false);
+    AscCommon.g_oIdCounter.Set_Load(false);
 };
 
 Asc['asc_docs_api'].prototype.openDocument = function(sData)
