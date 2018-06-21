@@ -1709,7 +1709,8 @@ CChartsDrawer.prototype =
 			stackedPerMax = step;
 		}
 
-		for (var i = 0; i < 20; i++) {
+		var maxPointsCount = 40;
+		for (var i = 0; i < maxPointsCount; i++) {
 			if (this.calcProp.subType === 'stackedPer' && (minUnit + step * i) > stackedPerMax) {
 				break;
 			}
