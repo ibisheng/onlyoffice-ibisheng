@@ -8785,6 +8785,7 @@
 				}
 				t.isChanged = true;
 				t.changeWorksheet("update", {reinitRanges: true});
+				t.objectRender.rebuildChartGraphicObjects(selectData);
 			}
 
 			var oSelection = History.GetSelection();
