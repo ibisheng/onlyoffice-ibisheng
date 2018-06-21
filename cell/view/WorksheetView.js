@@ -1254,19 +1254,15 @@
 
     WorksheetView.prototype._initCellsArea = function (type) {
         // calculate rows heights and visible rows
-        if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
-            this._calcHeaderRowHeight();
-            this._calcHeightRows(type);
-        }
+		this._calcHeaderRowHeight();
+		this._calcHeightRows(type);
         this.visibleRange.r2 = 0;
         this._calcVisibleRows();
         this._updateVisibleRowsCount(/*skipScrolReinit*/true);
 
         // calculate columns widths and visible columns
-        if (!(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight)) {
-            this._calcHeaderColumnWidth();
-            this._calcWidthColumns(type);
-        }
+		this._calcHeaderColumnWidth();
+		this._calcWidthColumns(type);
         this.visibleRange.c2 = 0;
         this._calcVisibleColumns();
         this._updateVisibleColsCount(/*skipScrolReinit*/true);
@@ -4146,7 +4142,6 @@
         var cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
 
         if (cc > oldColWidth) {
-
             History.Create_NewPoint();
             History.StartTransaction();
             // Выставляем, что это bestFit
