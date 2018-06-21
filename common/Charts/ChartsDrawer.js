@@ -3550,6 +3550,10 @@ CChartsDrawer.prototype =
 			if(this.calcProp.type === c_oChartTypes.Radar) {
 				calculateRadarGridLines();
 			} else {
+				if(isCatAxis && points[i].val < 0) {
+					continue;
+				}
+
 				if (crossDiff) {
 					posY = (points[i].pos - crossDiff) * this.calcProp.pxToMM;
 				} else {
@@ -3623,6 +3627,10 @@ CChartsDrawer.prototype =
 		}
 
 		for (var i = 0; i < points.length; i++) {
+			if(isCatAxis && points[i].val < 0) {
+				continue;
+			}
+
 			if (crossDiff) {
 				posX = (points[i].pos - crossDiff) * this.calcProp.pxToMM;
 			} else {
@@ -11397,6 +11405,9 @@ catAxisChart.prototype = {
 					break;
 				}
 
+				if(yPoints[k].val < 0) {
+					continue;
+				}
 				//основные линии
 				posY = yPoints[k].pos + firstDiff / 2;
 
@@ -11466,6 +11477,10 @@ catAxisChart.prototype = {
 				k = i * tickMarkSkip;
 				if (k >= xPoints.length) {
 					break;
+				}
+
+				if(xPoints[k].val < 0) {
+					continue;
 				}
 
 				posX = xPoints[k].pos - firstDiff / 2;
