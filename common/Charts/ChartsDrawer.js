@@ -3879,9 +3879,9 @@ drawBarChart.prototype = {
 		var defaultOverlap = (this.subType === "stacked" || this.subType === "stackedPer" || this.subType === "standard") ? 100 : 0;
 		var overlap = AscFormat.isRealNumber(this.chart.overlap) ? this.chart.overlap : defaultOverlap;
 		var numCache = this.cChartDrawer.getNumCache(this.chart.series[0].val);
-		var width = widthGraph / this.ptCount;
+		var width = widthGraph / xPoints.length;
 		if (this.cChartSpace.getValAxisCrossType() && numCache) {
-			width = widthGraph / (numCache.ptCount - 1);
+			width = widthGraph / (xPoints.length - 1);
 		}
 
 		var gapWidth = AscFormat.isRealNumber(this.chart.gapWidth) ? this.chart.gapWidth : 150;
