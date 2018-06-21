@@ -2635,13 +2635,10 @@ CChartsDrawer.prototype =
 			numCache = this.getNumCache(seriaVal);
 			if(!series[i].isHidden)
 			{
-				if(AscDFH.historyitem_type_PieChart === typeChart)
-				{
+				if (AscDFH.historyitem_type_PieChart === typeChart) {
 					ptCount = 1;
-				}
-				else
-				{
-					if(numCache) {
+				} else {
+					if (numCache && (ptCount === undefined || ptCount < numCache.ptCount)) {
 						ptCount = numCache.ptCount;
 					}
 				}
