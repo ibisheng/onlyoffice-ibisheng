@@ -4245,11 +4245,17 @@
 		var res;
 		if (f) {
 			//вложенные итоги игнорируются, чтобы избежать двойного суммирования
-			f.excludeNestedStAg = true;
+			var oldExcludeHiddenRows = f.excludeHiddenRows;
+			var oldIgnoreNestedStAg = f.excludeNestedStAg;
+			var oldCheckExclude = f.checkExclude;
 
-			f.checkExclude = true;
 			f.excludeHiddenRows = exclude;
+			f.excludeNestedStAg = true;
+			f.checkExclude = true;
 			res = f.Calculate(arg.slice(1));
+			f.excludeHiddenRows = oldExcludeHiddenRows;
+			f.excludeNestedStAg = oldIgnoreNestedStAg;
+			f.checkExclude = oldCheckExclude;
 		}
 
 		return res;
