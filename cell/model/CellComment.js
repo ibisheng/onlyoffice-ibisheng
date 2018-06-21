@@ -1261,8 +1261,8 @@ CCellCommentator.prototype.Redo = function(type, data) {
 					}
 				}
 			} else {
+				comment = this.findComment(data.from.asc_getId());
 				if (comment) {
-					comment = this.findComment(data.from.asc_getId());
 					comment.updateData(data.to);
 					this.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
 				}
