@@ -330,8 +330,10 @@ CChartsDrawer.prototype =
 				this.plotAreaChart.draw(this, null, true);
 			}
 
-			//DRAW CHARTS
-			drawCharts();
+			//DRAW 3D CHARTS
+			if (this.nDimensionCount === 3) {
+				drawCharts();
+			}
 
 			for(var i = 0; i < this.catAxisChart.length; i++) {
 				this.catAxisChart[i].draw(this);
@@ -341,6 +343,11 @@ CChartsDrawer.prototype =
 			}
 			for(var i = 0; i < this.serAxisChart.length; i++) {
 				this.serAxisChart[i].draw(this);
+			}
+
+			//DRAW CHARTS
+			if (this.nDimensionCount !== 3) {
+				drawCharts();
 			}
 		}
 	},
