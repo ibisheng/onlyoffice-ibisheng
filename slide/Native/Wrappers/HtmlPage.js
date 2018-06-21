@@ -515,7 +515,7 @@ CEditorPage.prototype.ThemeGenerateThumbnails = function(_master)
 
 CEditorPage.prototype.CheckLayouts = function(bIsAttack)
 {
-    if(!this.m_oLogicDocument && this.m_oLogicDocument.Api){
+    if(!this.m_oLogicDocument || !this.m_oLogicDocument.Api){
         return;
     }
     var slide = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage];

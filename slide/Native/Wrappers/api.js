@@ -454,10 +454,10 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
 
     //this.asyncFontsDocumentEndLoaded();
     //
-    if (oTheme)
-    {
-        _api.sendColorThemes(oTheme);
-    }
+    // if (oTheme)
+    // {
+    //     _api.sendColorThemes(oTheme);
+    // }
 
     window["native"]["onEndLoadingFile"](_result);
 
