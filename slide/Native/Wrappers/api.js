@@ -154,6 +154,22 @@ function asc_WriteUsers(c, s) {
     }
 }
 
+
+function asc_WriteColorSchemes(schemas, s) {
+
+    s["WriteLong"](schemas.length);
+
+    for (var i = 0; i < schemas.length; ++i) {
+        s["WriteString2"](schemas[i].get_name());
+
+        var colors = schemas[i].get_colors();
+        s["WriteLong"](colors.length);
+
+        for (var j = 0; j < colors.length; ++j) {
+            asc_menu_WriteColor(0, colors[j], s);
+        }
+    }
+}
 function NativeOpenFileP(_params, documentInfo){
     window["CreateMainTextMeasurerWrapper"]();
     window.g_file_path = "native_open_file";
@@ -193,12 +209,12 @@ function NativeOpenFileP(_params, documentInfo){
     //     window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
     // });
     //
-    // _api.asc_registerCallback("asc_onSendThemeColorSchemes", function(schemes) {
-    //     var stream = global_memory_stream_menu;
-    //     stream["ClearNoAttack"]();
-    //     asc_WriteColorSchemes(schemes, stream);
-    //     window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
-    // });
+    _api.asc_registerCallback("asc_onSendThemeColorSchemes", function(schemes) {
+        var stream = global_memory_stream_menu;
+        stream["ClearNoAttack"]();
+        asc_WriteColorSchemes(schemes, stream);
+        window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
+    });
 
 
     if (window.documentInfo["iscoauthoring"]) {
