@@ -77,7 +77,6 @@
     var asc_CCellInfo = AscCommonExcel.asc_CCellInfo;
     var asc_CHyperlink = asc.asc_CHyperlink;
     var asc_CPageSetup = asc.asc_CPageSetup;
-    var asc_CPageMargins = asc.asc_CPageMargins;
     var asc_CPagePrint = AscCommonExcel.CPagePrint;
     var asc_CAutoFilterInfo = AscCommonExcel.asc_CAutoFilterInfo;
 
@@ -1633,7 +1632,7 @@
         }
 
         var pageLeftField, pageRightField, pageTopField, pageBottomField;
-        if (pageMargins instanceof asc_CPageMargins) {
+        if (pageMargins) {
             pageLeftField = Math.max(pageMargins.asc_getLeft(), c_oAscPrintDefaultSettings.MinPageLeftField);
             pageRightField = Math.max(pageMargins.asc_getRight(), c_oAscPrintDefaultSettings.MinPageRightField);
             pageTopField = Math.max(pageMargins.asc_getTop(), c_oAscPrintDefaultSettings.MinPageTopField);

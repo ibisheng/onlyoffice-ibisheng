@@ -1889,13 +1889,11 @@
 		};
 
 		/** @constructor */
-		function asc_CPageMargins (obj) {
-			if (obj) {
-				this.left = obj.left;
-				this.right = obj.right;
-				this.top = obj.top;
-				this.bottom = obj.bottom;
-			}
+		function asc_CPageMargins () {
+			this.left = null;
+			this.right = null;
+			this.top = null;
+			this.bottom = null;
 
 			return this;
 		}
