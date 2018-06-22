@@ -314,9 +314,9 @@
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
 
-        if (undefined !== window["AscDesktopEditor"] && undefined !== window["AscDesktopEditor"]["isBlockchainSupport"])
+        if (undefined !== window["AscDesktopEditor"] && undefined !== window["AscDesktopEditor"]["CryptoMode"])
         {
-            this.DocInfo.put_Encrypted(window["AscDesktopEditor"]["isBlockchainSupport"]());
+            this.DocInfo.put_Encrypted(0 < window["AscDesktopEditor"]["CryptoMode"]);
         }
 
 		if (!oldInfo)
