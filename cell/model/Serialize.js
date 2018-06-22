@@ -6165,8 +6165,6 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadPageMargins(t,l, oPageMargins);
                 });
-                if(null == oWorksheet.PagePrintOptions)
-                    oWorksheet.PagePrintOptions = new Asc.asc_CPageOptions();
                 oWorksheet.PagePrintOptions.asc_setPageMargins(oPageMargins);
             }
             else if ( c_oSerWorksheetsTypes.PageSetup == type )
@@ -6175,14 +6173,10 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadPageSetup(t,l, oPageSetup);
                 });
-                if(null == oWorksheet.PagePrintOptions)
-                    oWorksheet.PagePrintOptions = new Asc.asc_CPageOptions();
                 oWorksheet.PagePrintOptions.asc_setPageSetup(oPageSetup);
             }
             else if ( c_oSerWorksheetsTypes.PrintOptions == type )
             {
-                if(null == oWorksheet.PagePrintOptions)
-                    oWorksheet.PagePrintOptions = new Asc.asc_CPageOptions();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadPrintOptions(t,l, oWorksheet.PagePrintOptions);
                 });

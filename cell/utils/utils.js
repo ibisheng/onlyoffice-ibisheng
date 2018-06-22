@@ -1952,13 +1952,11 @@
 		asc_CPageSetup.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
 		/** @constructor */
-		function asc_CPageOptions (obj) {
-			if (obj) {
-				this.pageMargins = obj.pageMargins;
-				this.pageSetup = obj.pageSetup;
-				this.gridLines = obj.gridLines;
-				this.headings = obj.headings;
-			}
+		function asc_CPageOptions () {
+			this.pageMargins = null;
+			this.pageSetup = null;
+			this.gridLines = null;
+			this.headings = null;
 
 			return this;
 		}

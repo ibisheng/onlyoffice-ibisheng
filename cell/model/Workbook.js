@@ -3091,6 +3091,8 @@
 		this.sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
 		this.pivotTables = [];
 
+		this.PagePrintOptions = new Asc.asc_CPageOptions();
+
 		this.lastFindOptions = null;
 
 		/*handlers*/
@@ -3295,10 +3297,6 @@
 		this.aCols.forEach(this.initColumn, this);
 	};
 	Worksheet.prototype.initPostOpen = function (handlers) {
-		if (!this.PagePrintOptions) {
-			// Даже если не было, создадим
-			this.PagePrintOptions = new Asc.asc_CPageOptions();
-		}
 		this.PagePrintOptions.init();
 
 		// Sheet Views
