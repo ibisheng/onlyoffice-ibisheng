@@ -2231,7 +2231,7 @@ CChartsDrawer.prototype =
 			maxVal = Math.pow(logBase, parseVal[0]);
 			minVal = Math.pow(logBase, parseFloat(parseVal[0]) - 1);
 			for (var i = 0; i < yPoints.length; i++) {
-				if (yPoints[i].val < maxVal && yPoints[i].val > minVal) {
+				if (yPoints[i].val < maxVal && yPoints[i].val >= minVal) {
 					startPos = yPoints[i + 1].pos;
 					diffPos = yPoints[i].pos - yPoints[i + 1].pos;
 					break;
