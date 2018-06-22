@@ -6161,19 +6161,15 @@
             }
             else if ( c_oSerWorksheetsTypes.PageMargins == type )
             {
-                var oPageMargins = new Asc.asc_CPageMargins();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadPageMargins(t,l, oPageMargins);
+                    return oThis.ReadPageMargins(t,l, oWorksheet.PagePrintOptions.pageMargins);
                 });
-                oWorksheet.PagePrintOptions.asc_setPageMargins(oPageMargins);
             }
             else if ( c_oSerWorksheetsTypes.PageSetup == type )
             {
-                var oPageSetup = new Asc.asc_CPageSetup();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadPageSetup(t,l, oPageSetup);
+                    return oThis.ReadPageSetup(t,l, oWorksheet.PagePrintOptions.pageSetup);
                 });
-                oWorksheet.PagePrintOptions.asc_setPageSetup(oPageSetup);
             }
             else if ( c_oSerWorksheetsTypes.PrintOptions == type )
             {

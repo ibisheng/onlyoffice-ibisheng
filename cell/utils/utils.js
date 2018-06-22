@@ -1916,7 +1916,7 @@
 		asc_CPageMargins.prototype.asc_setTop = function (val) { this.top = val; };
 		asc_CPageMargins.prototype.asc_setBottom = function (val) { this.bottom = val; };
 		/** @constructor */
-		function asc_CPageSetup () {
+		function asc_CPageSetup() {
 			this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
 			this.width = c_oAscPrintDefaultSettings.PageWidth;
 			this.height = c_oAscPrintDefaultSettings.PageHeight;
@@ -1950,21 +1950,16 @@
 		asc_CPageSetup.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
 		/** @constructor */
-		function asc_CPageOptions () {
-			this.pageMargins = null;
-			this.pageSetup = null;
+		function asc_CPageOptions() {
+			this.pageMargins = new asc_CPageMargins();
+			this.pageSetup = new asc_CPageSetup();
 			this.gridLines = null;
 			this.headings = null;
 
 			return this;
 		}
 		asc_CPageOptions.prototype.init = function () {
-			if (!this.pageMargins)
-				this.pageMargins = new asc_CPageMargins();
 			this.pageMargins.init();
-
-			if (!this.pageSetup)
-				this.pageSetup = new asc_CPageSetup();
 
 			if (null == this.gridLines)
 				this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
@@ -1980,7 +1975,7 @@
 		asc_CPageOptions.prototype.asc_setGridLines = function (val) { this.gridLines = val; };
 		asc_CPageOptions.prototype.asc_setHeadings = function (val) { this.headings = val; };
 
-		function CPagePrint () {
+		function CPagePrint() {
 			this.pageWidth = 0;
 			this.pageHeight = 0;
 
