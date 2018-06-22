@@ -1834,7 +1834,7 @@
 		}
 		//ws
 		this.forEach(function (ws) {
-			ws.initPostOpen(self.wsHandlers, bNoBuildDep);
+			ws.initPostOpen(self.wsHandlers);
 		});
 		//show active if it hidden
 		var wsActive = this.getActiveWs();
@@ -3294,7 +3294,7 @@
 	Worksheet.prototype.initColumns = function () {
 		this.aCols.forEach(this.initColumn, this);
 	};
-	Worksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
+	Worksheet.prototype.initPostOpen = function (handlers) {
 		if (!this.PagePrintOptions) {
 			// Даже если не было, создадим
 			this.PagePrintOptions = new Asc.asc_CPageOptions();
