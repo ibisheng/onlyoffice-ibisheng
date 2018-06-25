@@ -3783,6 +3783,41 @@
 
             window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.handleChangesCallback.changes });
 		};
+
+        this.asc_setAdvancedOptions = function(api, idOption, option)
+		{
+			if (!this.isNeedCrypt())
+				return false;
+
+            window.checkPasswordFromPlugin = true;
+            if (window["Asc"].c_oAscAdvancedOptionsID.TXT === idOption)
+            {
+                var _param = ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
+                window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+            }
+            else if (window["Asc"].c_oAscAdvancedOptionsID.CSV === idOption)
+            {
+                var delimiter = option.asc_getDelimiter();
+                var delimiterChar = option.asc_getDelimiterChar();
+                var _param = "";
+                _param += ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
+                if (null != delimiter) {
+                    _param += ("<m_nCsvDelimiter>" + delimiter + "</m_nCsvDelimiter>");
+                }
+                if (null != delimiterChar) {
+                    _param += ("<m_nCsvDelimiterChar>" + delimiterChar + "</m_nCsvDelimiterChar>");
+                }
+
+                window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+            }
+            else if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption)
+            {
+                var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+                api.currentPassword = option.asc_getPassword();
+                window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+            }
+            return true;
+		};
     }
 
     AscCommon.EncryptionWorker = new CEncryptionData();
@@ -3963,7 +3998,7 @@ window["asc_initAdvancedOptions"] = function(_code, _file_hash, _docInfo)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
-    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption() && !window.checkPasswordFromPlugin)
+    if ((_code == 90 || _code == 91) && AscCommon.EncryptionWorker.isNeedCrypt() && !window.checkPasswordFromPlugin)
     {
     	window.checkPasswordFromPlugin = true;
         window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash, "docinfo" : _docInfo });

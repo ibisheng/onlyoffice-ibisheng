@@ -415,6 +415,9 @@
 				// old version support
 				for (var i in this.runnedPluginsMap)
 				{
+					if (this.runnedPluginsMap[i].isSystem)
+						continue;
+					
 					if (this.pluginsMap[i])
 					{
 						guid = i;

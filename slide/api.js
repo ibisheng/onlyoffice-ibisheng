@@ -2130,6 +2130,9 @@ background-repeat: no-repeat;\
 	 */
 	asc_docs_api.prototype.asc_setAdvancedOptions       = function(idOption, option)
 	{
+        if (AscCommon.EncryptionWorker.asc_setAdvancedOptions(this, idOption, option))
+            return;
+
 		switch (idOption)
 		{
 			case c_oAscAdvancedOptionsID.DRM:
