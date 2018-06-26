@@ -2722,7 +2722,9 @@
 		var heightCtx = (height) ? height : ctx.getHeight();
 		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
 		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
-		if (null === drawingCtx && this.topLeftFrozenCell) {
+		var frozenX = this.topLeftFrozenCell ? c[this.topLeftFrozenCell.getCol0()].left - c[0].left : 0;
+		var frozenY = this.topLeftFrozenCell ? r[this.topLeftFrozenCell.getRow0()].top - r[0].top : 0;
+		/*if (null === drawingCtx && this.topLeftFrozenCell) {
 			if (undefined === leftFieldInPx) {
 				var cFrozen = this.topLeftFrozenCell.getCol0();
 				offsetX -= c[cFrozen].left - c[0].left;
@@ -2731,7 +2733,7 @@
 				var rFrozen = this.topLeftFrozenCell.getRow0();
 				offsetY -= r[rFrozen].top - r[0].top;
 			}
-		}
+		}*/
 		var x1 = c[range.c1].left - offsetX;
 		var y1 = r[range.r1].top - offsetY;
 		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
@@ -2748,20 +2750,6 @@
 			heightPage -= this.cellsTop;
 		}
 
-		/*ctx.setStrokeStyle(this.settings.activeCellBorderColor)
-			.setLineWidth(1).beginPath();
-
-		var i, d;
-		for (i = 0, d = x1; d <= x2; ++i) {
-			d += widthPage;
-			ctx.lineVerPrevPx(d, y1, y2);
-		}
-
-		for (i = 0, d = y1; d <= y2; ++i) {
-			d += heightPage;
-			ctx.lineHorPrevPx(x1, d, x2);
-		}*/
-
 		ctx.setStrokeStyle(this.settings.activeCellBorderColor);
 		ctx.setLineWidth(1).beginPath();
 
@@ -2774,7 +2762,7 @@
 			if(d + c[i].width > widthPage) {
 				if(d1 > x1 + offsetX && d1 < x2 + offsetX) {
 					var headingWidth = heading ? this.cellsLeft : 0;
-					ctx.lineVerPrevPx(d1 + headingWidth - offsetX, y1, y2);
+					ctx.lineVerPrevPx(d1 + headingWidth - offsetX + frozenX, y1, y2 + frozenY);
 				}
 				d = 0;
 			}
@@ -2790,7 +2778,7 @@
 			if(d + r[i].height > heightPage) {
 				if(d1 > y1 + offsetY && d1 < y2 + offsetY) {
 					var headingHeight = heading ? this.cellsTop : 0;
-					ctx.lineHorPrevPx(x1, d1 + headingHeight - offsetY, x2);
+					ctx.lineHorPrevPx(x1, d1 + headingHeight - offsetY + frozenY, x2 + frozenX);
 				}
 				d = 0;
 			}
@@ -2798,44 +2786,7 @@
 			d1 += r[i].height;
 		}
 
-		/*var i, d;
-		for(i = 0, d = x1; d <= x2; ++i) {
-
-		}*/
-
-
-
 		ctx.stroke();
-
-
-
-
-
-		/*var x1 = c[range.c1].left - offsetX;
-		var y1 = r[range.r1].top - offsetY;
-		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
-		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
-		ctx.setFillStyle(this.settings.cells.defaultState.background)
-		.setStrokeStyle(this.settings.activeCellBorderColor)
-			.setLineWidth(1).beginPath();
-
-		var i, d, l;
-		for (i = range.c1, d = x1; i <= range.c2 && d <= x2; ++i) {
-			l = c[i].width;
-			d += l;
-			if (0 < l) {
-				ctx.lineVerPrevPx(d + 3, y1 + 6, y2 + 7);
-			}
-		}
-		for (i = range.r1, d = y1; i <= range.r2 && d <= y2; ++i) {
-			l = r[i].height;
-			d += l;
-			if (0 < l) {
-				ctx.lineHorPrevPx(x1 + 6, d + 5, x2 + 7);
-			}
-		}
-
-		ctx.stroke();*/
 	};
 
     /** Удаляет вертикальные границы ячейки, если текст выходит за границы и соседние ячейки пусты */
