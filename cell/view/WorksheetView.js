@@ -1897,6 +1897,7 @@
         this._drawFrozenPaneLines();
         this._fixSelectionOfMergedCells();
         this._drawElements(this.af_drawButtons);
+		this._drawPrintLines();
         this.cellCommentator.drawCommentCells();
         this.objectRender.showDrawingObjectsEx(true);
         if (this.overlayCtx) {
@@ -2704,6 +2705,138 @@
 
 			return null;
 		};
+
+	WorksheetView.prototype._drawPrintLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
+		// Возможно сетку не нужно рисовать (при печати свои проверки)
+		if (null === drawingCtx && false === this.model.getSheetView().asc_getShowGridLines()) {
+			return;
+		}
+
+		if (range === undefined) {
+			range = this.visibleRange;
+		}
+		var ctx = drawingCtx || this.drawingCtx;
+		var c = this.cols;
+		var r = this.rows;
+		var widthCtx = (width) ? width : ctx.getWidth();
+		var heightCtx = (height) ? height : ctx.getHeight();
+		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+		if (null === drawingCtx && this.topLeftFrozenCell) {
+			if (undefined === leftFieldInPx) {
+				var cFrozen = this.topLeftFrozenCell.getCol0();
+				offsetX -= c[cFrozen].left - c[0].left;
+			}
+			if (undefined === topFieldInPx) {
+				var rFrozen = this.topLeftFrozenCell.getRow0();
+				offsetY -= r[rFrozen].top - r[0].top;
+			}
+		}
+		var x1 = c[range.c1].left - offsetX;
+		var y1 = r[range.r1].top - offsetY;
+		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
+		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
+
+
+		var printOptions = this.model.PagePrintOptions;
+		var widthPage = (printOptions.pageSetup.width - printOptions.pageMargins.left - printOptions.pageMargins.right) * asc_getcvt(3, 0, this._getPPIX());
+		var heightPage = (printOptions.pageSetup.height - printOptions.pageMargins.top - printOptions.pageMargins.bottom) * asc_getcvt(3, 0, this._getPPIY());
+
+		var heading = true;
+		if(heading) {
+			widthPage -= this.cellsLeft;
+			heightPage -= this.cellsTop;
+		}
+
+		/*ctx.setStrokeStyle(this.settings.activeCellBorderColor)
+			.setLineWidth(1).beginPath();
+
+		var i, d;
+		for (i = 0, d = x1; d <= x2; ++i) {
+			d += widthPage;
+			ctx.lineVerPrevPx(d, y1, y2);
+		}
+
+		for (i = 0, d = y1; d <= y2; ++i) {
+			d += heightPage;
+			ctx.lineHorPrevPx(x1, d, x2);
+		}*/
+
+		ctx.setStrokeStyle(this.settings.activeCellBorderColor);
+		ctx.setLineWidth(1).beginPath();
+
+		var i, d, d1;
+		for(i = 0, d = 0, d1 = 0; i < c.length; i++) {
+			if(d1 > x2 + offsetX) {
+				break;
+			}
+
+			if(d + c[i].width > widthPage) {
+				if(d1 > x1 + offsetX && d1 < x2 + offsetX) {
+					var headingWidth = heading ? this.cellsLeft : 0;
+					ctx.lineVerPrevPx(d1 + headingWidth - offsetX, y1, y2);
+				}
+				d = 0;
+			}
+			d += c[i].width;
+			d1 += c[i].width;
+		}
+
+		for(i = 0, d = 0, d1 = 0; i < r.length; i++) {
+			if(d1 > y2 + offsetY) {
+				break;
+			}
+
+			if(d + r[i].height > heightPage) {
+				if(d1 > y1 + offsetY && d1 < y2 + offsetY) {
+					var headingHeight = heading ? this.cellsTop : 0;
+					ctx.lineHorPrevPx(x1, d1 + headingHeight - offsetY, x2);
+				}
+				d = 0;
+			}
+			d += r[i].height;
+			d1 += r[i].height;
+		}
+
+		/*var i, d;
+		for(i = 0, d = x1; d <= x2; ++i) {
+
+		}*/
+
+
+
+		ctx.stroke();
+
+
+
+
+
+		/*var x1 = c[range.c1].left - offsetX;
+		var y1 = r[range.r1].top - offsetY;
+		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
+		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
+		ctx.setFillStyle(this.settings.cells.defaultState.background)
+		.setStrokeStyle(this.settings.activeCellBorderColor)
+			.setLineWidth(1).beginPath();
+
+		var i, d, l;
+		for (i = range.c1, d = x1; i <= range.c2 && d <= x2; ++i) {
+			l = c[i].width;
+			d += l;
+			if (0 < l) {
+				ctx.lineVerPrevPx(d + 3, y1 + 6, y2 + 7);
+			}
+		}
+		for (i = range.r1, d = y1; i <= range.r2 && d <= y2; ++i) {
+			l = r[i].height;
+			d += l;
+			if (0 < l) {
+				ctx.lineHorPrevPx(x1 + 6, d + 5, x2 + 7);
+			}
+		}
+
+		ctx.stroke();*/
+	};
 
     /** Удаляет вертикальные границы ячейки, если текст выходит за границы и соседние ячейки пусты */
     WorksheetView.prototype._eraseCellRightBorder = function ( drawingCtx, colBeg, colEnd, row, offsetX, offsetY ) {
@@ -5271,6 +5404,7 @@
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
             this._drawGrid(null, range);
+			this._drawPrintLines();
             this._drawCellsAndBorders(null, range);
             this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx(false,
@@ -5436,6 +5570,7 @@
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
             this._drawColumnHeaders(null, c1, c2);
             this._drawGrid(null, range);
+			this._drawPrintLines();
             this._drawCellsAndBorders(null, range);
             this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx(false,
