@@ -30,6 +30,33 @@
  *
  */
 
+
+Asc['asc_docs_api'].prototype.sync_CanUndoCallback = function(bCanUndo)
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteBool"](bCanUndo);
+    window["native"]["OnCallMenuEvent"](60, _stream); // ASC_MENU_EVENT_TYPE_CAN_UNDO
+};
+
+Asc['asc_docs_api'].prototype.sync_CanRedoCallback = function(bCanRedo)
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteBool"](bCanRedo);
+    window["native"]["OnCallMenuEvent"](61, _stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
+};
+
+Asc['asc_docs_api'].prototype.SetDocumentModified = function(bValue)
+{
+    this.isDocumentModify = bValue;
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteBool"](this.isDocumentModify);
+    window["native"]["OnCallMenuEvent"](66, _stream); // ASC_MENU_EVENT_TYPE_DOCUMETN_MODIFITY
+};
+
 Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 {
     var _return = undefined;
@@ -38,6 +65,16 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
     switch (type)
     {
+        case 3: // ASC_MENU_EVENT_TYPE_UNDO
+        {
+            this.WordControl.m_oLogicDocument.Document_Undo();
+            break;
+        }
+        case 4: // ASC_MENU_EVENT_TYPE_REDO
+        {
+            this.WordControl.m_oLogicDocument.Document_Redo();
+            break;
+        }
         case 62: //ASC_MENU_EVENT_TYPE_SEARCH_FINDTEXT
         {
             var SearchEngine = editor.WordControl.m_oLogicDocument.Search(_params[0], {MatchCase : _params[2]});
@@ -101,6 +138,40 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             break;
         }
 
+        case 450:   // ASC_MENU_EVENT_TYPE_GET_CHART_DATA
+        {
+            var chart = _api.asc_getChartObject();
+            
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](JSON.stringify(new Asc.asc_CChartBinary(chart)));
+            _return = _stream;
+            
+            break;
+        }
+        
+        case 460:   // ASC_MENU_EVENT_TYPE_SET_CHART_DATA
+        {
+            if (undefined !== _params) {
+                var chartData = _params[0];
+                if (chartData && chartData.length > 0) {
+                    var json = JSON.parse(chartData);
+                    if (json) {
+                        _api.asc_editChartDrawingObject(json);
+                    }
+                }
+            }
+            break;
+        }
+
+        case 2415: // ASC_MENU_EVENT_TYPE_CHANGE_COLOR_SCHEME
+        {
+            if (undefined !== _params) {
+                var indexScheme = parseInt(_params);
+                this.ChangeColorScheme(indexScheme);
+            }
+            break;
+        }
 
         case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
         {
