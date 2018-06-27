@@ -3039,10 +3039,12 @@
 			}
 			//расширяем границы
 			if(null != to){
-				if(to.r2 >= oThis.nRowsCount)
-					oThis.nRowsCount = to.r2 + 1;
-				if(to.c2 >= oThis.nColsCount)
-					oThis.nColsCount = to.c2 + 1;
+				var maxRow = gc_nMaxRow0 !== to.r2 ? to.r2 : to.r1;
+				var maxCol = gc_nMaxCol0 !== to.c2 ? to.c2 : to.c1;
+				if(maxRow >= oThis.nRowsCount)
+					oThis.nRowsCount = maxRow + 1;
+				if(maxCol >= oThis.nColsCount)
+					oThis.nColsCount = maxCol + 1;
 			}
 		});
 		this.hyperlinkManager = new RangeDataManager(function(data, from, to, oChangeParam){
@@ -3066,10 +3068,12 @@
 				data.Ref.cleanFormat();
 			//расширяем границы
 			if(null != to){
-				if(to.r2 >= oThis.nRowsCount)
-					oThis.nRowsCount = to.r2 + 1;
-				if(to.c2 >= oThis.nColsCount)
-					oThis.nColsCount = to.c2 + 1;
+				var maxRow = gc_nMaxRow0 !== to.r2 ? to.r2 : to.r1;
+				var maxCol = gc_nMaxCol0 !== to.c2 ? to.c2 : to.c1;
+				if(maxRow >= oThis.nRowsCount)
+					oThis.nRowsCount = maxRow + 1;
+				if(maxCol >= oThis.nColsCount)
+					oThis.nColsCount = maxCol + 1;
 			}
 		});
 		this.hyperlinkManager.setDependenceManager(this.mergeManager);
