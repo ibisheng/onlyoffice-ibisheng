@@ -2706,9 +2706,9 @@
 			return null;
 		};
 
-	WorksheetView.prototype._drawPrintLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx) {
-		// Возможно сетку не нужно рисовать (при печати свои проверки)
-		if (null === drawingCtx && false === this.model.getSheetView().asc_getShowGridLines()) {
+	WorksheetView.prototype._drawPrintLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
+
+		if (null === drawingCtx) {
 			return;
 		}
 
@@ -2718,6 +2718,73 @@
 		var ctx = drawingCtx || this.drawingCtx;
 		var c = this.cols;
 		var r = this.rows;
+
+
+		var pageBreakPreview = true;
+		if(pageBreakPreview) {
+			var printPages = [];
+			this.calcPagesPrint(this.model.PagePrintOptions, null, null, printPages);
+
+			var widthCtx = (width) ? width : ctx.getWidth();
+			var heightCtx = (height) ? height : ctx.getHeight();
+			var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
+			var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+			var frozenX = this.topLeftFrozenCell ? c[this.topLeftFrozenCell.getCol0()].left - c[0].left : 0;
+			var frozenY = this.topLeftFrozenCell ? r[this.topLeftFrozenCell.getRow0()].top - r[0].top : 0;
+
+			/*if (null === drawingCtx && this.topLeftFrozenCell) {
+				if (undefined === leftFieldInPx) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					offsetX -= c[cFrozen].left - c[0].left;
+				}
+				if (undefined === topFieldInPx) {
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetY -= r[rFrozen].top - r[0].top;
+				}
+			}*/
+
+			var startRange = printPages[0] ? printPages[0].pageRange : null;
+			var endRange = printPages[0] ? printPages[printPages.length - 1].pageRange : null;
+
+			var x1 = this.cellsLeft, x2 = this.cellsLeft , y1 = this.cellsTop, y2 = this.cellsTop;
+			if(startRange) {
+				x1 = Math.max(c[range.c1].left - offsetX, c[startRange.c1].left - offsetX);
+				y1 = Math.max(r[range.r1].top - offsetY, r[startRange.r1].top - offsetY);
+				x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx, c[endRange.c2].left + c[endRange.c2].width - offsetX);
+				y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx, r[endRange.r2].top + r[endRange.r2].height - offsetY);
+			}
+
+
+			var xCtx2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
+			var yCtx2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
+			ctx.setFillStyle(this.settings.cells.defaultState.border)
+				.fillRect(x1, y2, x2 - x1, yCtx2 - y2)
+				.fillRect(x2, y1, xCtx2 - x1, yCtx2 - y1);
+
+			ctx.setStrokeStyle(this.settings.activeCellBorderColor)
+				.setLineWidth(3).beginPath();
+
+
+			var i, d, pageRange;
+			for (i = 0, d = x1; i < printPages.length && d <= x2; ++i) {
+				pageRange = printPages[i].pageRange;
+
+				d = c[pageRange.c2].left + c[pageRange.c2].width - offsetX;
+				ctx.lineVerPrevPx(d + frozenX, y1, y2 + frozenY);
+			}
+			for (i = 0, d = y1; i < printPages.length && d <= y2; ++i) {
+				pageRange = printPages[i].pageRange;
+
+				d = r[pageRange.r2].top + r[pageRange.r2].height - offsetY;
+				ctx.lineHorPrevPx(x1, d + frozenY, x2 + frozenX);
+			}
+
+			ctx.stroke();
+
+			return;
+		}
+
+
 		var widthCtx = (width) ? width : ctx.getWidth();
 		var heightCtx = (height) ? height : ctx.getHeight();
 		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
