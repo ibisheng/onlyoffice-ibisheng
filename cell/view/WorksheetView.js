@@ -2706,7 +2706,7 @@
 			return null;
 		};
 
-	WorksheetView.prototype._drawPrintLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
+	WorksheetView.prototype._drawPrintLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx) {
 		// Возможно сетку не нужно рисовать (при печати свои проверки)
 		if (null === drawingCtx && false === this.model.getSheetView().asc_getShowGridLines()) {
 			return;
@@ -2741,11 +2741,24 @@
 
 
 		var printOptions = this.model.PagePrintOptions;
-		var widthPage = (printOptions.pageSetup.width - printOptions.pageMargins.left - printOptions.pageMargins.right) * asc_getcvt(3, 0, this._getPPIX());
-		var heightPage = (printOptions.pageSetup.height - printOptions.pageMargins.top - printOptions.pageMargins.bottom) * asc_getcvt(3, 0, this._getPPIY());
+		var orientation = printOptions.pageSetup.orientation;
+		var leftMargin = printOptions.pageMargins.left;
+		var rightMargin = printOptions.pageMargins.right;
+		var topMargin = printOptions.pageMargins.top;
+		var bottomMargin = printOptions.pageMargins.bottom;
+		var width = printOptions.pageSetup.width;
+		var height = printOptions.pageSetup.height;
+		if (Asc.c_oAscPageOrientation.PageLandscape === orientation) {
+			var tmp = width;
+			width = height;
+			height = tmp;
+		}
 
-		var heading = true;
-		if(heading) {
+		var widthPage = (width - leftMargin - rightMargin) * asc_getcvt(3, 0, this._getPPIX());
+		var heightPage = (height - topMargin - bottomMargin) * asc_getcvt(3, 0, this._getPPIY());
+
+		var headings = printOptions.headings;
+		if(headings) {
 			widthPage -= this.cellsLeft;
 			heightPage -= this.cellsTop;
 		}
@@ -2761,7 +2774,7 @@
 
 			if(d + c[i].width > widthPage) {
 				if(d1 > x1 + offsetX && d1 < x2 + offsetX) {
-					var headingWidth = heading ? this.cellsLeft : 0;
+					var headingWidth = headings ? this.cellsLeft : 0;
 					ctx.lineVerPrevPx(d1 + headingWidth - offsetX + frozenX, y1, y2 + frozenY);
 				}
 				d = 0;
@@ -2777,7 +2790,7 @@
 
 			if(d + r[i].height > heightPage) {
 				if(d1 > y1 + offsetY && d1 < y2 + offsetY) {
-					var headingHeight = heading ? this.cellsTop : 0;
+					var headingHeight = headings ? this.cellsTop : 0;
 					ctx.lineHorPrevPx(x1, d1 + headingHeight - offsetY + frozenY, x2 + frozenX);
 				}
 				d = 0;
