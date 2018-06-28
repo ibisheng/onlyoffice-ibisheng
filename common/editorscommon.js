@@ -3530,7 +3530,7 @@
         this.onDecodeError = function()
 		{
             var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-			_editor.sendEvent("asc_onError", Asc.c_oAscError.ID.VKeyEncrypt, Asc.c_oAscError.Level.Critical);
+			_editor.sendEvent("asc_onError", Asc.c_oAscError.ID.DataEncrypted, Asc.c_oAscError.Level.Critical);
 		};
 
         this.checkEditorId = function()
@@ -3693,14 +3693,16 @@
 			this.checkEditorId();
 
 			var isChangesMode = (_array[0]["change"]) ? true : false;
+			var _prefix = "";
 
 			if (isChangesMode)
 			{
                 for (var i = _array.length - 1; i >= 0; i--)
                 {
-                    if (_array[i]["change"].length > this.cryptoPrefixLen)
+                    if (_array[i]["change"].length > (this.cryptoPrefixLen + 1))
                     {
-                        if (this.cryptoPrefix == _array[i]["change"].substr(0, this.cryptoPrefixLen))
+                    	_prefix = _array[i]["change"].substr(0, this.cryptoPrefixLen + 1);
+                        if (-1 != _prefix.indexOf(this.cryptoPrefix))
                         {
                             _array[i] = _array[i]["change"].substr(this.cryptoPrefixLen);
                             isCrypted = true;
@@ -3717,9 +3719,10 @@
             {
                 for (var i = _array.length - 1; i >= 0; i--)
                 {
-                    if (_array[i].length > this.cryptoPrefixLen)
+                    if (_array[i].length > (this.cryptoPrefixLen + 1))
                     {
-                        if (this.cryptoPrefix == _array[i].substr(0, this.cryptoPrefixLen))
+                        _prefix = _array[i].substr(0, this.cryptoPrefixLen + 1);
+                        if (-1 != _prefix.indexOf(this.cryptoPrefix))
                         {
                             _array[i] = _array[i].substr(this.cryptoPrefixLen);
                             isCrypted = true;

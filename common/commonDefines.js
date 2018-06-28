@@ -176,7 +176,9 @@
 			ForceSaveButton: -331,
 			ForceSaveTimeout: -332,
 
-			OpenWarning : 500
+			OpenWarning : 500,
+
+            DataEncrypted : -600,
 		}
 	};
 
@@ -1259,6 +1261,7 @@
 	prot['ForceSaveButton']                  = prot.ForceSaveButton;
 	prot['ForceSaveTimeout']                 = prot.ForceSaveTimeout;
 	prot['OpenWarning']                      = prot.OpenWarning;
+	prot['DataEncrypted']                    = prot.DataEncrypted;
 	window['Asc']['c_oAscAsyncAction']       = window['Asc'].c_oAscAsyncAction = c_oAscAsyncAction;
 	prot                                     = c_oAscAsyncAction;
 	prot['Open']                             = prot.Open;
