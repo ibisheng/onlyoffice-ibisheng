@@ -463,10 +463,11 @@
 			else
 				this.ReadOnlyCounter--;
 
-			if (0 > this.ReadOnlyCounter)
-				this.ReadOnlyCounter = 0;
+			// при синхронной загрузке шрифтов (десктоп)
+			// может вызываться и в обратном порядке (setReadOnly(false), setReadOnly(true))
+			// поэтому сравнение с нулем неверно. отрицательные значение могут быть.
 
-			this.HtmlArea.readOnly = (0 == this.ReadOnlyCounter) ? false : true;
+			this.HtmlArea.readOnly = (0 >= this.ReadOnlyCounter) ? false : true;
 		},
 
 		show : function()
