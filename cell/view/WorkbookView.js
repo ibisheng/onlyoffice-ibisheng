@@ -2495,7 +2495,9 @@
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
         ws = this.getWorksheet(i);
-        ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, false, i, printPagesData.arrPages);
+        if (!ws.getHidden()) {
+			ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, false, i, printPagesData.arrPages);
+		}
       }
     } else if (printType === Asc.c_oAscPrintType.Selection) {
       activeWs = wb.getActive();

@@ -3752,9 +3752,7 @@
 		}
 	};
 	Worksheet.prototype.getHidden=function(){
-		if(null != this.bHidden)
-			return false != this.bHidden;
-		return false;
+		return true === this.bHidden;
 	};
 	Worksheet.prototype.setHidden = function (hidden) {
 		var bOldHidden = this.bHidden, wb = this.workbook, wsActive = wb.getActiveWs(), oVisibleWs = null;
