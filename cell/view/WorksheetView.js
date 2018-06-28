@@ -2718,44 +2718,46 @@
 		var c = this.cols;
 		var r = this.rows;
 
+		var printOptions = this.model.PagePrintOptions;
+		var orientation = printOptions.pageSetup.orientation;
+		var leftMargin = printOptions.pageMargins.left;
+		var rightMargin = printOptions.pageMargins.right;
+		var topMargin = printOptions.pageMargins.top;
+		var bottomMargin = printOptions.pageMargins.bottom;
+		var widthFromSetup = printOptions.pageSetup.width;
+		var heightFromSetup = printOptions.pageSetup.height;
 
+		var widthCtx = (width) ? width : ctx.getWidth();
+		var heightCtx = (height) ? height : ctx.getHeight();
+		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+		var frozenX = this.topLeftFrozenCell ? c[this.topLeftFrozenCell.getCol0()].left - c[0].left : 0;
+		var frozenY = this.topLeftFrozenCell ? r[this.topLeftFrozenCell.getRow0()].top - r[0].top : 0;
+
+
+		var i, d, d1;
+		var x1, x2, y1, y2;
 		var pageBreakPreview = true;
 		if(pageBreakPreview) {
 			var printPages = [];
-
-			console.time("asd");
-			this.calcPagesPrint(this.model.PagePrintOptions, null, null, printPages);
-			console.timeEnd("asd");
-
-
-			console.time("asd1");
-			var widthCtx = (width) ? width : ctx.getWidth();
-			var heightCtx = (height) ? height : ctx.getHeight();
-			var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
-			var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
-			var frozenX = this.topLeftFrozenCell ? c[this.topLeftFrozenCell.getCol0()].left - c[0].left : 0;
-			var frozenY = this.topLeftFrozenCell ? r[this.topLeftFrozenCell.getRow0()].top - r[0].top : 0;
-
-			/*if (null === drawingCtx && this.topLeftFrozenCell) {
-				if (undefined === leftFieldInPx) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					offsetX -= c[cFrozen].left - c[0].left;
-				}
-				if (undefined === topFieldInPx) {
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetY -= r[rFrozen].top - r[0].top;
-				}
-			}*/
+			this.calcPagesPrint(printOptions, null, null, printPages);
 
 			var startRange = printPages[0] ? printPages[0].pageRange : null;
 			var endRange = printPages[0] ? printPages[printPages.length - 1].pageRange : null;
 
-			var x1 = this.cellsLeft, x2 = this.cellsLeft , y1 = this.cellsTop, y2 = this.cellsTop;
+			x1 = this.cellsLeft;
+			x2 = this.cellsLeft;
+			y1 = this.cellsTop;
+			y2 = this.cellsTop;
 			if(startRange) {
-				x1 = Math.max(c[range.c1].left - offsetX, c[startRange.c1].left - offsetX);
-				y1 = Math.max(r[range.r1].top - offsetY, r[startRange.r1].top - offsetY);
-				x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx, c[endRange.c2].left + c[endRange.c2].width - offsetX);
-				y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx, r[endRange.r2].top + r[endRange.r2].height - offsetY);
+				var coord = Math.max(c[range.c1].left - offsetX, c[startRange.c1].left - offsetX);
+				x1 = coord > 0 ? coord : this.cellsLeft;
+				coord = Math.max(r[range.r1].top - offsetY, r[startRange.r1].top - offsetY);
+				y1 = coord > 0 ? coord : this.cellsTop;
+				coord = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx, c[endRange.c2].left + c[endRange.c2].width - offsetX);
+				x2 = coord > 0 ? coord : this.cellsLeft;
+				coord = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx, r[endRange.r2].top + r[endRange.r2].height - offsetY);
+				y2 = coord > 0 ? coord : this.cellsTop;
 			}
 
 
@@ -2768,8 +2770,7 @@
 			ctx.setStrokeStyle(this.settings.activeCellBorderColor)
 				.setLineWidth(3).beginPath();
 
-
-			var i, d, d1, pageRange;
+			var pageRange;
 			for (i = 0, d = 0, d1 = 0; i < printPages.length; ++i) {
 				if(d > x2 && d1 > y2) {
 					break;
@@ -2778,102 +2779,76 @@
 				pageRange = printPages[i].pageRange;
 				d = c[pageRange.c2].left + c[pageRange.c2].width - offsetX;
 				d1 = r[pageRange.r2].top + r[pageRange.r2].height - offsetY;
-				if(d >= x1) {
+				if(d > x1 && d1 > 0) {
 					ctx.lineVerPrevPx(d + frozenX, y1, y2 + frozenY);
 				}
-				if(d1 >= y1) {
+				if(d1 > y1 && d > 0) {
 					ctx.lineHorPrevPx(x1, d1 + frozenY, x2 + frozenX);
 				}
 			}
 
 			ctx.stroke();
-			console.timeEnd("asd1");
-			return;
 		}
 
+		var pageBreakGrid = true;
+		if(pageBreakGrid) {
+			x1 = c[range.c1].left - offsetX;
+			y1 = r[range.r1].top - offsetY;
+			x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
+			y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
 
-		var widthCtx = (width) ? width : ctx.getWidth();
-		var heightCtx = (height) ? height : ctx.getHeight();
-		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
-		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
-		var frozenX = this.topLeftFrozenCell ? c[this.topLeftFrozenCell.getCol0()].left - c[0].left : 0;
-		var frozenY = this.topLeftFrozenCell ? r[this.topLeftFrozenCell.getRow0()].top - r[0].top : 0;
-		/*if (null === drawingCtx && this.topLeftFrozenCell) {
-			if (undefined === leftFieldInPx) {
-				var cFrozen = this.topLeftFrozenCell.getCol0();
-				offsetX -= c[cFrozen].left - c[0].left;
-			}
-			if (undefined === topFieldInPx) {
-				var rFrozen = this.topLeftFrozenCell.getRow0();
-				offsetY -= r[rFrozen].top - r[0].top;
-			}
-		}*/
-		var x1 = c[range.c1].left - offsetX;
-		var y1 = r[range.r1].top - offsetY;
-		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
-		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
-
-
-		var printOptions = this.model.PagePrintOptions;
-		var orientation = printOptions.pageSetup.orientation;
-		var leftMargin = printOptions.pageMargins.left;
-		var rightMargin = printOptions.pageMargins.right;
-		var topMargin = printOptions.pageMargins.top;
-		var bottomMargin = printOptions.pageMargins.bottom;
-		var width = printOptions.pageSetup.width;
-		var height = printOptions.pageSetup.height;
-		if (Asc.c_oAscPageOrientation.PageLandscape === orientation) {
-			var tmp = width;
-			width = height;
-			height = tmp;
-		}
-
-		var widthPage = (width - leftMargin - rightMargin) * asc_getcvt(3, 0, this._getPPIX());
-		var heightPage = (height - topMargin - bottomMargin) * asc_getcvt(3, 0, this._getPPIY());
-
-		var headings = printOptions.headings;
-		if(headings) {
-			widthPage -= this.cellsLeft;
-			heightPage -= this.cellsTop;
-		}
-
-		ctx.setStrokeStyle(this.settings.activeCellBorderColor);
-		ctx.setLineWidth(1).beginPath();
-
-		var i, d, d1;
-		for(i = 0, d = 0, d1 = 0; i < c.length; i++) {
-			if(d1 > x2 + offsetX) {
-				break;
+			if (Asc.c_oAscPageOrientation.PageLandscape === orientation) {
+				var tmp = width;
+				widthFromSetup = heightFromSetup;
+				heightFromSetup = tmp;
 			}
 
-			if(d + c[i].width > widthPage) {
-				if(d1 > x1 + offsetX && d1 < x2 + offsetX) {
-					var headingWidth = headings ? this.cellsLeft : 0;
-					ctx.lineVerPrevPx(d1 + headingWidth - offsetX + frozenX, y1, y2 + frozenY);
+			var widthPage = (widthFromSetup - leftMargin - rightMargin) * asc_getcvt(3, 0, this._getPPIX());
+			var heightPage = (heightFromSetup - topMargin - bottomMargin) * asc_getcvt(3, 0, this._getPPIY());
+
+			var headings = printOptions.headings;
+			if(headings) {
+				widthPage -= this.cellsLeft;
+				heightPage -= this.cellsTop;
+			}
+
+			ctx.setStrokeStyle(this.settings.findFillColor);
+			ctx.setLineWidth(1).beginPath();
+
+			for(i = 0, d = 0, d1 = 0; i < c.length; i++) {
+				if(d1 > x2 + offsetX) {
+					break;
 				}
-				d = 0;
-			}
-			d += c[i].width;
-			d1 += c[i].width;
-		}
 
-		for(i = 0, d = 0, d1 = 0; i < r.length; i++) {
-			if(d1 > y2 + offsetY) {
-				break;
-			}
-
-			if(d + r[i].height > heightPage) {
-				if(d1 > y1 + offsetY && d1 < y2 + offsetY) {
-					var headingHeight = headings ? this.cellsTop : 0;
-					ctx.lineHorPrevPx(x1, d1 + headingHeight - offsetY + frozenY, x2 + frozenX);
+				if(d + c[i].width > widthPage) {
+					if(d1 > x1 + offsetX && d1 < x2 + offsetX) {
+						var headingWidth = /*headings ? this.cellsLeft : 0;*/this.cellsLeft;
+						ctx.lineVerPrevPx(d1 + headingWidth - offsetX + frozenX, y1, y2 + frozenY);
+					}
+					d = 0;
 				}
-				d = 0;
+				d += c[i].width;
+				d1 += c[i].width;
 			}
-			d += r[i].height;
-			d1 += r[i].height;
-		}
 
-		ctx.stroke();
+			for(i = 0, d = 0, d1 = 0; i < r.length; i++) {
+				if(d1 > y2 + offsetY) {
+					break;
+				}
+
+				if(d + r[i].height > heightPage) {
+					if(d1 > y1 + offsetY && d1 < y2 + offsetY) {
+						var headingHeight = /*headings ? this.cellsTop : 0;*/this.cellsTop;
+						ctx.lineHorPrevPx(x1, d1 + headingHeight - offsetY + frozenY, x2 + frozenX);
+					}
+					d = 0;
+				}
+				d += r[i].height;
+				d1 += r[i].height;
+			}
+
+			ctx.stroke();
+		}
 	};
 
     /** Удаляет вертикальные границы ячейки, если текст выходит за границы и соседние ячейки пусты */
