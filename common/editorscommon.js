@@ -3694,17 +3694,17 @@
 
 			var isChangesMode = (_array[0]["change"]) ? true : false;
 			var _prefix = "";
+			var _checkPrefixLen = this.cryptoPrefixLen + 1; // "ENCRYPTED; && ""ENCRYPTED;
 
 			if (isChangesMode)
 			{
                 for (var i = _array.length - 1; i >= 0; i--)
                 {
-                    if (_array[i]["change"].length > (this.cryptoPrefixLen + 1))
+                    if (_array[i]["change"].length > _checkPrefixLen)
                     {
-                    	_prefix = _array[i]["change"].substr(0, this.cryptoPrefixLen + 1);
+                    	_prefix = _array[i]["change"].substr(0, _checkPrefixLen);
                         if (-1 != _prefix.indexOf(this.cryptoPrefix))
                         {
-                            _array[i] = _array[i]["change"].substr(this.cryptoPrefixLen);
                             isCrypted = true;
                             break;
                         }
@@ -3719,12 +3719,11 @@
             {
                 for (var i = _array.length - 1; i >= 0; i--)
                 {
-                    if (_array[i].length > (this.cryptoPrefixLen + 1))
+                    if (_array[i].length > _checkPrefixLen)
                     {
-                        _prefix = _array[i].substr(0, this.cryptoPrefixLen + 1);
+                        _prefix = _array[i].substr(0, _checkPrefixLen);
                         if (-1 != _prefix.indexOf(this.cryptoPrefix))
                         {
-                            _array[i] = _array[i].substr(this.cryptoPrefixLen);
                             isCrypted = true;
                             break;
                         }
@@ -3735,11 +3734,11 @@
             {
                 for (var i = _array.length - 1; i >= 0; i--)
                 {
-                    if (_array[i].m_pData.length > this.cryptoPrefixLen)
+                    if (_array[i].m_pData.length > _checkPrefixLen)
                     {
-                        if (this.cryptoPrefix == _array[i].m_pData.substr(0, this.cryptoPrefixLen))
+                        _prefix = _array[i].m_pData.substr(0, _checkPrefixLen);
+                        if (-1 != _prefix.indexOf(this.cryptoPrefix))
                         {
-                            _array[i] = _array[i].m_pData.substr(this.cryptoPrefixLen);
                             isCrypted = true;
                             break;
                         }
