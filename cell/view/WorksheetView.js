@@ -2707,7 +2707,6 @@
 		};
 
 	WorksheetView.prototype._drawPrintLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
-
 		if (null === drawingCtx) {
 			return;
 		}
@@ -2723,8 +2722,13 @@
 		var pageBreakPreview = true;
 		if(pageBreakPreview) {
 			var printPages = [];
-			this.calcPagesPrint(this.model.PagePrintOptions, null, null, printPages);
 
+			console.time("asd");
+			this.calcPagesPrint(this.model.PagePrintOptions, null, null, printPages);
+			console.timeEnd("asd");
+
+
+			console.time("asd1");
 			var widthCtx = (width) ? width : ctx.getWidth();
 			var heightCtx = (height) ? height : ctx.getHeight();
 			var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
@@ -2765,22 +2769,25 @@
 				.setLineWidth(3).beginPath();
 
 
-			var i, d, pageRange;
-			for (i = 0, d = x1; i < printPages.length && d <= x2; ++i) {
-				pageRange = printPages[i].pageRange;
+			var i, d, d1, pageRange;
+			for (i = 0, d = 0, d1 = 0; i < printPages.length; ++i) {
+				if(d > x2 && d1 > y2) {
+					break;
+				}
 
+				pageRange = printPages[i].pageRange;
 				d = c[pageRange.c2].left + c[pageRange.c2].width - offsetX;
-				ctx.lineVerPrevPx(d + frozenX, y1, y2 + frozenY);
-			}
-			for (i = 0, d = y1; i < printPages.length && d <= y2; ++i) {
-				pageRange = printPages[i].pageRange;
-
-				d = r[pageRange.r2].top + r[pageRange.r2].height - offsetY;
-				ctx.lineHorPrevPx(x1, d + frozenY, x2 + frozenX);
+				d1 = r[pageRange.r2].top + r[pageRange.r2].height - offsetY;
+				if(d >= x1) {
+					ctx.lineVerPrevPx(d + frozenX, y1, y2 + frozenY);
+				}
+				if(d1 >= y1) {
+					ctx.lineHorPrevPx(x1, d1 + frozenY, x2 + frozenX);
+				}
 			}
 
 			ctx.stroke();
-
+			console.timeEnd("asd1");
 			return;
 		}
 
