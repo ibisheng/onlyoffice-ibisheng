@@ -75,6 +75,35 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             this.WordControl.m_oLogicDocument.Document_Redo();
             break;
         }
+        case 50: // ASC_MENU_EVENT_TYPE_INSERT_IMAGE
+        {
+            break;
+        }
+        case 53: // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
+        {
+            var shapeProp = asc_menu_ReadShapePr(_params["shape"], _current);
+            var aspect = parseFloat(_params["aspect"]);
+
+            var logicDocument = _api.WordControl.m_oLogicDocument;
+
+            if (logicDocument && logicDocument.Slides[logicDocument.CurPage]) {                  
+                var oDrawingObjects = logicDocument.Slides[logicDocument.CurPage].graphicObjects;
+                oDrawingObjects.changeCurrentState(new AscFormat.StartAddNewShape(oDrawingObjects, shapeProp.type));
+                    
+                var dsx = logicDocument.Height / 2.5 * aspect
+                var dsy = logicDocument.Height / 2.5                 
+                var dx  = logicDocument.Width * 0.5 - dsx * 0.5
+                var dy  = logicDocument.Height * 0.5 - dsy * 0.5
+
+                logicDocument.OnMouseDown({}, dx, dy, logicDocument.CurPage);
+                logicDocument.OnMouseMove({IsLocked: true}, dx + dsx, dy + dsy, logicDocument.CurPage);
+                logicDocument.OnMouseUp({}, dx, dy, logicDocument.CurPage);
+                logicDocument.Document_UpdateInterfaceState();
+                logicDocument.Document_UpdateRulersState();
+                logicDocument.Document_UpdateSelectionState();
+            }
+            break;
+        }
         case 62: //ASC_MENU_EVENT_TYPE_SEARCH_FINDTEXT
         {
             var SearchEngine = editor.WordControl.m_oLogicDocument.Search(_params[0], {MatchCase : _params[2]});
