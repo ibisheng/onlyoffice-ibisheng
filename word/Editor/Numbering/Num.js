@@ -443,8 +443,8 @@ CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
 		{
 			sResult = "" + nNumShift;
 
-			if (1 === T.length)
-				sResult = "0" + T;
+			if (1 === sResult.length)
+				sResult = "0" + sResult;
 			break;
 		}
 
