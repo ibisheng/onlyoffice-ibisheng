@@ -4920,7 +4920,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 			oLvl = oNum.GetLvl(oNumPr.Lvl).Copy();
 
 			var oTextPr = new CTextPr();
-			oTextPr.SetAll("Symbol");
+			oTextPr.RFonts.SetAll("Symbol");
 			oLvl.SetByType(c_oAscNumberingLevel.Bullet, oNumPr.Lvl, String.fromCharCode(0x00B7), oTextPr);
 		}
 
