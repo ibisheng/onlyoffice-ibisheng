@@ -77,6 +77,42 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
         }
         case 50: // ASC_MENU_EVENT_TYPE_INSERT_IMAGE
         {
+            var url = _params[0];
+            var w = _params[1];
+            var h = _params[2];
+
+            var editor = _api;
+            var logicDocument = _api.WordControl.m_oLogicDocument;
+
+            editor.WordControl.Thumbnails && editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+            logicDocument.FocusOnNotes = false;
+           
+            var oController = logicDocument.Slides[logicDocument.CurPage].graphicObjects;
+           
+            History.Create_NewPoint(AscDFH.historydescription_Presentation_AddFlowImage);
+            oController.resetSelection();
+                
+            var _w, _h;
+                
+            _w = logicDocument.Slides[logicDocument.CurPage].Width;
+            _h = logicDocument.Slides[logicDocument.CurPage].Height;
+           
+            var __w = Math.max((w * AscCommon.g_dKoef_pix_to_mm), 1);
+            var __h = Math.max((h * AscCommon.g_dKoef_pix_to_mm), 1);
+           
+            _w = Math.max(5, Math.min(_w, __w));
+            _h = Math.max(5, Math.min((_w * __h / __w)));
+           
+            var Image = oController.createImage(url, (logicDocument.Slides[logicDocument.CurPage].Width - _w)/2,
+                                                                    (logicDocument.Slides[logicDocument.CurPage].Height - _h)/2, _w, _h);
+            Image.setParent(logicDocument.Slides[logicDocument.CurPage]);
+            Image.addToDrawingObjects();
+            oController.selectObject(Image, 0);
+
+            logicDocument.Recalculate();
+            logicDocument.Document_UpdateInterfaceState();
+            logicDocument.CheckEmptyPlaceholderNotes();
+
             break;
         }
         case 53: // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
