@@ -2874,22 +2874,17 @@
 		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
 		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
 
-		var frozenX = 0, frozenY = 0;
+		var frozenX = 0, frozenY = 0, cFrozen, rFrozen;
 		if (null === drawingCtx && this.topLeftFrozenCell) {
 			if (undefined === leftFieldInPx) {
-				var cFrozen = this.topLeftFrozenCell.getCol0();
+				cFrozen = this.topLeftFrozenCell.getCol0();
 				offsetX -= frozenX = c[cFrozen].left - c[0].left;
 			}
 			if (undefined === topFieldInPx) {
-				var rFrozen = this.topLeftFrozenCell.getRow0();
+				rFrozen = this.topLeftFrozenCell.getRow0();
 				offsetY -= frozenY =  r[rFrozen].top - r[0].top;
 			}
 		}
-
-
-		//коодинаты области обновления
-		/*var upLeft = {x: c[range.c1].left, y: t[range.r1].top};
-		 var downRight = {x: c[range.c1].left, y: t[range.r1].top};*/
 
 		var basePageString = "Page ";
 
@@ -2902,38 +2897,28 @@
 
 			var startRange = printPages[0] ? printPages[0].pageRange : null;
 			var endRange = printPages[0] ? printPages[printPages.length - 1].pageRange : null;
-			var unionRange = new Asc.Range(startRange.c1, startRange.r1, endRange.c2, endRange.r2);
-
+			var unionRange = startRange ? new Asc.Range(startRange.c1, startRange.r1, endRange.c2, endRange.r2) : null;
 
 			//вначале закрашииваем непечатную область
 			var fillRanges = [];
-			var intersection = range.intersection(unionRange);
+			var intersection = unionRange ? range.intersection(unionRange) : null;
 			ctx.setFillStyle(this.settings.cells.defaultState.border);
 			if(intersection) {
 				//закрашиываем всю область обноавления за исключением области пересечения
 				fillRanges = intersection.difference(range);
 			} else {
-				//закрашиваем полностью область обновления
 				fillRanges.push(range);
-				/*x1 = c[range.c1].left;
-				y1 = r[range.r1].top;
-				x2 = c[range.c2].left + c[range.c2].width - this.cellsLeft;
-				y2 = r[range.r2].top + r[range.r2].height - this.cellsTop;
-				ctx.fillRect(x1 - offsetX - frozenX, y1 - offsetY - frozenY, x2 - offsetX, y2 - offsetY);*/
 			}
 
 			if(fillRanges) {
 				ctx.setFillStyle(this.settings.cells.defaultState.border);
-				var fXDiff, fYDiff;
 				for(i = 0; i < fillRanges.length; i++) {
 					x1 = Math.max(c[fillRanges[i].c1].left, c[range.c1].left);
 					y1 = Math.max(r[fillRanges[i].r1].top, r[range.r1].top);
 					x2 = Math.min(c[fillRanges[i].c2].left + c[fillRanges[i].c2].width - this.cellsLeft, c[range.c2].left + c[range.c2].width - this.cellsLeft);
 					y2 = Math.min(r[fillRanges[i].r2].top + r[fillRanges[i].r2].height - this.cellsTop, r[range.r2].top + r[range.r2].height - this.cellsTop);
 
-					fXDiff = x1 - offsetX === frozenX + this.cellsLeft ? frozenX : 0;
-					fYDiff = y1 - offsetY === frozenY + this.cellsTop ? frozenY : 0;
-					ctx.fillRect(x1 - offsetX - fXDiff, y1 - offsetY - fYDiff, x2 - offsetX, y2 - offsetY);
+					ctx.fillRect(x1 - offsetX, y1 - offsetY, x2 - offsetX, y2 - offsetY);
 				}
 			}
 
@@ -2963,28 +2948,27 @@
 					d = c[pageRange.c2].left + c[pageRange.c2].width - offsetX;
 					d1 = r[pageRange.r2].top + r[pageRange.r2].height - offsetY;
 					if(d > x1 && d1 > 0) {
-						ctx.lineVerPrevPx(d, y1, y2);
+						ctx.lineVerPrevPx(d, y1 - frozenY, y2);
 					}
 					if(d1 > y1 && d > 0) {
-						ctx.lineHorPrevPx(x1, d1, x2);
+						ctx.lineHorPrevPx(x1 - frozenX, d1, x2);
 					}
 
 					var centerX = c[pageRange.c1].left + ((c[pageRange.c2].left + c[pageRange.c2].width) - c[pageRange.c1].left) / 2;
 					var centerY = r[pageRange.r1].top + ((r[pageRange.r2].top + r[pageRange.r2].height) - r[pageRange.r1].top) / 2;
 					this.stringRender.setString(basePageString + (i + 1));
 					var textMetrics = this.stringRender._measureChars();
-					tX1 = centerX - offsetX;
+					tX1 = centerX - offsetX + this.cellsLeft;
 					tX2 = tX1 + textMetrics.width;
-					tY1 = centerY - offsetY;
+					tY1 = centerY - offsetY + this.cellsTop;
 					tY2 = tY1 + textMetrics.height;
-					//if(tX1 >= x1 && tX2 <= x2 && tY1 >= y1 && tY2 <= y2) {
-					this.stringRender.render(undefined, tX1, tY2, 100, this.settings.activeCellBorderColor);
-					//}
+					if(tX1 >= x1 && tX2 <= x2 && tY1 >= y1 && tY2 <= y2) {
+					    this.stringRender.render(undefined, tX1, tY2, 100, this.settings.activeCellBorderColor);
+					}
 				}
 
 				ctx.stroke();
 			}
-
 		}
 
 
@@ -3383,6 +3367,7 @@
                 tmpRange = new asc_Range( 0, 0, col - 1, row - 1 );
                 if ( !noCells ) {
                     this._drawGrid( null, tmpRange, offsetX, offsetY );
+					this._drawPrintLines( null, tmpRange, offsetX, offsetY );
                     this._drawCellsAndBorders(null, tmpRange, offsetX, offsetY );
                 }
             }
@@ -3394,6 +3379,7 @@
                 this._drawRowHeaders( null, 0, row, kHeaderDefault, offsetX, offsetY );
                 if ( !noCells ) {
                     this._drawGrid( null, tmpRange, offsetX, offsetY );
+					this._drawPrintLines( null, tmpRange, offsetX, offsetY );
                     this._drawCellsAndBorders(null, tmpRange, offsetX, offsetY );
                 }
             }
@@ -3405,6 +3391,7 @@
                 this._drawColumnHeaders( null, 0, col, kHeaderDefault, offsetX, offsetY );
                 if ( !noCells ) {
                     this._drawGrid( null, tmpRange, offsetX, offsetY );
+					this._drawPrintLines( null, tmpRange, offsetX, offsetY );
                     this._drawCellsAndBorders(null, tmpRange, offsetX, offsetY );
                 }
             }
@@ -5615,6 +5602,7 @@
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
             this._drawGrid(null, range);
+			this._drawPrintLines(null, range);
 
             this._drawCellsAndBorders(null, range);
             this.af_drawButtons(range, offsetX, offsetY);
@@ -5627,6 +5615,7 @@
                 range.c2 = cFrozen - 1;
                 offsetX = this.cols[0].left - this.cellsLeft;
                 this._drawGrid(null, range, offsetX);
+				this._drawPrintLines(null, range, offsetX);
                 this._drawCellsAndBorders(null, range, offsetX);
                 this.af_drawButtons(range, offsetX, offsetY);
                 this.objectRender.showDrawingObjectsEx(false,
@@ -5637,7 +5626,6 @@
         }
         // Отрисовывать нужно всегда, вдруг бордеры
         this._drawFrozenPaneLines();
-		this._drawPrintLines(null);
         this._fixSelectionOfMergedCells();
         this._drawSelection();
 
@@ -5794,6 +5782,7 @@
                 range.r2 = rFrozen - 1;
                 offsetY = this.rows[0].top - this.cellsTop;
                 this._drawGrid(null, range, undefined, offsetY);
+				this._drawPrintLines(null, range, undefined, offsetY);
                 this._drawCellsAndBorders(null, range, undefined, offsetY);
                 this.af_drawButtons(range, offsetX, offsetY);
                 this.objectRender.showDrawingObjectsEx(false,
