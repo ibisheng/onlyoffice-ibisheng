@@ -2934,16 +2934,23 @@
 				ctx.setLineWidth(3).beginPath();
 
 				var pageRange;
-				var tX1, tX2, tY1, tY2;
+				var tX1, tX2, tY1, tY2, pageIntersection, pIX1, pIX2, pIY1, pIY2;
 				for (i = 0, d = 0, d1 = 0; i < printPages.length; ++i) {
 					pageRange = printPages[i].pageRange;
-					if(!pageRange.intersection(range)) {
+					pageIntersection = pageRange.intersection(range);
+					if(!pageIntersection) {
 						if(pageRange.r1 > range.r2 && pageRange.c1 > range.c2) {
 							break;
 						} else {
 							continue;
 						}
 					}
+
+					pIX1 = c[pageIntersection.c1].left - offsetX;
+					pIY1 = r[pageIntersection.r1].top - offsetY;
+					pIX2 = c[pageIntersection.c2].left + c[pageIntersection.c2].width - offsetX;
+					pIY2 = r[pageIntersection.r2].top + r[pageIntersection.c2].height - offsetY;
+
 
 					d = c[pageRange.c2].left + c[pageRange.c2].width - offsetX;
 					d1 = r[pageRange.r2].top + r[pageRange.r2].height - offsetY;
@@ -2958,12 +2965,12 @@
 					var centerY = r[pageRange.r1].top + ((r[pageRange.r2].top + r[pageRange.r2].height) - r[pageRange.r1].top) / 2;
 					this.stringRender.setString(basePageString + (i + 1));
 					var textMetrics = this.stringRender._measureChars();
-					tX1 = centerX - offsetX + this.cellsLeft;
-					tX2 = tX1 + textMetrics.width;
-					tY1 = centerY - offsetY + this.cellsTop;
-					tY2 = tY1 + textMetrics.height;
-					if(tX1 >= x1 && tX2 <= x2 && tY1 >= y1 && tY2 <= y2) {
-					    this.stringRender.render(undefined, tX1, tY2, 100, this.settings.activeCellBorderColor);
+					tX1 = centerX - offsetX - textMetrics.width / 2;
+					tX2 = tX1 + textMetrics.width / 2;
+					tY1 = centerY - offsetY - textMetrics.height / 2;
+					tY2 = tY1 + textMetrics.height / 2;
+					if(tX1 >= pIX1 && tX2 <= pIX2 && tY1 >= pIY1 && tY2 <= pIY2) {
+					    this.stringRender.render(undefined, tX1, tY1, 100, this.settings.activeCellBorderColor);
 					}
 				}
 
@@ -3030,6 +3037,25 @@
 			}
 
 			ctx.stroke();
+		}
+	};
+
+	//TODO temp function
+	WorksheetView.prototype._preDrawPrintLines = function (range) {
+		var printOptions = this.model.PagePrintOptions;
+		var printPages = [];
+		this.calcPagesPrint(printOptions, null, null, printPages);
+
+		if (range === undefined) {
+			range = this.visibleRange;
+		}
+
+		this.updatePrintPages = [];
+		for (var i = 0; i < printPages.length; ++i) {
+
+			if(printPages[i].pageRange.intersection(range)) {
+				this.updatePrintPages[i] = printPages[i];
+			}
 		}
 	};
 
