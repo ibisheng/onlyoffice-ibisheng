@@ -71,7 +71,11 @@ var c_oAscNumberingLevel = {
 	UpperLetterDot_Left     : 0x2006,
 	LowerLetterBracket_Left : 0x2007,
 	LowerLetterDot_Left     : 0x2008,
-	LowerRomanDot_Right     : 0x2009
+	LowerRomanDot_Right     : 0x2009,
+	UpperRomanBracket_Left  : 0x200A,
+	LowerRomanBracket_Left  : 0x200B,
+	UpperLetterBracket_Left : 0x200C,
+	LowerLetterBracket_Left : 0x200D
 };
 
 // Преобразовываем число в буквенную строку :

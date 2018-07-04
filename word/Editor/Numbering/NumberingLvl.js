@@ -570,6 +570,38 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 			this.LvlText.push(new CNumberingLvlTextString("."));
 			this.TextPr = new CTextPr();
 			break;
+		case c_oAscNumberingLevel.UpperRomanBracket_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = Asc.c_oAscNumberingFormat.UpperRoman;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString(")"));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.LowerRomanBracket_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = Asc.c_oAscNumberingFormat.LowerRoman;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString(")"));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.UpperLetterBracket_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = Asc.c_oAscNumberingFormat.UpperLetter;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString(")"));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.LowerLetterBracket_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = Asc.c_oAscNumberingFormat.LowerLetter;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString(")"));
+			this.TextPr = new CTextPr();
+			break;
 	}
 };
 /**

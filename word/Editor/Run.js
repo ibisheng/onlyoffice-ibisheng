@@ -151,16 +151,6 @@ ParaRun.prototype.Get_Id = function()
 {
     return this.Id;
 };
-
-ParaRun.prototype.GetParagraph = function()
-{
-	return this.Paragraph;
-};
-ParaRun.prototype.SetParagraph = function(Paragraph)
-{
-	this.Paragraph = Paragraph;
-};
-
 ParaRun.prototype.Set_ParaMath = function(ParaMath, Parent)
 {
     this.ParaMath = ParaMath;
@@ -538,6 +528,9 @@ ParaRun.prototype.Add = function(Item, bMath)
     else
 	{
 		this.private_AddItemToRun(this.State.ContentPos, Item);
+
+		if (this.Type === para_Run && (Item.Type === para_Space))
+			this.ProcessAutoCorrect(this.State.ContentPos - 1);
 	}
 };
 
@@ -2146,44 +2139,28 @@ ParaRun.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPos
         DrawingLayout.Layout = true;
 };
 
-ParaRun.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Depth)
+ParaRun.prototype.GetNextRunElements = function(oRunElements, isUseContentPos, nDepth)
 {
-    var StartPos   = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : 0 );
-    var ContentLen = this.Content.length;
+    var nStartPos  = true === isUseContentPos ? oRunElements.ContentPos.Get(nDepth) : 0;
 
-    for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
+    for (var nCurPos = nStartPos, nCount = this.Content.length; nCurPos < nCount; ++nCurPos)
     {
-        var Item = this.Content[CurPos];
+    	if (oRunElements.IsEnoughElements())
+    		return;
 
-        if (RunElements.CheckType(Item.Type))
-        {
-            RunElements.Elements.push( Item );
-            RunElements.Count--;
-
-            if ( RunElements.Count <= 0 )
-                return;
-        }
+		oRunElements.Add(this.Content[nCurPos]);
     }
 };
-
-ParaRun.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Depth)
+ParaRun.prototype.GetPrevRunElements = function(oRunElements, isUseContentPos, nDepth)
 {
-    var StartPos   = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) - 1 : this.Content.length - 1 );
-    var ContentLen = this.Content.length;
+    var nStartPos = true === isUseContentPos ? oRunElements.ContentPos.Get(nDepth) - 1 : this.Content.length - 1;
 
-    for ( var CurPos = StartPos; CurPos >= 0; CurPos-- )
+    for (var nCurPos = nStartPos; nCurPos >= 0; --nCurPos)
     {
-        var Item = this.Content[CurPos];
-        var ItemType = Item.Type;
+    	if (oRunElements.IsEnoughElements())
+    		return;
 
-		if (RunElements.CheckType(Item.Type))
-        {
-            RunElements.Elements.push( Item );
-            RunElements.Count--;
-
-            if ( RunElements.Count <= 0 )
-                return;
-        }
+		oRunElements.Add(this.Content[nCurPos]);
     }
 };
 
@@ -10237,6 +10214,300 @@ ParaRun.prototype.GetElementsCount = function()
 ParaRun.prototype.IsFootnoteReferenceRun = function()
 {
 	return (1 === this.Content.length && para_FootnoteReference === this.Content[0].Type);
+};
+/**
+ * Производим автозамену
+ * @param nPos - позиция, на которой был добавлен последний элемент, с которого стартовала автозамена
+ * @returns {boolean}
+ */
+ParaRun.prototype.ProcessAutoCorrect = function(nPos)
+{
+	// Сколько максимально просматриваем элементов влево
+	var nMaxElements = 10;
+
+	var oParagraph = this.GetParagraph();
+	if (!oParagraph)
+		return false;
+
+	var oContentPos = oParagraph.Get_PosByElement(this);
+	if (!oContentPos)
+		return false;
+
+	oContentPos.Update(nPos, oContentPos.GetDepth() + 1);
+
+	var oRunElementsBefore = new CParagraphRunElements(oContentPos, nMaxElements, null, true);
+	oParagraph.GetPrevRunElements(oRunElementsBefore);
+	var arrElements = oRunElementsBefore.GetElements();
+	if (arrElements.length <= 0)
+		return false;
+
+	var sText = "";
+	for (var nIndex = 0, nCount = arrElements.length; nIndex < nCount; ++nIndex)
+	{
+		if (para_Text !== arrElements[nIndex].Type)
+			return false;
+
+		sText += String.fromCharCode(arrElements[nIndex].Value);
+	}
+
+	var oDocument = oParagraph.LogicDocument;
+	if (!oDocument)
+		return false;
+
+	// Автосоздание списка
+	if (oParagraph.GetNumPr())
+		return false;
+
+	var oPrevNumPr = null;
+	var oPrevParagraph = oParagraph.Get_DocumentPrev();
+	if (oPrevParagraph && type_Paragraph === oPrevParagraph.GetType())
+		oPrevNumPr = oPrevParagraph.GetNumPr();
+
+	if (oRunElementsBefore.IsEnd())
+	{
+		var oNumPr = null;
+
+		if (oDocument.IsAutomaticBulletedLists())
+		{
+			var oNumLvl = this.private_GetSuitableBulletedLvlForAutoCorrect(sText);
+			if (oNumLvl)
+			{
+				if (oPrevNumPr)
+				{
+					var oPrevNumLvl = oDocument.GetNumbering().GetNum(oPrevNumPr.NumId).GetLvl(oPrevNumPr.Lvl);
+					if (oPrevNumLvl.IsSimilar(oNumLvl))
+					{
+						oNumPr = new CNumPr(oPrevNumPr.NumId, oPrevNumPr.Lvl);
+					}
+				}
+
+				if (!oNumPr)
+				{
+					var oNum = oDocument.GetNumbering().CreateNum();
+					oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+					oNum.SetLvl(oNumLvl, 0);
+					oNumPr = new CNumPr(oNum.GetId(), 0);
+				}
+			}
+		}
+
+		if (oDocument.IsAutomaticNumberedLists())
+		{
+			var arrResult = this.private_GetSuitableNumberedLvlForAutoCorrect(sText);
+
+			if (arrResult)
+			{
+				for (var nIndex = 0, nCount = arrResult.length; nIndex < nCount; ++nIndex)
+				{
+					var oResult = arrResult[nIndex];
+					if (oResult && -1 !== oResult.Value && oResult.Lvl)
+					{
+						if (1 === oResult.Value)
+						{
+							var oNum = oDocument.GetNumbering().CreateNum();
+							oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
+							oNum.SetLvl(oResult.Lvl, 0);
+							oNumPr = new CNumPr(oNum.GetId(), 0);
+							break;
+						}
+						else if (oPrevNumPr)
+						{
+							oResult.Lvl.ResetNumberedText(oPrevNumPr.Lvl);
+							var oPrevNumLvl = oDocument.GetNumbering().GetNum(oPrevNumPr.NumId).GetLvl(oPrevNumPr.Lvl);
+							if (oPrevNumLvl.IsSimilar(oResult.Lvl))
+							{
+								var oNumInfo = oPrevParagraph.Parent.CalculateNumberingValues(oPrevParagraph, oPrevNumPr);
+								if (oResult.Value > oNumInfo[oPrevNumPr.Lvl] && oResult.Value <= oNumInfo[oPrevNumPr.Lvl] + 2)
+								{
+									oNumPr = new CNumPr(oPrevNumPr.NumId, oPrevNumPr.Lvl);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+		if (oNumPr)
+		{
+			if (false === oDocument.Document_Is_SelectionLocked({
+					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+					Elements  : [oParagraph],
+					CheckType : AscCommon.changestype_Paragraph_Properties
+				}))
+			{
+				oDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AutomaticListAsType);
+
+				var oStartPos = oParagraph.GetStartPos();
+				var oEndPos   = oContentPos;
+				oContentPos.Update(nPos + 1, oContentPos.GetDepth());
+
+				oParagraph.RemoveSelection();
+				oParagraph.SetSelectionUse(true);
+				oParagraph.SetSelectionContentPos(oStartPos, oEndPos, false);
+				oParagraph.Remove(1);
+				oParagraph.RemoveSelection();
+				oParagraph.MoveCursorToStartPos(false);
+
+				oParagraph.ApplyNumPr(oNumPr.NumId, oNumPr.Lvl);
+
+				oDocument.Recalculate();
+			}
+		}
+	}
+
+	return false;
+};
+/**
+ * Подбираем подходящий маркированный список
+ * @param sText {string}
+ * @returns {?CNumberingLvl}
+ */
+ParaRun.prototype.private_GetSuitableBulletedLvlForAutoCorrect = function(sText)
+{
+	var oNumberingLvl = new CNumberingLvl();
+	oNumberingLvl.InitDefault(0, c_oAscMultiLevelNumbering.Bullet);
+
+	if ('*' === sText)
+	{
+		var oTextPr = new CTextPr();
+		oTextPr.RFonts.SetAll("Symbol");
+		oNumberingLvl.SetByType(c_oAscNumberingLevel.Bullet, 0, String.fromCharCode(0x00B7), oTextPr);
+		return oNumberingLvl;
+	}
+	else if ('-' === sText)
+	{
+		var oTextPr = new CTextPr();
+		oTextPr.RFonts.SetAll("Arial");
+		oNumberingLvl.SetByType(c_oAscNumberingLevel.Bullet, 0, String.fromCharCode(0x2013), oTextPr);
+		return oNumberingLvl;
+	}
+
+	return null;
+};
+/**
+ * Подбираем подходящий нумерованный список
+ * @param sText {string}
+ * @returns {null | {Lvl : CNumberingLvl, Value : number}}
+ */
+ParaRun.prototype.private_GetSuitableNumberedLvlForAutoCorrect = function(sText)
+{
+	if (sText.length < 2)
+		return null;
+
+	var sLastChar = sText.charAt(sText.length - 1);
+	if ('.' !== sLastChar && ')' !== sLastChar)
+		return null;
+
+	var nFirstCharCode = sText.charCodeAt(0);
+
+	var nValue = -1;
+
+	var sValue = sText.slice(0, sText.length - 1);
+
+	// Проверяем, либо у нас все числовое, либо у нас все буквенное (все заглавные, либо все не заглавные)
+	if (48 <= nFirstCharCode && nFirstCharCode <= 57)
+	{
+		var oNumberingLvl = new CNumberingLvl();
+		oNumberingLvl.InitDefault(0, c_oAscMultiLevelNumbering.Numbered);
+
+		for (var nIndex = 0, nCount = sValue.length; nIndex < nCount; ++nIndex)
+		{
+			var nCurCharCode = sValue.charCodeAt(nIndex);
+			if (48 > nCurCharCode || nCurCharCode > 57)
+				return null;
+		}
+
+		if ('.' === sLastChar)
+			oNumberingLvl.SetByType(c_oAscNumberingLevel.DecimalDot_Left, 0);
+		else if (')' === sLastChar)
+			oNumberingLvl.SetByType(c_oAscNumberingLevel.DecimalBracket_Left, 0);
+
+		nValue = parseInt(sValue);
+
+		if (isNaN(nValue))
+			nValue = -1;
+
+		return [{Lvl : oNumberingLvl, Value : nValue}];
+	}
+	else if (65 <= nFirstCharCode && nFirstCharCode <= 90)
+	{
+		var nRoman  = AscCommon.RomanToInt(sValue);
+		var nLetter = AscCommon.LatinNumberingToInt(sValue);
+
+		var arrResult = [];
+		if (!isNaN(nRoman))
+		{
+			var oNumberingLvl = new CNumberingLvl();
+			oNumberingLvl.InitDefault(0, c_oAscMultiLevelNumbering.Numbered);
+
+			if ('.' === sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperRomanDot_Right, 0);
+			else if (')' !== sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperRomanBracket_Left, 0);
+
+			arrResult.push({Lvl : oNumberingLvl, Value : nRoman});
+		}
+
+		if (!isNaN(nLetter))
+		{
+			var oNumberingLvl = new CNumberingLvl();
+			oNumberingLvl.InitDefault(0, c_oAscMultiLevelNumbering.Numbered);
+
+			if ('.' === sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperLetterDot_Left, 0);
+			else if (')' !== sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperLetterBracket_Left, 0);
+
+			arrResult.push({Lvl : oNumberingLvl, Value : nLetter});
+		}
+
+		if (arrResult.length > 0)
+			return arrResult;
+
+		return null;
+	}
+	else if (97 <= nFirstCharCode && nFirstCharCode <= 122)
+	{
+		var nRoman  = AscCommon.RomanToInt(sValue);
+		var nLetter = AscCommon.LatinNumberingToInt(sValue);
+
+		var arrResult = [];
+
+		if (!isNaN(nRoman))
+		{
+			var oNumberingLvl = new CNumberingLvl();
+			oNumberingLvl.InitDefault(0, c_oAscMultiLevelNumbering.Numbered);
+
+			if ('.' === sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerRomanDot_Right, 0);
+			else if (')' !== sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerRomanBracket_Left, 0);
+
+			arrResult.push({Lvl : oNumberingLvl, Value : nRoman});
+		}
+		if (!isNaN(nLetter))
+		{
+			var oNumberingLvl = new CNumberingLvl();
+			oNumberingLvl.InitDefault(0, c_oAscMultiLevelNumbering.Numbered);
+
+			if ('.' === sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerLetterDot_Left, 0);
+			else if (')' !== sLastChar)
+				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerLetterBracket_Left, 0);
+
+			arrResult.push({Lvl : oNumberingLvl, Value : nLetter});
+		}
+
+		if (arrResult.length > 0)
+			return arrResult;
+
+		return null;
+	}
+
+	return null;
 };
 
 function CParaRunStartState(Run)

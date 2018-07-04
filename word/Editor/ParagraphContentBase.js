@@ -56,10 +56,18 @@ CParagraphContentBase.prototype.IsStopCursorOnEntryExit = function()
 CParagraphContentBase.prototype.PreDelete = function()
 {
 };
-CParagraphContentBase.prototype.SetParagraph = function(Paragraph)
+/**
+ * Выствялем параграф, в котром лежит данный элемент
+ * @param {Paragraph} oParagraph
+ */
+CParagraphContentBase.prototype.SetParagraph = function(oParagraph)
 {
-	this.Paragraph = Paragraph;
+	this.Paragraph = oParagraph;
 };
+/**
+ * Получаем параграф, в котором лежит данный элемент
+ * @returns {null|Paragraph}
+ */
 CParagraphContentBase.prototype.GetParagraph = function()
 {
 	return this.Paragraph;
@@ -99,10 +107,22 @@ CParagraphContentBase.prototype.Get_DrawingObjectContentPos = function(Id, Conte
 CParagraphContentBase.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPos, Depth)
 {
 };
-CParagraphContentBase.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Depth)
+/**
+ * Ищем список элементов, идущих после заданной позициц
+ * @param oRunElements {CParagraphRunElements}
+ * @param isUseContentPos {boolean}
+ * @param nDepth {number}
+ */
+CParagraphContentBase.prototype.GetNextRunElements = function(oRunElements, isUseContentPos, nDepth)
 {
 };
-CParagraphContentBase.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Depth)
+/**
+ * Ищем список элементов рана, предществующих заданной позиции
+ * @param oRunElements {CParagraphRunElements}
+ * @param isUseContentPos {boolean}
+ * @param nDepth {number}
+ */
+CParagraphContentBase.prototype.GetPrevRunElements = function(oRunElements, isUseContentPos, nDepth)
 {
 };
 CParagraphContentBase.prototype.CollectDocumentStatistics = function(ParaStats)
@@ -1510,48 +1530,49 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_Layout = function(Drawin
             return;
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Depth)
+CParagraphContentWithParagraphLikeContent.prototype.GetNextRunElements = function(oRunElements, isUseContentPos, nDepth)
 {
-    var CurPos     = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : 0 );
-    var ContentLen = this.Content.length;
+	if (oRunElements.IsEnoughElements())
+		return;
 
-    this.Content[CurPos].Get_NextRunElements( RunElements, UseContentPos,  Depth + 1 );
+	var nCurPos     = true === isUseContentPos ? oRunElements.ContentPos.Get(nDepth) : 0;
+	var nContentLen = this.Content.length;
 
-    if ( RunElements.Count <= 0 )
-        return;
+	this.Content[CurPos].GetNextRunElements(oRunElements, isUseContentPos, nDepth + 1);
 
-    CurPos++;
+	nCurPos++;
 
-    while ( CurPos < ContentLen )
-    {
-        this.Content[CurPos].Get_NextRunElements( RunElements, false,  Depth + 1 );
+	while (nCurPos < nContentLen)
+	{
+		if (oRunElements.IsEnoughElements())
+			return;
 
-        if ( RunElements.Count <= 0 )
-            break;
+		this.Content[nCurPos].GetNextRunElements(oRunElements, false, nDepth + 1);
+			break;
 
-        CurPos++;
-    }
+		nCurPos++;
+	}
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Depth)
+CParagraphContentWithParagraphLikeContent.prototype.GetPrevRunElements = function(oRunElements, UseContentPos, nDepth)
 {
-    var CurPos = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : this.Content.length - 1 );
+	if (oRunElements.IsEnoughElements())
+		return;
 
-    this.Content[CurPos].Get_PrevRunElements( RunElements, UseContentPos,  Depth + 1 );
+	var nCurPos = true === isUseContentPos ? oRunElements.ContentPos.Get(nDepth) : this.Content.length - 1;
 
-    if ( RunElements.Count <= 0 )
-        return;
+	this.Content[nCurPos].GetPrevRunElements(oRunElements, isUseContentPos, nDepth + 1);
 
-    CurPos--;
+	nCurPos--;
 
-    while ( CurPos >= 0 )
-    {
-        this.Content[CurPos].Get_PrevRunElements( RunElements, false,  Depth + 1 );
+	while (nCurPos >= 0)
+	{
+		if (oRunElements.IsEnoughElements())
+			return;
 
-        if ( RunElements.Count <= 0 )
-            break;
+		this.Content[nCurPos].GetPrevRunElements(oRunElements, false, nDepth + 1);
 
-        CurPos--;
-    }
+		nCurPos--;
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.CollectDocumentStatistics = function(ParaStats)
 {

@@ -3019,6 +3019,7 @@
 	window['AscDFH'].historydescription_Document_RemoveBookmark                     = 0x0152;
 	window['AscDFH'].historydescription_Document_ContinueNumbering                  = 0x0153;
 	window['AscDFH'].historydescription_Document_RestartNumbering                   = 0x0154;
+	window['AscDFH'].historydescription_Document_AutomaticListAsType                = 0x0155;
 
 
 

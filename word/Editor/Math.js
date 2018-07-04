@@ -1630,14 +1630,6 @@ ParaMath.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPo
         DrawingLayout.X += this.Width;
 };
 
-ParaMath.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Depth)
-{
-};
-
-ParaMath.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Depth)
-{
-};
-
 ParaMath.prototype.CollectDocumentStatistics = function(ParaStats)
 {
     // TODO: ParaMath.CollectDocumentStatistics

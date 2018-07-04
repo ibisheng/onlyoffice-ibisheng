@@ -1570,8 +1570,6 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     this.Id = this.IdCounter.Get_NewId();
 
-    this.NumInfoCounter = 0;
-
     // Сначала настраиваем размеры страницы и поля
     this.SectPr = new CSectionPr(this);
     this.SectionsInfo = new CDocumentSectionsInfo();
@@ -1715,6 +1713,11 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.TrackRevisionsManager = new CTrackRevisionsManager(this);
 
     this.DocumentOutline = new CDocumentOutline(this);
+
+    this.AutoCorrectSettings = {
+    	AutomaticBulletedLists : true,
+		AutomaticNumberedLists : true
+	};
 
     // Контролируем изменения интерфейса
     this.ChangedStyles      = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
@@ -17053,6 +17056,39 @@ CDocument.prototype.RestartNumbering = function(nRestartValue)
 
 	return true;
 };
+/**
+ * Устанавливаем настройку автосоздания маркированных списков
+ * @param isAuto {boolean}
+ */
+CDocument.prototype.SetAutomaticBulletedLists = function(isAuto)
+{
+	this.AutoCorrectSettings.AutomaticBulletedLists = isAuto;
+};
+/**
+ * Запрашиваем настройку автосоздания маркированных списков
+ * @returns {boolean}
+ */
+CDocument.prototype.IsAutomaticBulletedLists = function()
+{
+	return this.AutoCorrectSettings.AutomaticBulletedLists;
+};
+/**
+ * Устанавливаем настройку автосоздания нумерованных списков
+ * @param isAuto {boolean}
+ */
+CDocument.prototype.SetAutomaticNumberedLists = function(isAuto)
+{
+	this.AutoCorrectSettings.AutomaticNumberedLists = isAuto;
+};
+/**
+ * Запрашиваем настройку автосоздания нумерованных списков
+ * @returns {boolean}
+ */
+CDocument.prototype.IsAutomaticNumberedLists = function()
+{
+	return this.AutoCorrectSettings.AutomaticNumberedLists;
+};
+
 
 
 function CDocumentSelectionState()
@@ -18236,6 +18272,7 @@ CDocumentNumberingContinueEngine.prototype.GetNumPr = function()
 {
 	return this.SimilarNumPr ? this.SimilarNumPr : this.LastNumPr;
 };
+
 
 //-------------------------------------------------------------export---------------------------------------------------
 window['Asc'] = window['Asc'] || {};

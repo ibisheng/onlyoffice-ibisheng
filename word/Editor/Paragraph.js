@@ -2613,7 +2613,7 @@ Paragraph.prototype.Shift = function(PageIndex, Dx, Dy)
  * Удаляем элементы параграфа
  * @param nCount - количество удаляемых элементов, > 0 удаляем элементы после курсора, < 0 удаляем элементы до курсора
  * @param bOnlyText - true: удаляем только текст и пробелы, false - Удаляем любые элементы
- * @oaram bRemoveOnlySelection
+ * @param bRemoveOnlySelection
  * @param bOnAddText - удаление происходит на добавлении текста
  */
 Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText)
@@ -4069,6 +4069,17 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 		}
 	}
 };
+/**
+ * Устанавливаем позиции селекта внутри данного параграфа
+ * NB: Данная функция не стартует селект в параграфе, а лишь выставляет его границы!!!
+ * @param oStartPos {CParagraphContentPos}
+ * @param oEndPos {CParagraphContentPos}
+ * @param isCorrectAnchor {boolean}
+ */
+Paragraph.prototype.SetSelectionContentPos = function(oStartPos, oEndPos, isCorrectAnchor)
+{
+	return this.Set_SelectionContentPos(oStartPos, oEndPos, isCorrectAnchor);
+};
 Paragraph.prototype.Get_ParaContentPosByXY = function(X, Y, PageIndex, bYLine, StepEnd, bCenterMode)
 {
 	var SearchPos        = new CParagraphSearchPosXY();
@@ -4452,6 +4463,7 @@ Paragraph.prototype.MoveCursorToXY = function(X, Y, bLine, bDontChangeRealPos, C
 };
 /**
  * Находим позицию заданного элемента. (Данной функцией лучше пользоваться, когда параграф рассчитан)
+ * @returns {null | CParagraphContentPos}
  */
 Paragraph.prototype.Get_PosByElement = function(Class)
 {
@@ -4767,6 +4779,14 @@ Paragraph.prototype.Get_StartPos = function()
 	this.Content[0].Get_StartPos(ContentPos, Depth + 1);
 	return ContentPos;
 };
+/**
+ * Получаем начальную позицию в параграфе
+ * @returns {CParagraphContentPos}
+ */
+Paragraph.prototype.GetStartPos = function()
+{
+	return this.Get_StartPos();
+};
 Paragraph.prototype.Get_EndPos = function(BehindEnd)
 {
 	var ContentPos = new CParagraphContentPos();
@@ -4799,50 +4819,58 @@ Paragraph.prototype.Get_EndPos2 = function(BehindEnd)
 	this.Content[Pos].Get_EndPos(BehindEnd, ContentPos, Depth + 1);
 	return ContentPos;
 };
-Paragraph.prototype.Get_NextRunElements = function(RunElements)
+/**
+ * Составляем список элементов рана, идущих после заданной позиции
+ * @param oRunElements {CParagraphRunElements}
+ */
+Paragraph.prototype.GetNextRunElements = function(oRunElements)
 {
-	var ContentPos = RunElements.ContentPos;
+	var ContentPos = oRunElements.ContentPos;
 	var CurPos     = ContentPos.Get(0);
 	var ContentLen = this.Content.length;
 
-	this.Content[CurPos].Get_NextRunElements(RunElements, true, 1);
-
-	if (RunElements.Count <= 0)
-		return;
+	this.Content[CurPos].GetNextRunElements(oRunElements, true, 1);
 
 	CurPos++;
-
 	while (CurPos < ContentLen)
 	{
-		this.Content[CurPos].Get_NextRunElements(RunElements, false, 1);
+		if (oRunElements.IsEnoughElements())
+			break;
 
-		if (RunElements.Count <= 0)
+		this.Content[CurPos].GetNextRunElements(oRunElements, false, 1);
+
+		if (oRunElements.Count <= 0)
 			break;
 
 		CurPos++;
 	}
+
+	oRunElements.CheckEnd();
 };
-Paragraph.prototype.Get_PrevRunElements = function(RunElements)
+/**
+ * Составляем список элементов рана, идущих до заданной позиции
+ * @param oRunElements {CParagraphRunElements}
+ */
+Paragraph.prototype.GetPrevRunElements = function(oRunElements)
 {
-	var ContentPos = RunElements.ContentPos;
+	var ContentPos = oRunElements.ContentPos;
 	var CurPos     = ContentPos.Get(0);
 
-	this.Content[CurPos].Get_PrevRunElements(RunElements, true, 1);
-
-	if (RunElements.Count <= 0)
-		return;
+	this.Content[CurPos].GetPrevRunElements(oRunElements, true, 1);
 
 	CurPos--;
 
 	while (CurPos >= 0)
 	{
-		this.Content[CurPos].Get_PrevRunElements(RunElements, false, 1);
-
-		if (RunElements.Count <= 0)
+		if (oRunElements.IsEnoughElements())
 			break;
+
+		this.Content[CurPos].GetPrevRunElements(oRunElements, false, 1);
 
 		CurPos--;
 	}
+
+	oRunElements.CheckEnd();
 };
 /**
  * Получаем следующий за курсором элемент рана
@@ -4851,7 +4879,7 @@ Paragraph.prototype.Get_PrevRunElements = function(RunElements)
 Paragraph.prototype.GetNextRunElement = function()
 {
 	var oRunElements = new CParagraphRunElements(this.Get_ParaContentPos(this.Selection.Use, false, false), 1, null);
-	this.Get_NextRunElements(oRunElements);
+	this.GetNextRunElements(oRunElements);
 
 	if (oRunElements.Elements.length <= 0)
 		return null;
@@ -4865,7 +4893,7 @@ Paragraph.prototype.GetNextRunElement = function()
 Paragraph.prototype.GetPrevRunElement = function()
 {
 	var oRunElements = new CParagraphRunElements(this.Get_ParaContentPos(this.Selection.Use, false, false), 1, null);
-	this.Get_PrevRunElements(oRunElements);
+	this.GetPrevRunElements(oRunElements);
 
 	if (oRunElements.Elements.length <= 0)
 		return null;
@@ -12383,7 +12411,7 @@ Paragraph.prototype.CheckCommentStartEnd = function(sCommentId)
 Paragraph.prototype.IsColumnBreakOnLeft = function()
 {
 	var oRunElementsBefore = new CParagraphRunElements(this.Get_ParaContentPos(this.Selection.Use, false, false), 1, null);
-	this.Get_PrevRunElements(oRunElementsBefore);
+	this.GetPrevRunElements(oRunElementsBefore);
 
 	var arrElements = oRunElementsBefore.Elements;
 	if (arrElements
@@ -13518,6 +13546,14 @@ CParagraphContentPos.prototype =
         return 0;
     }
 };
+/**
+ * Получаем текущую глубину позиции
+ * @returns {number}
+ */
+CParagraphContentPos.prototype.GetDepth = function()
+{
+	return this.Depth - 1;
+};
 
 function CComplexFieldStatePos(oComplexField, isFieldCode)
 {
@@ -14451,13 +14487,20 @@ CRunRecalculateObject.prototype =
     }    
 };
 
-function CParagraphRunElements(ContentPos, Count, arrTypes)
+function CParagraphRunElements(ContentPos, Count, arrTypes, isReverse)
 {
     this.ContentPos = ContentPos;
     this.Elements   = [];
-    this.Count      = Count;
+    this.Count      = Count + 1; // Добавляем 1 для проверки достижения края параграфа
     this.Types      = arrTypes ? arrTypes : [];
+    this.End        = false;
+	this.Reverse    = undefined !== isReverse ? isReverse : false;
 }
+/**
+ * Проверяем элемент рана по типу
+ * @param nType
+ * @returns {boolean}
+ */
 CParagraphRunElements.prototype.CheckType = function(nType)
 {
 	if (this.Types.length <= 0)
@@ -14470,6 +14513,62 @@ CParagraphRunElements.prototype.CheckType = function(nType)
 	}
 
 	return false;
+};
+/**
+ * Добавляем данный элемент
+ * @param oElement {CRunElementBase}
+ */
+CParagraphRunElements.prototype.Add = function(oElement)
+{
+	if (this.CheckType(oElement.Type))
+	{
+		if (this.Reverse)
+			this.Elements.splice(0, 0, oElement);
+		else
+			this.Elements.push(oElement);
+
+		this.Count--;
+	}
+};
+/**
+ * Окончен ли сбор элементов
+ * @returns {boolean}
+ */
+CParagraphRunElements.prototype.IsEnoughElements = function()
+{
+	return (this.Count <= 0);
+};
+/**
+ * Проверяем достиглили мы края параграфа
+ * @param isEnd {boolean}
+ */
+CParagraphRunElements.prototype.CheckEnd = function(isEnd)
+{
+	if (this.Count <= 0)
+	{
+		this.End = false;
+		this.Elements.splice(this.Elements.length - 1, 1);
+	}
+	else if (this.Count >= 1)
+	{
+		this.End = true;
+	}
+};
+/**
+ * Проверяем достигли ли мы конца параграфа
+ * @returns {boolean}
+ */
+CParagraphRunElements.prototype.IsEnd = function()
+{
+	return this.End;
+};
+/**
+ * Получаем список элементов
+ * @returns {Array}
+ */
+CParagraphRunElements.prototype.GetElements = function()
+{
+	return this.Elements;
 };
 
 function CParagraphStatistics(Stats)
