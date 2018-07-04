@@ -10445,7 +10445,7 @@ ParaRun.prototype.private_GetSuitableNumberedLvlForAutoCorrect = function(sText)
 
 			if ('.' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperRomanDot_Right, 0);
-			else if (')' !== sLastChar)
+			else if (')' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperRomanBracket_Left, 0);
 
 			arrResult.push({Lvl : oNumberingLvl, Value : nRoman});
@@ -10458,7 +10458,7 @@ ParaRun.prototype.private_GetSuitableNumberedLvlForAutoCorrect = function(sText)
 
 			if ('.' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperLetterDot_Left, 0);
-			else if (')' !== sLastChar)
+			else if (')' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.UpperLetterBracket_Left, 0);
 
 			arrResult.push({Lvl : oNumberingLvl, Value : nLetter});
@@ -10483,7 +10483,7 @@ ParaRun.prototype.private_GetSuitableNumberedLvlForAutoCorrect = function(sText)
 
 			if ('.' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerRomanDot_Right, 0);
-			else if (')' !== sLastChar)
+			else if (')' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerRomanBracket_Left, 0);
 
 			arrResult.push({Lvl : oNumberingLvl, Value : nRoman});
@@ -10495,7 +10495,7 @@ ParaRun.prototype.private_GetSuitableNumberedLvlForAutoCorrect = function(sText)
 
 			if ('.' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerLetterDot_Left, 0);
-			else if (')' !== sLastChar)
+			else if (')' === sLastChar)
 				oNumberingLvl.SetByType(c_oAscNumberingLevel.LowerLetterBracket_Left, 0);
 
 			arrResult.push({Lvl : oNumberingLvl, Value : nLetter});
