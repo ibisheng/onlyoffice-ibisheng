@@ -794,8 +794,6 @@ function asc_menu_WriteShapePr(_type, _shapePr, _stream)
     _stream["WriteByte"](255);
 };
 
-
-
 function NativeOpenFileP(_params, documentInfo){
     window["CreateMainTextMeasurerWrapper"]();
     window.g_file_path = "native_open_file";
@@ -902,11 +900,12 @@ function NativeOpenFileP(_params, documentInfo){
         for(var i = 0; i < slides.length; ++i){
             aTimings.push(slides[i].timing.ToArray());
         }
+
+        _api.asc_GetDefaultTableStyles();
+
         return [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
     }
 }
-
-
 
 Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_params)
 {
