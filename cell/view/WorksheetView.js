@@ -99,6 +99,8 @@
     var asc_CSelectionMathInfo = AscCommonExcel.asc_CSelectionMathInfo;
     var vector_koef = AscCommonExcel.vector_koef;
 
+    var pageBreakPreviewMode = false;
+
     /*
      * Constants
      * -----------------------------------------------------------------------------
@@ -2286,7 +2288,7 @@
 		//добавлено сюда потому что отрисовка проиходит одновеременно с отрисовкой сетки
 		//и отрисовка происходит в два этапа - сначала текст - до линий сетки, потом линии печати - после линий сетки
 		//поэтому рассчет делаю 1 раз
-		var visiblePrintPages = this._getVisiblePrintPages(range);
+		var visiblePrintPages = pageBreakPreviewMode ? this._getVisiblePrintPages(range) : null;
 
 		// Возможно сетку не нужно рисовать (при печати свои проверки)
 		if (null === drawingCtx && false === this.model.getSheetView().asc_getShowGridLines()) {
@@ -2721,6 +2723,10 @@
 		};
 
 	WorksheetView.prototype._drawPageBreakPreviewLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height, printPages) {
+		if(!pageBreakPreviewMode) {
+			return;
+		}
+
 		if (range === undefined) {
 			range = this.visibleRange;
 		}
@@ -2779,7 +2785,7 @@
 				x1 = c[intersection.c1].left - offsetX;
 				y1 = r[intersection.r1].top - offsetY;
 				x2 = c[intersection.c2].left + c[intersection.c2].width - offsetX;
-				y2 = r[intersection.r2].top + r[intersection.c2].height - offsetY;
+				y2 = r[intersection.r2].top + r[intersection.r2].height - offsetY;
 
 				//рисуем линии, ограничивающие страницы
 				ctx.setStrokeStyle(this.settings.activeCellBorderColor);
@@ -2814,6 +2820,10 @@
 	};
 
 	WorksheetView.prototype._drawPageBreakPreviewLines2 = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
+
+		if(!pageBreakPreviewMode) {
+			return;
+		}
 
 		if (range === undefined) {
 			range = this.visibleRange;
@@ -2913,7 +2923,11 @@
 	};
 
 	WorksheetView.prototype._drawPageBreakPreviewText = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height, printPages) {
-		
+
+		if(!pageBreakPreviewMode) {
+			return;
+		}
+
 		if (range === undefined) {
 			range = this.visibleRange;
 		}
@@ -2947,10 +2961,10 @@
 			var intersection = unionRange ? range.intersection(unionRange) : null;
 
 			if(printPages[0] && intersection) {
-				x1 = c[intersection.c1].left - offsetX;
-				y1 = r[intersection.r1].top - offsetY;
-				x2 = c[intersection.c2].left + c[intersection.c2].width - offsetX;
-				y2 = r[intersection.r2].top + r[intersection.c2].height - offsetY;
+				x1 = c[range.c1].left - offsetX;
+				y1 = r[range.r1].top - offsetY;
+				x2 = c[range.c2].left + c[range.c2].width - offsetX;
+				y2 = r[range.r2].top + r[range.r2].height - offsetY;
 
 
 				var pageRange;
@@ -2969,27 +2983,25 @@
 
 					var centerX = c[pageRange.c1].left + ((c[pageRange.c2].left + c[pageRange.c2].width) - c[pageRange.c1].left) / 2 - offsetX;
 					var centerY = r[pageRange.r1].top + ((r[pageRange.r2].top + r[pageRange.r2].height) - r[pageRange.r1].top) / 2 - offsetY;
+
+					//TODO подобрать такой размер шрифта, чтобы у текста была нужная нам ширина(1/3 от ширины страницы)
 					var font = new AscCommonExcel.Font();
-					font.fs = 40;
+					font.fs = 30;
 					var str = [{text: basePageString + (index + 1), format: font}];
 					this.stringRender.setString(str);
-					//this.stringRender.setString(basePageString + (i + 1));
-					//this.stringRender.defaultFont.FontSize = 20;
 
 					var textMetrics = this.stringRender._measureChars();
 					tX1 = centerX - textMetrics.width / 2;
-					tX2 = tX1 + textMetrics.width / 2;
+					tX2 = centerX + textMetrics.width / 2;
 					tY1 = centerY - textMetrics.height / 2;
-					tY2 = tY1 + textMetrics.height / 2;
+					tY2 = centerY + textMetrics.height / 2;
 
-					if(!(tX1 > x2 || tX2 < x1 || (tY1 + this.cellsTop) > y2 || (tY2 + this.cellsTop) < y1)) {
+					if(!(tX1 > x2 || tX2 < x1 || tY1 > y2 || tY2 < y1)) {
 						ctx.AddClipRect(x1, y1, x2-x1, y2-y1);
 						this.stringRender.render(undefined, tX1, tY1, 100, this.settings.activeCellBorderColor);
 						ctx.RemoveClipRect();
 					}
 				}
-
-				ctx.stroke();
 			}
 		}
 	};
