@@ -14300,6 +14300,25 @@
 		return {X: xL, Y: yL};
 	};
 
+	WorksheetView.prototype.changePageOrient = function(orientation) {
+		var pageOptions = this.model.PagePrintOptions;
+		pageOptions.pageSetup.asc_setOrientation(orientation);
+	};
+
+	WorksheetView.prototype.changeDocSize = function(width, height) {
+		var pageOptions = this.model.PagePrintOptions;
+		pageOptions.pageSetup.asc_setWidth(width);
+		pageOptions.pageSetup.asc_setHeight(height);
+	};
+
+	WorksheetView.prototype.changePageMargins = function(left, top, right, bottom) {
+		var pageOptions = this.model.PagePrintOptions;
+		pageOptions.pageMargins.asc_setLeft(left);
+		pageOptions.pageMargins.asc_setTop(top);
+		pageOptions.pageMargins.asc_setRight(right);
+		pageOptions.pageMargins.asc_setBottom(bottom);
+	};
+
     //------------------------------------------------------------export---------------------------------------------------
     window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window["AscCommonExcel"].CellFlags = CellFlags;

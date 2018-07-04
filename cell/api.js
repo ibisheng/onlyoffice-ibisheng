@@ -626,6 +626,29 @@ var editor;
     return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
   };
 
+  spreadsheet_api.prototype.asc_changePageOrient = function(isPortrait, index)
+  {
+    var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+    var ws = this.wb.getWorksheet(sheetIndex);
+    if (isPortrait) {
+        ws.changePageOrient(Asc.c_oAscPageOrientation.PagePortrait);
+    } else {
+        ws.changePageOrient(Asc.c_oAscPageOrientation.PageLandscape);
+    }
+  };
+
+  spreadsheet_api.prototype.asc_changeDocSize = function (width, height) {
+    var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+    var ws = this.wb.getWorksheet(sheetIndex);
+    ws.changeDocSize(width, height);
+  };
+
+  spreadsheet_api.prototype.asc_changePageMargins = function (left, top, right, bottom) {
+      var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+      var ws = this.wb.getWorksheet(sheetIndex);
+      ws.changePageMargins(left, top, right, bottom);
+  };
+
   spreadsheet_api.prototype._onNeedParams = function(data, opt_isPassword) {
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
