@@ -43,6 +43,7 @@ var parserHelp = AscCommon.parserHelp;
 var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 	var History = AscCommon.History;
+	var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
@@ -7791,6 +7792,182 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 		return this.all.length;
 	};
 
+
+	/** @constructor */
+	function asc_CPageMargins (ws) {
+		this.left = null;
+		this.right = null;
+		this.top = null;
+		this.bottom = null;
+
+		this.ws = ws;
+
+		return this;
+	}
+	asc_CPageMargins.prototype.init = function () {
+		if (null == this.left)
+			this.left = c_oAscPrintDefaultSettings.PageLeftField;
+		if (null == this.top)
+			this.top = c_oAscPrintDefaultSettings.PageTopField;
+		if (null == this.right)
+			this.right = c_oAscPrintDefaultSettings.PageRightField;
+		if (null == this.bottom)
+			this.bottom = c_oAscPrintDefaultSettings.PageBottomField;
+	};
+	asc_CPageMargins.prototype.asc_getLeft = function () { return this.left; };
+	asc_CPageMargins.prototype.asc_getRight = function () { return this.right; };
+	asc_CPageMargins.prototype.asc_getTop = function () { return this.top; };
+	asc_CPageMargins.prototype.asc_getBottom = function () { return this.bottom; };
+
+	asc_CPageMargins.prototype.asc_setLeft = function (newVal) {
+		var oldVal = this.left;
+		this.left = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.left) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Left, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageMargins.prototype.asc_setRight = function (newVal) {
+		var oldVal = this.right;
+		this.right = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.right) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Right, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageMargins.prototype.asc_setTop = function (newVal) {
+		var oldVal = this.top;
+		this.top = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.top) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Top, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageMargins.prototype.asc_setBottom = function (newVal) {
+		var oldVal = this.bottom;
+		this.bottom = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.bottom) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Bottom, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	/** @constructor */
+	function asc_CPageSetup(ws) {
+		this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
+		this.width = c_oAscPrintDefaultSettings.PageWidth;
+		this.height = c_oAscPrintDefaultSettings.PageHeight;
+
+		this.fitToWidth = false; //ToDo can be a number
+		this.fitToHeight = false; //ToDo can be a number
+
+		// ToDo
+		this.blackAndWhite = false;
+		this.cellComments = 0; // none ST_CellComments
+		this.copies = 1;
+		this.draft = false;
+		this.errors = 0; // displayed ST_PrintError
+		this.firstPageNumber = -1;
+		this.pageOrder = 0; // downThenOver ST_PageOrder
+		this.scale = 100;
+		this.useFirstPageNumber = false;
+		this.usePrinterDefaults = true;
+
+		this.ws = ws;
+
+		return this;
+	}
+	asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
+	asc_CPageSetup.prototype.asc_getWidth = function () { return this.width; };
+	asc_CPageSetup.prototype.asc_getHeight = function () { return this.height; };
+
+	asc_CPageSetup.prototype.asc_setOrientation = function (newVal) {
+		var oldVal = this.orientation;
+		this.orientation = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.orientation) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Orientation, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageSetup.prototype.asc_setWidth = function (newVal) {
+		var oldVal = this.width;
+		this.width = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.width) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Width, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageSetup.prototype.asc_setHeight = function (newVal) {
+		var oldVal = this.height;
+		this.height = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.height) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Height, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+
+	asc_CPageSetup.prototype.asc_getFitToWidth = function () { return this.fitToWidth; };
+	asc_CPageSetup.prototype.asc_getFitToHeight = function () { return this.fitToHeight; };
+
+	asc_CPageSetup.prototype.asc_setFitToWidth = function (newVal) {
+		var oldVal = this.fitToWidth;
+		this.fitToWidth = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.fitToWidth) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_FitToWidth, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageSetup.prototype.asc_setFitToHeight = function (newVal) {
+		var oldVal = this.fitToHeight;
+		this.fitToHeight = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.fitToHeight) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_FitToHeight, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+
+	/** @constructor */
+	function asc_CPageOptions(ws) {
+		this.pageMargins = new asc_CPageMargins(ws);
+		this.pageSetup = new asc_CPageSetup(ws);
+		this.gridLines = null;
+		this.headings = null;
+		this.ws = ws;
+
+		return this;
+	}
+	asc_CPageOptions.prototype.init = function () {
+		this.pageMargins.init();
+
+		if (null == this.gridLines)
+			this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
+		if (null == this.headings)
+			this.headings = c_oAscPrintDefaultSettings.PageHeadings;
+	};
+	asc_CPageOptions.prototype.asc_getPageMargins = function () { return this.pageMargins; };
+	asc_CPageOptions.prototype.asc_getPageSetup = function () { return this.pageSetup; };
+	asc_CPageOptions.prototype.asc_getGridLines = function () { return this.gridLines; };
+	asc_CPageOptions.prototype.asc_getHeadings = function () { return this.headings; };
+	//методы только для меню, без добавляем в историю
+	asc_CPageOptions.prototype.asc_setPageMargins = function (val) { this.pageMargins = val; };
+	asc_CPageOptions.prototype.asc_setPageSetup = function (val) { this.pageSetup = val; };
+
+	asc_CPageOptions.prototype.asc_setGridLines = function (newVal) {
+		var oldVal = this.gridLines;
+		this.gridLines = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.gridLines) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_GridLines, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageOptions.prototype.asc_setHeadings = function (newVal) {
+		var oldVal = this.headings;
+		this.headings = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.headings) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Headings, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	var prot;
 	window['Asc'] = window['Asc'] || {};
@@ -7899,56 +8076,92 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
 
-window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
-prot									= CustomFilters.prototype;
-prot["asc_getAnd"]						= prot.asc_getAnd;
-prot["asc_getCustomFilters"]			= prot.asc_getCustomFilters;
-prot["asc_setAnd"]						= prot.asc_setAnd;
-prot["asc_setCustomFilters"]			= prot.asc_setCustomFilters;
+	window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
+	prot									= CustomFilters.prototype;
+	prot["asc_getAnd"]						= prot.asc_getAnd;
+	prot["asc_getCustomFilters"]			= prot.asc_getCustomFilters;
+	prot["asc_setAnd"]						= prot.asc_setAnd;
+	prot["asc_setCustomFilters"]			= prot.asc_setCustomFilters;
 
-window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
-prot									= CustomFilter.prototype;
-prot["asc_getOperator"]					= prot.asc_getOperator;
-prot["asc_getVal"]						= prot.asc_getVal;
-prot["asc_setOperator"]					= prot.asc_setOperator;
-prot["asc_setVal"]						= prot.asc_setVal;
+	window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
+	prot									= CustomFilter.prototype;
+	prot["asc_getOperator"]					= prot.asc_getOperator;
+	prot["asc_getVal"]						= prot.asc_getVal;
+	prot["asc_setOperator"]					= prot.asc_setOperator;
+	prot["asc_setVal"]						= prot.asc_setVal;
 
-window["Asc"]["DynamicFilter"]			= window["Asc"].DynamicFilter = DynamicFilter;
-prot									= DynamicFilter.prototype;
-prot["asc_getType"]						= prot.asc_getType;
-prot["asc_getVal"]						= prot.asc_getVal;
-prot["asc_getMaxVal"]					= prot.asc_getMaxVal;
-prot["asc_setType"]						= prot.asc_setType;
-prot["asc_setVal"]						= prot.asc_setVal;
-prot["asc_setMaxVal"]					= prot.asc_setMaxVal;
+	window["Asc"]["DynamicFilter"]			= window["Asc"].DynamicFilter = DynamicFilter;
+	prot									= DynamicFilter.prototype;
+	prot["asc_getType"]						= prot.asc_getType;
+	prot["asc_getVal"]						= prot.asc_getVal;
+	prot["asc_getMaxVal"]					= prot.asc_getMaxVal;
+	prot["asc_setType"]						= prot.asc_setType;
+	prot["asc_setVal"]						= prot.asc_setVal;
+	prot["asc_setMaxVal"]					= prot.asc_setMaxVal;
 
-window["Asc"]["ColorFilter"]			= window["Asc"].ColorFilter = ColorFilter;
-prot									= ColorFilter.prototype;
-prot["asc_getCellColor"]				= prot.asc_getCellColor;
-prot["asc_getCColor"]					= prot.asc_getCColor;
-prot["asc_getDxf"]						= prot.asc_getDxf;
-prot["asc_setCellColor"]				= prot.asc_setCellColor;
-prot["asc_setDxf"]						= prot.asc_setDxf;
-prot["asc_setCColor"]					= prot.asc_setCColor;
+	window["Asc"]["ColorFilter"]			= window["Asc"].ColorFilter = ColorFilter;
+	prot									= ColorFilter.prototype;
+	prot["asc_getCellColor"]				= prot.asc_getCellColor;
+	prot["asc_getCColor"]					= prot.asc_getCColor;
+	prot["asc_getDxf"]						= prot.asc_getDxf;
+	prot["asc_setCellColor"]				= prot.asc_setCellColor;
+	prot["asc_setDxf"]						= prot.asc_setDxf;
+	prot["asc_setCColor"]					= prot.asc_setCColor;
 
-window["Asc"]["Top10"]					= window["Asc"].Top10 = Top10;
-prot									= Top10.prototype;
-prot["asc_getFilterVal"]				= prot.asc_getFilterVal;
-prot["asc_getPercent"]					= prot.asc_getPercent;
-prot["asc_getTop"]						= prot.asc_getTop;
-prot["asc_getVal"]						= prot.asc_getVal;
-prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
-prot["asc_setPercent"]					= prot.asc_setPercent;
-prot["asc_setTop"]						= prot.asc_setTop;
-prot["asc_setVal"]						= prot.asc_setVal;
+	window["Asc"]["Top10"]					= window["Asc"].Top10 = Top10;
+	prot									= Top10.prototype;
+	prot["asc_getFilterVal"]				= prot.asc_getFilterVal;
+	prot["asc_getPercent"]					= prot.asc_getPercent;
+	prot["asc_getTop"]						= prot.asc_getTop;
+	prot["asc_getVal"]						= prot.asc_getVal;
+	prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
+	prot["asc_setPercent"]					= prot.asc_setPercent;
+	prot["asc_setTop"]						= prot.asc_setTop;
+	prot["asc_setVal"]						= prot.asc_setVal;
 
-window["Asc"]["TreeRBNode"]			= window["Asc"].TreeRBNode = TreeRBNode;
-window["Asc"]["TreeRB"]			= window["Asc"].TreeRB = TreeRB;
-prot									= TreeRB.prototype;
-prot["insertOrGet"]						= prot.insertOrGet;
-prot["deleteNode"]			= prot.deleteNode;
-prot["enumerate"]						= prot.enumerate;
-prot["getElem"]			= prot.getElem;
-prot["getNodeAll"]			= prot.getNodeAll;
-prot["isEmpty"]			= prot.getNodeAll;
+	window["Asc"]["TreeRBNode"]			= window["Asc"].TreeRBNode = TreeRBNode;
+	window["Asc"]["TreeRB"]			= window["Asc"].TreeRB = TreeRB;
+	prot									= TreeRB.prototype;
+	prot["insertOrGet"]						= prot.insertOrGet;
+	prot["deleteNode"]			= prot.deleteNode;
+	prot["enumerate"]						= prot.enumerate;
+	prot["getElem"]			= prot.getElem;
+	prot["getNodeAll"]			= prot.getNodeAll;
+	prot["isEmpty"]			= prot.getNodeAll;
+
+
+	window["Asc"]["asc_CPageMargins"] = window["Asc"].asc_CPageMargins = asc_CPageMargins;
+	prot = asc_CPageMargins.prototype;
+	prot["asc_getLeft"] = prot.asc_getLeft;
+	prot["asc_getRight"] = prot.asc_getRight;
+	prot["asc_getTop"] = prot.asc_getTop;
+	prot["asc_getBottom"] = prot.asc_getBottom;
+	prot["asc_setLeft"] = prot.asc_setLeft;
+	prot["asc_setRight"] = prot.asc_setRight;
+	prot["asc_setTop"] = prot.asc_setTop;
+	prot["asc_setBottom"] = prot.asc_setBottom;
+
+	window["Asc"]["asc_CPageSetup"] = window["Asc"].asc_CPageSetup = asc_CPageSetup;
+	prot = asc_CPageSetup.prototype;
+	prot["asc_getOrientation"] = prot.asc_getOrientation;
+	prot["asc_getWidth"] = prot.asc_getWidth;
+	prot["asc_getHeight"] = prot.asc_getHeight;
+	prot["asc_setOrientation"] = prot.asc_setOrientation;
+	prot["asc_setWidth"] = prot.asc_setWidth;
+	prot["asc_setHeight"] = prot.asc_setHeight;
+	prot["asc_getFitToWidth"] = prot.asc_getFitToWidth;
+	prot["asc_getFitToHeight"] = prot.asc_getFitToHeight;
+	prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
+	prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
+
+	window["Asc"]["asc_CPageOptions"] = window["Asc"].asc_CPageOptions = asc_CPageOptions;
+	prot = asc_CPageOptions.prototype;
+	prot["asc_getPageMargins"] = prot.asc_getPageMargins;
+	prot["asc_getPageSetup"] = prot.asc_getPageSetup;
+	prot["asc_getGridLines"] = prot.asc_getGridLines;
+	prot["asc_getHeadings"] = prot.asc_getHeadings;
+	prot["asc_setPageMargins"] = prot.asc_setPageMargins;
+	prot["asc_setPageSetup"] = prot.asc_setPageSetup;
+	prot["asc_setGridLines"] = prot.asc_setGridLines;
+	prot["asc_setHeadings"] = prot.asc_setHeadings;
 })(window);
