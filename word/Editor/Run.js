@@ -10229,6 +10229,10 @@ ParaRun.prototype.ProcessAutoCorrect = function(nPos)
 	if (!oParagraph)
 		return false;
 
+	var oDocument = oParagraph.LogicDocument;
+	if (!oDocument || !(oDocument instanceof CDocument))
+		return false;
+
 	var oContentPos = oParagraph.Get_PosByElement(this);
 	if (!oContentPos)
 		return false;
@@ -10249,10 +10253,6 @@ ParaRun.prototype.ProcessAutoCorrect = function(nPos)
 
 		sText += String.fromCharCode(arrElements[nIndex].Value);
 	}
-
-	var oDocument = oParagraph.LogicDocument;
-	if (!oDocument)
-		return false;
 
 	// Автосоздание списка
 	if (oParagraph.GetNumPr())
