@@ -3193,6 +3193,79 @@
 		return scheme;
 	}
 
+	function isEastAsianScript(value)
+	{
+		// Bopomofo (3100–312F)
+		// Bopomofo Extended (31A0–31BF)
+		// CJK Unified Ideographs (4E00–9FEA)
+		// CJK Unified Ideographs Extension A (3400–4DB5)
+		// CJK Unified Ideographs Extension B (20000–2A6D6)
+		// CJK Unified Ideographs Extension C (2A700–2B734)
+		// CJK Unified Ideographs Extension D (2B740–2B81D)
+		// CJK Unified Ideographs Extension E (2B820–2CEA1)
+		// CJK Unified Ideographs Extension F (2CEB0–2EBE0)
+		// CJK Compatibility Ideographs (F900–FAFF)
+		// CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+		// Kangxi Radicals (2F00–2FDF)
+		// CJK Radicals Supplement (2E80–2EFF)
+		// CJK Strokes (31C0–31EF)
+		// Ideographic Description Characters (2FF0–2FFF)
+		// Hangul Jamo (1100–11FF)
+		// Hangul Jamo Extended-A (A960–A97F)
+		// Hangul Jamo Extended-B (D7B0–D7FF)
+		// Hangul Compatibility Jamo (3130–318F)
+		// Halfwidth and Fullwidth Forms (FF00–FFEF)
+		// Hangul Syllables (AC00–D7AF)
+		// Hiragana (3040–309F)
+		// Kana Extended-A (1B100–1B12F)
+		// Kana Supplement (1B000–1B0FF)
+		// Kanbun (3190–319F)
+		// Katakana (30A0–30FF)
+		// Katakana Phonetic Extensions (31F0–31FF)
+		// Lisu (A4D0–A4FF)
+		// Miao (16F00–16F9F)
+		// Nushu (1B170–1B2FF)
+		// Tangut (17000–187EC)
+		// Tangut Components (18800–18AFF)
+		// Yi Syllables (A000–A48F)
+		// Yi Radicals (A490–A4CF)
+
+		return ((0x3100 <= value && value <= 0x312F)
+			|| (0x31A0 <= value && value <= 0x31BF)
+			|| (0x4E00 <= value && value <= 0x9FEA)
+			|| (0x3400 <= value && value <= 0x4DB5)
+			|| (0x20000 <= value && value <= 0x2A6D6)
+			|| (0x2A700 <= value && value <= 0x2B734)
+			|| (0x2B740 <= value && value <= 0x2B81D)
+			|| (0x2B820 <= value && value <= 0x2CEA1)
+			|| (0x2CEB0 <= value && value <= 0x2EBE0)
+			|| (0xF900 <= value && value <= 0xFAFF)
+			|| (0x2F800 <= value && value <= 0x2FA1F)
+			|| (0x2F00 <= value && value <= 0x2FDF)
+			|| (0x2E80 <= value && value <= 0x2EFF)
+			|| (0x31C0 <= value && value <= 0x31EF)
+			|| (0x2FF0 <= value && value <= 0x2FFF)
+			|| (0x1100 <= value && value <= 0x11FF)
+			|| (0xA960 <= value && value <= 0xA97F)
+			|| (0xD7B0 <= value && value <= 0xD7FF)
+			|| (0x3130 <= value && value <= 0x318F)
+			|| (0xFF00 <= value && value <= 0xFFEF)
+			|| (0xAC00 <= value && value <= 0xD7AF)
+			|| (0x3040 <= value && value <= 0x309F)
+			|| (0x1B100 <= value && value <= 0x1B12F)
+			|| (0x1B000 <= value && value <= 0x1B0FF)
+			|| (0x3190 <= value && value <= 0x319F)
+			|| (0x30A0 <= value && value <= 0x30FF)
+			|| (0x31F0 <= value && value <= 0x31FF)
+			|| (0xA4D0 <= value && value <= 0xA4FF)
+			|| (0x16F00 <= value && value <= 0x16F9F)
+			|| (0x1B170 <= value && value <= 0x1B2FF)
+			|| (0x17000 <= value && value <= 0x187EC)
+			|| (0x18800 <= value && value <= 0x18AFF)
+			|| (0xA000 <= value && value <= 0xA48F)
+			|| (0xA490 <= value && value <= 0xA4CF));
+	}
+
 	var g_oIdCounter = new CIdCounter();
 
 	window["SetDoctRendererParams"] = function (_params)
@@ -3966,6 +4039,7 @@
 	window["AscCommon"].loadSdk = loadSdk;
 	window["AscCommon"].getAltGr = getAltGr;
 	window["AscCommon"].getColorThemeByIndex = getColorThemeByIndex;
+	window["AscCommon"].isEastAsianScript = isEastAsianScript;
 
 	window["AscCommon"].JSZipWrapper = JSZipWrapper;
 	window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;

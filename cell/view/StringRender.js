@@ -829,6 +829,9 @@
 						} else if (isSP || isHP) {
 							// move hyphenation position
 							hpPos = chPos + 1;
+						} else if (AscCommon.isEastAsianScript(s.charCodeAt(j))) {
+							// move hyphenation position
+							hpPos = chPos;
 						}
 
 						if (wrap && tw + chw > maxWidth && chPos !== nlPos && !isSP) {
