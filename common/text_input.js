@@ -613,7 +613,7 @@
 
 		onInput : function(e, isFromCompositionUpdate)
 		{
-			if (this.Api.isLongAction())
+			if (this.Api.isLongAction() || this.Api.isViewMode)
 			{
 				AscCommon.stopEvent(e);
 				return false;
@@ -1034,7 +1034,7 @@
 
 		onKeyPress : function(e)
 		{
-			if (this.Api.isLongAction() || !this.Api.asc_IsFocus())
+			if (this.Api.isLongAction() || !this.Api.asc_IsFocus() || this.Api.isViewMode)
 			{
 				AscCommon.stopEvent(e);
 				return false;
