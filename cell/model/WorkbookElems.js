@@ -7851,6 +7851,26 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 				null, new UndoRedoData_Layout(oldVal, newVal));
 		}
 	};
+	asc_CPageMargins.prototype.asc_setOptions = function (obj) {
+		var prop;
+		prop = obj.asc_getLeft();
+		if(prop !== this.asc_getLeft()) {
+			this.asc_setLeft(prop);
+		}
+		prop = obj.asc_getRight();
+		if(prop !== this.asc_getRight()) {
+			this.asc_setRight(prop);
+		}
+		prop = obj.asc_getBottom();
+		if(prop !== this.asc_getBottom()) {
+			this.asc_setBottom(prop);
+		}
+		prop = obj.asc_getTop();
+		if(prop !== this.asc_getTop()) {
+			this.asc_setTop(prop);
+		}
+	};
+
 	/** @constructor */
 	function asc_CPageSetup(ws) {
 		this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
@@ -7924,8 +7944,39 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 				null, new UndoRedoData_Layout(oldVal, newVal));
 		}
 	};
+	asc_CPageSetup.prototype.asc_setOptions = function (obj) {
+
+		var prop;
+		prop = obj.asc_getOrientation();
+		if(prop !== this.asc_getOrientation()) {
+			this.asc_setOrientation(prop);
+		}
+		prop = obj.asc_getWidth();
+		if(prop !== this.asc_getWidth()) {
+			this.asc_setWidth(prop);
+		}
+		prop = obj.asc_getHeight();
+		if(prop !== this.asc_getHeight()) {
+			this.asc_setHeight(prop);
+		}
+		prop = obj.asc_getHeight();
+		if(prop !== this.asc_getHeight()) {
+			this.asc_setHeight(prop);
+		}
+		prop = obj.asc_getFitToWidth();
+		if(prop !== this.asc_getFitToWidth()) {
+			this.asc_setFitToWidth(prop);
+		}
+		prop = obj.asc_getFitToHeight();
+		if(prop !== this.asc_getFitToHeight()) {
+			this.asc_setFitToHeight(prop);
+		}
+	};
 
 	/** @constructor */
+	//этот объект используется как в модели, так и в меню для передачи измененных опций page layout
+	//если определена ws - это означает, что этот объект лежит в модели и при изменении его свойств идёт запись в историю
+	//в противном случае запись в историю не происходит
 	function asc_CPageOptions(ws) {
 		this.pageMargins = new asc_CPageMargins(ws);
 		this.pageSetup = new asc_CPageSetup(ws);
@@ -7966,6 +8017,19 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Headings, this.ws.getId(),
 				null, new UndoRedoData_Layout(oldVal, newVal));
 		}
+	};
+	asc_CPageOptions.prototype.asc_setOptions = function (obj) {
+		var gridLines = obj.asc_getOrientation();
+		if(gridLines !== this.asc_getGridLines()) {
+			this.asc_setGridLines(gridLines);
+		}
+		var heading = obj.asc_getHeadings();
+		if(gridLines !== this.asc_getHeadings()) {
+			this.asc_setHeadings(heading);
+		}
+
+		this.asc_getPageMargins().asc_setOptions(obj.asc_getPageMargins());
+		this.asc_setPageSetup().asc_setOptions(obj.asc_getPageSetup());
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

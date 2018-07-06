@@ -10229,6 +10229,12 @@
 		return cellCoord;
 	};
 
+	WorksheetView.prototype._isLockedLayoutOptions = function (callback) {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
+			AscCommonExcel.c_oAscLockLayoutOptions);
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
+
 	// Залочена ли панель для закрепления
 	WorksheetView.prototype._isLockedFrozenPane = function (callback) {
 		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
@@ -14300,23 +14306,67 @@
 		return {X: xL, Y: yL};
 	};
 
-	WorksheetView.prototype.changePageOrient = function(orientation) {
-		var pageOptions = this.model.PagePrintOptions;
-		pageOptions.pageSetup.asc_setOrientation(orientation);
+	/** Для api layout */
+	WorksheetView.prototype.changeDocSize = function (width, height) {
+		var t = this;
+		var pageOptions = t.model.PagePrintOptions;
+
+		var onChangeDocSize = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			pageOptions.pageSetup.asc_setWidth(width);
+			pageOptions.pageSetup.asc_setHeight(height);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(onChangeDocSize);
 	};
 
-	WorksheetView.prototype.changeDocSize = function(width, height) {
-		var pageOptions = this.model.PagePrintOptions;
-		pageOptions.pageSetup.asc_setWidth(width);
-		pageOptions.pageSetup.asc_setHeight(height);
+	WorksheetView.prototype.setPageOption = function (callback, val) {
+		var onChangeDocSize = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			callback(val);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(onChangeDocSize);
 	};
 
-	WorksheetView.prototype.changePageMargins = function(left, top, right, bottom) {
-		var pageOptions = this.model.PagePrintOptions;
-		pageOptions.pageMargins.asc_setLeft(left);
-		pageOptions.pageMargins.asc_setTop(top);
-		pageOptions.pageMargins.asc_setRight(right);
-		pageOptions.pageMargins.asc_setBottom(bottom);
+	WorksheetView.prototype.setPageOptions = function (obj) {
+		var t = this;
+		var pageOptions = t.model.PagePrintOptions;
+
+		if(!obj) {
+			return;
+		}
+
+		var onChangeDocSize = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			pageOptions.asc_setOptions(obj);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(onChangeDocSize);
 	};
 
     //------------------------------------------------------------export---------------------------------------------------
