@@ -708,6 +708,154 @@ function asc_menu_WriteAscStroke(_type, _stroke, _stream)
 
 };
 
+function asc_menu_ReadPosition(_params, _cursor) {
+    var _position = new Asc.CPosition();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _position.X = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _position.Y = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _position;
+}
+
+function asc_menu_WritePosition(_type, _position, _stream) {
+    if (!_position)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_position.X !== undefined && _position.X !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteDouble2"](_position.X);
+    }
+    if (_position.Y !== undefined && _position.Y !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_position.Y);
+    }
+
+    _stream["WriteByte"](255);
+}
+
+function asc_menu_ReadPaddings(_params, _cursor) {
+    var _paddings = new Asc.asc_CPaddings();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _paddings.Left = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _paddings.Top = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _paddings.Right = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _paddings.Bottom = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _paddings;
+};
+
+function asc_menu_WritePaddings(_type, _paddings, _stream) {
+    if (!_paddings)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_paddings.Left !== undefined && _paddings.Left !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteDouble2"](_paddings.Left);
+    }
+    if (_paddings.Top !== undefined && _paddings.Top !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_paddings.Top);
+    }
+    if (_paddings.Right !== undefined && _paddings.Right !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_paddings.Right);
+    }
+    if (_paddings.Bottom !== undefined && _paddings.Bottom !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteDouble2"](_paddings.Bottom);
+    }
+
+    _stream["WriteByte"](255);
+};
+
+function asc_menu_WriteImagePosition(_type, _position, _stream){
+    if (!_position)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_position.RelativeFrom !== undefined && _position.RelativeFrom !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_position.RelativeFrom);
+    }
+    if (_position.UseAlign !== undefined && _position.UseAlign !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteBool"](_position.UseAlign);
+    }
+    if (_position.Align !== undefined && _position.Align !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_position.Align);
+    }
+    if (_position.Value !== undefined && _position.Value !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteLong"](_position.Value);
+    }
+
+    _stream["WriteByte"](255);
+}
+
 function asc_menu_ReadShapePr(_params, _cursor)
 {
     var _settings = new Asc.asc_CShapeProperty();
@@ -763,8 +911,8 @@ function asc_menu_ReadShapePr(_params, _cursor)
 
     return _settings;
 };
-function asc_menu_WriteShapePr(_type, _shapePr, _stream)
-{
+
+function asc_menu_WriteShapePr(_type, _shapePr, _stream) {
     if (!_shapePr)
         return;
 
@@ -789,6 +937,103 @@ function asc_menu_WriteShapePr(_type, _shapePr, _stream)
     {
         _stream["WriteByte"](5);
         _stream["WriteBool"](_shapePr.bFromChart);
+    }
+
+    _stream["WriteByte"](255);
+};
+
+function asc_menu_WriteImagePr(_imagePr, _stream){
+    if (_imagePr.CanBeFlow !== undefined && _imagePr.CanBeFlow !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteBool"](_imagePr.CanBeFlow);
+    }
+    if (_imagePr.Width !== undefined && _imagePr.Width !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_imagePr.Width);
+    }
+    if (_imagePr.Height !== undefined && _imagePr.Height !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_imagePr.Height);
+    }
+    if (_imagePr.WrappingStyle !== undefined && _imagePr.WrappingStyle !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteLong"](_imagePr.WrappingStyle);
+    }
+
+    asc_menu_WritePaddings(4, _imagePr.Paddings, _stream);
+    asc_menu_WritePosition(5, _imagePr.Position, _stream);
+
+    if (_imagePr.AllowOverlap !== undefined && _imagePr.AllowOverlap !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteBool"](_imagePr.AllowOverlap);
+    }
+
+    asc_menu_WriteImagePosition(7, _imagePr.PositionH, _stream);
+    asc_menu_WriteImagePosition(8, _imagePr.PositionV, _stream);
+
+    if (_imagePr.Internal_Position !== undefined && _imagePr.Internal_Position !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteLong"](_imagePr.Internal_Position);
+    }
+
+    if (_imagePr.ImageUrl !== undefined && _imagePr.ImageUrl !== null)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteString2"](_imagePr.ImageUrl);
+    }
+
+    if (_imagePr.Locked !== undefined && _imagePr.Locked !== null)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteBool"](_imagePr.Locked);
+    }
+
+    //asc_menu_WriteChartPr(12, _imagePr.ChartProperties, _stream);
+    asc_menu_WriteShapePr(13, _imagePr.ShapeProperties, _stream);
+
+    if (_imagePr.ChangeLevel !== undefined && _imagePr.ChangeLevel !== null)
+    {
+        _stream["WriteByte"](14);
+        _stream["WriteLong"](_imagePr.ChangeLevel);
+    }
+
+    if (_imagePr.Group !== undefined && _imagePr.Group !== null)
+    {
+        _stream["WriteByte"](15);
+        _stream["WriteLong"](_imagePr.Group);
+    }
+
+    if (_imagePr.fromGroup !== undefined && _imagePr.fromGroup !== null)
+    {
+        _stream["WriteByte"](16);
+        _stream["WriteBool"](_imagePr.fromGroup);
+    }
+    if (_imagePr.severalCharts !== undefined && _imagePr.severalCharts !== null)
+    {
+        _stream["WriteByte"](17);
+        _stream["WriteBool"](_imagePr.severalCharts);
+    }
+
+    if (_imagePr.severalChartTypes !== undefined && _imagePr.severalChartTypes !== null)
+    {
+        _stream["WriteByte"](18);
+        _stream["WriteLong"](_imagePr.severalChartTypes);
+    }
+    if (_imagePr.severalChartStyles !== undefined && _imagePr.severalChartStyles !== null)
+    {
+        _stream["WriteByte"](19);
+        _stream["WriteLong"](_imagePr.severalChartStyles);
+    }
+    if (_imagePr.verticalTextAlign !== undefined && _imagePr.verticalTextAlign !== null)
+    {
+        _stream["WriteByte"](20);
+        _stream["WriteLong"](_imagePr.verticalTextAlign);
     }
 
     _stream["WriteByte"](255);

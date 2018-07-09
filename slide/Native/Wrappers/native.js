@@ -57,6 +57,91 @@ Asc['asc_docs_api'].prototype.SetDocumentModified = function(bValue)
     window["native"]["OnCallMenuEvent"](66, _stream); // ASC_MENU_EVENT_TYPE_DOCUMETN_MODIFITY
 };
 
+Asc['asc_docs_api'].prototype.sync_EndCatchSelectedElements = function()
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    var _count = this.SelectedObjectsStack.length;
+    var _naturalCount = 0;
+
+    for (var i = 0; i < _count; i++)
+    {
+        switch (this.SelectedObjectsStack[i].Type)
+        {
+            //case Asc.c_oAscTypeSelectElement.Paragraph:
+            //case Asc.c_oAscTypeSelectElement.Table:
+            case Asc.c_oAscTypeSelectElement.Image:
+            //case Asc.c_oAscTypeSelectElement.Hyperlink:
+            case Asc.c_oAscTypeSelectElement.Slide:
+            case Asc.c_oAscTypeSelectElement.Shape:           
+            {
+                ++_naturalCount;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    _stream["WriteLong"](_naturalCount);
+
+    for (var i = 0; i < _count; i++)
+    {
+        switch (this.SelectedObjectsStack[i].Type)
+        {
+            case Asc.c_oAscTypeSelectElement.Slide:
+            {
+                console.log("StackObjects -> Slide");
+                break;
+            }
+          
+            case Asc.c_oAscTypeSelectElement.Shape:
+            {
+                console.log("StackObjects -> Shape");
+                break;
+            }
+
+            case Asc.c_oAscTypeSelectElement.Paragraph:
+            {
+                //console.log("StackObjects -> Paragraph");
+                //_stream["WriteLong"](Asc.c_oAscTypeSelectElement.Paragraph);
+                //asc_menu_WriteParagraphPr(this.SelectedObjectsStack[i].Value, _stream);
+                break;
+            }
+
+            case Asc.c_oAscTypeSelectElement.Table:
+            {
+                //console.log("StackObjects -> Table");
+                //_stream["WriteLong"](Asc.c_oAscTypeSelectElement.Table);
+                //asc_menu_WriteTablePr(this.SelectedObjectsStack[i].Value, _stream);
+                break;
+            }
+            case Asc.c_oAscTypeSelectElement.Image:
+            {
+                console.log("StackObjects -> Image");
+                _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Image);
+                asc_menu_WriteImagePr(this.SelectedObjectsStack[i].Value, _stream);
+                break;
+            }
+            case Asc.c_oAscTypeSelectElement.Hyperlink:
+            {
+                //console.log("StackObjects -> Hyperlink");
+               // _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Hyperlink);
+               // asc_menu_WriteHyperPr(this.SelectedObjectsStack[i].Value, _stream);
+                break;
+            }
+            default:
+            {
+                // none
+                break;
+            }
+        }
+    }
+
+    window["native"]["OnCallMenuEvent"](6, global_memory_stream_menu);
+};
+
 Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 {
     var _return = undefined;
