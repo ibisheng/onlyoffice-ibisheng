@@ -408,7 +408,7 @@
 				var isTurnOffHistory = worksheet.workbook.bUndoChanges || worksheet.workbook.bRedoChanges;
 				
 				
-				var filterInfo = this._getFilterInfoByAddTableProps(activeRange, addFormatTableOptionsObj);
+				var filterInfo = this._getFilterInfoByAddTableProps(activeRange, addFormatTableOptionsObj, !!styleName);
 				var addNameColumn = filterInfo.addNameColumn;
 				var filterRange = filterInfo.filterRange;
 				var rangeWithoutDiff = filterInfo.rangeWithoutDiff;
@@ -5114,7 +5114,7 @@
 				return res;
 			},
 
-			_getFilterInfoByAddTableProps: function(ar, addFormatTableOptionsObj)
+			_getFilterInfoByAddTableProps: function(ar, addFormatTableOptionsObj, bTable)
 			{
 				var tempRange =  new Asc.Range(ar.c1, ar.r1, ar.c2, ar.r2);
 				var addNameColumn, filterRange, bIsManualOptions = false;
@@ -5147,7 +5147,18 @@
 				}
 				else
 				{
-					filterRange = tempRange;
+					if(!bTable) {
+						//меняем range в зависимости от последних ячеек со значениями
+						//ms ещё смотрит на аналогичные значения для начала диапазона
+						//TODO если будут такие переменные со значениями начала диапазона - сделать аналогично MS
+						var definedRange =  new Asc.Range(0, 0, this.worksheet.nColsCount - 1, this.worksheet.nRowsCount - 1);
+						filterRange = tempRange.intersection(definedRange);
+						if(!filterRange) {
+							filterRange = tempRange;
+						}
+					} else {
+						filterRange = tempRange;
+					}
 				}
 
 				var rangeWithoutDiff = filterRange.clone();
