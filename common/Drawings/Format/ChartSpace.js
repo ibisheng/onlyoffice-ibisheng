@@ -911,6 +911,7 @@ function checkPointInMap(map, worksheet, row, col)
                 var oContent = oLabel.tx.rich.content;
                 oContent.Set_ApplyToAll(true);
                 oContent.SetParagraphAlign(AscCommon.align_Left);
+                oContent.SetParagraphIndent({FirstLine: 0.0, Left: 0.0});
                 oContent.Set_ApplyToAll(false);
                 var oSize = oLabel.tx.rich.getContentOneStringSizes();
                 var fBoxW = fMultiplier*(oSize.w + oSize.h);
@@ -921,13 +922,12 @@ function checkPointInMap(map, worksheet, row, col)
                 var fX1, fY0, fXC, fYC;
                 fY0 = fAxisY + fDistance;
                 if(fDistance >= 0.0){
-                    fX1 = fCurX + oSize.h*fMultiplier;
-                    fXC = fX1 - fBoxW/2.0;
+                    fXC = fCurX - oSize.w*fMultiplier/2.0;
                     fYC = fY0 + fBoxH/2.0;
                 }
                 else{
-                    fX1 = fCurX - oSize.h*fMultiplier;
-                    fXC = fX1 + fBoxW/2.0;
+                    //fX1 = fCurX - oSize.h*fMultiplier;
+                    fXC = fCurX + oSize.w*fMultiplier/2.0;
                     fYC = fY0 - fBoxH/2.0;
                 }
                 var oTransform = oLabel.localTransformText;
