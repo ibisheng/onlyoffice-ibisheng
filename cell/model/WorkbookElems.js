@@ -6946,12 +6946,22 @@ CustomFilter.prototype.isHideValue = function(val) {
 		var trimVal = "string" === typeof(val) ? window["Asc"].trim(val) : val;
 		var trimFilterVal = "string" === typeof(filterVal) ? window["Asc"].trim(filterVal) : filterVal;
 
+
+		var matchingValues = function(val1, val2, op) {
+			var matchingInfo = AscCommonExcel.matchingValue(new AscCommonExcel.cString(val1));
+			if(op) {
+				matchingInfo.op = op;
+			}
+			return AscCommonExcel.matching(new AscCommonExcel.cString(val2), matchingInfo);
+		};
+
 		switch (this.Operator)
 		{
 			case c_oAscCustomAutoFilter.equals://equals
 			{
-				if(trimVal === trimFilterVal)
-				{
+				if(!isDigitValue) {
+					result = matchingValues(trimFilterVal, trimVal);
+				} else if(trimVal === trimFilterVal) {
 					result = true;
 				}
 				
@@ -6959,8 +6969,9 @@ CustomFilter.prototype.isHideValue = function(val) {
 			}
 			case c_oAscCustomAutoFilter.doesNotEqual://doesNotEqual
 			{
-				if(trimVal !== trimFilterVal)
-				{
+				if(!isDigitValue) {
+					result = matchingValues(trimFilterVal, trimVal, "<>");
+				} else if(trimVal !== trimFilterVal) {
 					result = true;
 				}
 					
