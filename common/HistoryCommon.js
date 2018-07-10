@@ -1070,6 +1070,15 @@
 			case AscDFH.historydescription_Document_RestartNumbering:
 				sString = "Document_RestartNumbering";
 				break;
+			case AscDFH.historydescription_Document_AutomaticListAsType:
+				sString = "Document_AutomaticListAsType";
+				break;
+			case AscDFH.historydescription_Document_CreateNum:
+				sString = "Document_CreateNum";
+				break;
+			case AscDFH.historydescription_Document_ChangeNumLvl:
+				sString = "Document_ChangeNumLvl";
+				break;
 		}
 		return sString;
 	}
@@ -3020,6 +3029,8 @@
 	window['AscDFH'].historydescription_Document_ContinueNumbering                  = 0x0153;
 	window['AscDFH'].historydescription_Document_RestartNumbering                   = 0x0154;
 	window['AscDFH'].historydescription_Document_AutomaticListAsType                = 0x0155;
+	window['AscDFH'].historydescription_Document_CreateNum                          = 0x0156;
+	window['AscDFH'].historydescription_Document_ChangeNumLvl                       = 0x0157;
 
 
 

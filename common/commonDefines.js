@@ -1165,6 +1165,18 @@
 		BulletFlag   : 0x1000,
 		NumberedFlag : 0x2000
 	};
+
+	/** enum {number} */
+	var c_oAscNumberingSuff = {
+		Tab   : 0x01,
+		Space : 0x02,
+		None  : 0x03
+	};
+
+	var c_oAscNumberingLvlTextType = {
+		Text : 0x00,
+		Num  : 0x01
+	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
 	var prot;
@@ -1892,4 +1904,15 @@
 	prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
 	prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
 	prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
+
+	window['Asc']['c_oAscNumberingSuff'] = window['Asc'].c_oAscNumberingSuff = c_oAscNumberingSuff;
+	prot = c_oAscNumberingSuff;
+	prot['Tab']   = c_oAscNumberingSuff.Tab;
+	prot['Space'] = c_oAscNumberingSuff.Space;
+	prot['None']  = c_oAscNumberingSuff.None;
+
+	window['Asc']['c_oAscNumberingLvlTextType'] = window['Asc'].c_oAscNumberingLvlTextType = c_oAscNumberingLvlTextType;
+	prot = c_oAscNumberingLvlTextType;
+	prot['Text'] = c_oAscNumberingLvlTextType.Text;
+	prot['Num']  = c_oAscNumberingLvlTextType.Num;
 })(window);

@@ -16846,27 +16846,54 @@ CDocument.prototype.SetLastNumberedList = function(sNumId, nLvl)
 };
 /**
  * Получаем текущую выделенную нумерацию
- * @returns {?CNumPr}
+ * @param [isCheckSelection=false] {boolean} - проверять ли по селекту
+ * @returns {?CNumPr} Если выделено несколько параграфов с одним NumId, но с разными уровнями, то Lvl = null
  */
-CDocument.prototype.GetSelectedNum = function()
+CDocument.prototype.GetSelectedNum = function(isCheckSelection)
 {
-	var oCurrentPara = this.GetCurrentParagraph(true);
-	if (!oCurrentPara)
-		return null;
+	if (true === isCheckSelection)
+	{
+		var arrParagraphs = this.GetCurrentParagraph(false, true);
+		if (arrParagraphs.length <= 0)
+			return null;
 
-	var oDocContent = oCurrentPara.GetParent();
-	if (!oDocContent)
-		return null;
+		var oStartNumPr = arrParagraphs[0].GetNumPr();
+		if (!oStartNumPr)
+			return null;
 
-	var oTopDocContent = oDocContent.GetTopDocumentContent();
-	if (!oTopDocContent || !oTopDocContent.IsNumberingSelection())
-		return null;
+		var oNumPr = oStartNumPr.Copy();
+		for (var nIndex = 1, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+		{
+			var oCurNumPr = arrParagraphs[nIndex].GetNumPr();
+			if (!oCurNumPr || oCurNumPr.NumId !== oStartNumPr.NumId)
+				return null;
 
-	oCurrentPara = oTopDocContent.Selection.Data.CurPara;
-	if (!oCurrentPara)
-		return null;
+			if (oCurNumPr.Lvl !== oStartNumPr.Lvl)
+				oNumPr.Lvl = null;
+		}
 
-	return oCurrentPara.GetNumPr();
+		return oNumPr;
+	}
+	else
+	{
+		var oCurrentPara = this.GetCurrentParagraph(true);
+		if (!oCurrentPara)
+			return null;
+
+		var oDocContent = oCurrentPara.GetParent();
+		if (!oDocContent)
+			return null;
+
+		var oTopDocContent = oDocContent.GetTopDocumentContent();
+		if (!oTopDocContent || !oTopDocContent.IsNumberingSelection())
+			return null;
+
+		oCurrentPara = oTopDocContent.Selection.Data.CurPara;
+		if (!oCurrentPara)
+			return null;
+
+		return oCurrentPara.GetNumPr();
+	}
 };
 /**
  * Продолжаем нумерацию в текущем параграфе
@@ -17088,7 +17115,6 @@ CDocument.prototype.IsAutomaticNumberedLists = function()
 {
 	return this.AutoCorrectSettings.AutomaticNumberedLists;
 };
-
 
 
 function CDocumentSelectionState()
@@ -18031,6 +18057,7 @@ function CDocumentNumberingInfoEngine(oPara, oNumPr, oNumbering)
 	this.Found       = false;
 	this.AbstractNum = null;
 	this.Nums        = {}; // Список Num, которые использовались. Нужно для обработки startOverride
+	this.Start       = [];
 
 	for (var nIndex = 0; nIndex < 9; ++nIndex)
 		this.NumInfo[nIndex] = undefined;
@@ -18046,7 +18073,10 @@ function CDocumentNumberingInfoEngine(oPara, oNumPr, oNumbering)
 	if (oAbstractNum)
 	{
 		for (var nLvl = 0; nLvl < 9; ++nLvl)
+		{
 			this.Restart[nLvl] = oAbstractNum.GetLvl(nLvl).GetRestart();
+			this.Start[nLvl]   = oAbstractNum.GetLvl(nLvl).GetStart() - 1;
+		}
 	}
 
 	this.AbstractNum = oAbstractNum;
@@ -18076,14 +18106,33 @@ CDocumentNumberingInfoEngine.prototype.CheckParagraph = function(oPara)
 
 	var oNum         = this.Numbering.GetNum(oParaNumPr.NumId);
 	var oAbstractNum = oNum.GetAbstractNum();
-	var oLvl         = oNum.GetLvl(oParaNumPr.Lvl);
 
 	if (oAbstractNum === this.AbstractNum && (undefined === oPara.Get_SectionPr() || true !== oPara.IsEmpty()))
 	{
-        if (undefined === this.NumInfo[oParaNumPr.Lvl] || -1 === this.PrevLvl || (this.PrevLvl < oParaNumPr.Lvl && (0 !== this.Restart[oParaNumPr.Lvl] && (-1 === this.Restart[oParaNumPr.Lvl] || this.PrevLvl <= (this.Restart[oParaNumPr.Lvl] - 1)))))
-        	this.NumInfo[oParaNumPr.Lvl] = oLvl.GetStart();
-        else
-            this.NumInfo[oParaNumPr.Lvl]++;
+		if (-1 === this.PrevLvl)
+		{
+			for (var nLvl = 0; nLvl < 9; ++nLvl)
+			{
+				this.NumInfo[nLvl] = this.Start[nLvl];
+			}
+		}
+		else if (oParaNumPr.Lvl < this.PrevLvl)
+		{
+			for (var nLvl = 0; nLvl < 9; ++nLvl)
+			{
+				if (nLvl > oParaNumPr.Lvl && 0 !== this.Restart[nLvl] && (-1 === this.Restart[nLvl] || oParaNumPr.Lvl <= this.Restart[nLvl] - 1))
+					this.NumInfo[nLvl] = this.Start[nLvl];
+			}
+		}
+		else if (oParaNumPr.Lvl > this.PrevLvl)
+		{
+			for (var nLvl = this.PrevLvl + 1; nLvl < oParaNumPr.Lvl; ++nLvl)
+			{
+				this.NumInfo[nLvl]++;
+			}
+		}
+
+		this.NumInfo[oParaNumPr.Lvl]++;
 
 		if (this.private_CheckNum(oNum))
 		{

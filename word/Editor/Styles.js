@@ -8848,75 +8848,156 @@ CTextPr.prototype.Is_Empty = function()
 
 	return true;
 };
-CTextPr.prototype.Get_Bold = function()
+CTextPr.prototype.GetBold = function()
 {
     return this.Bold;
 };
-CTextPr.prototype.Get_Italic = function()
+CTextPr.prototype.SetBold = function(isBold)
+{
+	this.Bold = isBold;
+};
+CTextPr.prototype.GetItalic = function()
 {
     return this.Italic;
 };
-CTextPr.prototype.Get_Strikeout = function()
+CTextPr.prototype.SetItalic = function(isItalic)
+{
+	this.Italic = isItalic;
+};
+CTextPr.prototype.GetStrikeout = function()
 {
     return this.Strikeout;
 };
-CTextPr.prototype.Get_Underline = function()
+CTextPr.prototype.SetStrikeout = function(isStrikeout)
+{
+	this.Strikeout = isStrikeout;
+};
+CTextPr.prototype.GetUnderline = function()
 {
     return this.Underline;
 };
-CTextPr.prototype.Get_Color = function()
+CTextPr.prototype.SetUnderline = function(isUnderling)
+{
+	this.Underline = isUnderline;
+};
+CTextPr.prototype.GetColor = function()
 {
     return this.Color;
 };
-CTextPr.prototype.Get_VertAlign = function()
+CTextPr.prototype.SetColor = function(nR, nG, nB, isAuto)
+{
+	if (undefined === nR)
+		this.Color = undefined;
+	else
+		this.Color = new CDocumentColor(nR, nG, nB, isAuto);
+};
+CTextPr.prototype.GetVertAlign = function()
 {
     return this.VertAlign;
 };
-CTextPr.prototype.Get_Highlight = function()
+CTextPr.prototype.SetVertAlign = function(nVertAlign)
+{
+	this.VertAlign = nVertAlign;
+};
+CTextPr.prototype.GetHighlight = function()
 {
     return this.HighLight;
 };
-CTextPr.prototype.Get_Spacing = function()
+CTextPr.prototype.SetHighlight = function(nHighlight)
+{
+	this.HighLight = nHighlight;
+};
+CTextPr.prototype.GetSpacing = function()
 {
     return this.Spacing;
 };
-CTextPr.prototype.Get_DStrikeout = function()
+CTextPr.prototype.SetSpacing = function(nSpacing)
+{
+	this.Spacing = nSpacing;
+};
+CTextPr.prototype.GetDStrikeout = function()
 {
     return this.DStrikeout;
 };
-CTextPr.prototype.Get_Caps = function()
+CTextPr.prototype.SetDStrikeout = function(isDStrikeout)
+{
+	this.DStrikeout = isDStrikeout;
+};
+CTextPr.prototype.GetCaps = function()
 {
     return this.Caps;
 };
-CTextPr.prototype.Get_SmallCaps = function()
+CTextPr.prototype.SetCaps = function(isCaps)
+{
+	this.Caps = isCaps;
+};
+CTextPr.prototype.GetSmallCaps = function()
 {
     return this.SmallCaps;
 };
-CTextPr.prototype.Get_Position = function()
+CTextPr.prototype.SetSmallCaps = function(isSmallCaps)
+{
+	this.SmallCaps = isSmallCaps;
+};
+CTextPr.prototype.GetPosition = function()
 {
     return this.Position;
 };
-CTextPr.prototype.Get_FontFamily = function()
+CTextPr.prototype.SetPosition = function(nPosition)
+{
+	this.Position = nPosition;
+};
+CTextPr.prototype.GetFontFamily = function()
 {
     if (this.RFonts && this.RFonts.Ascii && this.RFonts.Ascii.Name)
         return this.RFonts.Ascii.Name;
 
     return undefined;
 };
-CTextPr.prototype.Get_FontSize = function()
+CTextPr.prototype.SetFontFamily = function(sFontName)
+{
+	if (!this.RFonts)
+		this.RFonts = new CRFonts();
+
+	this.RFonts.SetAll(sFontName);
+};
+CTextPr.prototype.GetFontSize = function()
 {
     return this.FontSize;
 };
-CTextPr.prototype.Get_Lang = function()
+CTextPr.prototype.SetFontSize = function(nFontSize)
+{
+	this.FontSize = nFontSize;
+};
+CTextPr.prototype.GetLang = function()
 {
     if (this.Lang)
         return this.Lang.Val;
 
     return undefined;
 };
-CTextPr.prototype.Get_Shd = function()
+CTextPr.prototype.SetLang = function(nLang)
+{
+	if (!this.Lang)
+		this.Lang = new CLang();
+
+	this.Lang.Val = nLang;
+};
+CTextPr.prototype.GetShd = function()
 {
     return this.Shd;
+};
+CTextPr.prototype.SetShd = function(nType, nR, nG, nB)
+{
+	if (!this.Shd)
+		this.Shd = new CDocumentShd();
+
+	this.Shd.Value = nType;
+
+	if (Asc.c_oAscShdNil === nType)
+		return;
+
+	this.Shd.Color.Set(nR, nG, nB);
 };
 CTextPr.prototype.WriteToBinary = function(oWriter)
 {
@@ -8933,22 +9014,38 @@ CTextPr.prototype.GetAllFontNames = function(arrAllFonts)
 //----------------------------------------------------------------------------------------------------------------------
 // CTextPr Export
 //----------------------------------------------------------------------------------------------------------------------
-CTextPr.prototype['Get_Bold']       = CTextPr.prototype.Get_Bold;
-CTextPr.prototype['Get_Italic']     = CTextPr.prototype.Get_Italic;
-CTextPr.prototype['Get_Strikeout']  = CTextPr.prototype.Get_Strikeout;
-CTextPr.prototype['Get_Underline']  = CTextPr.prototype.Get_Underline;
-CTextPr.prototype['Get_Color']      = CTextPr.prototype.Get_Color;
-CTextPr.prototype['Get_VertAlign']  = CTextPr.prototype.Get_VertAlign;
-CTextPr.prototype['Get_Highlight']  = CTextPr.prototype.Get_Highlight;
-CTextPr.prototype['Get_Spacing']    = CTextPr.prototype.Get_Spacing;
-CTextPr.prototype['Get_DStrikeout'] = CTextPr.prototype.Get_DStrikeout;
-CTextPr.prototype['Get_Caps']       = CTextPr.prototype.Get_Caps;
-CTextPr.prototype['Get_SmallCaps']  = CTextPr.prototype.Get_SmallCaps;
-CTextPr.prototype['Get_Position']   = CTextPr.prototype.Get_Position;
-CTextPr.prototype['Get_FontFamily'] = CTextPr.prototype.Get_FontFamily;
-CTextPr.prototype['Get_FontSize']   = CTextPr.prototype.Get_FontSize;
-CTextPr.prototype['Get_Lang']       = CTextPr.prototype.Get_Lang;
-CTextPr.prototype['Get_Shd']        = CTextPr.prototype.Get_Shd;
+CTextPr.prototype['get_Bold']       = CTextPr.prototype.get_Bold       = CTextPr.prototype['Get_Bold']       = CTextPr.prototype.GetBold;
+CTextPr.prototype['put_Bold']       = CTextPr.prototype.put_Bold       = CTextPr.prototype.SetBold;
+CTextPr.prototype['get_Italic']     = CTextPr.prototype.get_Italic     = CTextPr.prototype['Get_Italic']     = CTextPr.prototype.GetItalic;
+CTextPr.prototype['put_Italic']     = CTextPr.prototype.put_Italic     = CTextPr.prototype.SetItalic;
+CTextPr.prototype['get_Strikeout']  = CTextPr.prototype.get_Strikeout  = CTextPr.prototype['Get_Strikeout']  = CTextPr.prototype.GetStrikeout;
+CTextPr.prototype['put_Strikeout']  = CTextPr.prototype.put_Strikeout  = CTextPr.prototype.SetStrikeout;
+CTextPr.prototype['get_Underline']  = CTextPr.prototype.get_Underline  = CTextPr.prototype['Get_Underline']  = CTextPr.prototype.GetUnderline;
+CTextPr.prototype['put_Underline']  = CTextPr.prototype.put_Underline  = CTextPr.prototype.SetUnderline;
+CTextPr.prototype['get_Color']      = CTextPr.prototype.get_Color      = CTextPr.prototype['Get_Color']      = CTextPr.prototype.GetColor;
+CTextPr.prototype['put_Color']      = CTextPr.prototype.put_Color      = CTextPr.prototype.SetColor;
+CTextPr.prototype['get_VertAlign']  = CTextPr.prototype.get_VertAlign  = CTextPr.prototype['Get_VertAlign']  = CTextPr.prototype.GetVertAlign;
+CTextPr.prototype['put_VertAlign']  = CTextPr.prototype.put_VertAlign  = CTextPr.prototype.SetVertAlign;
+CTextPr.prototype['get_Highlight']  = CTextPr.prototype.get_Highlight  = CTextPr.prototype['Get_Highlight']  = CTextPr.prototype.GetHighlight;
+CTextPr.prototype['put_Highlight']  = CTextPr.prototype.put_Highlight  = CTextPr.prototype.SetHighlight;
+CTextPr.prototype['get_Spacing']    = CTextPr.prototype.get_Spacing    = CTextPr.prototype['Get_Spacing']    = CTextPr.prototype.GetSpacing;
+CTextPr.prototype['put_Spacing']    = CTextPr.prototype.put_Spacing    = CTextPr.prototype.SetSpacing;
+CTextPr.prototype['get_DStrikeout'] = CTextPr.prototype.get_DStrikeout = CTextPr.prototype['Get_DStrikeout'] = CTextPr.prototype.GetDStrikeout;
+CTextPr.prototype['put_DStrikeout'] = CTextPr.prototype.put_DStrikeout = CTextPr.prototype.SetDStrikeout;
+CTextPr.prototype['get_Caps']       = CTextPr.prototype.get_Caps       = CTextPr.prototype['Get_Caps']       = CTextPr.prototype.GetCaps;
+CTextPr.prototype['put_Caps']       = CTextPr.prototype.put_Caps       = CTextPr.prototype.SetCaps;
+CTextPr.prototype['get_SmallCaps']  = CTextPr.prototype.get_SmallCaps  = CTextPr.prototype['Get_SmallCaps']  = CTextPr.prototype.GetSmallCaps;
+CTextPr.prototype['put_SmallCaps']  = CTextPr.prototype.put_SmallCaps  = CTextPr.prototype.SetSmallCaps;
+CTextPr.prototype['get_Position']   = CTextPr.prototype.get_Position   = CTextPr.prototype['Get_Position']   = CTextPr.prototype.GetPosition;
+CTextPr.prototype['put_Position']   = CTextPr.prototype.put_Position   = CTextPr.prototype.SetPosition;
+CTextPr.prototype['get_FontFamily'] = CTextPr.prototype.get_FontFamily = CTextPr.prototype['Get_FontFamily'] = CTextPr.prototype.GetFontFamily;
+CTextPr.prototype['put_FontFamily'] = CTextPr.prototype.put_FontFamily = CTextPr.prototype.SetFontFamily;
+CTextPr.prototype['get_FontSize']   = CTextPr.prototype.get_FontSize   = CTextPr.prototype['Get_FontSize']   = CTextPr.prototype.GetFontSize;
+CTextPr.prototype['put_FontSize']   = CTextPr.prototype.put_FontSize   = CTextPr.prototype.SetFontSize;
+CTextPr.prototype['get_Lang']       = CTextPr.prototype.get_Lang       = CTextPr.prototype['Get_Lang']       = CTextPr.prototype.GetLang;
+CTextPr.prototype['put_Lang']       = CTextPr.prototype.put_Lang       = CTextPr.prototype.SetLang;
+CTextPr.prototype['get_Shd']        = CTextPr.prototype.get_Shd        = CTextPr.prototype['Get_Shd']        = CTextPr.prototype.GetShd;
+CTextPr.prototype['put_Shd']        = CTextPr.prototype.put_Shd        = CTextPr.prototype.SetShd;
 //----------------------------------------------------------------------------------------------------------------------
 
 function CParaTab(Value, Pos, Leader)
@@ -10903,81 +11000,151 @@ CParaPr.prototype.Get_DiffPrChange = function()
 
     return ParaPr;
 };
-CParaPr.prototype.Get_ContextualSpacing = function()
+CParaPr.prototype.GetContextualSpacing = function()
 {
     return this.ContextualSpacing;
 };
-CParaPr.prototype.Get_IndLeft = function()
+CParaPr.prototype.SetContextualSpacing = function(isContextualSpacing)
+{
+	this.ContextualSpacing = isContextualSpacing;
+};
+CParaPr.prototype.GetIndLeft = function()
 {
     return this.Ind.Left;
 };
-CParaPr.prototype.Get_IndRight = function()
+CParaPr.prototype.GetIndRight = function()
 {
     return this.Ind.Right;
 };
-CParaPr.prototype.Get_IndFirstLine = function()
+CParaPr.prototype.GetIndFirstLine = function()
 {
     return this.Ind.FirstLine;
 };
-CParaPr.prototype.Get_Jc = function()
+CParaPr.prototype.SetInd = function(nFirst, nLeft, nRight)
+{
+	if (undefined !== nFirst)
+		this.Ind.FirstLine = nFirst;
+
+	if (undefined !== nLeft)
+		this.Ind.Left = nLeft;
+
+	if (undefined !== nRight)
+		this.Ind.Right = nRight;
+};
+CParaPr.prototype.GetJc = function()
 {
     return this.Jc;
 };
-CParaPr.prototype.Get_KeepLines = function()
+CParaPr.prototype.SetJc = function(nAlign)
+{
+	this.Jc = nAlign;
+};
+CParaPr.prototype.GetKeepLines = function()
 {
     return this.KeepLines;
 };
-CParaPr.prototype.Get_KeepNext = function()
+CParaPr.prototype.SetKeepLines = function(isKeepLines)
+{
+	this.KeepLines = isKeepLines;
+};
+CParaPr.prototype.GetKeepNext = function()
 {
     return this.KeepNext;
 };
-CParaPr.prototype.Get_PageBreakBefore = function()
+CParaPr.prototype.SetKeepNext = function(isKeepNext)
+{
+	this.KeepNext = isKeepNext;
+};
+CParaPr.prototype.GetPageBreakBefore = function()
 {
     return this.PageBreakBefore;
 };
-CParaPr.prototype.Get_SpacingLine = function()
+CParaPr.prototype.SetPageBreakBefore = function(isPageBreakBefore)
+{
+	this.PageBreakBefore = isPageBreakBefore;
+};
+CParaPr.prototype.GetSpacingLine = function()
 {
     return this.Spacing.Line;
 };
-CParaPr.prototype.Get_SpacingLineRule = function()
+CParaPr.prototype.GetSpacingLineRule = function()
 {
     return this.Spacing.LineRule;
 };
-CParaPr.prototype.Get_SpacingBefore = function()
+CParaPr.prototype.GetSpacingBefore = function()
 {
     return this.Spacing.Before;
 };
-CParaPr.prototype.Get_SpacingBeforeAutoSpacing = function()
+CParaPr.prototype.GetSpacingBeforeAutoSpacing = function()
 {
     return this.Spacing.BeforeAutoSpacing;
 };
-CParaPr.prototype.Get_SpacingAfter = function()
+CParaPr.prototype.GetSpacingAfter = function()
 {
     return this.Spacing.After;
 };
-CParaPr.prototype.Get_SpacingAfterAutoSpacing = function()
+CParaPr.prototype.GetSpacingAfterAutoSpacing = function()
 {
     return this.Spacing.AfterAutoSpacing;
 };
-CParaPr.prototype.Get_WidowControl = function()
+CParaPr.prototype.SetSpacing = function(nLine, nLineRule, nBefore, nAfter, isBeforeAuto, isAfterAuto)
+{
+	if (undefined !== nLine)
+		this.Spacing.Line = nLine;
+
+	if (undefined !== nLineRule)
+		this.Spacing.LineRule = nLineRule;
+
+	if (undefined !== nBefore)
+		this.Spacing.Before = nBefore;
+
+	if (undefined !== nAfter)
+		this.Spacing.After = nAfter;
+
+	if (undefined !== isBeforeAuto)
+		this.Spacing.BeforeAutoSpacing = isBeforeAuto;
+
+	if (undefined !== isAfterAuto)
+		this.Spacing.AfterAutoSpacing = isAfterAuto;
+};
+CParaPr.prototype.GetWidowControl = function()
 {
     return this.WidowControl;
 };
-CParaPr.prototype.Get_Tabs = function()
+CParaPr.prototype.SetWidowControl = function(isWidowControl)
+{
+	this.WidowControl = isWidowControl;
+};
+CParaPr.prototype.GetTabs = function()
 {
     return this.Tabs;
 };
-CParaPr.prototype.Get_NumPr = function()
+CParaPr.prototype.GetNumPr = function()
 {
     return this.NumPr;
 };
-CParaPr.prototype.Get_PStyle = function()
+CParaPr.prototype.SetNumPr = function(sNumId, nLvl)
+{
+	if (undefined === sNumId)
+		this.NumPr = undefined;
+	else
+		this.NumPr = new CNumPr(sNumId, nLvl);
+};
+CParaPr.prototype.GetPStyle = function()
 {
     return this.PStyle;
 };
-CParaPr.prototype.Get_OutlineLvl = function()
+CParaPr.prototype.SetPStyle = function(sPStyle)
+{
+	this.PStyle = sPStyle;
+};
+CParaPr.prototype.GetOutlineLvl = function()
 {
 	return this.OutlineLvl;
+};
+CParaPr.prototype.SetOutlineLvl = function(nOutlineLvl)
+{
+	this.OutlineLvl = nOutlineLvl;
 };
 CParaPr.prototype.WriteToBinary = function(oWriter)
 {
@@ -10990,25 +11157,36 @@ CParaPr.prototype.ReadFromBinary = function(oReader)
 //----------------------------------------------------------------------------------------------------------------------
 // CParaPr Export
 //----------------------------------------------------------------------------------------------------------------------
-CParaPr.prototype['Get_ContextualSpacing']        = CParaPr.prototype.Get_ContextualSpacing;
-CParaPr.prototype['Get_IndLeft']                  = CParaPr.prototype.Get_IndLeft;
-CParaPr.prototype['Get_IndRight']                 = CParaPr.prototype.Get_IndRight;
-CParaPr.prototype['Get_IndFirstLine']             = CParaPr.prototype.Get_IndFirstLine;
-CParaPr.prototype['Get_Jc']                       = CParaPr.prototype.Get_Jc;
-CParaPr.prototype['Get_KeepLines']                = CParaPr.prototype.Get_KeepLines;
-CParaPr.prototype['Get_KeepNext']                 = CParaPr.prototype.Get_KeepNext;
-CParaPr.prototype['Get_PageBreakBefore']          = CParaPr.prototype.Get_PageBreakBefore;
-CParaPr.prototype['Get_SpacingLine']              = CParaPr.prototype.Get_SpacingLine;
-CParaPr.prototype['Get_SpacingLineRule']          = CParaPr.prototype.Get_SpacingLineRule;
-CParaPr.prototype['Get_SpacingBefore']            = CParaPr.prototype.Get_SpacingBefore;
-CParaPr.prototype['Get_SpacingBeforeAutoSpacing'] = CParaPr.prototype.Get_SpacingBeforeAutoSpacing;
-CParaPr.prototype['Get_SpacingAfter']             = CParaPr.prototype.Get_SpacingAfter;
-CParaPr.prototype['Get_SpacingAfterAutoSpacing']  = CParaPr.prototype.Get_SpacingAfterAutoSpacing;
-CParaPr.prototype['Get_WidowControl']             = CParaPr.prototype.Get_WidowControl;
-CParaPr.prototype['Get_Tabs']                     = CParaPr.prototype.Get_Tabs;
-CParaPr.prototype['Get_NumPr']                    = CParaPr.prototype.Get_NumPr;
-CParaPr.prototype['Get_PStyle']                   = CParaPr.prototype.Get_PStyle;
-CParaPr.prototype['Get_OutlineLvl']               = CParaPr.prototype.Get_OutlineLvl;
+CParaPr.prototype['get_ContextualSpacing']        = CParaPr.prototype.get_ContextualSpacing        = CParaPr.prototype['Get_ContextualSpacing']        = CParaPr.prototype.GetContextualSpacing;
+CParaPr.prototype['put_ContextualSpacing']        = CParaPr.prototype.put_ContextualSpacing        = CParaPr.prototype.SetContextualSpacing;
+CParaPr.prototype['get_IndLeft']                  = CParaPr.prototype.get_IndLeft                  = CParaPr.prototype['Get_IndLeft']                  = CParaPr.prototype.GetIndLeft;
+CParaPr.prototype['get_IndRight']                 = CParaPr.prototype.get_IndRight                 = CParaPr.prototype['Get_IndRight']                 = CParaPr.prototype.GetIndRight;
+CParaPr.prototype['get_IndFirstLine']             = CParaPr.prototype.get_IndFirstLine             = CParaPr.prototype['Get_IndFirstLine']             = CParaPr.prototype.GetIndFirstLine;
+CParaPr.prototype['put_Ind']                      = CParaPr.prototype.put_Ind                      = CParaPr.prototype.SetInd;
+CParaPr.prototype['get_Jc']                       = CParaPr.prototype.get_Jc                       = CParaPr.prototype['Get_Jc']                       = CParaPr.prototype.GetJc;
+CParaPr.prototype['put_Jc']                       = CParaPr.prototype.put_Jc                       = CParaPr.prototype.SetJc;
+CParaPr.prototype['get_KeepLines']                = CParaPr.prototype.get_KeepLines                = CParaPr.prototype['Get_KeepLines']                = CParaPr.prototype.GetKeepLines;
+CParaPr.prototype['put_KeepLines']                = CParaPr.prototype.put_KeepLines                = CParaPr.prototype.SetKeepLines;
+CParaPr.prototype['get_KeepNext']                 = CParaPr.prototype.get_KeepNext                 = CParaPr.prototype['Get_KeepNext']                 = CParaPr.prototype.GetKeepNext;
+CParaPr.prototype['put_KeepNext']                 = CParaPr.prototype.put_KeepNext                 = CParaPr.prototype.SetKeepNext;
+CParaPr.prototype['get_PageBreakBefore']          = CParaPr.prototype.get_PageBreakBefore          = CParaPr.prototype['Get_PageBreakBefore']          = CParaPr.prototype.GetPageBreakBefore;
+CParaPr.prototype['put_PageBreakBefore']          = CParaPr.prototype.put_PageBreakBefore          = CParaPr.prototype.SetPageBreakBefore;
+CParaPr.prototype['get_SpacingLine']              = CParaPr.prototype.get_SpacingLine              = CParaPr.prototype['Get_SpacingLine']              = CParaPr.prototype.GetSpacingLine;
+CParaPr.prototype['get_SpacingLineRule']          = CParaPr.prototype.get_SpacingLineRule          = CParaPr.prototype['Get_SpacingLineRule']          = CParaPr.prototype.GetSpacingLineRule;
+CParaPr.prototype['get_SpacingBefore']            = CParaPr.prototype.get_SpacingBefore            = CParaPr.prototype['Get_SpacingBefore']            = CParaPr.prototype.GetSpacingBefore;
+CParaPr.prototype['get_SpacingBeforeAutoSpacing'] = CParaPr.prototype.get_SpacingBeforeAutoSpacing = CParaPr.prototype['Get_SpacingBeforeAutoSpacing'] = CParaPr.prototype.GetSpacingBeforeAutoSpacing;
+CParaPr.prototype['get_SpacingAfter']             = CParaPr.prototype.get_SpacingAfter             = CParaPr.prototype['Get_SpacingAfter']             = CParaPr.prototype.GetSpacingAfter;
+CParaPr.prototype['get_SpacingAfterAutoSpacing']  = CParaPr.prototype.get_SpacingAfterAutoSpacing  = CParaPr.prototype['Get_SpacingAfterAutoSpacing']  = CParaPr.prototype.GetSpacingAfterAutoSpacing;
+CParaPr.prototype['put_Spacing']                  = CParaPr.prototype.put_Spacing                  = CParaPr.prototype.SetSpacing;
+CParaPr.prototype['get_WidowControl']             = CParaPr.prototype.get_WidowControl             = CParaPr.prototype['Get_WidowControl']             = CParaPr.prototype.GetWidowControl;
+CParaPr.prototype['put_WidowControl']             = CParaPr.prototype.put_WidowControl             = CParaPr.prototype.SetWidowControl;
+CParaPr.prototype['get_Tabs']                     = CParaPr.prototype.get_Tabs                     = CParaPr.prototype['Get_Tabs']                     = CParaPr.prototype.GetTabs;
+CParaPr.prototype['get_NumPr']                    = CParaPr.prototype.get_NumPr                    = CParaPr.prototype['Get_NumPr']                    = CParaPr.prototype.GetNumPr;
+CParaPr.prototype['put_NumPr']                    = CParaPr.prototype.put_NumPr                    = CParaPr.prototype.SetNumPr;
+CParaPr.prototype['get_PStyle']                   = CParaPr.prototype.get_PStyle                   = CParaPr.prototype['Get_PStyle']                   = CParaPr.prototype.GetPStyle;
+CParaPr.prototype['put_PStyle']                   = CParaPr.prototype.put_PStyle                   = CParaPr.prototype.SetPStyle;
+CParaPr.prototype['get_OutlineLvl']               = CParaPr.prototype.get_OutlineLvl               = CParaPr.prototype['Get_OutlineLvl']               = CParaPr.prototype.GetOutlineLvl;
+CParaPr.prototype['put_OutlineLvl']               = CParaPr.prototype.put_OutlineLvl               = CParaPr.prototype.SetOutlineLvl;
 //----------------------------------------------------------------------------------------------------------------------
 
 function Copy_Bounds(Bounds)

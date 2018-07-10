@@ -3527,6 +3527,121 @@ background-repeat: no-repeat;\
 
 		oLogicDocument.RestartNumbering(nRestartValue);
 	};
+	asc_docs_api.prototype.asc_GetCurrentNumberingId = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return null;
+
+		var oNumPr = oLogicDocument.GetSelectedNum(true);
+		if (!oNumPr)
+			return null;
+
+		var oNum = oLogicDocument.GetNumbering().GetNum(oNumPr.NumId);
+		if (!oNum)
+			return null;
+
+		return oNumPr.NumId;
+	};
+	asc_docs_api.prototype.asc_GetCurrentNumberingLvl = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return -1;
+
+		var oNumPr = oLogicDocument.GetSelectedNum(true);
+		if (!oNumPr)
+			return -1;
+
+		return oNumPr.Lvl;
+	};
+	asc_docs_api.prototype.asc_GetNumberingPr = function(sNumId)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return null;
+
+		var oNum = oLogicDocument.GetNumbering().GetNum(sNumId);
+		if (!oNum)
+			return null;
+
+		var oAscNumbering = new Asc.CAscNumbering();
+		oNum.FillToAscNum(oAscNumbering);
+		return oAscNumbering;
+	};
+	asc_docs_api.prototype.asc_AddNewNumbering = function(oAscNumbering, isApply)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return null;
+
+		var arrParagraphs;
+		if (isApply)
+		{
+			arrParagraphs = oLogicDocument.GetSelectedParagraphs();
+
+			if (oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+					Elements  : arrParagraphs,
+					CheckType : AscCommon.changestype_Paragraph_Properties
+				}))
+			{
+				return null;
+			}
+		}
+
+		oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_CreateNum);
+		var oNumbering = oLogicDocument.GetNumbering();
+		var oNum = oNumbering.CreateNum();
+		oNum.FillFromAscNum(oAscNumbering);
+		var sNumId = oNum.GetId();
+
+		if (arrParagraphs)
+		{
+			for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+			{
+				var oPara = arrParagraphs[nIndex];
+				var oNumPr = oPara.GetNumPr();
+				if (!oNumPr)
+					oPara.ApplyNumPr(sNumId, 0);
+				else
+					oPara.ApplyNumPr(sNumId, oNumPr.Lvl);
+			}
+
+			oLogicDocument.Recalculate();
+			oLogicDocument.Document_UpdateInterfaceState();
+			oLogicDocument.Document_UpdateSelectionState();
+		}
+
+	};
+	asc_docs_api.prototype.asc_ChangeNumberingLvl = function(sNumId, oAscNumberingLvl, nLvl)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		var oNum = oLogicDocument.GetNumbering().GetNum(sNumId);
+		if (!oNum)
+			return;
+
+		if (!oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+				Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+				Elements  : [oNum],
+				CheckType : AscCommon.changestype_Paragraph_Properties
+			}))
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeNumLvl);
+
+			var oNumberingLvl = new CNumberingLvl();
+			oNumberingLvl.FillFromAscNumberingLvl(oAscNumberingLvl);
+			oNum.SetLvl(oNumberingLvl, nLvl);
+
+			oLogicDocument.Recalculate();
+			oLogicDocument.Document_UpdateInterfaceState();
+			oLogicDocument.Document_UpdateSelectionState();
+		}
+	};
+
 	asc_docs_api.prototype.put_Style    = function(sName)
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
@@ -9207,6 +9322,11 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['put_ListType']                              = asc_docs_api.prototype.put_ListType;
 	asc_docs_api.prototype['asc_ContinueNumbering']                     = asc_docs_api.prototype.asc_ContinueNumbering;
 	asc_docs_api.prototype['asc_RestartNumbering']                      = asc_docs_api.prototype.asc_RestartNumbering;
+	asc_docs_api.prototype['asc_GetCurrentNumberingId']                 = asc_docs_api.prototype.asc_GetCurrentNumberingId;
+	asc_docs_api.prototype['asc_GetCurrentNumberingLvl']                = asc_docs_api.prototype.asc_GetCurrentNumberingLvl;
+	asc_docs_api.prototype['asc_GetNumberingPr']                        = asc_docs_api.prototype.asc_GetNumberingPr;
+	asc_docs_api.prototype['asc_AddNewNumbering']                       = asc_docs_api.prototype.asc_AddNewNumbering;
+	asc_docs_api.prototype['asc_ChangeNumberingLvl']                    = asc_docs_api.prototype.asc_ChangeNumberingLvl;
 	asc_docs_api.prototype['put_Style']                                 = asc_docs_api.prototype.put_Style;
 	asc_docs_api.prototype['SetDeviceInputHelperId']                    = asc_docs_api.prototype.SetDeviceInputHelperId;
 	asc_docs_api.prototype['put_ShowSnapLines']                         = asc_docs_api.prototype.put_ShowSnapLines;

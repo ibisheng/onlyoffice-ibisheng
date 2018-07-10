@@ -3498,11 +3498,11 @@
 	ApiNumberingLevel.prototype.SetSuff = function(sType)
 	{
 		if ("space" === sType)
-			this.Num.SetLvlSuff(this.Lvl, c_oAscNumberingSuff.Space);
+			this.Num.SetLvlSuff(this.Lvl, Asc.c_oAscNumberingSuff.Space);
 		else if ("tab" === sType)
-			this.Num.SetLvlSuff(this.Lvl, c_oAscNumberingSuff.Tab);
+			this.Num.SetLvlSuff(this.Lvl, Asc.c_oAscNumberingSuff.Tab);
 		else if ("none" === sType)
-			this.Num.SetLvlSuff(this.Lvl, c_oAscNumberingSuff.None);
+			this.Num.SetLvlSuff(this.Lvl, Asc.c_oAscNumberingSuff.None);
 	};
 
 	//------------------------------------------------------------------------------------------------------------------

@@ -3068,12 +3068,12 @@ CParagraphRecalculateStateWrap.prototype =
 				{
 					switch (nNumSuff)
 					{
-						case c_oAscNumberingSuff.None:
+						case Asc.c_oAscNumberingSuff.None:
 						{
 							// Ничего не делаем
 							break;
 						}
-						case c_oAscNumberingSuff.Space:
+						case Asc.c_oAscNumberingSuff.Space:
 						{
 							var OldTextPr = g_oTextMeasurer.GetTextPr();
 
@@ -3085,7 +3085,7 @@ CParagraphRecalculateStateWrap.prototype =
 							g_oTextMeasurer.SetTextPr(OldTextPr, Theme);
 							break;
 						}
-						case c_oAscNumberingSuff.Tab:
+						case Asc.c_oAscNumberingSuff.Tab:
 						{
 							var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
 

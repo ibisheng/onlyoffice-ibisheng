@@ -1283,17 +1283,28 @@
 	CTextProp.prototype['get_Caps'] = CTextProp.prototype.get_Caps;
 	CTextProp.prototype['get_SmallCaps'] = CTextProp.prototype.get_SmallCaps;
 
-// paragraph and text properties objects container
+	/**
+	 * Paragraph and text properties objects container
+	 * @param paragraphProp
+	 * @param textProp
+	 * @constructor
+	 */
 	function CParagraphAndTextProp(paragraphProp, textProp)
 	{
 		this.ParaPr = (undefined != paragraphProp && null != paragraphProp) ? new CParagraphPropEx(paragraphProp) : null;
 		this.TextPr = (undefined != textProp && null != textProp) ? new CTextProp(textProp) : null;
 	}
 
+	/**
+	 * @returns {?CParagraphPropEx}
+	 */
 	CParagraphAndTextProp.prototype.get_ParaPr = function ()
 	{
 		return this.ParaPr;
 	};
+	/**
+	 * @returns {?CTextProp}
+	 */
 	CParagraphAndTextProp.prototype.get_TextPr = function ()
 	{
 		return this.TextPr;
@@ -1657,5 +1668,163 @@
 	CAscStyle.prototype['get_UIPriority'] = CAscStyle.prototype.get_UIPriority;
 	CAscStyle.prototype['put_UIPriority'] = CAscStyle.prototype.put_UIPriority;
 	CAscStyle.prototype['get_StyleId']    = CAscStyle.prototype.get_StyleId;
+
+
+	/**
+	 * Класс для работы с настройками нумерации
+	 * @constructor
+	 */
+	function CAscNumbering()
+	{
+		this.NumId = "";
+		this.Lvl   = new Array(9);
+		for (var nLvl = 0; nLvl < 9; ++nLvl)
+		{
+			this.Lvl[nLvl] = new CAscNumberingLvl(nLvl);
+		}
+	}
+	CAscNumbering.prototype.get_InternalId = function()
+	{
+		return this.NumId;
+	};
+	CAscNumbering.prototype.get_Lvl = function(nLvl)
+	{
+		if (nLvl < 0)
+			return this.Lvl[0];
+		else if (nLvl > 8)
+			return this.Lvl[8];
+
+		return this.Lvl[nLvl];
+	};
+	window['Asc']['CAscNumbering'] = window['Asc'].CAscNumbering = CAscNumbering;
+	CAscNumbering.prototype['get_InternalId'] = CAscNumbering.prototype.get_InternalId;
+	CAscNumbering.prototype['get_Lvl']        = CAscNumbering.prototype.get_Lvl;
+
+
+	/**
+	 * Класс для работы с текстом конкретного уровня нумерации
+	 * @constructor
+	 */
+	function CAscNumberingLvlText(Type, Value)
+	{
+		this.Type  = undefined !== Type ? Type : Asc.c_oAscNumberingLvlTextType.Text;
+		this.Value = undefined !== Value ? Value : "";
+	}
+	CAscNumberingLvlText.prototype.get_Type = function()
+	{
+		return this.Type;
+	};
+	CAscNumberingLvlText.prototype.put_Type = function(nType)
+	{
+		this.Type = nType;
+	};
+	CAscNumberingLvlText.prototype.get_Value = function()
+	{
+		return this.Value;
+	};
+	CAscNumberingLvlText.prototype.put_Value = function(vVal)
+	{
+		this.Value = vVal;
+	};
+	window['Asc']['CAscNumberingLvlText'] = window['Asc'].CAscNumberingLvlText = CAscNumberingLvlText;
+	CAscNumberingLvlText.prototype['get_Type']  = CAscNumberingLvlText.prototype.get_Type;
+	CAscNumberingLvlText.prototype['put_Type']  = CAscNumberingLvlText.prototype.put_Type;
+	CAscNumberingLvlText.prototype['get_Value'] = CAscNumberingLvlText.prototype.get_Value;
+	CAscNumberingLvlText.prototype['put_Value'] = CAscNumberingLvlText.prototype.put_Value;
+
+
+	/**
+	 * Класс для работы с настройками конкретного уровня нумерации
+	 * @constructor
+	 */
+	function CAscNumberingLvl(nLvlNum)
+	{
+		this.LvlNum  = nLvlNum;
+		this.Format  = Asc.c_oAscNumberingFormat.Bullet;
+		this.Text    = [];
+		this.TextPr  = new CTextPr();
+		this.ParaPr  = new CParaPr();
+		this.Start   = 1;
+		this.Restart = -1;
+		this.Suff    = Asc.c_oAscNumberingSuff.Tab;
+		this.Align   = AscCommon.align_Left;
+	}
+	CAscNumberingLvl.prototype.get_LvlNum = function()
+	{
+		return this.LvlNum;
+	};
+	CAscNumberingLvl.prototype.get_Format = function()
+	{
+		return this.Format;
+	};
+	CAscNumberingLvl.prototype.put_Format = function(nFormat)
+	{
+		this.Format = nFormat;
+	};
+	CAscNumberingLvl.prototype.get_Text = function()
+	{
+		return this.Text;
+	};
+	CAscNumberingLvl.prototype.put_Text = function(arrText)
+	{
+		this.Text = arrText;
+	};
+	CAscNumberingLvl.prototype.get_TextPr = function()
+	{
+		return this.TextPr;
+	};
+	CAscNumberingLvl.prototype.get_ParaPr = function()
+	{
+		return this.ParaPr;
+	};
+	CAscNumberingLvl.prototype.get_Start = function()
+	{
+		return this.Start;
+	};
+	CAscNumberingLvl.prototype.put_Start = function(nStart)
+	{
+		this.Start = nStart;
+	};
+	CAscNumberingLvl.prototype.get_Restart = function()
+	{
+		return this.Restart;
+	};
+	CAscNumberingLvl.prototype.put_Restart = function(nRestart)
+	{
+		this.Restart = nRestart;
+	};
+	CAscNumberingLvl.prototype.get_Suff = function()
+	{
+		return this.Suff;
+	};
+	CAscNumberingLvl.prototype.put_Suff = function(nSuff)
+	{
+		this.Suff = nSuff;
+	};
+	CAscNumberingLvl.prototype.get_Align = function()
+	{
+		return this.Align;
+	};
+	CAscNumberingLvl.prototype.put_Align = function(nAlign)
+	{
+		this.Align = nAlign;
+	};
+	window['Asc']['CAscNumberingLvl'] = window['Asc'].CAscNumberingLvl = CAscNumberingLvl;
+	CAscNumberingLvl.prototype['get_LvlNum']  = CAscNumberingLvl.prototype.get_LvlNum;
+	CAscNumberingLvl.prototype['get_Format']  = CAscNumberingLvl.prototype.get_Format;
+	CAscNumberingLvl.prototype['put_Format']  = CAscNumberingLvl.prototype.put_Format;
+	CAscNumberingLvl.prototype['get_Text']    = CAscNumberingLvl.prototype.get_Text;
+	CAscNumberingLvl.prototype['put_Text']    = CAscNumberingLvl.prototype.put_Text;
+	CAscNumberingLvl.prototype['get_TextPr']  = CAscNumberingLvl.prototype.get_TextPr;
+	CAscNumberingLvl.prototype['get_ParaPr']  = CAscNumberingLvl.prototype.get_ParaPr;
+	CAscNumberingLvl.prototype['get_Start']   = CAscNumberingLvl.prototype.get_Start;
+	CAscNumberingLvl.prototype['put_Start']   = CAscNumberingLvl.prototype.put_Start;
+	CAscNumberingLvl.prototype['get_Restart'] = CAscNumberingLvl.prototype.get_Restart;
+	CAscNumberingLvl.prototype['put_Restart'] = CAscNumberingLvl.prototype.put_Restart;
+	CAscNumberingLvl.prototype['get_Suff']    = CAscNumberingLvl.prototype.get_Suff;
+	CAscNumberingLvl.prototype['put_Suff']    = CAscNumberingLvl.prototype.put_Suff;
+	CAscNumberingLvl.prototype['get_Align']   = CAscNumberingLvl.prototype.get_Align;
+	CAscNumberingLvl.prototype['put_Align']   = CAscNumberingLvl.prototype.put_Align;
+
 
 })(window, undefined);

@@ -845,6 +845,34 @@ CNum.prototype.SetParaPr = function(nLvl, oParaPr)
 		oAbstractNum.SetParaPr(nLvl, oParaPr);
 	}
 };
+/**
+ * Заполняем специальный класс для общения с интерфейсом
+ * @param oAscNum {CAscNumbering}
+ */
+CNum.prototype.FillToAscNum = function(oAscNum)
+{
+	oAscNum.NumId = this.GetId();
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		var oLvl = this.GetLvl(nLvl);
+		oLvl.FillToAscNumberingLvl(oAscNum.get_Lvl(nLvl));
+		this.SetLvl(oLvl, nLvl);
+	}
+};
+/**
+ * Заполняем настройки нумерации из интерфейсного класса
+ * @param oAscNum {CAscNumbering}
+ */
+CNum.prototype.FillFromAscNum = function(oAscNum)
+{
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		var oLvl = new CNumberingLvl();
+		var oAscLvl = oAscNum.get_Lvl(nLvl);
+		oLvl.FillFromAscNumberingLvl(oAscLvl);
+		this.SetLvl(oLvl, nLvl);
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //----------------------------------------------------------------------------------------------------------------------

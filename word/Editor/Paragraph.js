@@ -2057,7 +2057,7 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 								break;
 						}
 
-						if (true === editor.ShowParaMarks && (c_oAscNumberingSuff.Tab === nNumSuff || oNumLvl.IsLegacy()))
+						if (true === editor.ShowParaMarks && (Asc.c_oAscNumberingSuff.Tab === nNumSuff || oNumLvl.IsLegacy()))
 						{
 							var TempWidth     = NumberingItem.WidthSuff;
 							var TempRealWidth = 3.143; // ширина символа "стрелка влево" в шрифте Wingding3,10

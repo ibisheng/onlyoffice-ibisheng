@@ -549,13 +549,13 @@ CComplexField.prototype.private_UpdateTOC = function()
 				var oNumLvl  = oNumbering.GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl);
 				var nNumSuff = oNumLvl.GetSuff();
 
-				if (c_oAscNumberingSuff.Space === nNumSuff)
+				if (Asc.c_oAscNumberingSuff.Space === nNumSuff)
 				{
 					oNumTabRun.Add_ToContent(0, new ParaSpace());
 					oContainer.Add_ToContent(1, oNumTabRun);
 					nContainerPos++;
 				}
-				else if (c_oAscNumberingSuff.Tab === nNumSuff)
+				else if (Asc.c_oAscNumberingSuff.Tab === nNumSuff)
 				{
 					oNumTabRun.Add_ToContent(0, new ParaTab());
 					isAddTabForNumbering = true;

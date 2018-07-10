@@ -41,13 +41,6 @@ var numbering_lvltext_Text = 1;
 var numbering_lvltext_Num  = 2;
 
 /** enum {number} */
-var c_oAscNumberingSuff = {
-	Tab   : 1,
-	Space : 2,
-	None  : 3
-};
-
-/** enum {number} */
 var c_oAscMultiLevelNumbering = {
 	Numbered    : 0,
 	Bullet      : 1,
