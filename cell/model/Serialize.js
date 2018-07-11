@@ -2493,11 +2493,8 @@
             if (null !== oDefinedName.LocalSheetId){
                 this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(oDefinedName.LocalSheetId);});
             }
-            if (null != oDefinedName.Hidden)
-            {
-                this.memory.WriteByte(c_oSerDefinedNameTypes.Hidden);
-                this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(oDefinedName.Hidden);
+            if (null != oDefinedName.Hidden) {
+                this.bs.WriteItem(c_oSerDefinedNameTypes.Hidden, function(){oThis.memory.WriteBool(oDefinedName.Hidden);});
             }
         };
 		this.WriteCalcPr = function(calcPr)
