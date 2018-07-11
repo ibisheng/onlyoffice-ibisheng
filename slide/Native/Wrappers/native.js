@@ -501,7 +501,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 8112: // ASC_PRESENTATIONS_EVENT_TYPE_DELETE_SLIDE           
         {
-            this.DeleteSlide();
+            this.WordControl.m_oLogicDocument.deleteSlides(_params);
             break;
         }
 
