@@ -1331,7 +1331,7 @@ CChartsDrawer.prototype =
 				seria = series[0];
 				numCache = t.getNumCache(seria.val);
 				min = 1;
-				max = numCache.ptCount + 1;
+				max = numCache.ptCount;
 			}
 		};
 
@@ -1442,7 +1442,7 @@ CChartsDrawer.prototype =
 		var arrayValues;
 		if(AscDFH.historyitem_type_CatAx === axis.getObjectType() || AscDFH.historyitem_type_DateAx === axis.getObjectType()) {
 			arrayValues = [];
-			var max = axis.min === 0 ? axis.max - 1 : axis.max;
+			var max = axis.max;
 			for(var i = axis.min; i <= max; i++) {
 				arrayValues.push(i);
 			}
