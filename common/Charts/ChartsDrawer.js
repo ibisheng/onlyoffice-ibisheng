@@ -4752,7 +4752,7 @@ drawLineChart.prototype = {
 				//рассчитываем значения
 				val = this._getYVal(n, i);
 
-				x = this.catAx ? this.cChartDrawer.getYPosition(n, this.catAx) : xPoints[n].pos;
+				x = this.catAx ? this.cChartDrawer.getYPosition(n + 1, this.catAx) : xPoints[n].pos;
 				y = this.cChartDrawer.getYPosition(val, this.valAx);
 
 				if (!this.paths.points) {
