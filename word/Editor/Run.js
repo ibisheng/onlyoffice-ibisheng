@@ -10288,11 +10288,6 @@ ParaRun.prototype.ProcessAutoCorrect = function(nPos)
 				var oEndPos   = oContentPos;
 				oContentPos.Update(nPos + 1, oContentPos.GetDepth());
 
-				var oNewContentPos = oContentPos.Copy();
-				oNewContentPos.Update(nPos + 2, oNewContentPos.GetDepth());
-
-				oParagraph.AddNeaer
-
 				oParagraph.RemoveSelection();
 				oParagraph.SetSelectionUse(true);
 				oParagraph.SetSelectionContentPos(oStartPos, oEndPos, false);
