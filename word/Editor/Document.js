@@ -1715,6 +1715,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.DocumentOutline = new CDocumentOutline(this);
 
     this.AutoCorrectSettings = {
+    	SmartQuotes            : true,
+		HyphensWithDash        : true,
     	AutomaticBulletedLists : true,
 		AutomaticNumberedLists : true
 	};
@@ -17115,7 +17117,38 @@ CDocument.prototype.IsAutomaticNumberedLists = function()
 {
 	return this.AutoCorrectSettings.AutomaticNumberedLists;
 };
-
+/**
+ * Устанавливаем параметр автозамены: заменять ли прямые кавычки "умными"
+ * @param isSmartQuotes {boolean}
+ */
+CDocument.prototype.SetAutoCorrectSmartQuotes = function(isSmartQuotes)
+{
+	this.AutoCorrectSettings.SmartQuotes = isSmartQuotes;
+};
+/**
+ * Запрашиваем настройку автозамены: заменять ли прямые кавычки "умными"
+ * @returns {boolean}
+ */
+CDocument.prototype.IsAutoCorrectSmartQuotes = function()
+{
+	return this.AutoCorrectSettings.SmartQuotes;
+};
+/**
+ * Устанавливаем параметр автозамены двух дефисов на тире
+ * @param isReplace {boolean}
+ */
+CDocument.prototype.SetAutoCorrectHyphensWithDash = function(isReplace)
+{
+	this.AutoCorrectSettings.HyphensWithDash = isReplace;
+};
+/**
+ * Запрашиваем настройку автозамены двух дефисов на тире
+ * @returns {boolean}
+ */
+CDocument.prototype.IsAutoCorrectHyphensWithDash = function()
+{
+	return this.AutoCorrectSettings.HyphensWithDash;
+};
 
 function CDocumentSelectionState()
 {

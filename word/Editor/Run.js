@@ -529,7 +529,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 	{
 		this.private_AddItemToRun(this.State.ContentPos, Item);
 
-		if (this.Type === para_Run && (Item.Type === para_Space))
+		if (this.Type === para_Run && Item.CanStartAutoCorrect())
 			this.ProcessAutoCorrect(this.State.ContentPos - 1);
 	}
 };
@@ -10238,6 +10238,36 @@ ParaRun.prototype.ProcessAutoCorrect = function(nPos)
 		return false;
 
 	oContentPos.Update(nPos, oContentPos.GetDepth() + 1);
+
+	if (para_Text === this.Content[nPos].Type && (34 === this.Content[nPos].Value || 39 === this.Content[nPos].Value))
+	{
+		if (oDocument.IsAutoCorrectSmartQuotes())
+		{
+			var isOpenQuote = true;
+
+			var oRunElementsBefore = new CParagraphRunElements(oContentPos, 1, null, false);
+			oParagraph.GetPrevRunElements(oRunElementsBefore);
+			var arrElements = oRunElementsBefore.GetElements();
+			if (arrElements.length > 0)
+			{
+				var oPrevElement = arrElements[0];
+				if (para_Text === oPrevElement.Type && 45 !== oPrevElement.Value)
+					isOpenQuote = false;
+			}
+
+			var nCharCode = (34 === this.Content[nPos].Value ? (isOpenQuote ? 8220 : 8221) : (isOpenQuote ? 8216 : 8217));
+
+			// Проверку на лок можно не делать, т.к. мы собираемся менять содержимое данного рана, а такую проверку мы уже делали
+
+			oDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AutoCorrectSmartQuotes);
+
+			this.RemoveFromContent(nPos, 1);
+			this.AddToContent(nPos, new ParaText(nCharCode));
+			this.State.ContentPos = nPos + 1;
+			return true;
+		}
+		return false;
+	}
 
 	var oRunElementsBefore = new CParagraphRunElements(oContentPos, nMaxElements, null, true);
 	oParagraph.GetPrevRunElements(oRunElementsBefore);

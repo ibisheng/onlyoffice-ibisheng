@@ -14547,7 +14547,10 @@ CParagraphRunElements.prototype.CheckEnd = function(isEnd)
 	if (this.Count <= 0)
 	{
 		this.End = false;
-		this.Elements.splice(this.Elements.length - 1, 1);
+		if (this.Reverse)
+			this.Elements.splice(0, 1);
+		else
+			this.Elements.splice(this.Elements.length - 1, 1);
 	}
 	else if (this.Count >= 1)
 	{

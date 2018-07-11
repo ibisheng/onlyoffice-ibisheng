@@ -1079,6 +1079,9 @@
 			case AscDFH.historydescription_Document_ChangeNumLvl:
 				sString = "Document_ChangeNumLvl";
 				break;
+			case AscDFH.historydescription_Document_AutoCorrectSmartQuotes:
+				sString = "Document_AutoCorrectSmartQuotes";
+				break;
 		}
 		return sString;
 	}
@@ -3031,6 +3034,7 @@
 	window['AscDFH'].historydescription_Document_AutomaticListAsType                = 0x0155;
 	window['AscDFH'].historydescription_Document_CreateNum                          = 0x0156;
 	window['AscDFH'].historydescription_Document_ChangeNumLvl                       = 0x0157;
+	window['AscDFH'].historydescription_Document_AutoCorrectSmartQuotes             = 0x0158;
 
 
 
