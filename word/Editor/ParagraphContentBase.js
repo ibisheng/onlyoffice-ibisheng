@@ -1538,8 +1538,8 @@ CParagraphContentWithParagraphLikeContent.prototype.GetNextRunElements = functio
 	var nCurPos     = true === isUseContentPos ? oRunElements.ContentPos.Get(nDepth) : 0;
 	var nContentLen = this.Content.length;
 
-	oRunElements.UpdatePos(CurPos, nDepth);
-	this.Content[CurPos].GetNextRunElements(oRunElements, isUseContentPos, nDepth + 1);
+	oRunElements.UpdatePos(nCurPos, nDepth);
+	this.Content[nCurPos].GetNextRunElements(oRunElements, isUseContentPos, nDepth + 1);
 
 	nCurPos++;
 
@@ -1548,20 +1548,20 @@ CParagraphContentWithParagraphLikeContent.prototype.GetNextRunElements = functio
 		if (oRunElements.IsEnoughElements())
 			return;
 
-		oRunElements.UpdatePos(CurPos, nDepth);
+		oRunElements.UpdatePos(nCurPos, nDepth);
 		this.Content[nCurPos].GetNextRunElements(oRunElements, false, nDepth + 1);
 
 		nCurPos++;
 	}
 };
-CParagraphContentWithParagraphLikeContent.prototype.GetPrevRunElements = function(oRunElements, UseContentPos, nDepth)
+CParagraphContentWithParagraphLikeContent.prototype.GetPrevRunElements = function(oRunElements, isUseContentPos, nDepth)
 {
 	if (oRunElements.IsEnoughElements())
 		return;
 
 	var nCurPos = true === isUseContentPos ? oRunElements.ContentPos.Get(nDepth) : this.Content.length - 1;
 
-	oRunElements.UpdatePos(CurPos, nDepth);
+	oRunElements.UpdatePos(nCurPos, nDepth);
 	this.Content[nCurPos].GetPrevRunElements(oRunElements, isUseContentPos, nDepth + 1);
 
 	nCurPos--;
@@ -1571,7 +1571,7 @@ CParagraphContentWithParagraphLikeContent.prototype.GetPrevRunElements = functio
 		if (oRunElements.IsEnoughElements())
 			return;
 
-		oRunElements.UpdatePos(CurPos, nDepth);
+		oRunElements.UpdatePos(nCurPos, nDepth);
 		this.Content[nCurPos].GetPrevRunElements(oRunElements, false, nDepth + 1);
 
 		nCurPos--;
