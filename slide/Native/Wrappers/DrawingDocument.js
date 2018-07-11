@@ -663,7 +663,13 @@ CDrawingDocument.prototype.UpdateTargetTransform = function(matrix)
 
 CDrawingDocument.prototype.UpdateThumbnailsAttack = function()
 {
-    //this.m_oWordControl.Thumbnails.RecalculateAll();
+    var aSlides = this.m_oWordControl.m_oLogicDocument.Slides;
+    var DrawingDocument = this.m_oWordControl.m_oLogicDocument.DrawingDocument;
+    DrawingDocument.OnStartRecalculate(aSlides.length);
+    for(var i = 0; i < aSlides.length; ++i){
+        DrawingDocument.OnRecalculatePage(i, aSlides[i]);
+    }
+    DrawingDocument.OnEndRecalculate();
 };
 
 CDrawingDocument.prototype.CheckGuiControlColors = function(bIsAttack)
