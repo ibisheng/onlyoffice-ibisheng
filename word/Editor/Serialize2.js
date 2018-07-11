@@ -4249,7 +4249,7 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap, saveP
             this.bs.WriteItemWithLength(function(){oThis.WriteLevelText(lvl.LvlText);});
         }
         //Restart
-        if(null != lvl.Restart)
+        if(lvl.Restart >= 0)
         {
             this.memory.WriteByte(c_oSerNumTypes.lvl_Restart);
             this.memory.WriteByte(c_oSerPropLenType.Long);
