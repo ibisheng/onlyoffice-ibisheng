@@ -162,6 +162,146 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             break;
         }
 
+        case 9 : // ASC_MENU_EVENT_TYPE_IMAGE
+        {
+            var _imagePr = new Asc.asc_CImgProperty();
+            while (_continue)
+            {
+                var _attr = _params[_current.pos++];
+                switch (_attr)
+                {
+                    case 0:
+                    {
+                        _imagePr.CanBeFlow = _params[_current.pos++];
+                        break;
+                    }
+                    case 1:
+                    {
+                        _imagePr.Width = _params[_current.pos++];
+                        break;
+                    }
+                    case 2:
+                    {
+                        _imagePr.Height = _params[_current.pos++];
+                        break;
+                    }
+                    case 3:
+                    {
+                        _imagePr.WrappingStyle = _params[_current.pos++];
+                        break;
+                    }
+                    case 4:
+                    {
+                        _imagePr.Paddings = asc_menu_ReadPaddings(_params, _current);
+                        break;
+                    }
+                    case 5:
+                    {
+                        _imagePr.Position = asc_menu_ReadPosition(_params, _current);
+                        break;
+                    }
+                    case 6:
+                    {
+                        _imagePr.AllowOverlap = _params[_current.pos++];
+                        break;
+                    }
+                    case 7:
+                    {
+                        _imagePr.PositionH = asc_menu_ReadImagePosition(_params, _current);
+                        break;
+                    }
+                    case 8:
+                    {
+                        _imagePr.PositionV = asc_menu_ReadImagePosition(_params, _current);
+                        break;
+                    }
+                    case 9:
+                    {
+                        _imagePr.Internal_Position = _params[_current.pos++];
+                        break;
+                    }
+                    case 10:
+                    {
+                        _imagePr.ImageUrl = _params[_current.pos++];
+                        break;
+                    }
+                    case 11:
+                    {
+                        _imagePr.Locked = _params[_current.pos++];
+                        break;
+                    }
+                    case 12:
+                    {
+                        _imagePr.ChartProperties = asc_menu_ReadChartPr(_params, _current);
+                        break;
+                    }
+                    case 13:
+                    {
+                        _imagePr.ShapeProperties = asc_menu_ReadShapePr(_params, _current);
+                        break;
+                    }
+                    case 14:
+                    {
+                        _imagePr.ChangeLevel = _params[_current.pos++];
+                        console.log("_imagePr.ChangeLevel : " + _imagePr.ChangeLevel);
+                        break;
+                    }
+                    case 15:
+                    {
+                        _imagePr.Group = _params[_current.pos++];
+                        break;
+                    }
+                    case 16:
+                    {
+                        _imagePr.fromGroup = _params[_current.pos++];
+                        break;
+                    }
+                    case 17:
+                    {
+                        _imagePr.severalCharts = _params[_current.pos++];
+                        break;
+                    }
+                    case 18:
+                    {
+                        _imagePr.severalChartTypes = _params[_current.pos++];
+                        break;
+                    }
+                    case 19:
+                    {
+                        _imagePr.severalChartStyles = _params[_current.pos++];
+                        break;
+                    }
+                    case 20:
+                    {
+                        _imagePr.verticalTextAlign = _params[_current.pos++];
+                        break;
+                    }
+                    case 21:
+                    {
+                        var bIsNeed = _params[_current.pos++];
+
+                        if (bIsNeed)
+                        {
+                            //TODO: change image
+                        }
+
+                        break;
+                    }
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+
+            this.ImgApply(_imagePr);
+            this.WordControl.m_oLogicDocument.Recalculate();
+ 
+            break;
+        }
+
         case 12: // ASC_MENU_EVENT_TYPE_TABLESTYLES 
         {
 
