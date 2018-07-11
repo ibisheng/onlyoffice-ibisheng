@@ -1084,7 +1084,7 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_RemoveSlide)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = AdditionalData;
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 if(this.Slides[selected_slides[i]].isLockedObject())
