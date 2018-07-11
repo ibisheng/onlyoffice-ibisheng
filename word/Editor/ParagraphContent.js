@@ -764,8 +764,13 @@ ParaText.prototype.IsEastAsianScript = function()
 };
 ParaText.prototype.CanStartAutoCorrect = function()
 {
-	// Прямые кавычки одинарные и двойные
-	return (34 === this.Value || 39 === this.Value);
+	// 34 "
+	// 39 '
+	// 45 -
+
+	return (34 === this.Value
+	|| 39 === this.Value
+	|| 45 === this.Value);
 };
 
 /**

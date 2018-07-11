@@ -1082,6 +1082,9 @@
 			case AscDFH.historydescription_Document_AutoCorrectSmartQuotes:
 				sString = "Document_AutoCorrectSmartQuotes";
 				break;
+			case AscDFH.historydescription_Document_AutoCorrectHyphensWithDash:
+				sString = "Document_AutoCorrectHyphensWithDash";
+				break;
 		}
 		return sString;
 	}
@@ -3035,6 +3038,7 @@
 	window['AscDFH'].historydescription_Document_CreateNum                          = 0x0156;
 	window['AscDFH'].historydescription_Document_ChangeNumLvl                       = 0x0157;
 	window['AscDFH'].historydescription_Document_AutoCorrectSmartQuotes             = 0x0158;
+	window['AscDFH'].historydescription_Document_AutoCorrectHyphensWithDash         = 0x0159;
 
 
 

@@ -2148,6 +2148,7 @@ ParaRun.prototype.GetNextRunElements = function(oRunElements, isUseContentPos, n
     	if (oRunElements.IsEnoughElements())
     		return;
 
+		oRunElements.UpdatePos(nCurPos, nDepth);
 		oRunElements.Add(this.Content[nCurPos]);
     }
 };
@@ -2160,6 +2161,7 @@ ParaRun.prototype.GetPrevRunElements = function(oRunElements, isUseContentPos, n
     	if (oRunElements.IsEnoughElements())
     		return;
 
+		oRunElements.UpdatePos(nCurPos, nDepth);
 		oRunElements.Add(this.Content[nCurPos]);
     }
 };
@@ -8440,7 +8442,7 @@ CParaRunRecalcInfo.prototype.OnRemove = function(nPos, nCount)
 	{
 		if (nPos <= this.MeasurePositions[nIndex] && this.MeasurePositions[nIndex] <= nPos + nCount - 1)
 		{
-			this.MeasurePositions.splice(nIndex);
+			this.MeasurePositions.splice(nIndex, 1);
 			nIndex--;
 		}
 		else if (this.MeasurePositions[nIndex] >= nPos + nCount)
@@ -10265,6 +10267,50 @@ ParaRun.prototype.ProcessAutoCorrect = function(nPos)
 			this.AddToContent(nPos, new ParaText(nCharCode));
 			this.State.ContentPos = nPos + 1;
 			return true;
+		}
+		return false;
+	}
+	else if (para_Text === this.Content[nPos].Type && 45 === this.Content[nPos].Value)
+	{
+		if (oDocument.IsAutoCorrectHyphensWithDash())
+		{
+			var oRunElementsBefore = new CParagraphRunElements(oContentPos, 1, null, false);
+			oRunElementsBefore.SetSaveContentPositions(true);
+			oParagraph.GetPrevRunElements(oRunElementsBefore);
+			var arrElements = oRunElementsBefore.GetElements();
+			if (arrElements.length > 0 && para_Text === arrElements[0].Type && 45 === arrElements[0].Value)
+			{
+				oDocument.Create_NewHistoryPoint(AscDFH.Document_AutoCorrectHyphensWithDash);
+
+				var oDash = new ParaText(8212);
+				this.AddToContent(nPos + 1, oDash);
+				var oStartPos = oRunElementsBefore.GetContentPositions()[0];
+				var oEndPos   = oContentPos;
+				oContentPos.Update(nPos + 1, oContentPos.GetDepth());
+
+				var oNewContentPos = oContentPos.Copy();
+				oNewContentPos.Update(nPos + 2, oNewContentPos.GetDepth());
+
+				oParagraph.AddNeaer
+
+				oParagraph.RemoveSelection();
+				oParagraph.SetSelectionUse(true);
+				oParagraph.SetSelectionContentPos(oStartPos, oEndPos, false);
+				oParagraph.Remove(1);
+				oParagraph.RemoveSelection();
+
+				// TODO:
+				for (var nTempPos = 0, nCount = this.Content.length; nTempPos < nCount; ++nTempPos)
+				{
+					if (this.Content[nTempPos] === oDash)
+					{
+						this.State.ContentPos = nTempPos + 1;
+						break;
+					}
+				}
+
+				return true;
+			}
 		}
 		return false;
 	}

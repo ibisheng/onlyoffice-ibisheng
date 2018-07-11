@@ -4829,6 +4829,7 @@ Paragraph.prototype.GetNextRunElements = function(oRunElements)
 	var CurPos     = ContentPos.Get(0);
 	var ContentLen = this.Content.length;
 
+	oRunElements.UpdatePos(CurPos, 0);
 	this.Content[CurPos].GetNextRunElements(oRunElements, true, 1);
 
 	CurPos++;
@@ -4837,6 +4838,7 @@ Paragraph.prototype.GetNextRunElements = function(oRunElements)
 		if (oRunElements.IsEnoughElements())
 			break;
 
+		oRunElements.UpdatePos(CurPos, 0);
 		this.Content[CurPos].GetNextRunElements(oRunElements, false, 1);
 
 		if (oRunElements.Count <= 0)
@@ -4856,6 +4858,7 @@ Paragraph.prototype.GetPrevRunElements = function(oRunElements)
 	var ContentPos = oRunElements.ContentPos;
 	var CurPos     = ContentPos.Get(0);
 
+	oRunElements.UpdatePos(CurPos, 0);
 	this.Content[CurPos].GetPrevRunElements(oRunElements, true, 1);
 
 	CurPos--;
@@ -4865,6 +4868,7 @@ Paragraph.prototype.GetPrevRunElements = function(oRunElements)
 		if (oRunElements.IsEnoughElements())
 			break;
 
+		oRunElements.UpdatePos(CurPos, 0);
 		this.Content[CurPos].GetPrevRunElements(oRunElements, false, 1);
 
 		CurPos--;
@@ -14495,7 +14499,36 @@ function CParagraphRunElements(ContentPos, Count, arrTypes, isReverse)
     this.Types      = arrTypes ? arrTypes : [];
     this.End        = false;
 	this.Reverse    = undefined !== isReverse ? isReverse : false;
+
+	this.CurContentPos        = new CParagraphContentPos();
+	this.SaveContentPositions = false;
+	this.ContentPositions     = [];
 }
+/**
+ * Обновляем текущую позицию
+ * @param nPos {number}
+ * @param nDepth {number}
+ */
+CParagraphRunElements.prototype.UpdatePos = function(nPos, nDepth)
+{
+	this.CurContentPos.Update(nPos, nDepth);
+};
+/**
+ * Сохранять ли позиции элементов
+ * @param isSave {boolean}
+ */
+CParagraphRunElements.prototype.SetSaveContentPositions = function(isSave)
+{
+	this.SaveContentPositions = isSave;
+};
+/**
+ * Получаем массив позиций элементов
+ * @returns {Array}
+ */
+CParagraphRunElements.prototype.GetContentPositions = function()
+{
+	return this.ContentPositions;
+};
 /**
  * Проверяем элемент рана по типу
  * @param nType
@@ -14523,9 +14556,19 @@ CParagraphRunElements.prototype.Add = function(oElement)
 	if (this.CheckType(oElement.Type))
 	{
 		if (this.Reverse)
+		{
+			if (this.SaveContentPositions)
+				this.ContentPositions.splice(0, 0, this.CurContentPos.Copy());
+
 			this.Elements.splice(0, 0, oElement);
+		}
 		else
+		{
+			if (this.SaveContentPositions)
+				this.ContentPositions.push(this.CurContentPos.Copy());
+
 			this.Elements.push(oElement);
+		}
 
 		this.Count--;
 	}
