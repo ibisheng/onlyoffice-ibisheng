@@ -1330,8 +1330,8 @@ CChartsDrawer.prototype =
 				//возможно стоит пройтись по всем сериям
 				seria = series[0];
 				numCache = t.getNumCache(seria.val);
-				min = 0;
-				max = numCache.ptCount;
+				min = 1;
+				max = numCache.ptCount + 1;
 			}
 		};
 
