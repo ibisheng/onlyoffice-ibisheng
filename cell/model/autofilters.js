@@ -3682,7 +3682,32 @@
 					if(!worksheet.AutoFilter)
 					{
 						newFilter = new AscCommonExcel.AutoFilter();
-						//ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext).clone();
+
+						//добавляем особый именованный диапазон, так же как это делает MS
+						//без него при открытии файла в MS и последующей сортировке, будет падение
+
+						//TODO только на сохранение добавляю данный именованный диапазон
+						//код ниже нуждается в доработке. addDefName - не добавляет в историю, editDefinesNames - не добавляет с подобными префиксами имена
+
+						//1 вариант
+						/*var defNameFilter = "_xlnm._FilterDatabase";
+						var oldDefName = this.worksheet.workbook.getDefinesNames(defNameFilter, this.worksheet.Id);
+						var defNameRef = AscCommon.parserHelp.get3DRef(this.worksheet.getName(), ref.getAbsName());
+						if(oldDefName) {
+							oldDefName.setRef(defNameRef);
+						} else {
+							this.worksheet.workbook.dependencyFormulas.addDefName(defNameFilter, defNameRef, this.worksheet.Id, false);
+						}*/
+
+						//2 вариант
+						/*var defNameFilter = "_xlnm._FilterDatabase";
+						var oldDefName = this.worksheet.workbook.getDefinesNames(defNameFilter, this.worksheet.Id);
+						var defNameRef = AscCommon.parserHelp.get3DRef(this.worksheet.getName(), ref.getAbsName());
+						var newDefName = new Asc.asc_CDefName(defNameFilter, defNameRef, this.worksheet.Id, false, false);
+
+						this.worksheet.workbook.editDefinesNames(oldDefName, newDefName);*/
+
+
 						newFilter.Ref =  ref;
 						worksheet.AutoFilter = newFilter;
 					}

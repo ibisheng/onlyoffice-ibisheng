@@ -2452,15 +2452,30 @@
         this.WriteDefinedNames = function()
         {
             var oThis = this;
-
             var defNameList = this.wb.dependencyFormulas.saveDefName();
+
+            var filterDefName = "_xlnm._FilterDatabase";
 
             if(null != defNameList ){
                 for(var i = 0; i < defNameList.length; i++){
-                    this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(defNameList[i]);});
+                    if(defNameList[i].Name !== filterDefName) {
+						this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(defNameList[i]);});
+                    }
                 }
             }
 
+            //write filters defines name
+            //TODO сделать добавление данных именованных диапазонов при добавлении а/ф
+            var ws, ref, defNameRef, defName;
+            for(var i = 0; i < wb.aWorksheets.length; i++) {
+				ws = wb.aWorksheets[i];
+                if(ws && ws.AutoFilter) {
+                    ref = ws.AutoFilter.Ref;
+					defNameRef = AscCommon.parserHelp.get3DRef(ws.getName(), ref.getAbsName());
+					defName = new Asc.asc_CDefName(filterDefName, defNameRef, ws.index, false, true);
+                    this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(defName);});
+                }
+            }
         };
         this.WriteDefinedName = function(oDefinedName, LocalSheetId)
         {
