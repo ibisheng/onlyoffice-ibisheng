@@ -1365,6 +1365,10 @@ Slide.prototype =
 
     getBase64Img: function()
     {
+        if(window["NATIVE_EDITOR_ENJINE"])
+        {
+           return "";
+        }
         if(typeof this.cachedImage === "string" && this.cachedImage.length > 0)
             return this.cachedImage;
 

@@ -561,6 +561,10 @@ function CMasterThumbnailDrawer()
 
     this.GetThumbnail = function(_master, use_background, use_master_shapes)
     {
+        if(window["NATIVE_EDITOR_ENJINE"])
+        {
+            return "";
+        }
         var h_px = 38;
         var w_px = 85;//(this.WidthMM * h_px / this.HeightMM) >> 0;
 
