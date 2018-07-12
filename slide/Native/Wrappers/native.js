@@ -513,7 +513,9 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 8114: // ASC_PRESENTATIONS_EVENT_TYPE_MOVE_SLIDE             
         {
-
+            var nPos = _params[0];
+            var aMoveArray = _params.slice(1);
+            this.WordControl.m_oLogicDocument.shiftSlides(nPos, aMoveArray, false);
             break;
         }
 
