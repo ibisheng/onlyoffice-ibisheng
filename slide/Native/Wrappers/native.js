@@ -507,7 +507,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 8113: // ASC_PRESENTATIONS_EVENT_TYPE_DUBLICATE_SLIDE        
         {
-            this.DublicateSlide();
+            this.WordControl.m_oLogicDocument.shiftSlides(Math.max.apply(Math, _params) + 1, _params, true);
             break;
         }
 
