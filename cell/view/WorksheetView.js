@@ -2931,6 +2931,7 @@
 		if (range === undefined) {
 			range = this.visibleRange;
 		}
+		var t = this;
 		var ctx = drawingCtx || this.drawingCtx;
 		var c = this.cols;
 		var r = this.rows;
@@ -2951,6 +2952,34 @@
 		}
 
 		var basePageString = "Page ";
+
+		var getOptimalFontSize = function(width, height) {
+			var needWidth = width / 3;
+			var needHeight = height / 3;
+
+			//TODO максмальный размер выбрал произвольно. изменить! + оптимизировать алгоритм по равенству
+			var font = new AscCommonExcel.Font();
+			var str;
+			var i = 0, j = 100, k, textMetrics;
+			while (i <= j) {
+
+				k = Math.floor((i + j) / 2);
+
+				font.fs = k;
+				str = [{text: basePageString + (index + 1), format: font}];
+				t.stringRender.setString(str);
+				textMetrics = t.stringRender._measureChars();
+
+				if (textMetrics.width === needWidth && textMetrics.height === needHeight) {
+					break;
+				} else if (textMetrics.width > needWidth || textMetrics.height > needHeight) {
+					j = k - 1;
+				} else {
+					i = k + 1;
+				}
+			}
+			return k;
+		};
 
 		var x1, x2, y1, y2;
 		var pageBreakPreview = true;
@@ -2981,12 +3010,14 @@
 						}
 					}
 
-					var centerX = c[pageRange.c1].left + ((c[pageRange.c2].left + c[pageRange.c2].width) - c[pageRange.c1].left) / 2 - offsetX;
-					var centerY = r[pageRange.r1].top + ((r[pageRange.r2].top + r[pageRange.r2].height) - r[pageRange.r1].top) / 2 - offsetY;
+					var widthPage = (c[pageRange.c2].left + c[pageRange.c2].width) - c[pageRange.c1].left;
+					var heightPage = (r[pageRange.r2].top + r[pageRange.r2].height) - r[pageRange.r1].top;
+					var centerX = c[pageRange.c1].left + (widthPage) / 2 - offsetX;
+					var centerY = r[pageRange.r1].top + (heightPage) / 2 - offsetY;
 
 					//TODO подобрать такой размер шрифта, чтобы у текста была нужная нам ширина(1/3 от ширины страницы)
 					var font = new AscCommonExcel.Font();
-					font.fs = 30;
+					font.fs = getOptimalFontSize(widthPage, heightPage);
 					var str = [{text: basePageString + (index + 1), format: font}];
 					this.stringRender.setString(str);
 
