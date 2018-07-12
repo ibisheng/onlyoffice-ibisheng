@@ -93,6 +93,8 @@ Asc['asc_docs_api'].prototype.sync_EndCatchSelectedElements = function()
             case Asc.c_oAscTypeSelectElement.Slide:
             {
                 console.log("StackObjects -> Slide");
+                // _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Slide);
+                // asc_menu_WriteSlidePr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
           

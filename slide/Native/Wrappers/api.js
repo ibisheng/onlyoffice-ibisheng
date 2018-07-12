@@ -1039,6 +1039,204 @@ function asc_menu_WriteImagePr(_imagePr, _stream){
     _stream["WriteByte"](255);
 };
 
+function asc_menu_WriteSlidePr(_slidePr, _stream){
+    asc_menu_WriteAscFill(0, _slidePr.Background, _stream);
+    asc_menu_WriteTiming(1, _slidePr.Timing, _stream);
+    if(AscFormat.isRealNumber(_slidePr.LayoutIndex)){
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_slidePr.LayoutIndex);
+    }
+    if(AscFormat.isRealBool(_slidePr.isHidden)){
+        _stream["WriteByte"](3);
+        _stream["WriteBool"](_slidePr.isHidden);
+    }
+    if(AscFormat.isRealBool(_slidePr.lockBackground)){
+        _stream["WriteByte"](4);
+        _stream["WriteBool"](_slidePr.lockBackground);
+    }
+    if(AscFormat.isRealBool(_slidePr.lockDelete)){
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_slidePr.lockDelete);
+    }
+    if(AscFormat.isRealBool(_slidePr.lockLayout)){
+        _stream["WriteByte"](6);
+        _stream["WriteBool"](_slidePr.lockLayout);
+    }
+    if(AscFormat.isRealBool(_slidePr.lockRemove)){
+        _stream["WriteByte"](7);
+        _stream["WriteBool"](_slidePr.lockRemove);
+    }
+    if(AscFormat.isRealBool(_slidePr.lockTiming)){
+        _stream["WriteByte"](8);
+        _stream["WriteBool"](_slidePr.lockTiming);
+    }
+    if(AscFormat.isRealBool(_slidePr.lockTranzition)){
+        _stream["WriteByte"](9);
+        _stream["WriteBool"](_slidePr.lockTranzition);
+    }
+}
+
+function asc_menu_ReadSlidePr(_params, _cursor){
+    var _settings = new Asc.CAscSlideProps();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.Background = asc_menu_ReadAscFill(_params, _cursor);
+                break;
+            }
+            case 1:
+            {
+                _settings.Timing = asc_menu_ReadTiming(_params, _cursor);
+                break;
+            }
+            case 2:
+            {
+                _settings.LayoutIndex = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _settings.isHidden = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _settings.lockBackground = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _settings.lockDelete = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _settings.lockLayout = _params[_cursor.pos++];
+                break;
+            }
+            case 7:
+            {
+                _settings.lockRemove = _params[_cursor.pos++];
+                break;
+            }
+            case 8:
+            {
+                _settings.lockTiming = _params[_cursor.pos++];
+                break;
+            }
+            case 9:
+            {
+                _settings.lockTranzition = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _settings;
+}
+
+function asc_menu_WriteTiming(type, _timing, _stream){
+
+    _stream["WriteLong"](type);
+    if(AscFormat.isRealNumber(_timing.TransitionType)){
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_timing.TransitionType);
+    }
+    if(AscFormat.isRealNumber(_timing.TransitionOption)){
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_timing.TransitionOption);
+    }
+    if(AscFormat.isRealNumber(_timing.TransitionDuration)){
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_timing.TransitionDuration);
+    }
+    if(AscFormat.isRealBool(_timing.SlideAdvanceOnMouseClick)){
+        _stream["WriteByte"](3);
+        _stream["WriteBool"](_timing.SlideAdvanceOnMouseClick);
+    }
+    if(AscFormat.isRealBool(_timing.SlideAdvanceAfter)){
+        _stream["WriteByte"](4);
+        _stream["WriteBool"](_timing.SlideAdvanceAfter);
+    }
+    if(AscFormat.isRealBool(_timing.ShowLoop)){
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_timing.ShowLoop);
+    }
+    if(AscFormat.isRealNumber(_timing.SlideAdvanceDuration)){
+        _stream["WriteByte"](6);
+        _stream["WriteLong"](_timing.SlideAdvanceDuration);
+    }
+
+    _stream["WriteByte"](255);
+}
+
+function asc_menu_ReadTiming(_params, _cursor)
+{
+    var _settings = new Asc.CAscSlideTiming();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.TransitionType = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _settings.TransitionOption = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _settings.TransitionDuration = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _settings.SlideAdvanceOnMouseClick = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _settings.SlideAdvanceAfter = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _settings.ShowLoop = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _settings.SlideAdvanceDuration = _params[_cursor.pos++];
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _settings;
+};
+
 function NativeOpenFileP(_params, documentInfo){
     window["CreateMainTextMeasurerWrapper"]();
     window.g_file_path = "native_open_file";
