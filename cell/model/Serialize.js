@@ -3692,7 +3692,7 @@
         this.WriteComments = function(aComments, ws)
         {
             var oThis = this;
-            var i, elem, coord;
+            var i, elem;
             for(i = 0; i < aComments.length; ++i)
             {
                 elem = aComments[i];
@@ -3705,12 +3705,9 @@
 						continue;
 					}
 				}
-                coord = elem.coords;
-                if(null === coord.nLeft || null === coord.nTop || null === coord.nRight || null === coord.nBottom ||
-                    null === coord.nLeftOffset || null === coord.nTopOffset || null === coord.nRightOffset || null === coord.nBottomOffset ||
-                    null === coord.dLeftMM || null === coord.dTopMM || null === coord.dWidthMM || null === coord.dHeightMM)
-                    continue;
-                this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(elem);});
+				if (elem.coords.isValid()) {
+					this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(elem);});
+				}
             }
         };
         this.WriteComment = function(comment)
@@ -6914,23 +6911,24 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadComment(t,l, oCommentCoords, aCommentData);
                 });
-                //todo проверка
-                var i;
-                for(i = 0, length = aCommentData.length; i < length; ++i)
-                {
-					aCommentData[i].coords = oCommentCoords;
+                if (oCommentCoords.isValid()) {
+                    var i;
+                    for(i = 0, length = aCommentData.length; i < length; ++i)
+                    {
+                        aCommentData[i].coords = oCommentCoords;
 
-                    var elem = aCommentData[i];
-                    elem.asc_putRow(oCommentCoords.nRow);
-                    elem.asc_putCol(oCommentCoords.nCol);
+                        var elem = aCommentData[i];
+                        elem.asc_putRow(oCommentCoords.nRow);
+                        elem.asc_putCol(oCommentCoords.nCol);
 
-                    if (elem.asc_getDocumentFlag()) {
-                        elem.nId = "doc_" + (this.wb.aComments.length + 1);
-                        this.wb.aComments.push(elem);
-                    } else {
-                        elem.wsId = oWorksheet.Id;
-                        elem.nId = "sheet" + elem.wsId + "_" + (oWorksheet.aComments.length + 1);
-                        oWorksheet.aComments.push(elem);
+                        if (elem.asc_getDocumentFlag()) {
+                            elem.nId = "doc_" + (this.wb.aComments.length + 1);
+                            this.wb.aComments.push(elem);
+                        } else {
+                            elem.wsId = oWorksheet.Id;
+                            elem.nId = "sheet" + elem.wsId + "_" + (oWorksheet.aComments.length + 1);
+                            oWorksheet.aComments.push(elem);
+                        }
                     }
                 }
             }
