@@ -3028,8 +3028,15 @@ CPresentation.prototype =
     },
 
 
-    hideSlides: function(isHide){
-        var aSelectedArray = editor.WordControl.Thumbnails.GetSelectedArray();
+    hideSlides: function(isHide, aSlides){
+
+        var aSelectedArray;
+        if(Array.isArray(aSlides)){
+            aSelectedArray = aSlides;
+        }
+        else{
+            aSelectedArray = editor.WordControl.Thumbnails.GetSelectedArray();
+        }
 	    if(false === this.Document_Is_SelectionLocked(AscCommon.changestype_SlideHide, aSelectedArray)){
             History.Create_NewPoint(AscDFH.historydescription_Presentation_HideSlides);
             var bShow = !isHide;

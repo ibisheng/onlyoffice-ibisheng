@@ -1021,7 +1021,7 @@ if(typeof CPresentation !== "undefined")
         }
         if(CheckType === AscCommon.changestype_SlideHide)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = AdditionalData;
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 var check_obj =
