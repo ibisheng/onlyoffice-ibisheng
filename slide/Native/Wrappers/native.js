@@ -101,6 +101,8 @@ Asc['asc_docs_api'].prototype.sync_EndCatchSelectedElements = function()
             case Asc.c_oAscTypeSelectElement.Shape:
             {
                 console.log("StackObjects -> Shape");
+                _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Shape);
+                asc_menu_WriteShapePr(undefined, this.SelectedObjectsStack[i].Value, _stream); 
                 break;
             }
 

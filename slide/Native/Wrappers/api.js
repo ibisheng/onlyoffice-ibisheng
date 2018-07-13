@@ -916,7 +916,9 @@ function asc_menu_WriteShapePr(_type, _shapePr, _stream) {
     if (!_shapePr)
         return;
 
-    _stream["WriteByte"](_type);
+    if (_type !== undefined) {
+        _stream["WriteByte"](_type);
+    }
 
     if (_shapePr.type !== undefined && _shapePr.type !== null)
     {
