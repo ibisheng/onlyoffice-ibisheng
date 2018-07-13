@@ -1048,7 +1048,7 @@ CBlockLevelSdt.prototype.UpdateBookmarks = function(oManager)
 };
 CBlockLevelSdt.prototype.GetSimilarNumbering = function(oContinueEngine)
 {
-	if (oContinueNumbering.IsFound())
+	if (oContinueEngine.IsFound())
 		return;
 
 	this.Content.GetSimilarNumbering(oContinueEngine);
