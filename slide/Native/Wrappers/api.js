@@ -1150,7 +1150,7 @@ function asc_menu_ReadSlidePr(_params, _cursor){
 
 function asc_menu_WriteTiming(type, _timing, _stream){
 
-    _stream["WriteLong"](type);
+    _stream["WriteByte"](type);
     if(AscFormat.isRealNumber(_timing.TransitionType)){
         _stream["WriteByte"](0);
         _stream["WriteLong"](_timing.TransitionType);
