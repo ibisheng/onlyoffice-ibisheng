@@ -729,31 +729,42 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 		{
 			if (false === this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText))
 			{
-				if (this.Content[this.CurPos.ContentPos].IsEmpty())
+				var oLogicDocument = this.GetLogicDocument();
+				if (oLogicDocument && true === oLogicDocument.IsFillingFormMode())
 				{
-					this.RemoveFromContent(this.CurPos.ContentPos, 1);
-
-					if ((Count < 0 && this.CurPos.ContentPos > 0) || this.CurPos.ContentPos >= this.Content.length)
-					{
-						this.CurPos.ContentPos--;
-						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
-					}
-					else
-					{
+					if (Count < 0 && this.CurPos.ContentPos > 0)
 						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
-					}
+					else
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
 				}
 				else
 				{
-					if (Count < 0 && this.CurPos.ContentPos > 0)
+					if (this.Content[this.CurPos.ContentPos].IsEmpty())
 					{
-						this.CurPos.ContentPos--;
-						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+						this.RemoveFromContent(this.CurPos.ContentPos, 1);
+
+						if ((Count < 0 && this.CurPos.ContentPos > 0) || this.CurPos.ContentPos >= this.Content.length)
+						{
+							this.CurPos.ContentPos--;
+							this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+						}
+						else
+						{
+							this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+						}
 					}
-					else if (this.CurPos.ContentPos < this.Content.length - 1)
+					else
 					{
-						this.CurPos.ContentPos++;
-						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+						if (Count < 0 && this.CurPos.ContentPos > 0)
+						{
+							this.CurPos.ContentPos--;
+							this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+						}
+						else if (this.CurPos.ContentPos < this.Content.length - 1)
+						{
+							this.CurPos.ContentPos++;
+							this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+						}
 					}
 				}
 			}
