@@ -1076,6 +1076,7 @@ function asc_menu_WriteSlidePr(_slidePr, _stream){
         _stream["WriteByte"](9);
         _stream["WriteBool"](_slidePr.lockTranzition);
     }
+    _stream["WriteByte"](255);
 }
 
 function asc_menu_ReadSlidePr(_params, _cursor){
