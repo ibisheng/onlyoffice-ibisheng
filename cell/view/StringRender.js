@@ -803,7 +803,7 @@
 			var tw = 0, nlPos = 0, isEastAsian, hpPos = undefined, isSP_ = true, delta = 0;
 
 			function measureFragment(s) {
-				var j, ch, chw, chPos, isNL, isSP, isHP, tm;
+				var j, ch, chc, chw, chPos, isNL, isSP, isHP, tm;
 
 				for (chPos = self.chars.length, j = 0; j < s.length; ++j, ++chPos) {
 					ch  = s.charAt(j);
@@ -816,7 +816,8 @@
 					// if 'wrap flag' is set
 					if (wrap || wrapNL) {
 						isHP = !isSP && !isNL ? self.reHyphen.test(ch) : false;
-						isEastAsian = AscCommon.isEastAsianScript(s.charCodeAt(j));
+						chc = s.charCodeAt(j);
+						isEastAsian = AscCommon.isEastAsianScript(chc);
 						if (isNL) {
 							// add new line marker
 							nlPos = chPos;
@@ -830,7 +831,9 @@
 							// move hyphenation position
 							hpPos = chPos + 1;
 						} else if (isEastAsian) {
-							if (0 !== j && !(AscCommon.g_aPunctuation[s.charCodeAt(j - 1)] & AscCommon.PUNCTUATION_FLAG_CANT_BE_AT_END_E)) {
+							if (0 !== j && !(AscCommon.g_aPunctuation[s.charCodeAt(j - 1)] &
+								AscCommon.PUNCTUATION_FLAG_CANT_BE_AT_END_E) &&
+								!(AscCommon.g_aPunctuation[chc] & AscCommon.PUNCTUATION_FLAG_CANT_BE_AT_BEGIN_E)) {
 								// move hyphenation position
 								hpPos = chPos;
 							}
@@ -847,7 +850,9 @@
 
 						if (isEastAsian) {
 							// move hyphenation position
-							if (j !== s.length && !(AscCommon.g_aPunctuation[s.charCodeAt(j + 1)] & AscCommon.PUNCTUATION_FLAG_CANT_BE_AT_BEGIN_E)) {
+							if (j !== s.length && !(AscCommon.g_aPunctuation[s.charCodeAt(j + 1)] &
+								AscCommon.PUNCTUATION_FLAG_CANT_BE_AT_BEGIN_E) &&
+								!(AscCommon.g_aPunctuation[chc] & AscCommon.PUNCTUATION_FLAG_CANT_BE_AT_END_E)) {
 								hpPos = chPos + 1;
 							}
 						}
