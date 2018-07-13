@@ -265,7 +265,7 @@ CContentControlPr.prototype.put_Color = function(r, g, b)
  */
 function CSdtGlobalSettings()
 {
-	this.Color         = new AscCommonWord.CDocumentColor();
+	this.Color         = new AscCommonWord.CDocumentColor(220, 220, 220);
 	this.ShowHighlight = false;
 }
 CSdtGlobalSettings.prototype.Copy = function()
