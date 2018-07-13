@@ -1565,9 +1565,10 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 
 	var DrawComm           = ( DocumentComments.Is_Use() && true !== LogicDocument.IsViewMode() && true !== this.LogicDocument.IsViewModeInReview());
 	var DrawFind           = LogicDocument.SearchEngine.Selection;
-	var DrawColl           = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
-	var DrawMMFields       = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
+	var DrawColl           = undefined !== pGraphics.RENDERER_PDF_FLAG;
+	var DrawMMFields       = !!(this.LogicDocument && true === this.LogicDocument.Is_HighlightMailMergeFields());
 	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true !== LogicDocument.IsViewMode() &&  true !== this.LogicDocument.IsViewModeInReview());
+	var SdtHighlightColor  = this.LogicDocument.GetSdtGlobalShowHighlight() && undefined === pGraphics.RENDERER_PDF_FLAG ? this.LogicDocument.GetSdtGlobalColor() : null;
 
 	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.GetEndInfoByPage(CurPage - 1), DrawSolvedComments);
 
@@ -1767,6 +1768,23 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				}
 			}
 
+			//----------------------------------------------------------------------------------------------------------
+			// Рисуем подсветку InlineSdt
+			//----------------------------------------------------------------------------------------------------------
+			if (SdtHighlightColor)
+			{
+				pGraphics.b_color1(SdtHighlightColor.r, SdtHighlightColor.g, SdtHighlightColor.b, 255);
+				var oSdtBounds;
+				for (var nSdtIndex = 0, nSdtCount = PDSH.InlineSdt.length; nSdtIndex < nSdtCount; ++nSdtIndex)
+				{
+					oSdtBounds = PDSH.InlineSdt[nSdtIndex].GetRangeBounds(CurLine, CurRange);
+					if (oSdtBounds)
+					{
+						pGraphics.rect(oSdtBounds.X, oSdtBounds.Y, oSdtBounds.W, oSdtBounds.H);
+						pGraphics.df();
+					}
+				}
+			}
 			//----------------------------------------------------------------------------------------------------------
 			// Рисуем заливку текста
 			//----------------------------------------------------------------------------------------------------------
@@ -11505,7 +11523,7 @@ Paragraph.prototype.GetStyleFromFormatting = function()
     }
     TextPr = this.Content[CurPos].Get_FirstTextPr();
 
-    // В стиль не добавляется HightLight
+    // В стиль не добавляется HighLight
     if (undefined !== TextPr.HighLight)
     {
         TextPr = TextPr.Copy();
@@ -13764,7 +13782,7 @@ CParagraphComplexFieldsInfo.prototype.IsHyperlinkField = function()
 	return (isHaveHyperlink && !isOtherField ? true : false);
 };
 
-function CParagraphDrawStateHightlights()
+function CParagraphDrawStateHighlights()
 {
     this.Page   = 0;
     this.Line   = 0;
@@ -13799,9 +13817,11 @@ function CParagraphDrawStateHightlights()
 
     this.Spaces = 0;
 
+    this.InlineSdt = [];
+
     this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
-CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
+CParagraphDrawStateHighlights.prototype.Reset = function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
 {
 	this.Paragraph = Paragraph;
 	this.Graphics  = Graphics;
@@ -13828,7 +13848,7 @@ CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, D
 
 	this.Check_CommentsFlag();
 };
-CParagraphDrawStateHightlights.prototype.Reset_Range = function(Page, Line, Range, X, Y0, Y1, SpacesCount)
+CParagraphDrawStateHighlights.prototype.Reset_Range = function(Page, Line, Range, X, Y0, Y1, SpacesCount)
 {
 	this.Page  = Page;
 	this.Line  = Line;
@@ -13844,8 +13864,14 @@ CParagraphDrawStateHightlights.prototype.Reset_Range = function(Page, Line, Rang
 	this.Y1 = Y1;
 
 	this.Spaces = SpacesCount;
+
+	this.InlineSdt = [];
 };
-CParagraphDrawStateHightlights.prototype.AddComment = function(Id)
+CParagraphDrawStateHighlights.prototype.AddInlineSdt = function(oSdt)
+{
+	this.InlineSdt.push(oSdt);
+};
+CParagraphDrawStateHighlights.prototype.AddComment = function(Id)
 {
 	if (!this.DrawComments)
 		return;
@@ -13857,7 +13883,7 @@ CParagraphDrawStateHightlights.prototype.AddComment = function(Id)
 	this.Comments.push(Id);
 	this.Check_CommentsFlag();
 };
-CParagraphDrawStateHightlights.prototype.RemoveComment = function(Id)
+CParagraphDrawStateHighlights.prototype.RemoveComment = function(Id)
 {
 	if (!this.DrawComments)
 		return;
@@ -13877,7 +13903,7 @@ CParagraphDrawStateHightlights.prototype.RemoveComment = function(Id)
 
 	this.Check_CommentsFlag();
 };
-CParagraphDrawStateHightlights.prototype.Check_CommentsFlag = function()
+CParagraphDrawStateHighlights.prototype.Check_CommentsFlag = function()
 {
 	// Проверяем флаг
 	var Para             = this.Paragraph;
@@ -13898,23 +13924,23 @@ CParagraphDrawStateHightlights.prototype.Check_CommentsFlag = function()
 		}
 	}
 };
-CParagraphDrawStateHightlights.prototype.Save_Coll = function()
+CParagraphDrawStateHighlights.prototype.Save_Coll = function()
 {
 	var Coll  = this.Coll;
 	this.Coll = new CParaDrawingRangeLines();
 	return Coll;
 };
-CParagraphDrawStateHightlights.prototype.Save_Comm = function()
+CParagraphDrawStateHighlights.prototype.Save_Comm = function()
 {
 	var Comm  = this.Comm;
 	this.Comm = new CParaDrawingRangeLines();
 	return Comm;
 };
-CParagraphDrawStateHightlights.prototype.Load_Coll = function(Coll)
+CParagraphDrawStateHighlights.prototype.Load_Coll = function(Coll)
 {
 	this.Coll = Coll;
 };
-CParagraphDrawStateHightlights.prototype.Load_Comm = function(Comm)
+CParagraphDrawStateHighlights.prototype.Load_Comm = function(Comm)
 {
 	this.Comm = Comm;
 };
@@ -14070,7 +14096,7 @@ CParagraphDrawStateLines.prototype.GetSpellingErrorsCounter = function()
 	return nCounter;
 };
 
-var g_oPDSH = new CParagraphDrawStateHightlights();
+var g_oPDSH = new CParagraphDrawStateHighlights();
 //var g_oPDSE = new CParagraphDrawStateElements();
 var g_oPDSL = new CParagraphDrawStateLines();
 

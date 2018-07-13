@@ -108,7 +108,7 @@ Asc['asc_docs_api'].prototype.asc_AddMailMergeField = function(Name)
 };
 Asc['asc_docs_api'].prototype.asc_SetHighlightMailMergeFields = function(Value)
 {
-    this.WordControl.m_oLogicDocument.Set_HightlightMailMergeFields(Value);
+    this.WordControl.m_oLogicDocument.Set_HightlighMailMergeFields(Value);
 };
 Asc['asc_docs_api'].prototype.asc_PreviewMailMergeResult = function(Index)
 {
@@ -252,7 +252,7 @@ CDocument.prototype.Add_MailMergeField = function(Name)
         this.Document_UpdateInterfaceState();
     }
 };
-CDocument.prototype.Set_HightlightMailMergeFields = function(Value)
+CDocument.prototype.Set_HightlighMailMergeFields = function(Value)
 {
     if (Value !== this.MailMergeFieldsHighlight)
     {

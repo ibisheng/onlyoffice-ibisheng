@@ -41,7 +41,7 @@ var type_BlockLevelSdt = 0x0003;
 
 /**
  * @param oParent - родительский класс
- * @param oLogicDocument - главный класс документа
+ * @param oLogicDocument {CDocument} - главный класс документа
  * @constructor
  * @extends {CDocumentContentElementBase}
  */
@@ -149,6 +149,16 @@ CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 };
 CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)
 {
+	if (this.LogicDocument.GetSdtGlobalShowHighlight())
+	{
+		var oBounds = this.GetContentBounds(CurPage);
+		var oColor  = this.LogicDocument.GetSdtGlobalColor();
+
+		oGraphics.b_color1(oColor.r, oColor.g, oColor.b, 255);
+		oGraphics.rect(oBounds.Left, oBounds.Top, oBounds.Right - oBounds.Left, oBounds.Bottom - oBounds.Top);
+		oGraphics.df();
+	}
+
 	this.Content.Draw(CurPage, oGraphics);
 
 	if (AscCommon.locktype_None !== this.Lock.Get_Type())
@@ -657,6 +667,12 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 	var oDrawingDocument = this.LogicDocument.Get_DrawingDocument();
 	var arrRects = [];
 
+	if (Asc.c_oAscSdtAppearance.Hidden === this.GetAppearance())
+	{
+		oDrawingDocument.OnDrawContentControl(null, isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In);
+		return;
+	}
+
 	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
 	{
 		if (this.IsEmptyPage(nCurPage))
@@ -678,7 +694,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		arrButtons.push(1);
 	}
 
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons);
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons, this.GetColor());
 };
 CBlockLevelSdt.prototype.AddContentControl = function(nContentControlType)
 {
@@ -1127,6 +1143,38 @@ CBlockLevelSdt.prototype.GetLabel = function()
 {
 	return (undefined !== this.Pr.Label ? this.Pr.Label : "");
 };
+CBlockLevelSdt.prototype.SetAppearance = function(nType)
+{
+	if (this.Pr.Appearance !== nType)
+	{
+		History.Add(new CChangesSdtPrAppearance(this, this.Pr.Appearance, nType));
+		this.Pr.Appearance = nType;
+	}
+};
+CBlockLevelSdt.prototype.GetAppearance = function()
+{
+	return this.Pr.Appearance;
+};
+CBlockLevelSdt.prototype.SetColor = function(oColor)
+{
+	if (null === oColor || undefined === oColor)
+	{
+		if (undefined !== this.Pr.Color)
+		{
+			History.Add(new CChangesSdtPrColor(this, this.Pr.Color, undefined));
+			this.Pr.Color = undefined;
+		}
+	}
+	else
+	{
+		History.Add(new CChangesSdtPrColor(this, this.Pr.Color, oColor));
+		this.Pr.Color = oColor;
+	}
+};
+CBlockLevelSdt.prototype.GetColor = function()
+{
+	return this.Pr.Color;
+};
 CBlockLevelSdt.prototype.SetDocPartObj = function(sCategory, sGallery, isUnique)
 {
 	History.Add(new CChangesSdtPrDocPartObj(this, this.Pr.DocPartObj, {Category : sCategory, Gallery : sGallery, Unique : isUnique}));
@@ -1170,6 +1218,12 @@ CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 
 	if (undefined !== oPr.Alias)
 		this.SetAlias(oPr.Alias);
+
+	if (undefined !== oPr.Appearance)
+		this.SetAppearance(oPr.Appearance);
+
+	if (undefined !== oPr.Color)
+		this.SetColor(oPr.Color);
 };
 CBlockLevelSdt.prototype.GetContentControlPr = function()
 {
@@ -1180,6 +1234,8 @@ CBlockLevelSdt.prototype.GetContentControlPr = function()
 	oPr.Lock       = this.Pr.Lock;
 	oPr.InternalId = this.GetId();
 	oPr.Alias      = this.GetAlias();
+	oPr.Appearance = this.GetAppearance();
+	oPr.Color      = this.GetColor();
 
 	return oPr;
 };

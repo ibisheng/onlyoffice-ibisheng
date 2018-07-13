@@ -43,6 +43,7 @@ AscDFH.changesFactory[AscDFH.historyitem_Document_DefaultTab]        = CChangesD
 AscDFH.changesFactory[AscDFH.historyitem_Document_EvenAndOddHeaders] = CChangesDocumentEvenAndOddHeaders;
 AscDFH.changesFactory[AscDFH.historyitem_Document_DefaultLanguage]   = CChangesDocumentDefaultLanguage;
 AscDFH.changesFactory[AscDFH.historyitem_Document_MathSettings]      = CChangesDocumentMathSettings;
+AscDFH.changesFactory[AscDFH.historyitem_Document_SdtGlobalSettings] = CChangesDocumentSdtGlobalSettings;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
@@ -59,6 +60,7 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Document_DefaultTab]        = [AscD
 AscDFH.changesRelationMap[AscDFH.historyitem_Document_EvenAndOddHeaders] = [AscDFH.historyitem_Document_EvenAndOddHeaders];
 AscDFH.changesRelationMap[AscDFH.historyitem_Document_DefaultLanguage]   = [AscDFH.historyitem_Document_DefaultLanguage];
 AscDFH.changesRelationMap[AscDFH.historyitem_Document_MathSettings]      = [AscDFH.historyitem_Document_MathSettings];
+AscDFH.changesRelationMap[AscDFH.historyitem_Document_SdtGlobalSettings] = [AscDFH.historyitem_Document_SdtGlobalSettings];
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -509,4 +511,30 @@ CChangesDocumentMathSettings.prototype.ReadFromBinary = function(Reader)
 CChangesDocumentMathSettings.prototype.CreateReverseChange = function()
 {
 	return new CChangesDocumentMathSettings(this.Class, this.New, this.Old);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesDocumentSdtGlobalSettings(Class, Old, New)
+{
+	AscDFH.CChangesBaseObjectProperty.call(this, Class);
+
+	this.Old = Old;
+	this.New = New;
+}
+CChangesDocumentSdtGlobalSettings.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesDocumentSdtGlobalSettings.prototype.constructor = CChangesDocumentSdtGlobalSettings;
+CChangesDocumentSdtGlobalSettings.prototype.Type = AscDFH.historyitem_Document_SdtGlobalSettings;
+CChangesDocumentSdtGlobalSettings.prototype.private_SetValue = function(Value)
+{
+	this.Class.Settings.SdtSettings = Value;
+};
+CChangesDocumentSdtGlobalSettings.prototype.private_CreateObject = function()
+{
+	return new CSdtGlobalSettings();
+};
+CChangesDocumentSdtGlobalSettings.prototype.private_IsCreateEmptyObject = function()
+{
+	return true;
 };

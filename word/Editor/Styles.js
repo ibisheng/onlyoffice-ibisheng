@@ -5099,6 +5099,14 @@ CDocumentColor.prototype =
         return true;
     }
 };
+CDocumentColor.prototype.WriteToBinary = function(oWriter)
+{
+	this.Write_ToBinary(oWriter);
+};
+CDocumentColor.prototype.ReadFromBinary = function(oReader)
+{
+	this.Read_FromBinary(oReader);
+};
 
 function CDocumentShd()
 {

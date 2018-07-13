@@ -1085,6 +1085,13 @@
 			case AscDFH.historydescription_Document_AutoCorrectHyphensWithDash:
 				sString = "Document_AutoCorrectHyphensWithDash";
 				break;
+			case AscDFH.historydescription_Document_SetGlobalSdtHighlightColor:
+				sString = "Document_SetGlobalSdtHighlightColor";
+				break;
+			case AscDFH.historydescription_Document_SetGlobalSdtShowHighlight:
+				sString = "Document_SetGlobalSdtShowHighlight";
+				break;
+
 		}
 		return sString;
 	}
@@ -1338,6 +1345,7 @@
 	window['AscDFH'].historyitem_Document_EvenAndOddHeaders = window['AscDFH'].historyitem_type_Document | 4;
 	window['AscDFH'].historyitem_Document_DefaultLanguage   = window['AscDFH'].historyitem_type_Document | 5;
 	window['AscDFH'].historyitem_Document_MathSettings      = window['AscDFH'].historyitem_type_Document | 6;
+	window['AscDFH'].historyitem_Document_SdtGlobalSettings = window['AscDFH'].historyitem_type_Document | 7;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе Paragraph
 	//------------------------------------------------------------------------------------------------------------------
@@ -1752,6 +1760,8 @@
 	window['AscDFH'].historyitem_SdtPr_Label      = window['AscDFH'].historyitem_type_SdtPr | 4;
 	window['AscDFH'].historyitem_SdtPr_Lock       = window['AscDFH'].historyitem_type_SdtPr | 5;
 	window['AscDFH'].historyitem_SdtPr_DocPartObj = window['AscDFH'].historyitem_type_SdtPr | 6;
+	window['AscDFH'].historyitem_SdtPr_Appearance = window['AscDFH'].historyitem_type_SdtPr | 7;
+	window['AscDFH'].historyitem_SdtPr_Color      = window['AscDFH'].historyitem_type_SdtPr | 8;
 	//------------------------------------------------------------------------------------------------------------------
 	// Графические классы общего назначение (без привязки к конкретному классу)
 	//------------------------------------------------------------------------------------------------------------------
@@ -3039,6 +3049,8 @@
 	window['AscDFH'].historydescription_Document_ChangeNumLvl                       = 0x0157;
 	window['AscDFH'].historydescription_Document_AutoCorrectSmartQuotes             = 0x0158;
 	window['AscDFH'].historydescription_Document_AutoCorrectHyphensWithDash         = 0x0159;
+	window['AscDFH'].historydescription_Document_SetGlobalSdtHighlightColor         = 0x015a;
+	window['AscDFH'].historydescription_Document_SetGlobalSdtShowHighlight          = 0x015b;
 
 
 

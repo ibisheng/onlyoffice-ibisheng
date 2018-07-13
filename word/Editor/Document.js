@@ -1534,6 +1534,7 @@ function CDocumentSettings()
 {
     this.MathSettings      = undefined !== CMathSettings ? new CMathSettings() : {};
     this.CompatibilityMode = document_compatibility_mode_Current;
+    this.SdtSettings       = new CSdtGlobalSettings();
 }
 
 /**
@@ -10898,7 +10899,7 @@ CDocument.prototype.Is_MailMergePreviewResult = function()
 {
 	return this.MailMergePreview;
 };
-CDocument.prototype.Is_HightlightMailMergeFields = function()
+CDocument.prototype.Is_HighlightMailMergeFields = function()
 {
 	return this.MailMergeFieldsHighlight;
 };
@@ -12492,6 +12493,37 @@ CDocument.prototype.AddPageCount = function()
 CDocument.prototype.GetCompatibilityMode = function()
 {
 	return this.Settings.CompatibilityMode;
+};
+CDocument.prototype.GetSdtGlobalColor = function()
+{
+	return this.Settings.SdtSettings.Color;
+};
+CDocument.prototype.SetSdtGlobalColor = function(r, g, b)
+{
+	var oNewColor = new CDocumentColor(r, g, b);
+	if (!oNewColor.Compare(this.Settings.SdtSettings.Color))
+	{
+		var oNewSettings = this.Settings.SdtSettings.Copy();
+		oNewSettings.Color = oNewColor;
+
+		this.History.Add(new CChangesDocumentSdtGlobalSettings(this, this.Settings.SdtSettings, oNewSettings));
+		this.Settings.SdtSettings = oNewSettings;
+	}
+};
+CDocument.prototype.GetSdtGlobalShowHighlight = function()
+{
+	return this.Settings.SdtSettings.ShowHighlight;
+};
+CDocument.prototype.SetSdtGlobalShowHighlight = function(isShow)
+{
+	if (this.Settings.SdtSettings.ShowHighlight !== isShow)
+	{
+		var oNewSettings = this.Settings.SdtSettings.Copy();
+		oNewSettings.ShowHighlight = isShow;
+
+		this.History.Add(new CChangesDocumentSdtGlobalSettings(this, this.Settings.SdtSettings, oNewSettings));
+		this.Settings.SdtSettings = oNewSettings;
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Math

@@ -135,6 +135,18 @@ CInlineLevelSdt.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _C
 
 	this.BoundsPaths = null;
 };
+CInlineLevelSdt.prototype.Draw_HighLights = function(PDSH)
+{
+	PDSH.AddInlineSdt(this);
+	CParagraphContentWithParagraphLikeContent.prototype.Draw_HighLights.apply(this, arguments);
+};
+CInlineLevelSdt.prototype.GetRangeBounds = function(_CurLine, _CurRange)
+{
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = (0 === _CurLine ? _CurRange - this.StartRange : _CurRange);
+
+	return this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)];
+};
 CInlineLevelSdt.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
 	if (false === UseContentPos && this.Content.length > 0)
@@ -269,11 +281,17 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 
 	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
 
+	if (Asc.c_oAscSdtAppearance.Hidden === this.GetAppearance())
+	{
+		oDrawingDocument.OnDrawContentControl(null, isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In);
+		return;
+	}
+
 	var sName      = this.GetAlias();
 	var isBuiltIn  = false;
 	var arrButtons = [];
 
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons);
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons, this.GetColor());
 };
 CInlineLevelSdt.prototype.SelectContentControl = function()
 {
@@ -385,6 +403,38 @@ CInlineLevelSdt.prototype.GetAlias = function()
 {
 	return (undefined !== this.Pr.Alias ? this.Pr.Alias : "");
 };
+CInlineLevelSdt.prototype.SetAppearance = function(nType)
+{
+	if (this.Pr.Appearance !== nType)
+	{
+		History.Add(new CChangesSdtPrAppearance(this, this.Pr.Appearance, nType));
+		this.Pr.Appearance = nType;
+	}
+};
+CInlineLevelSdt.prototype.GetAppearance = function()
+{
+	return this.Pr.Appearance;
+};
+CInlineLevelSdt.prototype.SetColor = function(oColor)
+{
+	if (null === oColor || undefined === oColor)
+	{
+		if (undefined !== this.Pr.Color)
+		{
+			History.Add(new CChangesSdtPrColor(this, this.Pr.Color, undefined));
+			this.Pr.Color = undefined;
+		}
+	}
+	else
+	{
+		History.Add(new CChangesSdtPrColor(this, this.Pr.Color, oColor));
+		this.Pr.Color = oColor;
+	}
+};
+CInlineLevelSdt.prototype.GetColor = function()
+{
+	return this.Pr.Color;
+};
 CInlineLevelSdt.prototype.SetContentControlId = function(Id)
 {
 	if (this.Pr.Id !== Id)
@@ -449,6 +499,12 @@ CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
 
 	if (undefined !== oPr.Alias)
 		this.SetAlias(oPr.Alias);
+
+	if (undefined !== oPr.Appearance)
+		this.SetAppearance(oPr.Appearance);
+
+	if (undefined !== oPr.Color)
+		this.SetColor(oPr.Color);
 };
 CInlineLevelSdt.prototype.GetContentControlPr = function()
 {
@@ -459,6 +515,8 @@ CInlineLevelSdt.prototype.GetContentControlPr = function()
 	oPr.Lock       = this.Pr.Lock;
 	oPr.InternalId = this.GetId();
 	oPr.Alias      = this.GetAlias();
+	oPr.Appearance = this.GetAppearance();
+	oPr.Color      = this.GetColor();
 
 	return oPr;
 };

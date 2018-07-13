@@ -229,6 +229,11 @@ var c_oAscHyperlinkAnchor = {
 	Bookmark      : 2
 };
 
+var c_oAscSdtAppearance = {
+	Frame  : 1,
+	Hidden : 2
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -346,6 +351,11 @@ prot['Character'] = c_oAscStyleType.Character;
 prot = window['Asc']['c_oAscHyperlinkAnchor'] = window['Asc'].c_oAscHyperlinkAnchor = c_oAscHyperlinkAnchor;
 prot['Heading']       = c_oAscHyperlinkAnchor.Heading;
 prot['Bookmark']      = c_oAscHyperlinkAnchor.Bookmark;
+
+prot = window['Asc']['c_oAscSdtAppearance'] = window['Asc'].c_oAscSdtAppearance = c_oAscSdtAppearance;
+prot['Frame']  = c_oAscSdtAppearance.Frame;
+prot['Hidden'] = c_oAscSdtAppearance.Hidden;
+
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;
