@@ -243,7 +243,7 @@ CDrawingDocument.prototype.StartTrackTable = function()
 
 CDrawingDocument.prototype.OnRecalculatePage = function(index, pageObject)
 {
-    var l, t, r, b;
+    var l, t, r, b, bIsHidden = !pageObject.isVisible();
     if(index === this.m_oLogicDocument.CurPage)
     {
         var oBoundsChecker = new AscFormat.CSlideBoundsChecker();
@@ -260,7 +260,7 @@ CDrawingDocument.prototype.OnRecalculatePage = function(index, pageObject)
         b = this.m_oLogicDocument.Height;
         t = 0.0;
     }
-    this.Native["DD_OnRecalculatePage"](index, l, t, r, b);
+    this.Native["DD_OnRecalculatePage"](index, l, t, r, b, bIsHidden, pageObject.Get_Id());
 };
 
 CDrawingDocument.prototype.OnEndRecalculate = function()
