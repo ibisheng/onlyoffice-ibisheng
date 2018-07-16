@@ -453,8 +453,9 @@ function (window, undefined) {
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 -
-							1)
+						var diffArg1 = arg1 === 0 ? 0 : 1;
+						var diffArg2 = arg2 === 0 ? 0 : 1;
+						res = new Asc.Range(bbox.c1 + arg2 - diffArg2, bbox.r1 + arg1 - diffArg1, bbox.c1 + arg2 - diffArg2, bbox.r1 + arg1 - diffArg1);
 						res = new cRef(res.getName(), ws);
 					}
 				}
