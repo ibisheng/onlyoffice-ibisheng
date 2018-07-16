@@ -525,8 +525,8 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 8115: // ASC_PRESENTATIONS_EVENT_TYPE_HIDE_SLIDE             
         {
-            var bIsHide = _params[0];
-            var aHideArray = _params.slice(1);
+            var bIsHide = this.WordControl.m_oLogicDocument.Slides[_params[0]].isVisible();
+            var aHideArray = _params;
             this.WordControl.m_oLogicDocument.hideSlides(bIsHide, aHideArray);
             break;
         }
