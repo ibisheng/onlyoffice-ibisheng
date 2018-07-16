@@ -4397,7 +4397,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     aStrings.splice(nPtsLength, aStrings.length - nPtsLength);
                 }
                 if(aScale.length > 0){
-                    while(aStrings.length <= aScale[aScale.length - 1]){
+                    while(aStrings.length < aScale[aScale.length - 1]){
                         aStrings.push("");
                     }
                     for(i = 0; i < aScale.length; ++i){
