@@ -639,6 +639,12 @@ var editor;
     ws.changeDocSize(width, height);
   };
 
+  spreadsheet_api.prototype.asc_changePageMargins = function (left, right, top, bottom, index) {
+      var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+      var ws = this.wb.getWorksheet(sheetIndex);
+      ws.changePageMargins(left, right, top, bottom);
+  };
+
   spreadsheet_api.prototype._onNeedParams = function(data, opt_isPassword) {
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
@@ -3429,6 +3435,8 @@ var editor;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
+  prot["asc_changeDocSize"] = prot.asc_changeDocSize;
+  prot["asc_changePageMargins"] = prot.asc_changePageMargins;
 	prot["asc_decodeBuffer"] = prot.asc_decodeBuffer;
 
   prot["asc_registerCallback"] = prot.asc_registerCallback;

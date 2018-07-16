@@ -14359,6 +14359,30 @@
 		return this._isLockedLayoutOptions(onChangeDocSize);
 	};
 
+	WorksheetView.prototype.changePageMargins = function (left, right, top, bottom) {
+		var t = this;
+		var pageOptions = t.model.PagePrintOptions.asc_getPageMargins();
+		var pageMargins = pageOptions.asc_getPageMargins();
+
+		var callback = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			pageMargins.asc_setLeft(left);
+			pageMargins.asc_setRight(right);
+			pageMargins.asc_setTop(top);
+			pageMargins.asc_setBottom(bottom);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(callback);
+	};
+
 	WorksheetView.prototype.setPageOption = function (callback, val) {
 		var onChangeDocSize = function (isSuccess) {
 			if (false === isSuccess) {
