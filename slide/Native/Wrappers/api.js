@@ -1575,7 +1575,7 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
                 dataBuffer.drawingUrls = data.drawingUrls[0];
             }
 
-            dataBuffer.sBase64 = data.sBase64;
+            dataBuffer.sBase64 = data;
         }
     };
 
@@ -1620,7 +1620,7 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
                 dataBuffer.drawingUrls = data.drawingUrls[0];
             }
 
-            dataBuffer.sBase64 = data.sBase64;
+            dataBuffer.sBase64 = data;
         }
     }
 
@@ -1650,6 +1650,23 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
 
     return _stream;
 };
+
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
+{
+    if (0 == type)
+    {
+        this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, param);
+    }
+    else if (1 == type)
+    {
+        this.AddImageUrlNative(param, 200, 200);
+    }
+    else if (2 == type)
+    {
+        this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, param);
+    }
+};
+
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Select = function()
 {
     this.WordControl.m_oLogicDocument.MoveCursorLeft(false, true);

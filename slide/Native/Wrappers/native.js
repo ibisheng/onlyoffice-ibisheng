@@ -415,21 +415,21 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             break;
         }
         
-        // case 111 : // ASC_MENU_EVENT_TYPE_CONTEXTMENU_CUT
-        // {
-        //     _return = this.Call_Menu_Context_Cut();
-        //     break;
-        // }
-        // case 112: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_PASTE
-        // {
-        //     this.Call_Menu_Context_Paste(_params[0], _params[1]);
-        //     break;
-        // }
-        // case 113: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_DELETE
-        // {
-        //     this.Call_Menu_Context_Delete();
-        //     break;
-        // }
+        case 111 : // ASC_MENU_EVENT_TYPE_CONTEXTMENU_CUT
+        {
+            _return = this.Call_Menu_Context_Cut();
+            break;
+        }
+        case 112: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_PASTE
+        {
+            this.Call_Menu_Context_Paste(_params[0], _params[1]);
+            break;
+        }
+        case 113: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_DELETE
+        {
+            this.Call_Menu_Context_Delete();
+            break;
+        }
        
         case 114: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_SELECT
         {
