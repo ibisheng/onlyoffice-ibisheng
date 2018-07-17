@@ -3437,7 +3437,8 @@ var editor;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
   prot["asc_changeDocSize"] = prot.asc_changeDocSize;
   prot["asc_changePageMargins"] = prot.asc_changePageMargins;
-	prot["asc_decodeBuffer"] = prot.asc_decodeBuffer;
+  prot["asc_setPageOption"] = prot.asc_setPageOption;
+  prot["asc_decodeBuffer"] = prot.asc_decodeBuffer;
 
   prot["asc_registerCallback"] = prot.asc_registerCallback;
   prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;
