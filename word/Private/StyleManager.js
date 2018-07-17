@@ -321,7 +321,7 @@ CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
     else if (StyleId == this.Default.ParaList)
     {
         Style.Clear("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph);
-        Style.Create_ListParagraph();
+        Style.CreateListParagraph();
     }
     else if (StyleId == this.Default.Header)
     {
@@ -346,22 +346,22 @@ CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
 	else if (StyleId === this.Default.Title)
 	{
 		Style.Clear("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_Title();
+		Style.CreateTitle();
 	}
 	else if (StyleId === this.Default.Subtitle)
 	{
 		Style.Clear("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_Subtitle();
+		Style.CreateSubtitle();
 	}
 	else if (StyleId === this.Default.Quote)
 	{
 		Style.Clear("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_Quote();
+		Style.CreateQuote();
 	}
 	else if (StyleId === this.Default.IntenseQuote)
 	{
 		Style.Clear("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_IntenseQuote();
+		Style.CreateIntenseQuote();
 	}
     else
     {
@@ -515,7 +515,7 @@ CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
     else if (StyleId == this.Default.ParaList)
     {
         Style.Clear("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph);
-        Style.Create_ListParagraph();
+        Style.CreateListParagraph();
     }
     else if (StyleId == this.Default.Header)
     {
@@ -540,22 +540,22 @@ CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
 	else if (StyleId === this.Default.Title)
 	{
 		Style.Clear("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_Title();
+		Style.CreateTitle();
 	}
 	else if (StyleId === this.Default.Subtitle)
 	{
 		Style.Clear("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_Subtitle();
+		Style.CreateSubtitle();
 	}
 	else if (StyleId === this.Default.Quote)
 	{
 		Style.Clear("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_Quote();
+		Style.CreateQuote();
 	}
 	else if (StyleId === this.Default.IntenseQuote)
 	{
 		Style.Clear("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		Style.Create_IntenseQuote();
+		Style.CreateIntenseQuote();
 	}
 
     this.LogicDocument.TurnOnHistory();
