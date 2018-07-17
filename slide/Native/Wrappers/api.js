@@ -56,6 +56,78 @@ window["use_native_fonts_only"] = true;
 // declarate unused methods and objects
 window["ftm"] = FT_Memory;
 
+// ASCCOLOR
+function asc_menu_ReadColor(_params, _cursor)
+{
+    var _color = new Asc.asc_CColor();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _color.type = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _color.r = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _color.g = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _color.b = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _color.a = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _color.Auto = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _color.value = _params[_cursor.pos++];
+                break;
+            }
+            case 7:
+            {
+                _color.ColorSchemeId = _params[_cursor.pos++];
+                break;
+            }
+            case 8:
+            {
+                var _count = _params[_cursor.pos++];
+                for (var i = 0; i < _count; i++)
+                {
+                    var _mod = new AscFormat.CColorMod();
+                    _mod.name = _params[_cursor.pos++];
+                    _mod.val = _params[_cursor.pos++];
+                    _color.Mods.push(_mod);
+                }
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _color;
+}
 function asc_menu_WriteColor(_type, _color, _stream)
 {
     if (!_color)
