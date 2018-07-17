@@ -746,7 +746,20 @@
 					{
 						// китайская точка
 						AscCommon.stopEvent(e);
-						this.clear();
+
+						if (AscCommon.AscBrowser.isIE && !AscCommon.AscBrowser.isIeEdge)
+						{
+							// ie тепряет фокус
+							setTimeout(function(){
+                                window['AscCommon'].g_inputContext.clear();
+                                window['AscCommon'].g_inputContext.HtmlArea.focus();
+							}, 0);
+						}
+						else
+						{
+							this.clear();
+						}
+
 						return false;
 					}
 				}
