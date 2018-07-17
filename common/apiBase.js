@@ -182,6 +182,8 @@
 
 		this.macros = null;
 
+        this.openFileCryptBinary = null;
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw =
 			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -311,6 +313,11 @@
 		{
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
+
+        if (undefined !== window["AscDesktopEditor"] && undefined !== window["AscDesktopEditor"]["CryptoMode"])
+        {
+            this.DocInfo.put_Encrypted(0 < window["AscDesktopEditor"]["CryptoMode"]);
+        }
 
 		if (!oldInfo)
 		{
@@ -510,6 +517,11 @@
 		if (!isRepeat) {
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		}
+
+        if (this.DocInfo.get_Encrypted() && window["AscDesktopEditor"] && !window["AscDesktopEditor"]["IsLocalFile"](true))
+        {
+            window["AscDesktopEditor"]["OpenFileCrypt"](this.DocInfo.get_Title(), this.DocInfo.get_Url(), window.openFileCryptCallback);
+        }
 	};
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
 	{
@@ -550,6 +562,9 @@
 		}
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		this.sendEvent('asc_onDocumentContentReady');
+
+        if (this.editorId == c_oEditorId.Spreadsheet)
+			this.onUpdateDocumentModified(this.asc_isDocumentModified());
 	};
 	// Save
 	baseEditorsApi.prototype.processSavedFile                    = function(url, downloadType)
@@ -1607,7 +1622,53 @@
 	baseEditorsApi.prototype["pluginMethod_EndAction"] = function(type, description)
 	{
 		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
+
+        if (this._callbackPluginEndAction)
+		{
+			this._callbackPluginEndAction.call(this);
+		}
 	};
+
+    baseEditorsApi.prototype["pluginMethod_OnEncryption"] = function(obj)
+    {
+        var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+        switch (obj.type)
+        {
+            case "generatePassword":
+            {
+                if ("" == obj["password"])
+                {
+                    _editor.sendEvent("asc_onError", "There is no connection with the blockchain", c_oAscError.Level.Critical);
+                    return;
+                }
+
+                var _ret = _editor.asc_nativeGetFile3();
+                window["AscDesktopEditor"]["buildCryptedStart"](_ret.data, _ret.header, obj["password"], obj["docinfo"] ? obj["docinfo"] : "");
+                break;
+            }
+            case "getPasswordByFile":
+            {
+                if ("" != obj["password"])
+                {
+                    var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
+                    _editor.currentPassword = obj["password"];
+
+                    window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+                }
+                else
+                {
+                    this._onNeedParams(undefined, true);
+                }
+                break;
+            }
+            case "encryptData":
+            case "decryptData":
+            {
+                AscCommon.EncryptionWorker.receiveChanges(obj);
+                break;
+            }
+        }
+    };
 
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()

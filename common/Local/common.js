@@ -314,58 +314,6 @@ window["UpdateInstallPlugins"] = function()
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
 
-window["UpdateSystemPlugins"] = function()
-{
-	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
-	_plugins[0]["url"] = _plugins[0]["url"].replace(" ", "%20");
-	_plugins[1]["url"] = _plugins[1]["url"].replace(" ", "%20");
-
-	for (var k = 0; k < 2; k++)
-	{
-		var _pluginsCur = _plugins[k];
-
-		var _len = _pluginsCur["pluginsData"].length;
-		for (var i = 0; i < _len; i++)
-			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
-	}
-
-	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-
-	var _array = [];
-
-	for (var k = 0; k < 2; k++)
-	{
-		var _pluginsCur = _plugins[k];
-		var _len = _pluginsCur["pluginsData"].length;
-
-		for (var i = 0; i < _len; i++)
-		{
-			var _plugin = _pluginsCur["pluginsData"][i];
-			for (var j = 0; j < _plugin["variations"].length; j++)
-			{
-				var _variation = _plugin["variations"][j];
-				if (_variation["initDataType"] == "desktop")
-				{
-					_array.push(_plugin);
-					break;
-				}
-			}
-		}
-	}
-
-	var _arraySystem = [];
-	for (var i = 0; i < _array.length; i++)
-	{
-		var plugin = new Asc.CPlugin();
-		plugin["deserialize"](_array[i]);
-
-		_arraySystem.push(plugin);
-	}
-
-	window.g_asc_plugins.registerSystem("", _arraySystem);
-	window.g_asc_plugins.runAllSystem();
-};
-
 AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	if ("undefined" != typeof(FileReader) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {
@@ -388,19 +336,6 @@ AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 		};
 	}
 }
-
-window["asc_initAdvancedOptions"] = function(_code, _file_hash)
-{
-    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-
-    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
-	{
-		window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash });
-		return;
-	}
-
-	_editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
-};
 
 window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 {
@@ -511,12 +446,6 @@ window["OnNativeReturnCallback"] = function(name, obj)
 {
 	var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	_api.sendEvent(name, obj);
-};
-
-window["OnNativeOpenFilenameDialog"] = function(file)
-{
-	window.on_native_open_filename_dialog(file);
-	delete window.on_native_open_filename_dialog;
 };
 
 window["asc_IsVisibleSign"] = function(guid)
@@ -680,7 +609,7 @@ _proto.prototype["pluginMethod_OnEncryption"] = function(obj)
 				return;
 			}
 
-			window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true);
+			window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true, obj["docinfo"] ? obj["docinfo"] : "");
 			break;
 		}
 		case "getPasswordByFile":
@@ -698,6 +627,12 @@ _proto.prototype["pluginMethod_OnEncryption"] = function(obj)
 			}
 			break;
 		}
+        case "encryptData":
+        case "decryptData":
+        {
+            AscCommon.EncryptionWorker.receiveChanges(obj);
+            break;
+        }
 	}
 };
 // -------------------------------------------

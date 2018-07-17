@@ -3810,8 +3810,8 @@
 	};
 	Worksheet.prototype.getRowsCount=function(){
 		var result = this.nRowsCount;
-		var pane = this.sheetViews[0].pane;
-		if (null !== pane && null !== pane.topLeftFrozenCell)
+		var pane = this.sheetViews.length && this.sheetViews[0].pane;
+		if (pane && pane.topLeftFrozenCell)
 			result = Math.max(result, pane.topLeftFrozenCell.getRow0());
 		return result;
 	};
@@ -4018,8 +4018,8 @@
 	};
 	Worksheet.prototype.getColsCount=function(){
 		var result = this.nColsCount;
-		var pane = this.sheetViews[0].pane;
-		if (null !== pane && null !== pane.topLeftFrozenCell)
+		var pane = this.sheetViews.length && this.sheetViews[0].pane;
+		if (pane && pane.topLeftFrozenCell)
 			result = Math.max(result, pane.topLeftFrozenCell.getCol0());
 		return result;
 	};

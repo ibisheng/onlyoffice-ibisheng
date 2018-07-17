@@ -183,8 +183,10 @@
 
 					if (window.Asc.plugin.methodCallback)
 					{
-						window.Asc.plugin.methodCallback(pluginData.methodReturnData);
-						window.Asc.plugin.methodCallback = null;
+					    var methodCallback = window.Asc.plugin.methodCallback;
+                        window.Asc.plugin.methodCallback = null;
+                        methodCallback(pluginData.methodReturnData);
+                        methodCallback = null;
 					}
 					else if (window.Asc.plugin.onMethodReturn)
 					{

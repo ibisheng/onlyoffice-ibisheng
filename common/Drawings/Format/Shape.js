@@ -5405,7 +5405,7 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
 {
     return AscFormat.ExecuteNoHistory(function(){
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null, oTxWarpStructNoTransform: null, oTxWarpStructParamarksNoTransform: null};
-        if(window["NATIVE_EDITOR_ENJINE"]){
+        if(window["IS_NATIVE_EDITOR"]){
             return oRet;
         }
         //return oRet;

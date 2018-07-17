@@ -75,9 +75,8 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 			AscCommon.g_oDocumentUrls.documentUrl = "/" + AscCommon.g_oDocumentUrls.documentUrl;
 		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
-	
-    editor._OfflineAppDocumentEndLoad(_url, _data, _len);
 
+    editor._OfflineAppDocumentEndLoad(_url, _data, _len);
 	editor.sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
 };
 
@@ -181,10 +180,10 @@ Asc['asc_docs_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 			window["DesktopOfflineAppDocumentStartSave"](isSaveAs);
 	}
 };
-window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
+window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce, docinfo)
 {
 	window.doadssIsSaveAs = isSaveAs;
-	if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
+	if (true !== isForce && window.g_asc_plugins && AscCommon.EncryptionWorker.isNeedCrypt())
 	{
 		window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
 		return;
@@ -198,7 +197,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isFo
 	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
-	window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? editor.currentPassword : password);
+	window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? editor.currentPassword : password, docinfo);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 {

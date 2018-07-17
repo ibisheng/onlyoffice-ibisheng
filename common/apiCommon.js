@@ -113,14 +113,16 @@
 	}
 
 	var c_oLicenseResult = {
-		Error       : 1,
-		Expired     : 2,
-		Success     : 3,
-		UnknownUser : 4,
-		Connections : 5,
-		ExpiredTrial: 6,
-		SuccessLimit: 7,
-		UsersCount  : 8
+		Error         : 1,
+		Expired       : 2,
+		Success       : 3,
+		UnknownUser   : 4,
+		Connections   : 5,
+		ExpiredTrial  : 6,
+		SuccessLimit  : 7,
+		UsersCount    : 8,
+		ConnectionsOS : 9,
+		UsersCountOS  : 10
 	};
 
 	var c_oRights = {
@@ -4030,6 +4032,8 @@
 	prot['ExpiredTrial'] = prot.ExpiredTrial;
 	prot['SuccessLimit'] = prot.SuccessLimit;
 	prot['UsersCount'] = prot.UsersCount;
+	prot['ConnectionsOS'] = prot.ConnectionsOS;
+	prot['UsersCountOS'] = prot.UsersCountOS;
 
 	window['Asc']['c_oRights'] = window['Asc'].c_oRights = c_oRights;
 	prot = c_oRights;

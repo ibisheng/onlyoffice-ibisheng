@@ -514,7 +514,7 @@ ChangeAdjState.prototype =
                 }
                 var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
                 for(i = 0; i < aAllConnectors.length; ++i){
-                    if(!oMapOriginalsIds[aAllConnectors.Get_Id()]){
+                    if(!oMapOriginalsIds[aAllConnectors[i].Get_Id()]){
                         aAllConnectors[i].calculateTransform();
                     }
                 }

@@ -4128,7 +4128,7 @@
         this.nLastFilePos = 0;
         this.nRealTableCount = 0;
         this.bs = new BinaryCommonWriter(this.Memory);
-        this.Write = function(noBase64)
+        this.Write = function(noBase64, onlySaveBase64)
         {
             pptx_content_writer._Start();
 			if (noBase64) {
@@ -4137,7 +4137,10 @@
             this.WriteMainTable();
             pptx_content_writer._End();
 			if (noBase64) {
-				return this.Memory.GetData();
+			    if (onlySaveBase64)
+                    return this.Memory.GetBase64Memory();
+			    else
+			        return this.Memory.GetData();
 			} else {
 				return this.WriteFileHeader(this.Memory.GetCurPosition(), AscCommon.c_oSerFormat.Version) + this.Memory.GetBase64Memory();
 			}
@@ -6922,11 +6925,8 @@
                         elem.asc_putCol(oCommentCoords.nCol);
 
                         if (elem.asc_getDocumentFlag()) {
-                            elem.nId = "doc_" + (this.wb.aComments.length + 1);
                             this.wb.aComments.push(elem);
                         } else {
-                            elem.wsId = oWorksheet.Id;
-                            elem.nId = "sheet" + elem.wsId + "_" + (oWorksheet.aComments.length + 1);
                             oWorksheet.aComments.push(elem);
                         }
                     }
@@ -6993,6 +6993,13 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCommentData(t,l,oCommentData);
                 });
+
+				if (oCommentData.asc_getDocumentFlag()) {
+					oCommentData.nId = "doc_" + (this.wb.aComments.length + 1);
+				} else {
+					oCommentData.wsId = this.curWorksheet.Id;
+					oCommentData.nId = "sheet" + oCommentData.wsId + "_" + (this.curWorksheet.aComments.length + 1);
+				}
                 aCommentData.push(oCommentData);
             }
             else

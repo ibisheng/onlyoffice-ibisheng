@@ -966,7 +966,10 @@
     this._msgBuffer = [];
   };
 
-  DocsCoApi.prototype._send = function(data) {
+  DocsCoApi.prototype._send = function(data, useEncryption) {
+    if (!useEncryption && data && data["type"] == "saveChanges" && AscCommon.EncryptionWorker)
+      return AscCommon.EncryptionWorker.sendChanges(this, data, AscCommon.EncryptionMessageType.Encrypt);
+
     if (data !== null && typeof data === "object") {
       if (this._state > 0) {
         this.sockjs.send(JSON.stringify(data));
@@ -1128,7 +1131,10 @@
     this.onDocumentOpen(data);
   };
 
-  DocsCoApi.prototype._onSaveChanges = function(data) {
+  DocsCoApi.prototype._onSaveChanges = function(data, useEncryption) {
+    if (!useEncryption && AscCommon.EncryptionWorker)
+      return AscCommon.EncryptionWorker.sendChanges(this, data, AscCommon.EncryptionMessageType.Decrypt);
+
     if (!this.check_state()) {
       if (!this.get_isAuth()) {
         this._authOtherChanges.push(data);

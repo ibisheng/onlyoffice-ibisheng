@@ -463,10 +463,11 @@
 			else
 				this.ReadOnlyCounter--;
 
-			if (0 > this.ReadOnlyCounter)
-				this.ReadOnlyCounter = 0;
+			// при синхронной загрузке шрифтов (десктоп)
+			// может вызываться и в обратном порядке (setReadOnly(false), setReadOnly(true))
+			// поэтому сравнение с нулем неверно. отрицательные значение могут быть.
 
-			this.HtmlArea.readOnly = (0 == this.ReadOnlyCounter) ? false : true;
+			this.HtmlArea.readOnly = (0 >= this.ReadOnlyCounter) ? false : true;
 		},
 
 		show : function()
@@ -612,7 +613,7 @@
 
 		onInput : function(e, isFromCompositionUpdate)
 		{
-			if (this.Api.isLongAction())
+			if (this.Api.isLongAction() || this.Api.isViewMode)
 			{
 				AscCommon.stopEvent(e);
 				return false;
@@ -1046,7 +1047,7 @@
 
 		onKeyPress : function(e)
 		{
-			if (this.Api.isLongAction() || !this.Api.asc_IsFocus())
+			if (this.Api.isLongAction() || !this.Api.asc_IsFocus() || this.Api.isViewMode)
 			{
 				AscCommon.stopEvent(e);
 				return false;
