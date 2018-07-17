@@ -3037,7 +3037,7 @@ background-repeat: no-repeat;\
 		if (null == prop)
 			return;
 
-		var arr_ind    = this.WordControl.Thumbnails.GetSelectedArray();
+		var arr_ind    = this.WordControl.m_oLogicDocument.GetSelectedSlides()
 		var _back_fill = prop.get_background();
 
 		if (_back_fill)
