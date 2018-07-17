@@ -619,7 +619,7 @@ var editor;
   // Опции страницы (для печати)
   spreadsheet_api.prototype.asc_setPageOptions = function(options, index) {
     var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
-    this.wbModel.getWorksheet(sheetIndex).setPageOptions(options);
+    this.wb.getWorksheet(sheetIndex).setPageOptions(options);
   };
 
   spreadsheet_api.prototype.asc_getPageOptions = function(index) {

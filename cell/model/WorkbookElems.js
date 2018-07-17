@@ -48,6 +48,9 @@ var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
 
+var UndoRedoData_Layout = AscCommonExcel.UndoRedoData_Layout;
+
+
 var c_oAscCustomAutoFilter = Asc.c_oAscCustomAutoFilter;
 var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
 

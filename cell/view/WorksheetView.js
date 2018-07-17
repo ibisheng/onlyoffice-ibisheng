@@ -14361,7 +14361,7 @@
 
 	WorksheetView.prototype.changePageMargins = function (left, right, top, bottom) {
 		var t = this;
-		var pageOptions = t.model.PagePrintOptions.asc_getPageMargins();
+		var pageOptions = t.model.PagePrintOptions;
 		var pageMargins = pageOptions.asc_getPageMargins();
 
 		var callback = function (isSuccess) {
