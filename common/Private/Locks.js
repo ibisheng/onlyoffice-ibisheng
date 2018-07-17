@@ -1007,7 +1007,7 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_SlideBg)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = this.GetSelectedSlides();
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 var check_obj =
@@ -1038,7 +1038,7 @@ if(typeof CPresentation !== "undefined")
         {
             if(!AdditionalData || !AdditionalData.All)
             {
-                var aSelectedSlides = this.Api.WordControl.Thumbnails.GetSelectedArray();
+                var aSelectedSlides = this.GetSelectedSlides();
                 for(var i = 0; i < aSelectedSlides.length; ++i){
                     var check_obj =
                         {
@@ -1115,7 +1115,7 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_Layout)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = this.GetSelectedSlides();
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 var check_obj =
