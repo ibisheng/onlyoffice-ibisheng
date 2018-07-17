@@ -1825,54 +1825,51 @@ CopyProcessor.prototype =
     CopyGraphicObject: function(oDomTarget, oGraphicObj, drawingCopyObject)
     {
         var sSrc = drawingCopyObject.ImageUrl;
-        if(sSrc.length > 0)
+        if(oDomTarget && sSrc.length > 0)
         {
-            if(oDomTarget)
-            {
-				var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
-				oGraphicObj.draw(_bounds_cheker, 0);
+            var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
+            oGraphicObj.draw(_bounds_cheker, 0);
 
-				var width, height;
-				if(drawingCopyObject && drawingCopyObject.ExtX)
-					width = Math.round(drawingCopyObject.ExtX * g_dKoef_mm_to_pix);
-				else
-					width = Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix);
+            var width, height;
+            if(drawingCopyObject && drawingCopyObject.ExtX)
+                width = Math.round(drawingCopyObject.ExtX * g_dKoef_mm_to_pix);
+            else
+                width = Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix);
 
-				if(drawingCopyObject && drawingCopyObject.ExtY)
-					height = Math.round(drawingCopyObject.ExtY * g_dKoef_mm_to_pix);
-				else
-					height = Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix);
+            if(drawingCopyObject && drawingCopyObject.ExtY)
+                height = Math.round(drawingCopyObject.ExtY * g_dKoef_mm_to_pix);
+            else
+                height = Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix);
 
-				var oImg = new CopyElement("img");
-				oImg.oAttributes["width"] = width;
-				oImg.oAttributes["height"] = height;
-				oImg.oAttributes["src"] = sSrc;
-				if (this.api.DocumentReaderMode)
-					oImg.oAttributes["style"] = "max-width:100%;";
-				oDomTarget.addChild(oImg);
-			}
+            var oImg = new CopyElement("img");
+            oImg.oAttributes["width"] = width;
+            oImg.oAttributes["height"] = height;
+            oImg.oAttributes["src"] = sSrc;
+            if (this.api.DocumentReaderMode)
+                oImg.oAttributes["style"] = "max-width:100%;";
+            oDomTarget.addChild(oImg);
+        }
 
 
-            if(oGraphicObj instanceof CShape)
-            {
-                this.oPresentationWriter.WriteShape(oGraphicObj);
-            }
-            else if(oGraphicObj instanceof AscFormat.CImageShape)
-            {
-                this.oPresentationWriter.WriteImage(oGraphicObj);
-            }
-            else if(oGraphicObj instanceof AscFormat.CGroupShape)
-            {
-                this.oPresentationWriter.WriteGroupShape(oGraphicObj);
-            }
-            else if(oGraphicObj instanceof AscFormat.CChartSpace)
-            {
-                this.oPresentationWriter.WriteChart(oGraphicObj);
-            }
-            else if(oGraphicObj instanceof CGraphicFrame)
-            {
-                this.oPresentationWriter.WriteTable(oGraphicObj);
-            }
+        if(oGraphicObj instanceof CShape)
+        {
+            this.oPresentationWriter.WriteShape(oGraphicObj);
+        }
+        else if(oGraphicObj instanceof AscFormat.CImageShape)
+        {
+            this.oPresentationWriter.WriteImage(oGraphicObj);
+        }
+        else if(oGraphicObj instanceof AscFormat.CGroupShape)
+        {
+            this.oPresentationWriter.WriteGroupShape(oGraphicObj);
+        }
+        else if(oGraphicObj instanceof AscFormat.CChartSpace)
+        {
+            this.oPresentationWriter.WriteChart(oGraphicObj);
+        }
+        else if(oGraphicObj instanceof CGraphicFrame)
+        {
+            this.oPresentationWriter.WriteTable(oGraphicObj);
         }
     }
 };
