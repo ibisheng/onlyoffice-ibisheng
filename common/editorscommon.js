@@ -1276,6 +1276,7 @@
 		switch (format)
 		{
 			case c_oAscFileType.PDF:
+			case c_oAscFileType.PDFA:
 				return 'pdf';
 				break;
 			case c_oAscFileType.HTML:

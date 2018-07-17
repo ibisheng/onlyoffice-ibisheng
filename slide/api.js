@@ -6909,7 +6909,7 @@ background-repeat: no-repeat;\
 		{
 			oAdditionalData["inline"] = 1;
 		}
-		if (c_oAscFileType.PDF == filetype)
+		if (c_oAscFileType.PDF == filetype || c_oAscFileType.PDFA == filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
 			dataContainer.data = dd.ToRendererPart(isNoBase64);

@@ -316,7 +316,7 @@ var editor;
       return;
     }
 
-    if (c_oAscFileType.PDF === typeFile) {
+    if (c_oAscFileType.PDF === typeFile || c_oAscFileType.PDFA === typeFile) {
       this.adjustPrint = adjustPrint ? adjustPrint : new Asc.asc_CAdjustPrint();
     }
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
@@ -751,7 +751,7 @@ var editor;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }
-    if (c_oAscFileType.PDF === sFormat) {
+    if (c_oAscFileType.PDF === sFormat || c_oAscFileType.PDFA === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
       var pdfPrinterMemory = this.wb.printSheets(printPagesData).DocumentRenderer.Memory;
       dataContainer.data = isNoBase64 ? pdfPrinterMemory.GetData() : pdfPrinterMemory.GetBase64Memory();

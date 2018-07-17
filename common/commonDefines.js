@@ -52,6 +52,7 @@
 	var c_oAscFileType = {
 		UNKNOWN : 0,
 		PDF     : 0x0201,
+		PDFA    : 0x0901,
 		HTML    : 0x0803,
 
 		// Word
@@ -1192,6 +1193,7 @@
 	prot                         = c_oAscFileType;
 	prot['UNKNOWN']              = prot.UNKNOWN;
 	prot['PDF']                  = prot.PDF;
+	prot['PDFA']                 = prot.PDFA;
 	prot['HTML']                 = prot.HTML;
 	prot['DOCX']                 = prot.DOCX;
 	prot['DOC']                  = prot.DOC;
