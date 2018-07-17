@@ -310,6 +310,13 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
         {
 
         }
+
+        case 20: // ASC_MENU_EVENT_TYPE_SLIDE
+        {
+            var props = asc_menu_ReadSlidePr(_params, _current);
+            this.SetSlideProps(props);
+            break;
+        }
         
         case 50: // ASC_MENU_EVENT_TYPE_INSERT_IMAGE
         {
