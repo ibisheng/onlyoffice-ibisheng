@@ -1157,7 +1157,7 @@ function (window, undefined) {
 		from: 0, to: 1
 	};
 	UndoRedoData_Layout.prototype.getType = function () {
-		return UndoRedoDataTypes.PivotTable;
+		return UndoRedoDataTypes.Layout;
 	};
 	UndoRedoData_Layout.prototype.getProperties = function () {
 		return this.Properties;
@@ -2667,9 +2667,43 @@ function (window, undefined) {
 			return;
 		}
 
+		var pageOptions = ws.PagePrintOptions;
+		var pageSetup = pageOptions.asc_getPageSetup();
+		var pageMargins = pageOptions.asc_getPageMargins();
 		var value = bUndo ? Data.from : Data.to;
 		switch (Type) {
 			case AscCH.historyitem_Layout_Left:
+				pageMargins.asc_setLeft(value);
+				break;
+			case AscCH.historyitem_Layout_Right:
+				pageMargins.asc_setRight(value);
+				break;
+			case AscCH.historyitem_Layout_Top:
+				pageMargins.asc_setTop(value);
+				break;
+			case AscCH.historyitem_Layout_Bottom:
+				pageMargins.asc_setBottom(value);
+				break;
+			case AscCH.historyitem_Layout_Width:
+				pageSetup.asc_setWidth(value);
+				break;
+			case AscCH.historyitem_Layout_Height:
+				pageSetup.asc_setHeight(value);
+				break;
+			case AscCH.historyitem_Layout_FitToWidth:
+				pageSetup.asc_setFitToWidth(value);
+				break;
+			case AscCH.historyitem_Layout_FitToHeight:
+				pageSetup.asc_setFitToHeight(value);
+				break;
+			case AscCH.historyitem_Layout_GridLines:
+				pageOptions.asc_setGridLines(value);
+				break;
+			case AscCH.historyitem_Layout_Headings:
+				pageOptions.asc_setHeadings(value);
+				break;
+			case AscCH.historyitem_Layout_Orientation:
+				pageSetup.asc_setOrientation(value);
 				break;
 		}
 	};
