@@ -113,14 +113,16 @@
 	}
 
 	var c_oLicenseResult = {
-		Error       : 1,
-		Expired     : 2,
-		Success     : 3,
-		UnknownUser : 4,
-		Connections : 5,
-		ExpiredTrial: 6,
-		SuccessLimit: 7,
-		UsersCount  : 8
+		Error         : 1,
+		Expired       : 2,
+		Success       : 3,
+		UnknownUser   : 4,
+		Connections   : 5,
+		ExpiredTrial  : 6,
+		SuccessLimit  : 7,
+		UsersCount    : 8,
+		ConnectionsOS : 9,
+		UsersCountOS  : 10
 	};
 
 	var c_oRights = {
@@ -3068,6 +3070,7 @@
 		this.Permissions = null;
 		this.Lang = null;
 		this.OfflineApp = false;
+		this.Encrypted;
 	}
 
 	prot = asc_CDocInfo.prototype;
@@ -3166,6 +3169,12 @@
 	};
 	prot.put_Lang = prot.asc_putLang = function (v) {
 		this.Lang = v;
+	};
+	prot.get_Encrypted = prot.asc_getEncrypted = function () {
+		return this.Encrypted;
+	};
+	prot.put_Encrypted = prot.asc_putEncrypted = function (v) {
+		this.Encrypted = v;
 	};
 
 	function COpenProgress() {
@@ -3683,6 +3692,8 @@
 	prot['ExpiredTrial'] = prot.ExpiredTrial;
 	prot['SuccessLimit'] = prot.SuccessLimit;
 	prot['UsersCount'] = prot.UsersCount;
+	prot['ConnectionsOS'] = prot.ConnectionsOS;
+	prot['UsersCountOS'] = prot.UsersCountOS;
 
 	window['Asc']['c_oRights'] = window['Asc'].c_oRights = c_oRights;
 	prot = c_oRights;
@@ -4387,6 +4398,10 @@
 	prot["put_Mode"] = prot["asc_putMode"] = prot.asc_putMode;
 	prot["get_Permissions"] = prot["asc_getPermissions"] = prot.asc_getPermissions;
 	prot["put_Permissions"] = prot["asc_putPermissions"] = prot.asc_putPermissions;
+	prot["get_Lang"] = prot["asc_getLang"] = prot.asc_getLang;
+	prot["put_Lang"] = prot["asc_putLang"] = prot.asc_putLang;
+	prot["get_Encrypted"] = prot["asc_getEncrypted"] = prot.asc_getEncrypted;
+	prot["put_Encrypted"] = prot["asc_putEncrypted"] = prot.asc_putEncrypted;
 
 	window["AscCommon"].COpenProgress = COpenProgress;
 	prot = COpenProgress.prototype;

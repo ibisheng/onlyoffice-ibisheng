@@ -8995,7 +8995,8 @@ DrawingObjectsController.prototype =
 
             if ( undefined != Props.DefaultTab )
             {
-                this.setDefaltTabSize( Props.DefaultTab );
+                AscCommonWord.Default_Tab_Stop = Props.DefaultTab;
+                //this.setDefaltTabSize( Props.DefaultTab );
             }
 
 

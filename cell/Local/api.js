@@ -234,10 +234,10 @@ var c_oAscError = Asc.c_oAscError;
 			asc["editor"].CoAuthoringApi.onSaveChanges(_changes[i], null, true);
 		}
 	};
-	window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
+	window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce, docinfo)
 	{
 		window.doadssIsSaveAs = isSaveAs;
-		if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
+		if (true !== isForce && window.g_asc_plugins && AscCommon.EncryptionWorker.isNeedCrypt())
 		{
 			window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
 			return;
@@ -251,7 +251,7 @@ var c_oAscError = Asc.c_oAscError;
 		if (AscCommon.AscBrowser.isRetina)
 			_param += "retina=true;";
 
-		window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? asc["editor"].currentPassword : password);
+		window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? asc["editor"].currentPassword : password, docinfo);
 	};
 	window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 	{
@@ -322,8 +322,7 @@ var c_oAscError = Asc.c_oAscError;
 			AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 		}
 
-		asc["editor"]._OfflineAppDocumentEndLoad(_data, _len);
-
-		asc["editor"].sendEvent("asc_onDocumentPassword", ("" != asc["editor"].currentPassword) ? true : false);
+        asc["editor"]._OfflineAppDocumentEndLoad(_data, _len);
+        asc["editor"].sendEvent("asc_onDocumentPassword", ("" != asc["editor"].currentPassword) ? true : false);
 	};
 })(jQuery, window);

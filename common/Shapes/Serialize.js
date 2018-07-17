@@ -372,6 +372,8 @@ function BinaryPPTYLoader()
 
         this.LoadDocument();
 
+        AscFormat.checkPlaceholdersText();
+
         this.ImageMapChecker = null;
     }
 
@@ -4706,7 +4708,61 @@ function BinaryPPTYLoader()
                 }
             }
         }
-		if (dxaOrig > 0 && dyaOrig > 0) {
+        var oleType = null;
+        while (s.cur < _end_rec)
+        {
+            var _at = s.GetUChar();
+            switch (_at)
+            {
+                case 1:
+                {
+                    s.GetLong();//length
+                    oleType = s.GetUChar();
+                    break;
+                }
+                case 2:
+                {
+
+                    switch(oleType)
+                    {
+                        case 1:
+                        {
+                            ole.setObjectFile("maskFile.docx");
+                            s.SkipRecord();
+                            break;
+                        }
+                        case 2:
+                        {
+                            ole.setObjectFile("maskFile.xlsx");
+                            s.SkipRecord();
+                            break;
+                        }
+                        case 4:
+                        {
+                            s.GetLong();//length
+
+                            var type2 = s.GetUChar();
+                            s.SkipRecord();
+                            break;
+                        }
+                        default:
+                        {
+                            s.SkipRecord();
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default:
+                {
+                    s.SkipRecord();
+                    break;
+                }
+            }
+        }
+
+
+        if (dxaOrig > 0 && dyaOrig > 0) {
 			var ratio = 4 / 3 / 20;//twips to px
 			ole.setPixSizes(ratio * dxaOrig, ratio * dyaOrig);
 		}
@@ -5669,6 +5725,14 @@ function BinaryPPTYLoader()
                 {
                     if(isOle) {
                         this.ReadOleInfo(pic);
+                        if(pic.m_sObjectFile === "maskFile.docx"
+                            ||  pic.m_sObjectFile === "maskFile.xlsx"){
+                            var oParent = pic.parent;
+                            pic = AscFormat.CImageShape.prototype.copy.call(pic);
+                            if(oParent){
+                                pic.setParent(oParent);
+                            }
+                        }
                     } else {
                         s.SkipRecord();
                     }
@@ -9692,6 +9756,14 @@ function CPres()
                     {
                         if(isOle) {
                             this.ReadOleInfo(pic);
+                            if(pic.m_sObjectFile === "maskFile.docx"
+                                ||  pic.m_sObjectFile === "maskFile.xlsx"){
+                                var oParent = pic.parent;
+                                pic = AscFormat.CImageShape.prototype.copy.call(pic);
+                                if(oParent){
+                                    pic.setParent(oParent);
+                                }
+                            }
                         } else {
                             s.SkipRecord();
                         }
@@ -9824,6 +9896,18 @@ function CPres()
 
                         switch(oleType)
                         {
+                            case 1:
+                            {
+                                ole.setObjectFile("maskFile.docx");
+                                s.SkipRecord();
+                                break;
+                            }
+                            case 2:
+                            {
+                                ole.setObjectFile("maskFile.xlsx");
+                                s.SkipRecord();
+                                break;
+                            }
                             case 4:
                             {
                                 s.GetLong();//length

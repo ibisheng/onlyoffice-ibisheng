@@ -658,6 +658,7 @@
     this.lang = undefined;
     this.jwtOpen = undefined;
     this.jwtSession = undefined;
+    this.encrypted = undefined;
     this._isViewer = false;
     this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     this._lockBuffer = [];
@@ -965,7 +966,10 @@
     this._msgBuffer = [];
   };
 
-  DocsCoApi.prototype._send = function(data) {
+  DocsCoApi.prototype._send = function(data, useEncryption) {
+    if (!useEncryption && data && data["type"] == "saveChanges" && AscCommon.EncryptionWorker)
+      return AscCommon.EncryptionWorker.sendChanges(this, data, AscCommon.EncryptionMessageType.Encrypt);
+
     if (data !== null && typeof data === "object") {
       if (this._state > 0) {
         this.sockjs.send(JSON.stringify(data));
@@ -1127,7 +1131,10 @@
     this.onDocumentOpen(data);
   };
 
-  DocsCoApi.prototype._onSaveChanges = function(data) {
+  DocsCoApi.prototype._onSaveChanges = function(data, useEncryption) {
+    if (!useEncryption && AscCommon.EncryptionWorker)
+      return AscCommon.EncryptionWorker.sendChanges(this, data, AscCommon.EncryptionMessageType.Decrypt);
+
     if (!this.check_state()) {
       if (!this.get_isAuth()) {
         this._authOtherChanges.push(data);
@@ -1547,6 +1554,7 @@
 	this.permissions = docInfo.get_Permissions();
 	this.lang = docInfo.get_Lang();
 	this.jwtOpen = docInfo.get_Token();
+    this.encrypted = docInfo.get_Encrypted();
 
     this.setDocId(docid);
     this._initSocksJs();
@@ -1599,6 +1607,7 @@
       'lang': this.lang,
       'mode': this.mode,
       'permissions': this.permissions,
+      'encrypted': this.encrypted,
       'jwtOpen': this.jwtOpen,
       'jwtSession': this.jwtSession
     });

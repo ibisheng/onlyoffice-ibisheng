@@ -2883,7 +2883,9 @@ function CDrawingDocument()
 			this.m_oWordControl.m_oApi.sendEvent("asc_onEndCalculate");
 			this.m_bIsDocumentCalculating = false;
 
-			this.m_oWordControl.onMouseMove(undefined, undefined);
+			window.setTimeout(function() {
+                editor.WordControl.onMouseMove(undefined, undefined);
+            }, 1);
 		}
 
 		if (-1 != this.m_lCurrentPage)
