@@ -4301,247 +4301,210 @@ CStyles.prototype =
     },
 
     Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault, PassedStyles, StartStyleId)
-    {
-        // Делаем проверку от зацикливания, среди уже пройденных стилей ищем текущий стриль.
-        for (var nIndex = 0, nCount = PassedStyles.length; nIndex < nCount; nIndex++)
-        {
-            if (PassedStyles[nIndex] == StyleId)
-                return;
-        }
-        PassedStyles.push(StyleId);
+	{
+		// Делаем проверку от зацикливания, среди уже пройденных стилей ищем текущий стриль.
+		for (var nIndex = 0, nCount = PassedStyles.length; nIndex < nCount; nIndex++)
+		{
+			if (PassedStyles[nIndex] == StyleId)
+				return;
+		}
+		PassedStyles.push(StyleId);
 
-        var Style = this.Style[StyleId];
-        if ( undefined == StyleId || undefined === Style )
-        {
-            if ( true === bUseDefault )
-            {
-                // Копируем свойства по умолчанию для данного типа
-                switch ( Type )
-                {
-                    case styletype_Paragraph:
-                    {
-                        var DefId = this.Default.Paragraph;
-
-                        if (undefined != this.Style[DefId])
-                        {
-                            Pr.ParaPr.Merge(this.Style[DefId].ParaPr);
-                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
-                        }
-
-                        break;
-                    }
-                    case styletype_Numbering:
-                    {
-                        var DefId = this.Default.Numbering;
-                        break;
-                    }
-                    case styletype_Table:
-                    {
-                        var DefId = this.Default.Table;
-
-                        if (undefined != this.Style[DefId])
-                        {
-                            Pr.ParaPr.Merge(this.Style[DefId].ParaPr);
-                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
-                            Pr.TablePr.Merge(this.Styles[DefId].TablePr);
-                            Pr.TableRowPr.Merge(this.Styles[DefId].TableRowPr);
-                            Pr.TableCellPr.Merge(this.Styles[DefId].TableCellPr);
-                        }
-
-                        break;
-                    }
-                    case styletype_Character:
-                    {
-                        var DefId = this.Default.Character;
-
-                        if (undefined != this.Style[DefId])
-                        {
-                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-            return;
-        }
-
-        if ( null === Style.BasedOn )
-        {
-            // TODO: Проверить нужно ли копировать стили по умолчанию для данного типа стиля, когда сам стиль задан
-            //       Для параграфа, вроде как не нужно (см. ivanova_veronica.docx стиль "Colon")
-            
-            // Копируем свойства по умолчанию для данного типа
-            if ( true === bUseDefault )
-            {
-                // Копируем свойства по умолчанию для данного типа
-                switch ( Type )
-                {
-                    case styletype_Paragraph:
-                    {
-//                        var DefId = this.Default.Paragraph;
-//
-//                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-//                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
-
-                        break;
-                    }
-                    case styletype_Numbering:
-                    {
-                        var DefId = this.Default.Numbering;
-                        break;
-                    }
-                    case styletype_Table:
-                    {
-                        var DefId = this.Default.Table;
-
-                        /*
-                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
-                        Pr.TablePr.Merge( this.Styles[DefId].TablePr );
-                        Pr.TableRowPr.Merge( this.Styles[DefId].TableRowPr );
-                        Pr.TableCellPr.Merge( this.Styles[DefId].TableCellPr );
-                        */
-
-                        break;
-                    }
-                    case styletype_Character:
-                    {
-                        var DefId = this.Default.Character;
-
-                        if (undefined != this.Style[DefId])
-                        {
-                            Pr.TextPr.Merge(this.Style[DefId].TextPr);
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-            // Копируем свойства текущего стиля
-            switch ( Type )
-            {
-                case styletype_Paragraph:
-                {
-                    Pr.ParaPr.Merge( Style.ParaPr );
-                    Pr.TextPr.Merge( Style.TextPr );
-
-                    break;
-                }
-                case styletype_Numbering:
-                {
-                    break;
-                }
-                case styletype_Table:
-                {
-                    Pr.ParaPr.Merge( Style.ParaPr );
-                    Pr.TextPr.Merge( Style.TextPr );
-
-                    // Заглушка на случай, если в табличные стили начнут объединять с не табличными стилями
-                    if ( undefined != Style.TablePr )
-                    {
-                        Pr.TablePr.Merge(     Style.TablePr );
-                        Pr.TableRowPr.Merge(  Style.TableRowPr );
-                        Pr.TableCellPr.Merge( Style.TableCellPr );
-
-                        Pr.TableBand1Horz.Merge(  Style.TableBand1Horz  );
-                        Pr.TableBand1Vert.Merge(  Style.TableBand1Vert  );
-                        Pr.TableBand2Horz.Merge(  Style.TableBand2Horz  );
-                        Pr.TableBand2Vert.Merge(  Style.TableBand2Vert  );
-                        Pr.TableFirstCol.Merge(   Style.TableFirstCol   );
-                        Pr.TableFirstRow.Merge(   Style.TableFirstRow   );
-                        Pr.TableLastCol.Merge(    Style.TableLastCol    );
-                        Pr.TableLastRow.Merge(    Style.TableLastRow    );
-                        Pr.TableTLCell.Merge(     Style.TableTLCell     );
-                        Pr.TableTRCell.Merge(     Style.TableTRCell     );
-                        Pr.TableBLCell.Merge(     Style.TableBLCell     );
-                        Pr.TableBRCell.Merge(     Style.TableBRCell     );
-                        Pr.TableWholeTable.Merge( Style.TableWholeTable );
-                    }
-
-                    break;
-                }
-                case styletype_Character:
-                {
-                    Pr.TextPr.Merge( Style.TextPr );
-
-                    break;
-                }
-            }
-        }
-        else
-        {
-            // Копируем свойства родительского стиля
-			this.Internal_Get_Pr(Pr, Style.BasedOn, Type, false, PassedStyles, StartStyleId);
-
-            // Копируем свойства из стиля нумерации, если она задана, но только для самого стиля, а не для базовых
-			if ((styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) && StyleId === StartStyleId)
+		var Style = this.Style[StyleId];
+		if (undefined == StyleId || undefined === Style)
+		{
+			if (true === bUseDefault)
 			{
-				var oNumbering = editor.WordControl.m_oLogicDocument.GetNumbering();
-				if (undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId)
+				// Копируем свойства по умолчанию для данного типа
+				switch (Type)
 				{
-					var oNum = oNumbering.GetNum(Style.ParaPr.NumPr.NumId);
+					case styletype_Paragraph:
+					{
+						var DefId = this.Default.Paragraph;
+
+						if (undefined != this.Style[DefId])
+						{
+							Pr.ParaPr.Merge(this.Style[DefId].ParaPr);
+							Pr.TextPr.Merge(this.Style[DefId].TextPr);
+						}
+
+						break;
+					}
+					case styletype_Numbering:
+					{
+						var DefId = this.Default.Numbering;
+						break;
+					}
+					case styletype_Table:
+					{
+						var DefId = this.Default.Table;
+
+						if (undefined != this.Style[DefId])
+						{
+							Pr.ParaPr.Merge(this.Style[DefId].ParaPr);
+							Pr.TextPr.Merge(this.Style[DefId].TextPr);
+							Pr.TablePr.Merge(this.Styles[DefId].TablePr);
+							Pr.TableRowPr.Merge(this.Styles[DefId].TableRowPr);
+							Pr.TableCellPr.Merge(this.Styles[DefId].TableCellPr);
+						}
+
+						break;
+					}
+					case styletype_Character:
+					{
+						var DefId = this.Default.Character;
+
+						if (undefined != this.Style[DefId])
+						{
+							Pr.TextPr.Merge(this.Style[DefId].TextPr);
+						}
+
+						break;
+					}
+				}
+			}
+
+			return;
+		}
+
+		if (null === Style.BasedOn)
+		{
+			// TODO: Проверить нужно ли копировать стили по умолчанию для данного типа стиля, когда сам стиль задан
+			//       Для параграфа, вроде как не нужно (см. ivanova_veronica.docx стиль "Colon")
+
+			// Копируем свойства по умолчанию для данного типа
+			if (true === bUseDefault)
+			{
+				// Копируем свойства по умолчанию для данного типа
+				switch (Type)
+				{
+					case styletype_Paragraph:
+					{
+						//                        var DefId = this.Default.Paragraph;
+						//
+						//                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+						//                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+
+						break;
+					}
+					case styletype_Numbering:
+					{
+						var DefId = this.Default.Numbering;
+						break;
+					}
+					case styletype_Table:
+					{
+						var DefId = this.Default.Table;
+
+						/*
+						 Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+						 Pr.TextPr.Merge( this.Style[DefId].TextPr );
+						 Pr.TablePr.Merge( this.Styles[DefId].TablePr );
+						 Pr.TableRowPr.Merge( this.Styles[DefId].TableRowPr );
+						 Pr.TableCellPr.Merge( this.Styles[DefId].TableCellPr );
+						 */
+
+						break;
+					}
+					case styletype_Character:
+					{
+						var DefId = this.Default.Character;
+
+						if (undefined != this.Style[DefId])
+						{
+							Pr.TextPr.Merge(this.Style[DefId].TextPr);
+						}
+
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			// Копируем свойства родительского стиля
+			this.Internal_Get_Pr(Pr, Style.BasedOn, Type, false, PassedStyles, StartStyleId);
+		}
+
+		// Копируем свойства из стиля нумерации
+		var oLogicDocument = this.private_GetLogicDocument();
+		if ((styletype_Paragraph === Type || styletype_Table === Type) && undefined != Style.ParaPr.NumPr && oLogicDocument)
+		{
+			var oNumbering = oLogicDocument.GetNumbering();
+			if (0 != Style.ParaPr.NumPr.NumId)
+			{
+				var oNum = oNumbering.GetNum(Style.ParaPr.NumPr.NumId);
+				if (oNum)
+				{
 					var nLvl = oNum.GetLvlByStyle(StyleId);
 					if (-1 != nLvl)
 						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, nLvl));
+					else if (undefined !== Style.ParaPr.NumPr.Lvl)
+						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, tyle.ParaPr.NumPr.Lvl));
 					else
 						Pr.ParaPr.NumPr = undefined;
 				}
 			}
+			else
+			{
+				// Word значение 0 для NumId воспринимает как отсутствие нумерации и обнуляет левый отступ и
+				// отступ первой строки
+				Pr.ParaPr.NumPr         = undefined;
+				Pr.ParaPr.Ind.Left      = 0;
+				Pr.ParaPr.Ind.FirstLine = 0;
+			}
+		}
 
-            // Копируем свойства текущего стиля
-            switch ( Type )
-            {
-                case styletype_Paragraph:
-                {
-                    Pr.ParaPr.Merge( Style.ParaPr );
-                    Pr.TextPr.Merge( Style.TextPr );
+		// Копируем свойства текущего стиля
+		switch (Type)
+		{
+			case styletype_Paragraph:
+			{
+				Pr.ParaPr.Merge(Style.ParaPr);
+				Pr.TextPr.Merge(Style.TextPr);
 
-                    break;
-                }
-                case styletype_Numbering:
-                {
-                    break;
-                }
-                case styletype_Table:
-                {
-                    Pr.ParaPr.Merge( Style.ParaPr );
-                    Pr.TextPr.Merge( Style.TextPr );
+				break;
+			}
+			case styletype_Numbering:
+			{
+				break;
+			}
+			case styletype_Table:
+			{
+				Pr.ParaPr.Merge(Style.ParaPr);
+				Pr.TextPr.Merge(Style.TextPr);
 
-                    if ( undefined != Style.TablePr )
-                    {
-                        Pr.TablePr.Merge(     Style.TablePr );
-                        Pr.TableRowPr.Merge(  Style.TableRowPr );
-                        Pr.TableCellPr.Merge( Style.TableCellPr );
+				if (undefined != Style.TablePr)
+				{
+					Pr.TablePr.Merge(Style.TablePr);
+					Pr.TableRowPr.Merge(Style.TableRowPr);
+					Pr.TableCellPr.Merge(Style.TableCellPr);
 
-                        Pr.TableBand1Horz.Merge(  Style.TableBand1Horz  );
-                        Pr.TableBand1Vert.Merge(  Style.TableBand1Vert  );
-                        Pr.TableBand2Horz.Merge(  Style.TableBand2Horz  );
-                        Pr.TableBand2Vert.Merge(  Style.TableBand2Vert  );
-                        Pr.TableFirstCol.Merge(   Style.TableFirstCol   );
-                        Pr.TableFirstRow.Merge(   Style.TableFirstRow   );
-                        Pr.TableLastCol.Merge(    Style.TableLastCol    );
-                        Pr.TableLastRow.Merge(    Style.TableLastRow    );
-                        Pr.TableTLCell.Merge(     Style.TableTLCell     );
-                        Pr.TableTRCell.Merge(     Style.TableTRCell     );
-                        Pr.TableBLCell.Merge(     Style.TableBLCell     );
-                        Pr.TableBRCell.Merge(     Style.TableBRCell     );
-                        Pr.TableWholeTable.Merge( Style.TableWholeTable );
-                    }
+					Pr.TableBand1Horz.Merge(Style.TableBand1Horz);
+					Pr.TableBand1Vert.Merge(Style.TableBand1Vert);
+					Pr.TableBand2Horz.Merge(Style.TableBand2Horz);
+					Pr.TableBand2Vert.Merge(Style.TableBand2Vert);
+					Pr.TableFirstCol.Merge(Style.TableFirstCol);
+					Pr.TableFirstRow.Merge(Style.TableFirstRow);
+					Pr.TableLastCol.Merge(Style.TableLastCol);
+					Pr.TableLastRow.Merge(Style.TableLastRow);
+					Pr.TableTLCell.Merge(Style.TableTLCell);
+					Pr.TableTRCell.Merge(Style.TableTRCell);
+					Pr.TableBLCell.Merge(Style.TableBLCell);
+					Pr.TableBRCell.Merge(Style.TableBRCell);
+					Pr.TableWholeTable.Merge(Style.TableWholeTable);
+				}
 
-                    break;
-                }
-                case styletype_Character:
-                {
-                    Pr.TextPr.Merge( Style.TextPr );
+				break;
+			}
+			case styletype_Character:
+			{
+				Pr.TextPr.Merge(Style.TextPr);
 
-                    break;
-                }
-            }
-        }
-    },
+				break;
+			}
+		}
+	},
 
     Document_Get_AllFontNames : function(AllFonts)
     {
@@ -4903,6 +4866,14 @@ CStyles.prototype.GetAscStylesArray = function()
 	}
 
 	return arrStyles;
+};
+/**
+ * Получаем ссылку на класс документа
+ * @returns {?CDocument}
+ */
+CStyles.prototype.private_GetLogicDocument = function()
+{
+	return (editor && editor.WordControl && editor.WordControl.m_oLogicDocument ? editor.WordControl.m_oLogicDocument : null);
 };
 
 function CDocumentColor(r,g,b, Auto)
