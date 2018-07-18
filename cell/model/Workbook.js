@@ -4669,18 +4669,12 @@
 		});
 
 	};
-	Worksheet.prototype._getColNoEmpty=function(col){
+	Worksheet.prototype._getColNoEmpty = function (col) {
 		//0-based
-		var oCurCol = this.aCols[col];
-		if(oCurCol)
-			return oCurCol;
-		return null;
+		return this.aCols[col] || null;
 	};
-	Worksheet.prototype._getColNoEmptyWithAll=function(col){
-		var oRes = this._getColNoEmpty(col);
-		if(null == oRes)
-			oRes = this.oAllCol;
-		return oRes;
+	Worksheet.prototype._getColNoEmptyWithAll = function (col) {
+		return this._getColNoEmpty(col) || this.oAllCol;
 	};
 	Worksheet.prototype._getRow = function(index, fAction) {
 		//0-based
