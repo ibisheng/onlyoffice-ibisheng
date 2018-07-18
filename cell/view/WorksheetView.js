@@ -617,8 +617,7 @@
 
 	WorksheetView.prototype.getColumnWidthInSymbols = function (index) {
 		var c = this.model._getColNoEmptyWithAll(index);
-		var charCount = c ? c.charCount : null;
-		return null === charCount ? charCount : this.defaultColWidthChars;
+		return (c && c.charCount) || this.defaultColWidthChars;
 	};
 
     WorksheetView.prototype.getSelectedColumnWidthInSymbols = function () {
