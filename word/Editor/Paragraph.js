@@ -6546,8 +6546,8 @@ Paragraph.prototype.DrawSelectionOnPage = function(CurPage)
 
 			this.DrawingDocument.AddPageSelection(PageAbs, SelectX, SelectY, SelectW, SelectH);
 
-			if (selectionflag_NumberingCur === this.Selection.Flag)
-				this.DrawingDocument.AddPageSelection(PageAbs, SelectX, SelectY, SelectW2, SelectH);
+			if (selectionflag_NumberingCur === this.Selection.Flag && this.DrawingDocument.AddPageSelection2)
+				this.DrawingDocument.AddPageSelection2(PageAbs, SelectX, SelectY, SelectW2, SelectH);
 
 			break;
 		}

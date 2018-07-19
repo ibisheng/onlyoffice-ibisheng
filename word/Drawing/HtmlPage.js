@@ -2980,6 +2980,8 @@ function CEditorPage(api)
 
 				drDoc.private_EndDrawSelection();
 
+				drDoc.DrawPageSelection2(overlay);
+
 				if (this.MobileTouchManager)
 					this.MobileTouchManager.CheckSelect(overlay);
 			}

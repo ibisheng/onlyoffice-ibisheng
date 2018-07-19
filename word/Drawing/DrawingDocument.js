@@ -2671,6 +2671,8 @@ function CDrawingDocument()
 	this.IsTextMatrixUse = false;
 	this.IsTextSelectionOutline = false;
 
+	this.OverlaySelection2 = {};
+
 	this.HorVerAnchors = [];
 
 	this.MathMenuLoad = false;
@@ -5938,7 +5940,7 @@ function CDrawingDocument()
 		this.IsTextSelectionOutline = isSelectionOutline;
 	}
 
-	this.private_StartDrawSelection = function (overlay)
+	this.private_StartDrawSelection = function (overlay, isSelect2)
 	{
 		this.Overlay = overlay;
 		this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
@@ -5946,7 +5948,7 @@ function CDrawingDocument()
 		this.Overlay.m_oContext.fillStyle = "rgba(51,102,204,255)";
 		this.Overlay.m_oContext.beginPath();
 
-		if (this.m_oWordControl.MobileTouchManager)
+		if (this.m_oWordControl.MobileTouchManager && (true !== isSelect2))
 		{
 			this.m_oWordControl.MobileTouchManager.RectSelect1 = null;
 			this.m_oWordControl.MobileTouchManager.RectSelect2 = null;
@@ -6054,6 +6056,34 @@ function CDrawingDocument()
 			ctx.lineTo(x4, y4);
 			ctx.closePath();
 		}
+	}
+
+    this.AddPageSelection2 = function (pageIndex, x, y, w, h)
+    {
+        if (!this.OverlaySelection2.Data)
+            this.OverlaySelection2.Data = [];
+
+        this.OverlaySelection2.Data.push([pageIndex, x, y, w, h]);
+    }
+
+    this.DrawPageSelection2 = function(overlay)
+	{
+		if (this.OverlaySelection2.Data)
+		{
+			console.log("oleg");
+            this.private_StartDrawSelection(overlay, true);
+
+			var len = this.OverlaySelection2.Data.length;
+			var value;
+			for (var i = 0; i < len; i++)
+			{
+				value = this.OverlaySelection2.Data[i];
+				this.AddPageSelection(value[0], value[1], value[2], value[3], value[4]);
+			}
+
+            this.private_EndDrawSelection();
+		}
+        this.OverlaySelection2 = {};
 	}
 
 	this.CheckSelectMobile = function (overlay)
