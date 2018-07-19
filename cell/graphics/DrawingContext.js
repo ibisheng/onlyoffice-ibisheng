@@ -318,13 +318,13 @@
 	 * @memberOf Asc
 	 */
 	function TextMetrics(width, height, lineHeight, baseline, descender, fontSize, widthBB) {
-		this.width = width !== undefined ? width : 0;
-		this.height = height !== undefined ? height : 0;
-		this.lineHeight = lineHeight !== undefined ? lineHeight : 0;
-		this.baseline = baseline !== undefined ? baseline : 0;
-		this.descender = descender !== undefined ? descender : 0;
-		this.fontSize = fontSize !== undefined ? fontSize : 0;
-		this.widthBB = widthBB !== undefined ? widthBB : 0;
+		this.width = width || 0;
+		this.height = height || 0;
+		this.lineHeight = lineHeight || 0;
+		this.baseline = baseline || 0;
+		this.descender = descender || 0;
+		this.fontSize = fontSize || 0;
+		this.widthBB = widthBB || 0;
 
 		return this;
 	}
