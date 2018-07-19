@@ -6070,8 +6070,7 @@ function CDrawingDocument()
 	{
 		if (this.OverlaySelection2.Data)
 		{
-			console.log("oleg");
-            this.private_StartDrawSelection(overlay, true);
+			this.private_StartDrawSelection(overlay, true);
 
 			var len = this.OverlaySelection2.Data.length;
 			var value;
