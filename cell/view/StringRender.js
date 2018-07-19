@@ -196,14 +196,17 @@
 
 		/**
 		 * Setups one or more strings to process on
-		 * @param {Array} fragments  Array of formatted strings AscCommonExcel.Fragment
+		 * @param {String|Array} fragments  A simple string or array of formatted strings AscCommonExcel.Fragment
 		 * @param {AscCommonExcel.CellFlags} flags  Optional.
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
 		StringRender.prototype.setString = function(fragments, flags) {
 			this.fragments = [];
 			if ( asc_typeof(fragments) === "string" ) {
-				throw 'Invalid fragments argument for function StringRender.setString';
+				var newFragment = new AscCommonExcel.Fragment();
+				newFragment.text = fragments;
+				newFragment.format = new AscCommonExcel.Font();
+				this.fragments.push(newFragment);
 			} else {
 				for (var i = 0; i < fragments.length; ++i) {
 					this.fragments.push(fragments[i].clone());
@@ -444,7 +447,7 @@
 
 		/**
 		 * Measures string
-		 * @param {Array} fragments  Array of formatted strings AscCommonExcel.Fragment
+		 * @param {String|Array} fragments  A simple string or array of formatted strings AscCommonExcel.Fragment
 		 * @param {AscCommonExcel.CellFlags} [flags]      Optional.
 		 * @param {Number} [maxWidth]   Optional. Text width restriction
 		 * @return {Asc.TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
