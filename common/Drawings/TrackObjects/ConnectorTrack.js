@@ -35,7 +35,12 @@
 
     }
     CConnectorTrack.prototype = Object.create(AscFormat.XYAdjustmentTrack.prototype);
-    CConnectorTrack.prototype.track = function()
+    CConnectorTrack.prototype.track = function () {
+        AscFormat.ExecuteNoHistory(function () {
+            return this.track_();
+        }, this, []);
+    };
+    CConnectorTrack.prototype.track_ = function()
     {
 
         var oConnectorInfo = this.originalObject.nvSpPr.nvUniSpPr;
