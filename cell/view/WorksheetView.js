@@ -2965,7 +2965,9 @@
 				k = Math.floor((i + j) / 2);
 
 				font.fs = k;
-				str = [{text: basePageString + (index + 1), format: font}];
+				str = new AscCommonExcel.Fragment();
+				str.text = basePageString + (index + 1);
+				str.format = font;
 				t.stringRender.setString(str);
 				textMetrics = t.stringRender._measureChars();
 
@@ -3017,7 +3019,9 @@
 					//TODO подобрать такой размер шрифта, чтобы у текста была нужная нам ширина(1/3 от ширины страницы)
 					var font = new AscCommonExcel.Font();
 					font.fs = getOptimalFontSize(widthPage, heightPage);
-					var str = [{text: basePageString + (index + 1), format: font}];
+					var str = new AscCommonExcel.Fragment();
+					str.text = basePageString + (index + 1);
+					str.format = font;
 					this.stringRender.setString(str);
 
 					var textMetrics = this.stringRender._measureChars();

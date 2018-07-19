@@ -196,17 +196,17 @@
 
 		/**
 		 * Setups one or more strings to process on
-		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
+		 * @param {Array} fragments  Array of formatted strings AscCommonExcel.Fragment
 		 * @param {AscCommonExcel.CellFlags} flags  Optional.
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
-		StringRender.prototype.setString = function(str, flags) {
+		StringRender.prototype.setString = function(fragments, flags) {
 			this.fragments = [];
-			if ( asc_typeof(str) === "string" ) {
-				this.fragments.push({text: str, format: new AscCommonExcel.Font()});
+			if ( asc_typeof(fragments) === "string" ) {
+				throw 'Invalid fragments argument for function StringRender.setString';
 			} else {
-				for (var i = 0; i < str.length; ++i) {
-					this.fragments.push({text: str[i].text, format: str[i].format});
+				for (var i = 0; i < fragments.length; ++i) {
+					this.fragments.push(fragments[i].clone());
 				}
 			}
 			this.flags = flags;
@@ -444,38 +444,16 @@
 
 		/**
 		 * Measures string
-		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
+		 * @param {Array} fragments  Array of formatted strings AscCommonExcel.Fragment
 		 * @param {AscCommonExcel.CellFlags} [flags]      Optional.
 		 * @param {Number} [maxWidth]   Optional. Text width restriction
 		 * @return {Asc.TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
 		 */
-		StringRender.prototype.measureString = function(str, flags, maxWidth) {
-			if (str !== undefined) {
-				this.setString(str, flags);
+		StringRender.prototype.measureString = function(fragments, flags, maxWidth) {
+			if (fragments) {
+				this.setString(fragments, flags);
 			}
 			return this._doMeasure(maxWidth);
-		};
-
-		/**
-		 * Draw string
-		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
-		 * @param {AscCommonExcel.CellFlags} flags  Optional.
-		 * @param {Number} x  Left of the text rect
-		 * @param {Number} y  Top of the text rect
-		 * @param {Number} maxWidth  Text width restriction
-		 * @param {String} textColor  Default text color for formatless string
-		 * @return {StringRender}  Returns 'this' to allow chaining
-		 */
-		StringRender.prototype.renderString = function(str, flags, x, y, maxWidth, textColor) {
-			if (str !== undefined) {
-				this.setString(str, flags);
-			}
-			if (this.charWidths.length < 1 && null === this._doMeasure(maxWidth)) {
-				asc_debug("log", "Warning: can not measure '", str, "'");
-				return this;
-			}
-			this._doRender(undefined, x, y, maxWidth, textColor);
-			return this;
 		};
 
 		/**
@@ -955,7 +933,7 @@
 				canReduce = false;
 				ratio = maxWidth / tm.width;
 				for (var i = 0; i < this.fragments.length; ++i) {
-					format = this.fragments[i].format = this.fragments[i].format.clone();
+					format = this.fragments[i].format;
 					size = Math.max(minSize, Math.floor(format.getSize() * ratio * 2) / 2);
 					format.setSize(size);
 					if (minSize < size) {
