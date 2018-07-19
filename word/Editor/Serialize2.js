@@ -6694,7 +6694,7 @@ function BinaryFileReader(doc, openParams)
 		if (null == stDefault.Character) {
 			if (!characterNameId) {
 				var oNewStyle = new CStyle("Default Paragraph Font", null, null, styletype_Character );
-				oNewStyle.Create_Default_Character();
+				oNewStyle.CreateDefaultParagraphFont();
 				characterNameId = oDocStyle.Add(oNewStyle);
 				//remove style with same name
 				var oStartDocStyle = aStartDocStylesNames[oNewStyle.Name.toLowerCase().replace(/\s/g,"")];
@@ -6707,7 +6707,7 @@ function BinaryFileReader(doc, openParams)
 		if (null == stDefault.Numbering) {
 			if (!numberingNameId) {
 				var oNewStyle = new CStyle("No List", null, null, styletype_Numbering);
-				oNewStyle.Create_Default_Numbering();
+				oNewStyle.CreateNoList();
 				numberingNameId = oDocStyle.Add(oNewStyle);
 				//remove style with same name
 				var oStartDocStyle = aStartDocStylesNames[oNewStyle.Name.toLowerCase().replace(/\s/g,"")];
@@ -6720,7 +6720,7 @@ function BinaryFileReader(doc, openParams)
 		if (null == stDefault.Paragraph) {
 			if (!paragraphNameId) {
 				var oNewStyle = new CStyle("Normal", null, null, styletype_Paragraph);
-				oNewStyle.Create_Default_Paragraph();
+				oNewStyle.CreateNormal();
 				paragraphNameId = oDocStyle.Add(oNewStyle);
 				//remove style with same name
 				var oStartDocStyle = aStartDocStylesNames[oNewStyle.Name.toLowerCase().replace(/\s/g,"")];

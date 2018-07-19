@@ -581,7 +581,7 @@ CTextBody.prototype =
         return AscFormat.ExecuteNoHistory(function(){
             var oStyles = new CStyles(false);
             var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
-            Style_Para_Def.Create_Default_Paragraph();
+            Style_Para_Def.CreateNormal();
             oStyles.Default.Paragraph = oStyles.Add( Style_Para_Def );
             return {styles: oStyles, lastId: oStyles.Default.Paragraph};
         }, this, []);
