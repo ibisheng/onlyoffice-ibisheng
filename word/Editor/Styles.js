@@ -3374,6 +3374,10 @@ CStyle.prototype.CreateQuote = function()
 		Ind : {
 			Left  : 720 * g_dKoef_twips_to_mm,
 			Right : 720 * g_dKoef_twips_to_mm
+		},
+
+		Spacing : {
+			After : 0
 		}
 	});
 };
@@ -3404,6 +3408,10 @@ CStyle.prototype.CreateIntenseQuote = function()
 				Value   : border_Single,
 				Unifill : AscFormat.CreateUniFillSchemeColorWidthTint(0, 0)
 			}
+		},
+
+		Spacing : {
+			After : 0
 		}
 	});
 };
