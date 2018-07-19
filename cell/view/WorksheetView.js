@@ -421,7 +421,7 @@
 		// ToDo разобраться со значениями
 		this._setFont(undefined, this.model.getDefaultFontName(), defaultFontSize);
 		var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
-		this.headersHeightByFont = tm.height + 1;
+		this.headersHeightByFont = tm.height;
 
 		this.maxRowHeightPx = AscCommonExcel.convertPtToPx(Asc.c_oAscMaxRowHeight);
 		this.defaultRowDescender = this.stringRender.lines[0].d;
@@ -4760,7 +4760,7 @@
           // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
 			if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) &&
 				!fMergedRows) {
-				var newHeight = tm.height + 1;
+				var newHeight = tm.height;
               if (angle && textBound) {
                   newHeight = Math.max(rowInfo.height, textBound.height);
               }
@@ -11122,7 +11122,7 @@
                         }
                     }
 
-                    height = Math.max(height, ct.metrics.height + 1);
+                    height = Math.max(height, ct.metrics.height);
                 }
 
                 t.model.setRowBestFit(true, Math.min(height, t.maxRowHeightPx) * asc_getcvt(0, 1, t._getPPIY()), r, r);
@@ -11972,7 +11972,7 @@
                     bUpdateRowHeight = mergedRange.r1 === mergedRange.r2;
                 }
                 if (bUpdateRowHeight) {
-                    h = Math.max(h, ct.angle ? ct.textBound.height : ct.metrics.height + 1);
+                    h = Math.max(h, ct.angle ? ct.textBound.height : ct.metrics.height);
                 }
 
                 if (ct.cellVA !== Asc.c_oAscVAlign.Top && ct.cellVA !== Asc.c_oAscVAlign.Center && !isMerged && !ct.angle) {

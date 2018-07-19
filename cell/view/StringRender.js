@@ -612,7 +612,7 @@
 				self.lines.push(l);
 				if (TW < l.tw) {TW = l.tw;}
 				BL = TH + l.bl;
-				TH += l.th;
+				TH += l.th + 1;
 			}
 
 			if (0 >= this.chars.length) {
