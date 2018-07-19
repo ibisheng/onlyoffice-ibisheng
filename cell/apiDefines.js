@@ -530,6 +530,7 @@ var c_oAscPopUpSelectorType = {
   prot['DynamicFilter'] = prot.DynamicFilter;
   prot['Top10'] = prot.Top10;
   prot['Filters'] = prot.Filters;
+  prot['None'] = prot.None;
   window['Asc']['c_oAscFindLookIn'] = window['Asc'].c_oAscFindLookIn = c_oAscFindLookIn;
   prot = c_oAscFindLookIn;
   prot['Formulas'] = prot.Formulas;
