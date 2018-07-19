@@ -3501,6 +3501,7 @@ var editor;
   prot["asc_isWorksheetHidden"] = prot.asc_isWorksheetHidden;
   prot["asc_isWorksheetLockedOrDeleted"] = prot.asc_isWorksheetLockedOrDeleted;
   prot["asc_isWorkbookLocked"] = prot.asc_isWorkbookLocked;
+  prot["asc_isLayoutLocked"] = prot.asc_isLayoutLocked;
   prot["asc_getHiddenWorksheets"] = prot.asc_getHiddenWorksheets;
   prot["asc_showWorksheet"] = prot.asc_showWorksheet;
   prot["asc_hideWorksheet"] = prot.asc_hideWorksheet;
