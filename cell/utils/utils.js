@@ -38,7 +38,6 @@
 	 */
 	function (window, undefined) {
 		// Import
-		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
 		var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 		var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 		var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
@@ -1888,93 +1887,6 @@
 			asc_setText: function (val) { this.text = val; }
 		};
 
-		/** @constructor */
-		function asc_CPageMargins () {
-			this.left = null;
-			this.right = null;
-			this.top = null;
-			this.bottom = null;
-
-			return this;
-		}
-		asc_CPageMargins.prototype.init = function () {
-			if (null == this.left)
-				this.left = c_oAscPrintDefaultSettings.PageLeftField;
-			if (null == this.top)
-				this.top = c_oAscPrintDefaultSettings.PageTopField;
-			if (null == this.right)
-				this.right = c_oAscPrintDefaultSettings.PageRightField;
-			if (null == this.bottom)
-				this.bottom = c_oAscPrintDefaultSettings.PageBottomField;
-		};
-		asc_CPageMargins.prototype.asc_getLeft = function () { return this.left; };
-		asc_CPageMargins.prototype.asc_getRight = function () { return this.right; };
-		asc_CPageMargins.prototype.asc_getTop = function () { return this.top; };
-		asc_CPageMargins.prototype.asc_getBottom = function () { return this.bottom; };
-		asc_CPageMargins.prototype.asc_setLeft = function (val) { this.left = val; };
-		asc_CPageMargins.prototype.asc_setRight = function (val) { this.right = val; };
-		asc_CPageMargins.prototype.asc_setTop = function (val) { this.top = val; };
-		asc_CPageMargins.prototype.asc_setBottom = function (val) { this.bottom = val; };
-		/** @constructor */
-		function asc_CPageSetup() {
-			this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
-			this.width = c_oAscPrintDefaultSettings.PageWidth;
-			this.height = c_oAscPrintDefaultSettings.PageHeight;
-
-			this.fitToWidth = false; //ToDo can be a number
-			this.fitToHeight = false; //ToDo can be a number
-
-			// ToDo
-			this.blackAndWhite = false;
-			this.cellComments = 0; // none ST_CellComments
-			this.copies = 1;
-			this.draft = false;
-			this.errors = 0; // displayed ST_PrintError
-			this.firstPageNumber = -1;
-			this.pageOrder = 0; // downThenOver ST_PageOrder
-			this.scale = 100;
-			this.useFirstPageNumber = false;
-			this.usePrinterDefaults = true;
-
-			return this;
-		}
-		asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
-		asc_CPageSetup.prototype.asc_getWidth = function () { return this.width; };
-		asc_CPageSetup.prototype.asc_getHeight = function () { return this.height; };
-		asc_CPageSetup.prototype.asc_setOrientation = function (val) { this.orientation = val; };
-		asc_CPageSetup.prototype.asc_setWidth = function (val) { this.width = val; };
-		asc_CPageSetup.prototype.asc_setHeight = function (val) { this.height = val; };
-		asc_CPageSetup.prototype.asc_getFitToWidth = function () { return this.fitToWidth; };
-		asc_CPageSetup.prototype.asc_getFitToHeight = function () { return this.fitToHeight; };
-		asc_CPageSetup.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
-		asc_CPageSetup.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
-
-		/** @constructor */
-		function asc_CPageOptions() {
-			this.pageMargins = new asc_CPageMargins();
-			this.pageSetup = new asc_CPageSetup();
-			this.gridLines = null;
-			this.headings = null;
-
-			return this;
-		}
-		asc_CPageOptions.prototype.init = function () {
-			this.pageMargins.init();
-
-			if (null == this.gridLines)
-				this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
-			if (null == this.headings)
-				this.headings = c_oAscPrintDefaultSettings.PageHeadings;
-		};
-		asc_CPageOptions.prototype.asc_getPageMargins = function () { return this.pageMargins; };
-		asc_CPageOptions.prototype.asc_getPageSetup = function () { return this.pageSetup; };
-		asc_CPageOptions.prototype.asc_getGridLines = function () { return this.gridLines; };
-		asc_CPageOptions.prototype.asc_getHeadings = function () { return this.headings; };
-		asc_CPageOptions.prototype.asc_setPageMargins = function (val) { this.pageMargins = val; };
-		asc_CPageOptions.prototype.asc_setPageSetup = function (val) { this.pageSetup = val; };
-		asc_CPageOptions.prototype.asc_setGridLines = function (val) { this.gridLines = val; };
-		asc_CPageOptions.prototype.asc_setHeadings = function (val) { this.headings = val; };
-
 		function CPagePrint() {
 			this.pageWidth = 0;
 			this.pageHeight = 0;
@@ -2612,41 +2524,6 @@
 		prot["asc_setSheet"] = prot.asc_setSheet;
 		prot["asc_setRange"] = prot.asc_setRange;
 		prot["asc_setText"] = prot.asc_setText;
-
-		window["Asc"]["asc_CPageMargins"] = window["Asc"].asc_CPageMargins = asc_CPageMargins;
-		prot = asc_CPageMargins.prototype;
-		prot["asc_getLeft"] = prot.asc_getLeft;
-		prot["asc_getRight"] = prot.asc_getRight;
-		prot["asc_getTop"] = prot.asc_getTop;
-		prot["asc_getBottom"] = prot.asc_getBottom;
-		prot["asc_setLeft"] = prot.asc_setLeft;
-		prot["asc_setRight"] = prot.asc_setRight;
-		prot["asc_setTop"] = prot.asc_setTop;
-		prot["asc_setBottom"] = prot.asc_setBottom;
-
-		window["Asc"]["asc_CPageSetup"] = window["Asc"].asc_CPageSetup = asc_CPageSetup;
-		prot = asc_CPageSetup.prototype;
-		prot["asc_getOrientation"] = prot.asc_getOrientation;
-		prot["asc_getWidth"] = prot.asc_getWidth;
-		prot["asc_getHeight"] = prot.asc_getHeight;
-		prot["asc_setOrientation"] = prot.asc_setOrientation;
-		prot["asc_setWidth"] = prot.asc_setWidth;
-		prot["asc_setHeight"] = prot.asc_setHeight;
-		prot["asc_getFitToWidth"] = prot.asc_getFitToWidth;
-		prot["asc_getFitToHeight"] = prot.asc_getFitToHeight;
-		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
-		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
-
-		window["Asc"]["asc_CPageOptions"] = window["Asc"].asc_CPageOptions = asc_CPageOptions;
-		prot = asc_CPageOptions.prototype;
-		prot["asc_getPageMargins"] = prot.asc_getPageMargins;
-		prot["asc_getPageSetup"] = prot.asc_getPageSetup;
-		prot["asc_getGridLines"] = prot.asc_getGridLines;
-		prot["asc_getHeadings"] = prot.asc_getHeadings;
-		prot["asc_setPageMargins"] = prot.asc_setPageMargins;
-		prot["asc_setPageSetup"] = prot.asc_setPageSetup;
-		prot["asc_setGridLines"] = prot.asc_setGridLines;
-		prot["asc_setHeadings"] = prot.asc_setHeadings;
 
 		window["AscCommonExcel"].CPagePrint = CPagePrint;
 		window["AscCommonExcel"].CPrintPagesData = CPrintPagesData;

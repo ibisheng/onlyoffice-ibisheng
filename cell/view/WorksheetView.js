@@ -99,6 +99,8 @@
     var asc_CSelectionMathInfo = AscCommonExcel.asc_CSelectionMathInfo;
     var vector_koef = AscCommonExcel.vector_koef;
 
+    var pageBreakPreviewMode = false;
+
     /*
      * Constants
      * -----------------------------------------------------------------------------
@@ -2282,6 +2284,12 @@
 
 	/** Рисует сетку таблицы */
 	WorksheetView.prototype._drawGrid = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
+		//отрисовку для режима предварительного просмотра страниц
+		//добавлено сюда потому что отрисовка проиходит одновеременно с отрисовкой сетки
+		//и отрисовка происходит в два этапа - сначала текст - до линий сетки, потом линии печати - после линий сетки
+		//поэтому рассчет делаю 1 раз
+		var visiblePrintPages = pageBreakPreviewMode ? this._getVisiblePrintPages(range) : null;
+
 		// Возможно сетку не нужно рисовать (при печати свои проверки)
 		if (null === drawingCtx && false === this.model.getSheetView().asc_getShowGridLines()) {
 			return;
@@ -2312,8 +2320,12 @@
 		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
 		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
 		ctx.setFillStyle(this.settings.cells.defaultState.background)
-			.fillRect(x1, y1, x2 - x1, y2 - y1)
-			.setStrokeStyle(this.settings.cells.defaultState.border)
+			.fillRect(x1, y1, x2 - x1, y2 - y1);
+
+		//рисуем текст для преварительного просмотра
+		this._drawPageBreakPreviewText(drawingCtx, range, leftFieldInPx, topFieldInPx, width, height, visiblePrintPages);
+
+		ctx.setStrokeStyle(this.settings.cells.defaultState.border)
 			.setLineWidth(1).beginPath();
 
 		var i, d, l;
@@ -2349,6 +2361,11 @@
 
 			ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
+
+		//рисуем текст для преварительного просмотра
+		this._drawPageBreakPreviewLines(drawingCtx, range, leftFieldInPx, topFieldInPx, width, height, visiblePrintPages);
+		//отрисовка линий предварительного просмотра страниц без использования calcPagesPrint
+		this._drawPageBreakPreviewLines2(drawingCtx, range, leftFieldInPx, topFieldInPx, width, height);
 	};
 
     WorksheetView.prototype._drawCellsAndBorders = function ( drawingCtx, range, offsetXForDraw, offsetYForDraw ) {
@@ -2704,6 +2721,343 @@
 
 			return null;
 		};
+
+	WorksheetView.prototype._drawPageBreakPreviewLines = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height, printPages) {
+		if(!pageBreakPreviewMode) {
+			return;
+		}
+
+		if (range === undefined) {
+			range = this.visibleRange;
+		}
+		var ctx = drawingCtx || this.drawingCtx;
+		var c = this.cols;
+		var r = this.rows;
+
+		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+
+		var frozenX = 0, frozenY = 0, cFrozen, rFrozen;
+		if (null === drawingCtx && this.topLeftFrozenCell) {
+			if (undefined === leftFieldInPx) {
+				cFrozen = this.topLeftFrozenCell.getCol0();
+				offsetX -= frozenX = c[cFrozen].left - c[0].left;
+			}
+			if (undefined === topFieldInPx) {
+				rFrozen = this.topLeftFrozenCell.getRow0();
+				offsetY -= frozenY =  r[rFrozen].top - r[0].top;
+			}
+		}
+
+		var i, d, d1;
+		var x1, x2, y1, y2;
+		var pageBreakPreview = true;
+		if(pageBreakPreview) {
+			var startRange = printPages[0] ? printPages[0].page.pageRange : null;
+			var endRange = printPages[0] ? printPages[printPages.length - 1].page.pageRange : null;
+			var unionRange = startRange ? new Asc.Range(startRange.c1, startRange.r1, endRange.c2, endRange.r2) : null;
+
+			//вначале закрашииваем непечатную область
+			var fillRanges = [];
+			var intersection = unionRange ? range.intersection(unionRange) : null;
+			ctx.setFillStyle(this.settings.cells.defaultState.border);
+			if(intersection) {
+				//закрашиываем всю область обноавления за исключением области пересечения
+				fillRanges = intersection.difference(range);
+			} else {
+				fillRanges.push(range);
+			}
+
+			if(fillRanges) {
+				ctx.setFillStyle(this.settings.cells.defaultState.border);
+				for(i = 0; i < fillRanges.length; i++) {
+					x1 = Math.max(c[fillRanges[i].c1].left, c[range.c1].left);
+					y1 = Math.max(r[fillRanges[i].r1].top, r[range.r1].top);
+					x2 = Math.min(c[fillRanges[i].c2].left + c[fillRanges[i].c2].width - this.cellsLeft, c[range.c2].left + c[range.c2].width - this.cellsLeft);
+					y2 = Math.min(r[fillRanges[i].r2].top + r[fillRanges[i].r2].height - this.cellsTop, r[range.r2].top + r[range.r2].height - this.cellsTop);
+
+					ctx.fillRect(x1 - offsetX, y1 - offsetY, x2 - offsetX, y2 - offsetY);
+				}
+			}
+
+
+			if(printPages[0] && intersection) {
+				x1 = c[intersection.c1].left - offsetX;
+				y1 = r[intersection.r1].top - offsetY;
+				x2 = c[intersection.c2].left + c[intersection.c2].width - offsetX;
+				y2 = r[intersection.r2].top + r[intersection.r2].height - offsetY;
+
+				//рисуем линии, ограничивающие страницы
+				ctx.setStrokeStyle(this.settings.activeCellBorderColor);
+				ctx.setLineWidth(3).beginPath();
+
+				var pageRange;
+				var pageIntersection;
+				for (i = 0, d = 0, d1 = 0; i < printPages.length; ++i) {
+					pageRange = printPages[i].page.pageRange;
+					pageIntersection = pageRange.intersection(range);
+					if(!pageIntersection) {
+						if(pageRange.r1 > range.r2 && pageRange.c1 > range.c2) {
+							break;
+						} else {
+							continue;
+						}
+					}
+
+					d = c[pageRange.c2].left + c[pageRange.c2].width - offsetX;
+					d1 = r[pageRange.r2].top + r[pageRange.r2].height - offsetY;
+					if(d > x1 && d1 > 0) {
+						ctx.lineVerPrevPx(d, y1 - frozenY, y2);
+					}
+					if(d1 > y1 && d > 0) {
+						ctx.lineHorPrevPx(x1 - frozenX, d1, x2);
+					}
+				}
+
+				ctx.stroke();
+			}
+		}
+	};
+
+	WorksheetView.prototype._drawPageBreakPreviewLines2 = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height) {
+
+		if(!pageBreakPreviewMode) {
+			return;
+		}
+
+		if (range === undefined) {
+			range = this.visibleRange;
+		}
+		var ctx = drawingCtx || this.drawingCtx;
+		var c = this.cols;
+		var r = this.rows;
+
+		var widthCtx = (width) ? width : ctx.getWidth();
+		var heightCtx = (height) ? height : ctx.getHeight();
+		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+
+		var frozenX = 0, frozenY = 0, cFrozen, rFrozen;
+		if (null === drawingCtx && this.topLeftFrozenCell) {
+			if (undefined === leftFieldInPx) {
+				cFrozen = this.topLeftFrozenCell.getCol0();
+				offsetX -= frozenX = c[cFrozen].left - c[0].left;
+			}
+			if (undefined === topFieldInPx) {
+				rFrozen = this.topLeftFrozenCell.getRow0();
+				offsetY -= frozenY =  r[rFrozen].top - r[0].top;
+			}
+		}
+
+		var printOptions = this.model.PagePrintOptions;
+		var orientation = printOptions.pageSetup.orientation;
+
+		var leftMargin = printOptions.pageMargins.left;
+		var rightMargin = printOptions.pageMargins.right;
+		var topMargin = printOptions.pageMargins.top;
+		var bottomMargin = printOptions.pageMargins.bottom;
+		var widthFromSetup = printOptions.pageSetup.width;
+		var heightFromSetup = printOptions.pageSetup.height;
+
+		var pageBreakGrid = true;
+		var i, d, d1;
+		var x1, x2, y1, y2;
+		if(pageBreakGrid) {
+			x1 = c[range.c1].left - offsetX;
+			y1 = r[range.r1].top - offsetY;
+			x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
+			y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
+
+			if (Asc.c_oAscPageOrientation.PageLandscape === orientation) {
+				var tmp = width;
+				widthFromSetup = heightFromSetup;
+				heightFromSetup = tmp;
+			}
+
+			var widthPage = (widthFromSetup - leftMargin - rightMargin) * asc_getcvt(3, 0, this._getPPIX());
+			var heightPage = (heightFromSetup - topMargin - bottomMargin) * asc_getcvt(3, 0, this._getPPIY());
+
+			var headings = printOptions.headings;
+			if(headings) {
+				widthPage -= this.cellsLeft;
+				heightPage -= this.cellsTop;
+			}
+
+			ctx.setStrokeStyle(this.settings.findFillColor);
+			ctx.setLineWidth(1).beginPath();
+
+			for(i = 0, d = 0, d1 = 0; i < c.length; i++) {
+				if(d1 > x2 + offsetX) {
+					break;
+				}
+
+				if(d + c[i].width > widthPage) {
+					if(d1 > x1 + offsetX && d1 < x2 + offsetX) {
+						var headingWidth = /*headings ? this.cellsLeft : 0;*/this.cellsLeft;
+						ctx.lineVerPrevPx(d1 + headingWidth - offsetX, y1, y2);
+					}
+					d = 0;
+				}
+				d += c[i].width;
+				d1 += c[i].width;
+			}
+
+			for(i = 0, d = 0, d1 = 0; i < r.length; i++) {
+				if(d1 > y2 + offsetY) {
+					break;
+				}
+
+				if(d + r[i].height > heightPage) {
+					if(d1 > y1 + offsetY && d1 < y2 + offsetY) {
+						var headingHeight = /*headings ? this.cellsTop : 0;*/this.cellsTop;
+						ctx.lineHorPrevPx(x1, d1 + headingHeight - offsetY, x2);
+					}
+					d = 0;
+				}
+				d += r[i].height;
+				d1 += r[i].height;
+			}
+
+			ctx.stroke();
+		}
+	};
+
+	WorksheetView.prototype._drawPageBreakPreviewText = function (drawingCtx, range, leftFieldInPx, topFieldInPx, width, height, printPages) {
+
+		if(!pageBreakPreviewMode) {
+			return;
+		}
+
+		if (range === undefined) {
+			range = this.visibleRange;
+		}
+		var t = this;
+		var ctx = drawingCtx || this.drawingCtx;
+		var c = this.cols;
+		var r = this.rows;
+
+		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+
+		var frozenX = 0, frozenY = 0, cFrozen, rFrozen;
+		if (null === drawingCtx && this.topLeftFrozenCell) {
+			if (undefined === leftFieldInPx) {
+				cFrozen = this.topLeftFrozenCell.getCol0();
+				offsetX -= frozenX = c[cFrozen].left - c[0].left;
+			}
+			if (undefined === topFieldInPx) {
+				rFrozen = this.topLeftFrozenCell.getRow0();
+				offsetY -= frozenY =  r[rFrozen].top - r[0].top;
+			}
+		}
+
+		var basePageString = "Page ";
+
+		var getOptimalFontSize = function(width, height) {
+			var needWidth = width / 3;
+			var needHeight = height / 3;
+
+			//TODO максмальный размер выбрал произвольно. изменить! + оптимизировать алгоритм по равенству
+			var font = new AscCommonExcel.Font();
+			var str;
+			var i = 0, j = 100, k, textMetrics;
+			while (i <= j) {
+
+				k = Math.floor((i + j) / 2);
+
+				font.fs = k;
+				str = [{text: basePageString + (index + 1), format: font}];
+				t.stringRender.setString(str);
+				textMetrics = t.stringRender._measureChars();
+
+				if (textMetrics.width === needWidth && textMetrics.height === needHeight) {
+					break;
+				} else if (textMetrics.width > needWidth || textMetrics.height > needHeight) {
+					j = k - 1;
+				} else {
+					i = k + 1;
+				}
+			}
+			return k;
+		};
+
+		var x1, x2, y1, y2;
+		var pageBreakPreview = true;
+		if(pageBreakPreview) {
+			var startRange = printPages[0] ? printPages[0].page.pageRange : null;
+			var endRange = printPages[0] ? printPages[printPages.length - 1].page.pageRange : null;
+			var unionRange = startRange ? new Asc.Range(startRange.c1, startRange.r1, endRange.c2, endRange.r2) : null;
+			var intersection = unionRange ? range.intersection(unionRange) : null;
+
+			if(printPages[0] && intersection) {
+				x1 = c[range.c1].left - offsetX;
+				y1 = r[range.r1].top - offsetY;
+				x2 = c[range.c2].left + c[range.c2].width - offsetX;
+				y2 = r[range.r2].top + r[range.r2].height - offsetY;
+
+
+				var pageRange;
+				var tX1, tX2, tY1, tY2, pageIntersection, index;
+				for (var i = 0; i < printPages.length; ++i) {
+					pageRange = printPages[i].page.pageRange;
+					index = printPages[i].index;
+					pageIntersection = pageRange.intersection(range);
+					if(!pageIntersection) {
+						if(pageRange.r1 > range.r2 && pageRange.c1 > range.c2) {
+							break;
+						} else {
+							continue;
+						}
+					}
+
+					var widthPage = (c[pageRange.c2].left + c[pageRange.c2].width) - c[pageRange.c1].left;
+					var heightPage = (r[pageRange.r2].top + r[pageRange.r2].height) - r[pageRange.r1].top;
+					var centerX = c[pageRange.c1].left + (widthPage) / 2 - offsetX;
+					var centerY = r[pageRange.r1].top + (heightPage) / 2 - offsetY;
+
+					//TODO подобрать такой размер шрифта, чтобы у текста была нужная нам ширина(1/3 от ширины страницы)
+					var font = new AscCommonExcel.Font();
+					font.fs = getOptimalFontSize(widthPage, heightPage);
+					var str = [{text: basePageString + (index + 1), format: font}];
+					this.stringRender.setString(str);
+
+					var textMetrics = this.stringRender._measureChars();
+					tX1 = centerX - textMetrics.width / 2;
+					tX2 = centerX + textMetrics.width / 2;
+					tY1 = centerY - textMetrics.height / 2;
+					tY2 = centerY + textMetrics.height / 2;
+
+					if(!(tX1 > x2 || tX2 < x1 || tY1 > y2 || tY2 < y1)) {
+						ctx.AddClipRect(x1, y1, x2-x1, y2-y1);
+						this.stringRender.render(undefined, tX1, tY1, 100, this.settings.activeCellBorderColor);
+						ctx.RemoveClipRect();
+					}
+				}
+			}
+		}
+	};
+
+
+	//TODO temp function
+	WorksheetView.prototype._getVisiblePrintPages = function (range) {
+		var printOptions = this.model.PagePrintOptions;
+		var printPages = [];
+		this.calcPagesPrint(printOptions, null, null, printPages);
+
+		var res = [];
+		if (range === undefined) {
+			range = this.visibleRange;
+		}
+
+		for (var i = 0; i < printPages.length; ++i) {
+
+			if(printPages[i].pageRange.intersection(range)) {
+				res.push({index: i, page: printPages[i]});
+			}
+		}
+
+		return res;
+	};
 
     /** Удаляет вертикальные границы ячейки, если текст выходит за границы и соседние ячейки пусты */
     WorksheetView.prototype._eraseCellRightBorder = function ( drawingCtx, colBeg, colEnd, row, offsetX, offsetY ) {
@@ -5271,6 +5625,7 @@
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
             this._drawGrid(null, range);
+
             this._drawCellsAndBorders(null, range);
             this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx(false,
@@ -9905,6 +10260,12 @@
 		return cellCoord;
 	};
 
+	WorksheetView.prototype._isLockedLayoutOptions = function (callback) {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
+			AscCommonExcel.c_oAscLockLayoutOptions);
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
+
 	// Залочена ли панель для закрепления
 	WorksheetView.prototype._isLockedFrozenPane = function (callback) {
 		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
@@ -13974,6 +14335,112 @@
 		xL -= (this.cols[c].left - widthDiff - this.cellsLeft - this.cellsLeft);
 		yL -= (this.rows[r].top - heightDiff - this.cellsTop - this.cellsTop);
 		return {X: xL, Y: yL};
+	};
+
+	/** Для api layout */
+	WorksheetView.prototype.changeDocSize = function (width, height) {
+		var t = this;
+		var pageOptions = t.model.PagePrintOptions;
+
+		var onChangeDocSize = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			pageOptions.pageSetup.asc_setWidth(width);
+			pageOptions.pageSetup.asc_setHeight(height);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(onChangeDocSize);
+	};
+
+	WorksheetView.prototype.changePageOrient = function (orientation) {
+		var pageOptions = this.model.PagePrintOptions;
+
+		var callback = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			pageOptions.pageSetup.asc_setOrientation(orientation);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(callback);
+	};
+
+	WorksheetView.prototype.changePageMargins = function (left, right, top, bottom) {
+		var t = this;
+		var pageOptions = t.model.PagePrintOptions;
+		var pageMargins = pageOptions.asc_getPageMargins();
+
+		var callback = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			pageMargins.asc_setLeft(left);
+			pageMargins.asc_setRight(right);
+			pageMargins.asc_setTop(top);
+			pageMargins.asc_setBottom(bottom);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(callback);
+	};
+
+	WorksheetView.prototype.setPageOption = function (callback, val) {
+		var onChangeDocSize = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			callback(val);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(onChangeDocSize);
+	};
+
+	WorksheetView.prototype.setPageOptions = function (obj) {
+		var t = this;
+		var pageOptions = t.model.PagePrintOptions;
+
+		if(!obj) {
+			return;
+		}
+
+		var onChangeDocSize = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			pageOptions.asc_setOptions(obj);
+
+			History.EndTransaction();
+		};
+
+		return this._isLockedLayoutOptions(onChangeDocSize);
 	};
 
     //------------------------------------------------------------export---------------------------------------------------

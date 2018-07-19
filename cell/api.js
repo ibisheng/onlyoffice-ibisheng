@@ -309,6 +309,7 @@ var editor;
     AscCommonExcel.g_oUndoRedoPivotTables = new AscCommonExcel.UndoRedoPivotTables(wbModel);
     AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Worksheet(wbModel, -1);
     AscCommonExcel.g_oUndoRedoSharedFormula = new AscCommonExcel.UndoRedoSharedFormula(wbModel);
+    AscCommonExcel.g_oUndoRedoLayout = new AscCommonExcel.UndoRedoRedoLayout(wbModel);
   };
 
   spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent, adjustPrint) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -622,12 +623,40 @@ var editor;
   // Опции страницы (для печати)
   spreadsheet_api.prototype.asc_setPageOptions = function(options, index) {
     var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
-    this.wbModel.getWorksheet(sheetIndex).PagePrintOptions = options;
+    this.wb.getWorksheet(sheetIndex).setPageOptions(options);
   };
 
   spreadsheet_api.prototype.asc_getPageOptions = function(index) {
     var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
     return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
+  };
+
+  spreadsheet_api.prototype.asc_setPageOption = function (func, val, index) {
+      var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+      var ws = this.wb.getWorksheet(sheetIndex);
+      ws.setPageOption(func, val);
+  };
+
+  spreadsheet_api.prototype.asc_changeDocSize = function (width, height, index) {
+    var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+    var ws = this.wb.getWorksheet(sheetIndex);
+    ws.changeDocSize(width, height);
+  };
+
+  spreadsheet_api.prototype.asc_changePageMargins = function (left, right, top, bottom, index) {
+      var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+      var ws = this.wb.getWorksheet(sheetIndex);
+      ws.changePageMargins(left, right, top, bottom);
+  };
+
+  spreadsheet_api.prototype.asc_changePageOrient = function (isPortrait, index) {
+      var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+      var ws = this.wb.getWorksheet(sheetIndex);
+      if (isPortrait) {
+          ws.changePageOrient(Asc.c_oAscPageOrientation.PagePortrait);
+      } else {
+          ws.changePageOrient(Asc.c_oAscPageOrientation.PageLandscape);
+      }
   };
 
   spreadsheet_api.prototype._onNeedParams = function(data, opt_isPassword) {
@@ -857,6 +886,8 @@ var editor;
    * asc_onContextMenu			(event)												- эвент на контекстное меню
    * asc_onDocumentContentReady ()                        - эвент об окончании загрузки документа
    * asc_onFilterInfo	        (countFilter, countRecords)								- send count filtered and all records
+   * asc_onLockDocumentProps/asc_onUnLockDocumentProps    - эвент о том, что залочены опции layout
+   * asc_onUpdateDocumentProps                            - эвент о том, что необходимо обновить данные во вкладке layout
    */
 
   spreadsheet_api.prototype.asc_registerCallback = function(name, callback, replaceOldCallback) {
@@ -1157,6 +1188,9 @@ var editor;
       },
       "checkDefNameLock": function(lockElem) {
         return t._onCheckDefNameLock(lockElem);
+      },
+      "updateAllLayoutsLock": function() {
+          t._onUpdateAllLayoutsLock.apply(t, arguments);
       }
     }, this.getViewMode());
 
@@ -1202,6 +1236,9 @@ var editor;
           t._onUpdateSheetsLock(lockElem);
 
           t._onUpdateDefinedNames(lockElem);
+
+          //эвент о локе в меню вкладки layout
+          t._onUpdateLayoutLock(lockElem);
 
           var ws = t.wb.getWorksheet();
           var lockSheetId = lockElem.Element["sheetId"];
@@ -1393,6 +1430,35 @@ var editor;
     }
   };
 
+  spreadsheet_api.prototype._onUpdateAllLayoutsLock = function () {
+      var t = this;
+      if (t.wbModel) {
+          var i, length, wsModel, wsIndex;
+          for (i = 0, length = t.wbModel.getWorksheetCount(); i < length; ++i) {
+              wsModel = t.wbModel.getWorksheet(i);
+              wsIndex = wsModel.getIndex();
+
+              var isLocked = t.asc_isLayoutLocked(wsIndex);
+              if (isLocked) {
+                  t.handlers.trigger("asc_onLockDocumentProps", wsIndex);
+              } else {
+                  t.handlers.trigger("asc_onUnLockDocumentProps", wsIndex);
+              }
+          }
+      }
+  };
+
+  spreadsheet_api.prototype._onUpdateLayoutMenu = function (nSheetId) {
+      var t = this;
+      if (t.wbModel) {
+          var wsModel = t.wbModel.getWorksheetById(nSheetId);
+          if (wsModel) {
+              var wsIndex = wsModel.getIndex();
+              t.handlers.trigger("asc_onUpdateDocumentProps", wsIndex);
+          }
+      }
+  };
+
   spreadsheet_api.prototype._onShowDrawingObjects = function() {
     if (this.wb) {
       var ws = this.wb.getWorksheet();
@@ -1420,6 +1486,22 @@ var editor;
       var wsIndex = wsModel.getIndex();
       t.handlers.trigger("asc_onWorksheetLocked", wsIndex, t.asc_isWorksheetLockedOrDeleted(wsIndex));
     }
+  };
+
+  spreadsheet_api.prototype._onUpdateLayoutLock = function(lockElem) {
+      var t = this;
+
+      var wsModel = t.wbModel.getWorksheetById(lockElem.Element["sheetId"]);
+      if (wsModel) {
+          var wsIndex = wsModel.getIndex();
+
+          var isLocked = t.asc_isLayoutLocked(wsIndex);
+          if(isLocked) {
+			  t.handlers.trigger("asc_onLockDocumentProps", wsIndex);
+          } else {
+			  t.handlers.trigger("asc_onUnLockDocumentProps", wsIndex);
+          }
+      }
   };
 
   spreadsheet_api.prototype._onUpdateFrozenPane = function(lockElem) {
@@ -1757,6 +1839,21 @@ var editor;
     var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, null, null);
     // Проверим, редактирует ли кто-то лист
     return (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));
+  };
+
+  // Залочена ли работа с листом
+  spreadsheet_api.prototype.asc_isLayoutLocked = function(index) {
+      var ws = this.wbModel.getWorksheet(index);
+      var sheetId = null;
+      if (null === ws || undefined === ws) {
+          sheetId = this.asc_getActiveWorksheetId();
+      } else {
+          sheetId = ws.getId();
+      }
+
+      var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, "layoutOptions");
+      // Проверим, редактирует ли кто-то лист
+      return (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));
   };
 
   spreadsheet_api.prototype.asc_getHiddenWorksheets = function() {
@@ -3376,7 +3473,12 @@ var editor;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
-	prot["asc_decodeBuffer"] = prot.asc_decodeBuffer;
+  prot["asc_changeDocSize"] = prot.asc_changeDocSize;
+  prot["asc_changePageMargins"] = prot.asc_changePageMargins;
+  prot["asc_setPageOption"] = prot.asc_setPageOption;
+  prot["asc_changePageOrient"] = prot.asc_changePageOrient;
+
+  prot["asc_decodeBuffer"] = prot.asc_decodeBuffer;
 
   prot["asc_registerCallback"] = prot.asc_registerCallback;
   prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;

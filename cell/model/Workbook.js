@@ -3095,7 +3095,7 @@
 		this.sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
 		this.pivotTables = [];
 
-		this.PagePrintOptions = new Asc.asc_CPageOptions();
+		this.PagePrintOptions = new Asc.asc_CPageOptions(this);
 
 		this.lastFindOptions = null;
 
