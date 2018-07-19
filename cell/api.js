@@ -882,6 +882,8 @@ var editor;
    * asc_onContextMenu			(event)												- эвент на контекстное меню
    * asc_onDocumentContentReady ()                        - эвент об окончании загрузки документа
    * asc_onFilterInfo	        (countFilter, countRecords)								- send count filtered and all records
+   * asc_onLockDocumentProps/asc_onUnLockDocumentProps    - эвент о том, что залочены опции layout
+   * asc_onUpdateDocumentProps                            - эвент о том, что необходимо обновить данные во вкладке layout
    */
 
   spreadsheet_api.prototype.asc_registerCallback = function(name, callback, replaceOldCallback) {
@@ -1442,6 +1444,17 @@ var editor;
       }
   };
 
+  spreadsheet_api.prototype._onUpdateLayoutMenu = function (nSheetId) {
+      var t = this;
+      if (t.wbModel) {
+          var wsModel = t.wbModel.getWorksheetById(nSheetId);
+          if (wsModel) {
+              var wsIndex = wsModel.getIndex();
+              t.handlers.trigger("asc_onUpdateDocumentProps", wsIndex);
+          }
+      }
+  };
+
   spreadsheet_api.prototype._onShowDrawingObjects = function() {
     if (this.wb) {
       var ws = this.wb.getWorksheet();
@@ -1482,7 +1495,7 @@ var editor;
           if(isLocked) {
 			  t.handlers.trigger("asc_onLockDocumentProps", wsIndex);
           } else {
-			  //t.handlers.trigger("asc_onUnLockDocumentProps", wsIndex);
+			  t.handlers.trigger("asc_onUnLockDocumentProps", wsIndex);
           }
       }
   };

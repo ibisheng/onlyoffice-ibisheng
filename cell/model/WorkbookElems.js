@@ -8022,7 +8022,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 		}
 	};
 	asc_CPageOptions.prototype.asc_setOptions = function (obj) {
-		var gridLines = obj.asc_getOrientation();
+		var gridLines = obj.asc_getGridLines();
 		if(gridLines !== this.asc_getGridLines()) {
 			this.asc_setGridLines(gridLines);
 		}
@@ -8032,7 +8032,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 		}
 
 		this.asc_getPageMargins().asc_setOptions(obj.asc_getPageMargins());
-		this.asc_setPageSetup().asc_setOptions(obj.asc_getPageSetup());
+		this.asc_getPageSetup().asc_setOptions(obj.asc_getPageSetup());
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

@@ -2706,6 +2706,8 @@ function (window, undefined) {
 				pageSetup.asc_setOrientation(value);
 				break;
 		}
+
+		this.wb.oApi._onUpdateLayoutMenu(nSheetId);
 	};
 
 
