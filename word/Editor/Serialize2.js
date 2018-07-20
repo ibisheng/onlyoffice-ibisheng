@@ -4647,18 +4647,14 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
     };
     this.WriteHyperlink = function (oHyperlink, bUseSelection) {
         var oThis = this;
-        var sLink = oHyperlink.GetValue();
         var sTooltip = oHyperlink.GetToolTip();
-		var sAnchor = oHyperlink.GetAnchor();
-        //Link
-        this.memory.WriteByte(c_oSer_HyperlinkType.Link);
-        this.memory.WriteString2(sLink);
-        //Anchor
-        if (null != sAnchor && "" != sAnchor)
-        {
-            this.memory.WriteByte(c_oSer_HyperlinkType.Anchor);
-            this.memory.WriteString2(sAnchor);
-        }
+		if (oHyperlink.IsAnchor()) {
+			this.memory.WriteByte(c_oSer_HyperlinkType.Anchor);
+			this.memory.WriteString2(oHyperlink.GetAnchor());
+		} else {
+			this.memory.WriteByte(c_oSer_HyperlinkType.Link);
+			this.memory.WriteString2(oHyperlink.GetValue());
+		}
         //Tooltip
         if (null != sTooltip && "" != sTooltip)
         {
