@@ -3399,7 +3399,9 @@
 					var api = window["Asc"]["editor"];
 					var oImageMap = {};
 					AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+						History.TurnOff();
 						AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+						History.TurnOn();
 						t.aResult.props.oImageMap = oImageMap;
 						worksheet.setSelectionInfo('paste', {data: t.aResult});
 					}, true );
