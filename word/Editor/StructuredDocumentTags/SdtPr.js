@@ -249,7 +249,7 @@ CContentControlPr.prototype.get_Color = function()
 	if (!this.Color)
 		return null;
 
-	return [this.Color.r, this.Color.g, this.Color.b];
+	return {r : this.Color.r, g : this.Color.g, b : this.Color.b};
 };
 CContentControlPr.prototype.put_Color = function(r, g, b)
 {
