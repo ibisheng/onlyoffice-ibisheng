@@ -1310,6 +1310,8 @@ var editor;
           t._onUpdateSheetsLock(lockElem);
           /*снимаем лок для DefName*/
           t.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.OK);
+          //эвент о локе в меню вкладки layout
+          t._onUpdateLayoutLock(lockElem);
         }
       }
     };
