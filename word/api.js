@@ -3568,6 +3568,18 @@ background-repeat: no-repeat;\
 
 		return oNumPr.Lvl;
 	};
+	asc_docs_api.prototype.asc_GetCalculatedNumberingValue = function()
+	{
+		var oLogicDocument = this.private_GetLogicDocument();
+		if (!oLogicDocument)
+			return -1;
+
+		var oParagraph = oLogicDocument.GetCurrentParagraph(true);
+		if (!oParagraph)
+			return -1;
+
+		return oParagraph.GetNumberingCalculatedValue();
+	};
 	asc_docs_api.prototype.asc_GetNumberingPr = function(sNumId)
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
@@ -9322,6 +9334,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_RestartNumbering']                      = asc_docs_api.prototype.asc_RestartNumbering;
 	asc_docs_api.prototype['asc_GetCurrentNumberingId']                 = asc_docs_api.prototype.asc_GetCurrentNumberingId;
 	asc_docs_api.prototype['asc_GetCurrentNumberingLvl']                = asc_docs_api.prototype.asc_GetCurrentNumberingLvl;
+	asc_docs_api.prototype['asc_GetCalculatedNumberingValue']           = asc_docs_api.prototype.asc_GetCalculatedNumberingValue;
 	asc_docs_api.prototype['asc_GetNumberingPr']                        = asc_docs_api.prototype.asc_GetNumberingPr;
 	asc_docs_api.prototype['asc_AddNewNumbering']                       = asc_docs_api.prototype.asc_AddNewNumbering;
 	asc_docs_api.prototype['asc_ChangeNumberingLvl']                    = asc_docs_api.prototype.asc_ChangeNumberingLvl;

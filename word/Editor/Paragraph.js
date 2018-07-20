@@ -13080,6 +13080,14 @@ Paragraph.prototype.GetNumberingPage = function(isAbsolute)
 
 	return isAbsolute ? this.GetAbsolutePage(this.Numbering.Page) : this.Numbering.Page;
 };
+/**
+ * Получаем рассчитанное значение для нумерованного списка
+ * @returns {number} -1 - либо списка нет у данного параграфа, либо данный параграф не был рассчитан
+ */
+Paragraph.prototype.GetNumberingCalculatedValue = function()
+{
+	return this.Numbering.GetCalculatedValue();
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

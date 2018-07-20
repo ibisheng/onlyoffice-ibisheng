@@ -1181,7 +1181,8 @@ function ParaNumbering()
 	this.Page  = 0;
 
 	this.Internal = {
-		NumInfo : undefined
+		NumInfo   : undefined,
+		CalcValue : -1
 	};
 }
 ParaNumbering.prototype = Object.create(CRunElementBase.prototype);
@@ -1194,7 +1195,8 @@ ParaNumbering.prototype.Draw = function(X,Y,Context, Numbering, TextPr, NumPr, T
 };
 ParaNumbering.prototype.Measure = function (Context, Numbering, NumInfo, TextPr, NumPr, Theme)
 {
-	this.Internal.NumInfo = NumInfo;
+	this.Internal.NumInfo   = NumInfo;
+	this.Internal.CalcValue = NumInfo && NumPr ? NumInfo[NumPr.Lvl] : -1;
 
 	this.Width        = 0;
 	this.Height       = 0;
@@ -1238,6 +1240,10 @@ ParaNumbering.prototype.Write_ToBinary = function(Writer)
 };
 ParaNumbering.prototype.Read_FromBinary = function(Reader)
 {
+};
+ParaNumbering.prototype.GetCalculatedValue = function()
+{
+	return this.Internal.CalcValue;
 };
 
 // TODO: Реализовать табы по точке и с чертой.
