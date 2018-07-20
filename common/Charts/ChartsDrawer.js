@@ -1898,7 +1898,7 @@ CChartsDrawer.prototype =
 
 	calculateSizePlotArea : function(chartSpace, bNotRecalculate)
 	{
-		if(!bNotRecalculate || undefined === this.calcProp.chartGutter._left) {
+		if(!bNotRecalculate || undefined === this.calcProp.chartGutter) {
 			this._calculateMarginsChart(chartSpace);
 		}
 
