@@ -6892,6 +6892,7 @@ function BinaryFileReader(doc, openParams)
         //надо сбросить то, что остался после открытия документа
 		var isWordCopyPaste = copyPasteObj ? copyPasteObj.wordCopyPaste : null;
 		var isExcelCopyPaste = copyPasteObj ? copyPasteObj.excelCopyPaste : null;
+		var isCopyPaste = isWordCopyPaste || isExcelCopyPaste;
 		var api = isWordCopyPaste ? this.Document.DrawingDocument.m_oWordControl.m_oApi : null;
 		var insertDocumentUrlsData = api ? api.insertDocumentUrlsData : null;
         pptx_content_loader.Clear();
@@ -7084,7 +7085,7 @@ function BinaryFileReader(doc, openParams)
         for (var i in oPastedImagesUnique)
             aPrepeareImages.push(i);
 			
-		if(!isWordCopyPaste && !isExcelCopyPaste)
+		if(!isCopyPaste)
 		{
 			this.Document.Content = this.oReadResult.DocumentContent;
 			
