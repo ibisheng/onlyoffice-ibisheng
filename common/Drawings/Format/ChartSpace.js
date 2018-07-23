@@ -1062,6 +1062,37 @@ function checkPointInMap(map, worksheet, row, col)
         this.extY = fMaxY - fMinY;
     };
 
+
+
+    CLabelsBox.prototype.setPosition = function(x, y)
+    {
+        this.x = x;
+        this.y = y;
+        for(var i = 0; i < this.aLabels.length; ++i)
+        {
+            if(this.aLabels[i])
+            {
+                var lbl = this.aLabels[i];
+                lbl.setPosition(lbl.relPosX + x, lbl.relPosY + y);
+            }
+        }
+    };
+
+
+    CLabelsBox.prototype.checkShapeChildTransform = function(t)
+    {
+        // this.transform = this.localTransform.CreateDublicate();
+        // global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
+        // this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+        for(var i = 0; i < this.aLabels.length; ++i)
+        {
+            if(this.aLabels[i])
+                this.aLabels[i].checkShapeChildTransform(t);
+        }
+    };
+
+
+
     function fCreateLabel(sText, idx, oParent, oChart, oTxPr, oSpPr, oDrawingDocument){
         var dlbl = new AscFormat.CDLbl();
         dlbl.parent = oParent;
