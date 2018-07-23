@@ -9137,6 +9137,7 @@
 				t.isChanged = true;
 				t.changeWorksheet("update", {reinitRanges: true});
 				t.objectRender.rebuildChartGraphicObjects(selectData);
+                t.objectRender.showDrawingObjectsEx(true);
 			}
 
 			var oSelection = History.GetSelection();
