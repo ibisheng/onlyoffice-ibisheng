@@ -10021,10 +10021,10 @@ CChartSpace.prototype.hitInTextRect = function()
                                 oLineMarker.localX = fCurPosX + distance_to_text;
                                 if(oLineMarker.pen){
                                     if(AscFormat.isRealNumber(oLineMarker.pen.w)){
-                                        fPenWidth = oLineMarker.pen.w/12700.0;
+                                        fPenWidth = oLineMarker.pen.w/36000.0;
                                     }
                                     else{
-                                        fPenWidth = 1.0;
+                                        fPenWidth = 12700.0/36000.0;
                                     }
                                 }
                                 else{
@@ -10108,10 +10108,10 @@ CChartSpace.prototype.hitInTextRect = function()
                                     oLineMarker.localX = fCurPosX + distance_to_text;
                                     if(oLineMarker.pen){
                                         if(AscFormat.isRealNumber(oLineMarker.pen.w)){
-                                            fPenWidth = oLineMarker.pen.w/12700.0;
+                                            fPenWidth = oLineMarker.pen.w/36000.0;
                                         }
                                         else{
-                                            fPenWidth = 1.0;
+                                            fPenWidth = 12700.0/36000.0;
                                         }
                                     }
                                     else{
