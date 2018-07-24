@@ -2468,6 +2468,7 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
 {
     if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0])
     {
+        this.chart.plotArea.removeCharts(1, this.chart.plotArea.charts.length - 1);
         var  asc_series = asc_chart.series;
         var chart_type = this.chart.plotArea.charts[0];
         var first_series = chart_type.series[0] ? chart_type.series[0] : chart_type.getSeriesConstructor();
