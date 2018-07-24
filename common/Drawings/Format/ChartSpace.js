@@ -10477,70 +10477,39 @@ CChartSpace.prototype.recalculatePenBrush = function()
             {
                 this.chart.plotArea.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
             }
-            if(this.chart.plotArea.valAx)
-            {
-                if(this.chart.plotArea.valAx.compiledTickMarkLn)
+            for(var t = 0; t < this.chart.plotArea.axId.length; ++t){
+                var oAxis = this.chart.plotArea.axId[t];
+                if(oAxis.compiledTickMarkLn)
                 {
-                    this.chart.plotArea.valAx.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    checkBlackUnifill(this.chart.plotArea.valAx.compiledTickMarkLn.Fill, true);
+                    oAxis.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                    checkBlackUnifill(oAxis.compiledTickMarkLn.Fill, true);
                 }
-                if(this.chart.plotArea.valAx.compiledMajorGridLines)
+                if(oAxis.compiledMajorGridLines)
                 {
-                    this.chart.plotArea.valAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    checkBlackUnifill(this.chart.plotArea.valAx.compiledMajorGridLines.Fill, true);
+                    oAxis.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                    checkBlackUnifill(oAxis.compiledMajorGridLines.Fill, true);
                 }
-                if(this.chart.plotArea.valAx.compiledMinorGridLines)
+                if(oAxis.compiledMinorGridLines)
                 {
-                    this.chart.plotArea.valAx.compiledMinorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    checkBlackUnifill(this.chart.plotArea.valAx.compiledMinorGridLines.Fill, true);
+                    oAxis.compiledMinorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                    checkBlackUnifill(oAxis.compiledMinorGridLines.Fill, true);
                 }
-                if(this.chart.plotArea.valAx.title)
+                if(oAxis.title)
                 {
-
-                    if(this.chart.plotArea.valAx.title.brush)
+                    if(oAxis.title.brush)
                     {
-                        this.chart.plotArea.valAx.title.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                        oAxis.title.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
                     }
-                    if(this.chart.plotArea.valAx.title.pen)
+                    if(oAxis.title.pen)
                     {
-                        this.chart.plotArea.valAx.title.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    }
-                }
-
-            }
-            if(this.chart.plotArea.catAx)
-            {
-                if(this.chart.plotArea.catAx.compiledTickMarkLn)
-                {
-                    this.chart.plotArea.catAx.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    checkBlackUnifill(this.chart.plotArea.catAx.compiledTickMarkLn.Fill, true);
-                }
-                if(this.chart.plotArea.catAx.compiledMajorGridLines)
-                {
-                    this.chart.plotArea.catAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    checkBlackUnifill(this.chart.plotArea.catAx.compiledMajorGridLines.Fill, true);
-                }
-                if(this.chart.plotArea.catAx.compiledMinorGridLines)
-                {
-                    this.chart.plotArea.catAx.compiledMinorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    checkBlackUnifill(this.chart.plotArea.catAx.compiledMinorGridLines.Fill, true);
-                }
-                if(this.chart.plotArea.catAx.title)
-                {
-                    if(this.chart.plotArea.catAx.title.brush)
-                    {
-                        this.chart.plotArea.catAx.title.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
-                    }
-                    if(this.chart.plotArea.catAx.title.pen)
-                    {
-                        this.chart.plotArea.catAx.title.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                        oAxis.title.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
                     }
                 }
             }
 
-            if(this.chart.plotArea.charts[0])
-            {
-                var series = this.chart.plotArea.charts[0].series;
+            for(t = 0; t < this.chart.plotArea.charts.length; ++t){
+                var oChart = this.chart.plotArea.charts[t];
+                var series = oChart.series;
                 for(var i = 0; i < series.length; ++i)
                 {
                     var pts = AscFormat.getPtsFromSeries(series[i]);
@@ -10581,27 +10550,27 @@ CChartSpace.prototype.recalculatePenBrush = function()
                         }
                     }
                 }
-                if(this.chart.plotArea.charts[0].calculatedHiLowLines)
+                if(oChart.calculatedHiLowLines)
                 {
-                    this.chart.plotArea.charts[0].calculatedHiLowLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                    oChart.calculatedHiLowLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
                 }
-                if( this.chart.plotArea.charts[0].upDownBars)
+                if(oChart.upDownBars)
                 {
-                    if(this.chart.plotArea.charts[0].upDownBars.upBarsBrush)
+                    if(oChart.upDownBars.upBarsBrush)
                     {
-                        this.chart.plotArea.charts[0].upDownBars.upBarsBrush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                        oChart.upDownBars.upBarsBrush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
                     }
-                    if(this.chart.plotArea.charts[0].upDownBars.upBarsPen)
+                    if(oChart.upDownBars.upBarsPen)
                     {
-                        this.chart.plotArea.charts[0].upDownBars.upBarsPen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                        oChart.upDownBars.upBarsPen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
                     }
-                    if(this.chart.plotArea.charts[0].upDownBars.downBarsBrush)
+                    if(oChart.upDownBars.downBarsBrush)
                     {
-                        this.chart.plotArea.charts[0].upDownBars.downBarsBrush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                        oChart.upDownBars.downBarsBrush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
                     }
-                    if(this.chart.plotArea.charts[0].upDownBars.downBarsPen)
+                    if(oChart.upDownBars.downBarsPen)
                     {
-                        this.chart.plotArea.charts[0].upDownBars.downBarsPen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
+                        oChart.upDownBars.downBarsPen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA, this.clrMapOvr);
                     }
                 }
             }
