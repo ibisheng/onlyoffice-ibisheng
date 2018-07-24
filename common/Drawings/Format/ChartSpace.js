@@ -9741,6 +9741,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             content_width = 0.01;
                         var cur_content_width, max_content_width = 0;
                         var arr_heights = [];
+                        var arr_heights2 = [];
                         for(i = 0; i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
@@ -9748,6 +9749,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             if(cur_content_width > max_content_width)
                                 max_content_width = cur_content_width;
                             arr_heights.push(calc_entry.txBody.getSummaryHeight());
+                            arr_heights2.push(calc_entry.txBody.getSummaryHeight3());
                         }
                         if(max_content_width < max_legend_width - left_inset)
                         {
@@ -9761,11 +9763,16 @@ CChartSpace.prototype.hitInTextRect = function()
                         var max_entry_height2 = Math.max(0, Math.max.apply(Math, arr_heights));
                         for(i = 0; i < arr_heights.length; ++i)
                             arr_heights[i] = max_entry_height2;
+                        var max_entry_height2 = Math.max(0, Math.max.apply(Math, arr_heights2));
+                        for(i = 0; i < arr_heights2.length; ++i)
+                            arr_heights2[i] = max_entry_height2;
 
                         var height_summ = 0;
-                        for(i = 0;  i < arr_heights.length; ++i)
+                        var height_summ2 = 0;
+                        for(i = 0;  i < arr_heights2.length; ++i)
                         {
-                            height_summ+=arr_heights[i];
+                            height_summ+=arr_heights2[i];
+                            height_summ2+=arr_heights[i];
                             if(height_summ > max_legend_height)
                             {
                                 cut_index = i;
@@ -9776,7 +9783,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         {
                             if(cut_index > 0)
                             {
-                                legend_height = height_summ - arr_heights[cut_index];
+                                legend_height = height_summ2 - arr_heights[cut_index];
                             }
                             else
                             {
@@ -9825,6 +9832,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             content_width = 0.01;
                         var cur_content_width, max_content_width = 0;
                         var arr_heights = [];
+                        var arr_heights2 = [];
                         for(i = 0; i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
@@ -9832,6 +9840,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             if(cur_content_width > max_content_width)
                                 max_content_width = cur_content_width;
                             arr_heights.push(calc_entry.txBody.getSummaryHeight());
+                            arr_heights2.push(calc_entry.txBody.getSummaryHeight3());
                         }
 
 
@@ -9851,6 +9860,9 @@ CChartSpace.prototype.hitInTextRect = function()
                         var max_entry_height2 = Math.max(0, Math.max.apply(Math, arr_heights));
                         for(i = 0; i < arr_heights.length; ++i)
                             arr_heights[i] = max_entry_height2;
+                        var max_entry_height2 = Math.max(0, Math.max.apply(Math, arr_heights2));
+                        for(i = 0; i < arr_heights2.length; ++i)
+                            arr_heights2[i] = max_entry_height2;
                         if(max_content_width < max_legend_width - left_inset)
                         {
                             legend_width = max_content_width + left_inset;
@@ -9862,7 +9874,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         var height_summ = 0;
                         for(i = 0;  i < arr_heights.length; ++i)
                         {
-                            height_summ+=arr_heights[i];
+                            height_summ+=arr_heights2[i];
                             if(height_summ > max_legend_height)
                             {
                                 cut_index = i;
@@ -9975,8 +9987,10 @@ CChartSpace.prototype.hitInTextRect = function()
                     var fCurEntryWidth, oCurEntry;
                     var fLegendWidth, fLegendHeight;
                     var aHeights = [];
+                    var aHeights2 = [];
                     var fMaxEntryHeight = 0.0;
                     var fCurEntryHeight = 0.0;
+                    var fCurEntryHeight2 = 0.0;
                     var aWidths = [];
                     var fCurPosX;
                     var fCurPosY;
@@ -9992,9 +10006,11 @@ CChartSpace.prototype.hitInTextRect = function()
                             fMaxEntryWidth = fCurEntryWidth;
                         }
                         fCurEntryHeight = oCurEntry.txBody.getSummaryHeight();
+                        fCurEntryHeight2 = oCurEntry.txBody.getSummaryHeight3();
                         aHeights.push(fCurEntryHeight);
-                        if(fMaxEntryHeight < fCurEntryHeight){
-                            fMaxEntryHeight = fCurEntryHeight;
+                        aHeights2.push(fCurEntryHeight2);
+                        if(fMaxEntryHeight < fCurEntryHeight2){
+                            fMaxEntryHeight = fCurEntryHeight2;
                         }
                         fSummWidth += fCurEntryWidth;
                     }
@@ -10005,7 +10021,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         }
                         else{
                             fLegendWidth = fSummWidth;
-                            fLegendHeight = fMaxEntryHeight;
+                            fLegendHeight = Math.max.apply(Math, aHeights);
                         }
                         fDistanceBetweenLabels = (fLegendWidth - fSummWidth)/(calc_entryes.length + 1);
                         fCurPosX = 0.0;
@@ -10066,9 +10082,11 @@ CChartSpace.prototype.hitInTextRect = function()
                                     fMaxEntryWidth = fCurEntryWidth;
                                 }
                                 fCurEntryHeight = oCurEntry.txBody.getSummaryHeight();
+                                fCurEntryHeight2 = oCurEntry.txBody.getSummaryHeight3();
                                 aHeights.push(fCurEntryHeight);
-                                if(fMaxEntryHeight < fCurEntryHeight){
-                                    fMaxEntryHeight = fCurEntryHeight;
+                                aHeights2.push(fCurEntryHeight2);
+                                if(fMaxEntryHeight < fCurEntryHeight2){
+                                    fMaxEntryHeight = fCurEntryHeight2;
                                 }
                                 fSummWidth += fCurEntryWidth;
                             }
@@ -10080,8 +10098,9 @@ CChartSpace.prototype.hitInTextRect = function()
                             calc_entryes.splice(nMaxEntriesCount, calc_entryes.length - nMaxEntriesCount);
                             aWidths.splice(nMaxEntriesCount, aWidths.length - nMaxEntriesCount);
                             aHeights.splice(nMaxEntriesCount, aHeights.length - nMaxEntriesCount);
+                            aHeights2.splice(nMaxEntriesCount, aHeights2.length - nMaxEntriesCount);
                             fMaxEntryWidth =  distance_to_text + fMarkerWidth + distance_to_text + Math.max.apply(Math, aWidths);
-                            fMaxEntryHeight = Math.max.apply(Math, aHeights);
+                            fMaxEntryHeight = Math.max.apply(Math, aHeights2);
                         }
                         var nRowsCount = Math.ceil(calc_entryes.length / nColsCount);
                         if(bFixedSize){
@@ -10090,10 +10109,10 @@ CChartSpace.prototype.hitInTextRect = function()
                         }
                         else{
                             fLegendWidth = fMaxEntryWidth*nColsCount;
-                            fLegendHeight = nRowsCount*fMaxEntryHeight;
+                            fLegendHeight = nRowsCount* Math.max.apply(Math, aHeights);
                         }
                         fDistanceBetweenLabels = (fLegendWidth - nColsCount*fMaxEntryWidth)/nColsCount;
-                        fVertDistanceBetweenLabels = (fLegendHeight - nRowsCount*fMaxEntryHeight)/nRowsCount;
+                        fVertDistanceBetweenLabels = (fLegendHeight - nRowsCount* Math.max.apply(Math, aHeights))/nRowsCount;
                         legend.extX = fLegendWidth;
                         legend.extY = fLegendHeight;
                         fCurPosY = fVertDistanceBetweenLabels/2.0;
@@ -10118,23 +10137,23 @@ CChartSpace.prototype.hitInTextRect = function()
                                     else{
                                         fPenWidth = 0.0;
                                     }
-                                    oLineMarker.localY = Math.max(0.0, fCurPosY + fMaxEntryHeight/2.0 - fPenWidth/2.0);
+                                    oLineMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - fPenWidth/2.0);
                                     if(oMarker){
                                         oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
-                                        oMarker.localY = Math.max(0.0, fCurPosY + fMaxEntryHeight/2.0 - marker_size/2.0);
+                                        oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - marker_size/2.0);
                                     }
                                 }
                                 else{
                                     if(oMarker){
                                         oMarker.localX = fCurPosX + distance_to_text;
-                                        oMarker.localY = Math.max(0.0, fCurPosY + fMaxEntryHeight/2.0  - marker_size/2.0);
+                                        oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0  - marker_size/2.0);
                                     }
                                 }
                                 oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
-                                oCurEntry.localY = Math.max(0, fCurPosY + fMaxEntryHeight/2.0 - aHeights[nEntryIndex]/2.0);
+                                oCurEntry.localY = Math.max(0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - aHeights[nEntryIndex]/2.0);
                                 fCurPosX += (fMaxEntryWidth + fDistanceBetweenLabels);
                             }
-                            fCurPosY += (fMaxEntryHeight + fVertDistanceBetweenLabels);
+                            fCurPosY += (Math.max.apply(Math, aHeights) + fVertDistanceBetweenLabels);
                         }
                         legend.setPosition(0, 0);
                     }

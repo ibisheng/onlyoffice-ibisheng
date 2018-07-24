@@ -73,6 +73,21 @@
         }
         return fSummHeight;
     };
+
+    CDrawingDocContent.prototype.GetSummaryHeight_ =function () {
+        var dHeight = 0.0;
+        for(var i = 0; i < this.Content.length; ++i){
+            var oElement = this.Content[i];
+            if(oElement.GetType() === type_Paragraph){
+                for(var j = 0; j < oElement.Lines.length; ++j){
+                    var oLine = oElement.Lines[j];
+                    dHeight += (oLine.Bottom - oLine.Top - oLine.Metrics.Descent);
+                }
+            }
+        }
+        return dHeight;
+    };
+
     CDrawingDocContent.prototype.Get_ColumnsCount = function(){
         var nColumnCount = 1;
         if(this.Parent.getBodyPr){

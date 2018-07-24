@@ -523,6 +523,14 @@ CTextBody.prototype =
         return this.content2 ? this.content2.GetSummaryHeight() : 0;
     },
 
+    getSummaryHeight3: function()
+    {
+        if(this.content && this.content.GetSummaryHeight_){
+            return this.content.GetSummaryHeight_();
+        }
+        return 0;
+    },
+
     getCompiledBodyPr: function()
     {
         this.recalculateBodyPr();
