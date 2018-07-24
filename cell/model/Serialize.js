@@ -6856,7 +6856,9 @@
 			}
 			if (curFormula) {
 				cell.setFormulaInternal(curFormula.parsed);
-				if (curFormula.parsed.ca || cell.isNullTextString()) {
+				//TODO в версии 5.1.5 при открытии ячейки с формулой и пустым текстом попадали в changedCell по условию !cell.getValueWithoutFormat()
+				//TODO добавляю данное условие для правки бага. до выпуска обязательно пересмотреть!!!
+				if (curFormula.parsed.ca || cell.isNullTextString() || !cell.getValueWithoutFormat()) {
 					tmp.ws.workbook.dependencyFormulas.addToChangedCell(cell);
 				}
 			}
