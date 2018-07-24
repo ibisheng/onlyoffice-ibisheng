@@ -111,6 +111,8 @@ function CChartsDrawer()
 	this.floor3DChart = null;
 	this.sideWall3DChart = null;
 	this.backWall3DChart = null;
+
+	this.changeAxisMap = null;
 }
 
 CChartsDrawer.prototype =
@@ -1246,13 +1248,89 @@ CChartsDrawer.prototype =
 			}
 
 			for(var j = 0; j < charts[i].axId.length; j++) {
-				if(id === charts[i].axId[j].axId) {
+				if(id === this._searchChangedAxisId(charts[i].axId[j].axId)) {
 					res.push(charts[i]);
 					break;
 				}
 			}
 		}
 		return res;
+	},
+
+	_searchChangedAxisId: function(id) {
+		var res = id;
+
+		if(this.changeAxisMap && this.changeAxisMap[id]) {
+			res = this.changeAxisMap[id];
+		}
+
+		return res;
+	},
+
+	_searchChangedAxis: function(axis) {
+		var res = axis;
+
+		if(this.changeAxisMap && axis.axId && this.changeAxisMap[axis.axId]) {
+			var newId = this.changeAxisMap[axis.axId];
+			var newAxis = this._searchAxisById(newId);
+			if(null !== newAxis) {
+				res = newAxis;
+			}
+		}
+
+		return res;
+	},
+
+	_searchAxisById: function(id, chartSpace) {
+		var res = null;
+		chartSpace = chartSpace || this.cChartSpace;
+		if(chartSpace) {
+			var axId = chartSpace.chart.plotArea.axId;
+			for(var i = 0; i < axId.length; i++) {
+				if(id === axId[i].axId) {
+					res = axId[i];
+					break;
+				}
+			}
+		}
+
+		return res;
+	},
+	
+	_calculateChangeAxisMap: function (chartSpace) {
+		//ms рисует по-разному диаграммы со скрытымми/не скрытыми осями
+		//если ось скрыта - ищем замену среди основных открытых
+		this.changeAxisMap = {};
+		var axId = chartSpace.chart.plotArea.axId;
+
+		var searchNeedAxis = function(excludeAxis) {
+			var res = null;
+
+			var needPos = excludeAxis.axPos === window['AscFormat'].AX_POS_L || excludeAxis.axPos === window['AscFormat'].AX_POS_R;
+			for (var j = 0; j < axId.length; j++) {
+				var curAxis = axId[j];
+				var curPos = curAxis.axPos === window['AscFormat'].AX_POS_L || curAxis.axPos === window['AscFormat'].AX_POS_R;
+				if(excludeAxis.axId !== axId[j].axId && needPos === curPos) {
+					if(excludeAxis.getObjectType() === curAxis.getObjectType()) {
+						res = curAxis;
+						break;
+					}
+				}
+			}
+
+			return res;
+		};
+
+		if(axId) {
+			for (var i = 0; i < axId.length; i++) {
+				if(axId[i].bDelete && AscDFH.historyitem_type_ValAx === axId[i].getObjectType()) {
+					var needAxis = searchNeedAxis(axId[i]);
+					if(needAxis) {
+						this.changeAxisMap[axId[i].axId] = needAxis.axId;
+					}
+				}
+			}
+		}
 	},
 
 	_calculateData2: function(chart, grouping, axis)
@@ -1800,6 +1878,7 @@ CChartsDrawer.prototype =
 
 	//****functions for UP Functions****
 	preCalculateData: function (chartSpace) {
+		this._calculateChangeAxisMap(chartSpace);
 		this.cChartSpace = chartSpace;
 		this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 
@@ -3778,7 +3857,7 @@ CChartsDrawer.prototype =
 		var res = null;
 		for(var i = 0; i < axId.length; i++) {
 			if(axId[i].getObjectType() === type) {
-				res = axId[i];
+				res = this._searchChangedAxis(axId[i]);
 				break;
 			}
 		}
@@ -9875,7 +9954,9 @@ drawScatterChart.prototype = {
 		this.paths = {};
 
 		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.catAx = this.cChartDrawer._searchChangedAxis(this.catAx);
 		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.valAx = this.cChartDrawer._searchChangedAxis(this.valAx);
 
 		this._recalculateScatter();
 	},
@@ -10216,7 +10297,9 @@ drawStockChart.prototype = {
 		this.paths = {};
 
 		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.catAx = this.cChartDrawer._searchChangedAxis(this.catAx);
 		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.valAx = this.cChartDrawer._searchChangedAxis(this.valAx);
 
 		this._calculateLines();
 	},
@@ -10435,7 +10518,9 @@ drawBubbleChart.prototype = {
 		this.paths = {};
 
 		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.catAx = this.cChartDrawer._searchChangedAxis(this.catAx);
 		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.valAx = this.cChartDrawer._searchChangedAxis(this.valAx);
 
 		this._recalculateScatter();
 	},
