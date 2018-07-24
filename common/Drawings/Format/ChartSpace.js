@@ -11306,11 +11306,55 @@ CChartSpace.prototype.recalculateSeriesColors = function()
             if(oChart.varyColors
                 && (series.length === 1 || oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart))
             {
+                var base_fills2 = getArrayFillsFromBase(style.fill2, getMaxIdx(series));
                 for(var ii = 0; ii < series.length; ++ ii)
                 {
                     var ser = series[ii];
                     var pts = AscFormat.getPtsFromSeries(ser);
                     this.ptsCount += pts.length;
+
+                    ser.compiledSeriesBrush = new AscFormat.CUniFill();
+                    ser.compiledSeriesBrush.merge(base_fills2[ser.idx]);
+                    if(ser.spPr && ser.spPr.Fill)
+                    {
+                        ser.compiledSeriesBrush.merge(ser.spPr.Fill);
+                    }
+
+
+                    ser.compiledSeriesPen =  new AscFormat.CLn();
+                    if(style.line1 === EFFECT_NONE)
+                    {
+                        ser.compiledSeriesPen.w = 0;
+                    }
+                    else if(style.line1 === EFFECT_SUBTLE)
+                    {
+                        ser.compiledSeriesPen.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
+                    }
+                    else if(style.line1 === EFFECT_MODERATE)
+                    {
+                        ser.compiledSeriesPen.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[1]);
+                    }
+                    else if(style.line1 === EFFECT_INTENSE)
+                    {
+                        ser.compiledSeriesPen.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[2]);
+                    }
+                    var base_line_fills2;
+                    if(this.style === 34)
+                        base_line_fills2 = getArrayFillsFromBase(style.line2, getMaxIdx(series));
+
+                    ser.compiledSeriesPen.Fill = new AscFormat.CUniFill();
+                    if(this.style !== 34)
+                    {
+                        ser.compiledSeriesPen.Fill.merge(style.line2[0]);
+                    }
+                    else
+                    {
+                        ser.compiledSeriesPen.Fill.merge(base_line_fills[ser.idx]);
+                    }
+                    if(ser.spPr && ser.spPr.ln)
+                        ser.compiledSeriesPen.merge(ser.spPr.ln);
+
+
                     if(!(oChart.getObjectType() === AscDFH.historyitem_type_LineChart || oChart.getObjectType() === AscDFH.historyitem_type_ScatterChart))
                     {
                         var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
