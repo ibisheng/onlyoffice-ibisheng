@@ -2796,6 +2796,49 @@ $( function () {
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 43010);
 
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),1,{\"5-1-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43222);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),2,{\"5-1-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43224);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),3,{\"5-1-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43227);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),1,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43224);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),3,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43228);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),1,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43220);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),2,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43224);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),3,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43227);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),-1,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43217);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),-2,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43216);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),0,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43219);
 	});
 
 	test( "Test: \"WORKDAY.INTL\"", function () {

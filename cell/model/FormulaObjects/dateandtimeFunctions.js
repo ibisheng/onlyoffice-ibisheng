@@ -465,10 +465,10 @@
 	function _includeInHolidays(date, holidays) {
 		for (var i = 0; i < holidays.length; i++) {
 			if (date.getTime() == holidays[i].getTime()) {
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	function weekNumber(dt, iso, type) {
@@ -1374,7 +1374,7 @@
 			for (var i = 0; i < difAbs; i++) {
 				var date = new cDate(start);
 				date.setUTCDate(start.getUTCDate() + i);
-				if (date.getUTCDay() !== 6 && date.getUTCDay() !== 0 && _includeInHolidays(date, holidays)) {
+				if (date.getUTCDay() !== 6 && date.getUTCDay() !== 0 && !_includeInHolidays(date, holidays)) {
 					count++;
 				}
 			}
@@ -1452,7 +1452,7 @@
 			for (var i = 0; i < difAbs; i++) {
 				var date = new cDate(start);
 				date.setUTCDate(start.getUTCDate() + i);
-				if (_includeInHolidays(date, holidays) && !weekends[date.getUTCDay()]) {
+				if (!_includeInHolidays(date, holidays) && !weekends[date.getUTCDay()]) {
 					count++;
 				}
 			}
@@ -1875,54 +1875,29 @@
 			return holidays;
 		}
 
-		var calcDate = function () {
-			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
+		var calcDate = function (startdate, workdaysCount, holidays) {
+			var diff = Math.sign(workdaysCount);
+			var daysCounter = 0;
+			var currentDate = new cDate(startdate);
 
-			if (1 === Math.abs(dif)) {
-				//если данный день выходной
-				//если далее выходные
-				date = new cDate(val0.getTime() + dif1 * c_msPerDay);
-				while(date.getUTCDay() === 6 || date.getUTCDay() === 0 || !_includeInHolidays(date, holidays)){
-					dif >= 0 ? dif1++ : dif1--;
-					date = new cDate(val0.getTime() + dif1 * c_msPerDay);
-				}
-			}else{
-				while (Math.abs(dif) > count) {
-					date = new cDate(val0.getTime() + dif1 * c_msPerDay);
-					if (date.getUTCDay() !== 6 && date.getUTCDay() !== 0 && _includeInHolidays(date, holidays)) {
-						count++;
-					}
-					dif >= 0 ? dif1++ : dif1--;
-
-					//если последняя итерация
-					if (!(Math.abs(dif) > count)) {
-						//проверяем не оказалось ли следом выходных. если оказались - прибавляем
-						date = new cDate(val0.getTime() + dif1 * c_msPerDay);
-						if (date.getUTCDay() === 6 && dif > 0) {
-							dif1 += 2;
-						} else if (date.getUTCDay() === 0 && dif > 0) {
-							dif1 += 1;
-						} else if (date.getUTCDay() === 6 && dif < 0) {
-							dif1 -= 1;
-						} else if (date.getUTCDay() === 0 && dif < 0) {
-							dif1 -= 2;
-						}
-					}
+			while (daysCounter !== workdaysCount) {
+				currentDate = new cDate(currentDate.getTime() + diff * c_msPerDay);
+				if (currentDate.getUTCDay() !== 0 && currentDate.getUTCDay() !== 6 && !_includeInHolidays(currentDate, holidays)) {
+					daysCounter += diff;
 				}
 			}
 
-			date = new cDate(val0.getTime() + dif1 * c_msPerDay);
-			val = date.getExcelDate();
-
-			if (val < 0) {
-				return new cError(cErrorType.not_numeric);
-			}
-
-			return t.setCalcValue(new cNumber(val), 14);
+			return currentDate;
 		};
 
+		var date = calcDate(val0, arg1.getValue(), holidays);
+		var val = date.getExcelDate();
 
-		return calcDate();
+		if (val < 0) {
+			return new cError(cErrorType.not_numeric);
+		}
+
+		return t.setCalcValue(new cNumber(val), 14);
 	};
 
 	/**
@@ -1980,7 +1955,7 @@
 			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
 			while (Math.abs(dif) > count) {
 				date = new cDate(val0.getTime() + dif1 * c_msPerDay);
-				if (_includeInHolidays(date, holidays) && !weekends[date.getUTCDay()]) {
+				if (!_includeInHolidays(date, holidays) && !weekends[date.getUTCDay()]) {
 					count++;
 				}
 				dif >= 0 ? dif1++ : dif1--;
