@@ -11129,7 +11129,8 @@ CChartSpace.prototype.recalculateAxisTickMark = function()
             axis.compiledTickMarkLn = axis.compiledLn.createDuplicate();
             if(AscFormat.isRealNumber(axis.compiledTickMarkLn.w))
                 axis.compiledTickMarkLn.w/=2;
-            axis.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, oThis.clrMapOvr)
+            axis.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, oThis.clrMapOvr);
+            checkBlackUnifill(axis.compiledTickMarkLn.Fill, true);
         };
         var default_style = CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.style);
         var parent_objects = this.getParentObjects();
