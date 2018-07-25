@@ -767,8 +767,6 @@ var editor;
     if (actionType) {
       this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
     }
-    // Меняем тип состояния (на сохранение)
-    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
     var isNoBase64 = typeof ArrayBuffer !== 'undefined';
     //sFormat: xlsx, xls, ods, csv, html
     var dataContainer = {data: null, part: null, index: 0, count: 0};
@@ -808,6 +806,8 @@ var editor;
       }
       dataContainer.data = oBinaryFileWriter.Write(isNoBase64);
     }
+    // Меняем тип состояния (на сохранение)
+    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
     var fCallback = function(input) {
       var error = c_oAscError.ID.Unknown;
       if (null != input && command == input["type"]) {
