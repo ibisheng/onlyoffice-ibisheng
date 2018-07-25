@@ -793,7 +793,7 @@ var editor;
       }
       var cp = {'delimiter': AscCommon.c_oAscCsvDelimiter.Comma, 'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
       this.downloadType = options.downloadType;
-      this.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
+      this.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), c_oAscAdvancedOptionsAction.Save);
       return;
     } else {
       var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
