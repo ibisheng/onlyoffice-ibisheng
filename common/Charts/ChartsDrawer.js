@@ -4940,7 +4940,7 @@ drawLineChart.prototype = {
 						x3 = points[i][n + 2] ? n + 2 : points[i][n + 1] ? n + 1 : n;
 						y3 = this._getYVal(x3, i);
 
-						this.paths.series[i][n] = this._calculateSplineLine(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints);
+						this.paths.series[i][n] = this._calculateSplineLine(x + 1, y, x1 + 1, y1, x2 + 1, y2, x3 + 1, y3);
 					} else {
 						this.paths.series[i][n] = this._calculateLine(points[i][n].x, points[i][n].y, points[i][n + 1].x, points[i][n + 1].y);
 					}
@@ -5126,7 +5126,7 @@ drawLineChart.prototype = {
 		return pathId;
 	},
 
-	_calculateSplineLine: function (x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints) {
+	_calculateSplineLine: function (x, y, x1, y1, x2, y2, x3, y3) {
 		var pathId = this.cChartSpace.AllocPath();
 		var path = this.cChartSpace.GetPath(pathId);
 
@@ -9999,7 +9999,8 @@ drawScatterChart.prototype = {
 					}
 				} else {
 					//xVal = betweenAxisCross ? n : n + 1;
-					xVal = this.catAx instanceof AscFormat.CCatAx ? n : n + 1;
+					//xVal = this.catAx instanceof AscFormat.CCatAx ? n : n + 1;
+					xVal = n + 1;
 				}
 
 
