@@ -3886,6 +3886,42 @@ CChartsDrawer.prototype =
 		}
 
 		return res;
+	},
+
+	calculateSplineLine: function (x, y, x1, y1, x2, y2, x3, y3, catAx, valAx) {
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
+		var pathH = this.calcProp.pathH;
+		var pathW = this.calcProp.pathW;
+
+		var startCoords;
+		var endCoords;
+
+		for (var i = 0; i <= 1;) {
+			var splineCoords = this.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+
+			if (i === 0) {
+				startCoords = {
+					x: this.getYPosition(splineCoords[0], catAx),
+					y: this.getYPosition(splineCoords[1], valAx)
+				};
+			}
+
+			endCoords = {
+				x: this.getYPosition(splineCoords[0], catAx),
+				y: this.getYPosition(splineCoords[1], valAx)
+			};
+
+			if (i === 0) {
+				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
+			}
+			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
+
+			i = i + 0.1;
+		}
+
+		return pathId;
 	}
 };
 
@@ -4940,7 +4976,7 @@ drawLineChart.prototype = {
 						x3 = points[i][n + 2] ? n + 2 : points[i][n + 1] ? n + 1 : n;
 						y3 = this._getYVal(x3, i);
 
-						this.paths.series[i][n] = this._calculateSplineLine(x + 1, y, x1 + 1, y1, x2 + 1, y2, x3 + 1, y3);
+						this.paths.series[i][n] = this.cChartDrawer.calculateSplineLine(x + 1, y, x1 + 1, y1, x2 + 1, y2, x3 + 1, y3, this.catAx, this.valAx);
 					} else {
 						this.paths.series[i][n] = this._calculateLine(points[i][n].x, points[i][n].y, points[i][n + 1].x, points[i][n + 1].y);
 					}
@@ -5122,42 +5158,6 @@ drawLineChart.prototype = {
 
 		path.moveTo(x * pathW, y * pathH);
 		path.cubicBezTo(x1 * pathW, y1 * pathH, x2 * pathW, y2 * pathH, x3 * pathW, y3 * pathH);
-
-		return pathId;
-	},
-
-	_calculateSplineLine: function (x, y, x1, y1, x2, y2, x3, y3) {
-		var pathId = this.cChartSpace.AllocPath();
-		var path = this.cChartSpace.GetPath(pathId);
-
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-
-		var startCoords;
-		var endCoords;
-
-		for (var i = 0; i <= 1;) {
-			var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
-
-			if (i === 0) {
-				startCoords = {
-					x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
-					y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
-				};
-			}
-
-			endCoords = {
-				x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
-				y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
-			};
-
-			if (i === 0) {
-				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
-			}
-			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
-
-			i = i + 0.1;
-		}
 
 		return pathId;
 	},
@@ -10059,7 +10059,20 @@ drawScatterChart.prototype = {
 
 				if (points[i][n] != null && points[i][n + 1] != null) {
 					if (isSplineLine) {
-						this.paths.series[i][n] = this._calculateSplineLine(points[i], n, xPoints, yPoints);
+
+						var x = points[i][n - 1] ? points[i][n - 1].x : points[i][n].x;
+						var y = points[i][n - 1] ? points[i][n - 1].y : points[i][n].y;
+
+						var x1 = points[i][n].x;
+						var y1 = points[i][n].y;
+
+						var x2 = points[i][n + 1] ? points[i][n + 1].x : points[i][n].x;
+						var y2 = points[i][n + 1] ? points[i][n + 1].y : points[i][n].y;
+
+						var x3 = points[i][n + 2] ? points[i][n + 2].x : points[i][n + 1] ? points[i][n + 1].x : points[i][n].x;
+						var y3 = points[i][n + 2] ? points[i][n + 2].y : points[i][n + 1] ? points[i][n + 1].y : points[i][n].y;
+
+						this.paths.series[i][n] = this.cChartDrawer.calculateSplineLine(x, y, x1, y1, x2, y2, x3, y3, this.catAx, this.valAx);
 					} else {
 						x = this.cChartDrawer.getYPosition(points[i][n].x, this.catAx);
 						y = this.cChartDrawer.getYPosition(points[i][n].y, this.valAx);
@@ -10220,54 +10233,6 @@ drawScatterChart.prototype = {
 		path.moveTo(x * pathW, y * pathH);
 		path.cubicBezTo(x1 * pathW, y1 * pathH, x2 * pathW, y2 * pathH, x3 * pathW, y3 * pathH);
 
-
-		return pathId;
-	},
-
-	_calculateSplineLine: function (points, k, xPoints, yPoints) {
-		var pathId = this.cChartSpace.AllocPath();
-		var path = this.cChartSpace.GetPath(pathId);
-
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-
-		var x = points[k - 1] ? points[k - 1].x : points[k].x;
-		var y = points[k - 1] ? points[k - 1].y : points[k].y;
-
-		var x1 = points[k].x;
-		var y1 = points[k].y;
-
-		var x2 = points[k + 1] ? points[k + 1].x : points[k].x;
-		var y2 = points[k + 1] ? points[k + 1].y : points[k].y;
-
-		var x3 = points[k + 2] ? points[k + 2].x : points[k + 1] ? points[k + 1].x : points[k].x;
-		var y3 = points[k + 2] ? points[k + 2].y : points[k + 1] ? points[k + 1].y : points[k].y;
-
-		var startCoords;
-		var endCoords;
-
-		for (var i = 0; i <= 1;) {
-			var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
-
-			if (i === 0) {
-				startCoords = {
-					x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
-					y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
-				};
-			}
-
-			endCoords = {
-				x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
-				y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
-			};
-
-			if (i === 0) {
-				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
-			}
-			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
-
-			i = i + 0.1;
-		}
 
 		return pathId;
 	}
