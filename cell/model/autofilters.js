@@ -4073,7 +4073,7 @@
 					var val = window["Asc"].trim(cell.getValueWithoutFormat());
 					var textLowerCase = text.toLowerCase();
 
-					isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+					isDateTimeFormat = cell.getNumFormat().isDateTimeFormat() && cell.getType() === window["AscCommon"].CellValueType.Number;
 
 					if (isDateTimeFormat) {
 						dataValue = AscCommon.NumFormat.prototype.parseDate(val);
