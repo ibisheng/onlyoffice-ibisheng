@@ -287,7 +287,12 @@ CChartsDrawer.prototype =
 		this.areaChart.draw(this);
 
 
-		var drawCharts = function() {
+		var drawCharts = function(bBeforeAxes) {
+			//рисуем 3d диаграммы только до отрисовки сетки
+			if(!bBeforeAxes && t.nDimensionCount === 3) {
+				return;
+			}
+
 			//TODO в дальнейшем нужно вместо массива формировать map с id модели
 			for(var i in t.charts) {
 				var chartModel = t._getChartModelById(chartSpace.chart.plotArea, i);
@@ -296,8 +301,14 @@ CChartsDrawer.prototype =
 				}
 
 				var type = chartModel.getObjectType();
+				var isLinesChart = type === AscDFH.historyitem_type_LineChart || type === AscDFH.historyitem_type_ScatterChart;
+				//рисуем линейные диаграммы после отрисовки сетки
+				if((isLinesChart && bBeforeAxes) || (!isLinesChart && !bBeforeAxes)) {
+					continue;
+				} 
+
 				var bIsNoSmartAttack = false;
-				if(t.nDimensionCount === 3 || type === AscDFH.historyitem_type_LineChart || type === AscDFH.historyitem_type_ScatterChart) {
+				if(t.nDimensionCount === 3 || isLinesChart) {
 					bIsNoSmartAttack = true;
 				}
 
@@ -333,9 +344,8 @@ CChartsDrawer.prototype =
 			}
 
 			//DRAW 3D CHARTS
-			if (this.nDimensionCount === 3) {
-				drawCharts();
-			}
+			//рисуем оси поверх 3d-диаграмм и линейных/точечных
+			drawCharts(true);
 
 			for(var i = 0; i < this.catAxisChart.length; i++) {
 				this.catAxisChart[i].draw(this);
@@ -348,9 +358,7 @@ CChartsDrawer.prototype =
 			}
 
 			//DRAW CHARTS
-			if (this.nDimensionCount !== 3) {
-				drawCharts();
-			}
+			drawCharts();
 		}
 	},
 
