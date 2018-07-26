@@ -573,7 +573,7 @@ var editor;
    exp:	asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new Asc.asc_CCSVAdvancedOptions(1200, c_oAscCsvDelimiter.Comma) );
    */
   spreadsheet_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
-
+    var v;
     if (AscCommon.EncryptionWorker.asc_setAdvancedOptions(this, idOption, option))
       return;
 
@@ -581,7 +581,7 @@ var editor;
       case c_oAscAdvancedOptionsID.CSV:
         // Проверяем тип состояния в данный момент
         if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
-          var v = {
+          v = {
             "id": this.documentId,
             "userid": this.documentUserId,
             "format": this.documentFormat,
@@ -595,7 +595,7 @@ var editor;
           };
 
           sendCommand(this, null, v);
-        } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
+        } else {
           var options = {CSVOptions: option, downloadType: this.downloadType};
           this.downloadType = DownloadType.None;
           this._asc_downloadAs(c_oAscFileType.CSV, c_oAscAsyncAction.DownloadAs, options);
@@ -604,7 +604,7 @@ var editor;
       case c_oAscAdvancedOptionsID.DRM:
         // Проверяем тип состояния в данный момент
         if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
-          var v = {
+          v = {
             "id": this.documentId,
             "userid": this.documentUserId,
             "format": this.documentFormat,
