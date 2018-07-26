@@ -185,6 +185,7 @@
 			this.colorsFont = null;
 			this.sortColor = null;
 			this.columnName = null;
+			this.sheetColumnName = null;
 			
 			return this;
 		}
@@ -240,6 +241,8 @@
             asc_setColorsFont : function(val) { this.colorsFont = val; },
             asc_setSortColor : function(val) { this.sortColor = val; },
 			asc_setColumnName : function(val) { this.columnName = val; },
+			asc_setSheetColumnName : function(val) { this.sheetColumnName = val; },
+
 			
 			asc_getCellId : function() { return this.cellId; },
             asc_getCellCoord : function() { return this.cellCoord; },
@@ -252,7 +255,8 @@
             asc_getColorsFill : function() { return this.colorsFill; },
             asc_getColorsFont : function() { return this.colorsFont; },
             asc_getSortColor : function() { return this.sortColor; },
-			asc_getColumnName : function() { return this.columnName; }
+			asc_getColumnName : function() { return this.columnName; },
+			asc_getSheetColumnName : function(val) { return this.sheetColumnName; }
 		};
 		
 		var g_oAdvancedTableInfoSettings = {
@@ -5218,6 +5222,7 @@
         prot["asc_getSortColor"]				= prot.asc_getSortColor;
 		prot["asc_getColumnName"]				= prot.asc_getColumnName;
 		prot["asc_setFilterObj"]				= prot.asc_setFilterObj;
+		prot["asc_getSheetColumnName"]			= prot.asc_getSheetColumnName;
 		
 		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;

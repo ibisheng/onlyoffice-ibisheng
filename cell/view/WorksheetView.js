@@ -13397,6 +13397,7 @@
         autoFilterObject.asc_setDiplayName(displayName);
         autoFilterObject.asc_setSortColor(ascColor);
 		autoFilterObject.asc_setColumnName(columnName);
+		autoFilterObject.asc_setSheetColumnName(AscCommon.g_oCellAddressUtils.colnumToColstr(rangeButton.c1 + 1));
 
         var columnRange = Asc.Range(rangeButton.c1, autoFilter.Ref.r1 + 1, rangeButton.c1, autoFilter.Ref.r2);
 
