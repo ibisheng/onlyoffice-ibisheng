@@ -3647,7 +3647,7 @@ CChartsDrawer.prototype =
 				}
 
 				if (crossDiff) {
-					posY = (points[i].pos - crossDiff) * this.calcProp.pxToMM;
+					posY = (points[i].pos + crossDiff) * this.calcProp.pxToMM;
 				} else {
 					posY = points[i].pos * this.calcProp.pxToMM;
 				}
@@ -3678,7 +3678,7 @@ CChartsDrawer.prototype =
 
 				if (crossDiff && i === points.length - 1) {
 					if (crossDiff) {
-						posY = (points[i].pos + crossDiff) * this.calcProp.pxToMM;
+						posY = (points[i].pos - crossDiff) * this.calcProp.pxToMM;
 					}
 
 					i++;
@@ -3696,7 +3696,11 @@ CChartsDrawer.prototype =
 	getVerticalGridLines: function (axis, isCatAxis) {
 		var gridLines, minorGridLines;
 
-    	var crossBetween = this.cChartSpace.getValAxisCrossType();
+		var crossBetween = this.cChartSpace.getValAxisCrossType();
+		if(null === crossBetween && isCatAxis) {
+			crossBetween = axis.crossAx ? axis.crossAx.crossBetween : null;
+		}
+
 		var heightLine = this.calcProp.heightCanvas - (this.calcProp.chartGutter._bottom + this.calcProp.chartGutter._top);
 		var rightMargin = this.calcProp.widthCanvas - this.calcProp.chartGutter._right;
 		var posY = this.calcProp.chartGutter._top;
