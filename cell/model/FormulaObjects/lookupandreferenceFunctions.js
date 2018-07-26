@@ -443,7 +443,7 @@ function (window, undefined) {
 			var ws = arg0.getWS(), bbox = arg0.getBBox0();
 
 			if (bbox.r1 === bbox.r2) {/*одна строка*/
-				res = new Asc.Range(bbox.c1 + arg1 - 1, bbox.r1, bbox.c1 + arg1 - 1, bbox.r1);
+				res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1, bbox.c1 + arg2 - 1, bbox.r1);
 				res = new cRef(res.getName(), ws);
 			} else {
 				if (0 === arg1 && arg2 > 0) {
