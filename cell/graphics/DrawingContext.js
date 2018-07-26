@@ -907,8 +907,12 @@
 	DrawingContext.prototype.getFontMetrics = function (units) {
 		var fm = this.fmgrGraphics[3];
 		var d = Math.abs(fm.m_lDescender);
-		var r = getCvtRatio(0/*px*/, units >= 0 && units <= 3 ? units : this.units, this.ppiX);
-		var r2 = getCvtRatio(1/*pt*/, units >= 0 && units <= 3 ? units : this.units, this.ppiX);
+		var ppiX = 96;
+		if (AscCommon.AscBrowser.isRetina) {
+			ppiX = AscCommon.AscBrowser.convertToRetinaValue(ppiX, true);
+		}
+		var r = getCvtRatio(0/*px*/, units >= 0 && units <= 3 ? units : this.units, ppiX);
+		var r2 = getCvtRatio(1/*pt*/, units >= 0 && units <= 3 ? units : this.units, ppiX);
 		var factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
 
 		var res = new FontMetrics();

@@ -4751,25 +4751,27 @@
     WorksheetView.prototype._updateRowHeight =
       function (tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound) {
 			var rowInfo = this.rows[row];
-          // update row's descender
+			// update row's descender
 			if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged && !angle) {
-              rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
-          }
+			    rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
+			}
 
-          // update row's height
-          // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
+			// update row's height
+			// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
 			if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) &&
 				!fMergedRows) {
 				var newHeight = tm.height;
-              if (angle && textBound) {
-                  newHeight = Math.max(rowInfo.height, textBound.height);
-              }
+				var oldHeight = AscCommonExcel.convertPtToPx(rowInfo.heightReal);
+				if (angle && textBound) {
+				    newHeight = Math.max(oldHeight, textBound.height);
+				}
 
-				newHeight = Math.min(this.maxRowHeightPx, Math.max(rowInfo.height, newHeight));
-				if (newHeight !== rowInfo.height) {
-					rowInfo.heightReal = rowInfo.height = newHeight;
+				newHeight = Math.min(this.maxRowHeightPx, Math.max(oldHeight, newHeight));
+				if (newHeight !== oldHeight) {
+					rowInfo.heightReal = AscCommonExcel.convertPxToPt(newHeight);
+					rowInfo.height = newHeight * this.getZoom();
 					History.TurnOff();
-                  this.model.setRowHeight(AscCommonExcel.convertPxToPt(rowInfo.height), row, row, false);
+                  this.model.setRowHeight(rowInfo.heightReal, row, row, false);
 					History.TurnOn();
 
                   if (angle) {
@@ -11910,7 +11912,7 @@
 
     WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {
         var r, c, h, d, ct, isMerged;
-        var mergedRange, bUpdateRowHeight;
+        var mergedRange, bUpdateRowHeight, oldHeight;
 
         if (range === undefined) {
             range = this.model.selectionRange.getLast().clone();
@@ -11980,10 +11982,13 @@
                     d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
                 }
             }
-            if (Math.abs(h - this.rows[r].height) > 0.000001 && !this.rows[r].isCustomHeight) {
-                this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeightPx);
+			h = Math.min(h, this.maxRowHeightPx);
+			oldHeight = AscCommonExcel.convertPtToPx(this.rows[r].heightReal);
+            if (Math.abs(h - oldHeight) > 0.000001 && !this.rows[r].isCustomHeight) {
+				this.rows[r].heightReal = AscCommonExcel.convertPxToPt(h);
+				this.rows[r].height = h * this.getZoom();
 				History.TurnOff();
-                this.model.setRowHeight(this.rows[r].height * asc_getcvt(0, 1, this._getPPIY()), r, r, false);
+                this.model.setRowHeight(this.rows[r].heightReal, r, r, false);
 				History.TurnOn();
                 this.isChanged = true;
             }
