@@ -958,6 +958,7 @@
 		StringRender.prototype._doRender = function(drawingCtx, x, y, maxWidth, textColor) {
 			var self = this;
 			var ctx = drawingCtx || this.drawingCtx;
+			var zoom = ctx.getZoom();
 			var ppiy = ctx.getPPIY();
 			var align  = this.flags ? this.flags.textAlign : null;
 			var i, j, p, p_, f, f_, strBeg;
@@ -990,21 +991,23 @@
 				var ul = Asc.EUnderline.underlineNone !== prop.font.Underline;
 				var isSO = so === true;
 				var fsz, x2, y, lw, dy, i, b, x_, cp;
+				var bl = asc_round(l.bl * zoom);
 
+				y = y1 + bl + dh;
 				if (align !== AscCommon.align_Justify || dx < 0.000001) {
-					ctx.fillText(self.chars.slice(begin, end), x1, y1 + l.bl + dh, undefined, self.charWidths.slice(begin, end), angle);
+					ctx.fillText(self.chars.slice(begin, end), x1, y, undefined, self.charWidths.slice(begin, end), angle);
 				} else {
 					for (i = b = begin, x_ = x1; i < end; ++i) {
 						cp = self.charProps[i];
 						if (cp && cp.wrd && i > b) {
-							ctx.fillText(self.chars.slice(b, i), x_, y1 + l.bl + dh, undefined, self.charWidths.slice(b, i), angle);
+							ctx.fillText(self.chars.slice(b, i), x_, y, undefined, self.charWidths.slice(b, i), angle);
 							x_ += self._calcCharsWidth(b, i - 1) + dx;
 							dw += dx;
 							b = i;
 						}
 					}
 					if (i > b) { // draw remainder of text
-						ctx.fillText(self.chars.slice(b, i), x_, y1 + l.bl + dh, undefined, self.charWidths.slice(b, i), angle);
+						ctx.fillText(self.chars.slice(b, i), x_, y, undefined, self.charWidths.slice(b, i), angle);
 					}
 				}
 
@@ -1017,12 +1020,12 @@
 					   .beginPath();
 					dy = (lw / 2); dy = dy >> 0;
 					if (ul) {
-						y = asc_round(y1 + l.bl + prop.lm.d * 0.4);
+						y = asc_round(y1 + bl + prop.lm.d * 0.4);
 						ctx.lineHor(x1, y + dy, x2 + 1/*px*/); // ToDo вопрос тут
 					}
 					if (isSO) {
 						dy += 1;
-						y = asc_round(y1 + l.bl - prop.lm.a * 0.275);
+						y = asc_round(y1 + bl - prop.lm.a * 0.275);
 						ctx.lineHor(x1, y - dy, x2 + 1/*px*/); // ToDo вопрос тут
 					}
 					ctx.stroke();
@@ -1066,7 +1069,7 @@
 					}
 					if (p.nl || p.hp) {
 						// begin new line
-						y1 += l.th;
+						y1 += asc_round(l.th * zoom);
 						l = self.lines[++n];
 						x1 = initX(i);
 						dx = computeWordDeltaX();

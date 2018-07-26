@@ -2203,12 +2203,12 @@
         var text = isColHeader ? this._getColumnTitle(index) : this._getRowTitle(index);
         var sr = this.stringRender;
         var tm = this._roundTextMetrics(sr.measureString(text));
-        var bl = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
+        var bl = y2WithoutBorder - Asc.round((isColHeader ? this.defaultRowDescender : this.rows[index].descender) * this.getZoom());
         var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
         var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
 
 		ctx.AddClipRect(x, y, w, h);
-		ctx.setFillStyle(st.color).fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths);
+		ctx.setFillStyle(st.color).fillText(text, textX, textY + Asc.round(tm.baseline * this.getZoom()), undefined, sr.charWidths);
 		ctx.RemoveClipRect();
     };
 
@@ -2591,8 +2591,9 @@
 			var h = this.rows[rowB].top + this.rows[rowB].height - offsetY - y1;
 			var x2 = x1 + w - (isTrimmedR ? 0 : gridlineSize);
 			var y2 = y1 + h - gridlineSize;
-			var bl = !isMerged ? (y2 - this.rows[rowB].descender) :
-				(y2 - ct.metrics.height + ct.metrics.baseline - 1);
+			var bl = y2 - Asc.round(
+					(isMerged ? (ct.metrics.height + ct.metrics.baseline - 1) : this.rows[rowB].descender) *
+					this.getZoom());
 			var x1ct = isMerged ? x1 : this.cols[col].left - offsetX;
 			var x2ct = isMerged ? x2 : x1ct + this.cols[col].width - gridlineSize;
 			var textX = this._calcTextHorizPos(x1ct, x2ct, ct.metrics, ct.cellHA);
@@ -4769,7 +4770,7 @@
 				newHeight = Math.min(this.maxRowHeightPx, Math.max(oldHeight, newHeight));
 				if (newHeight !== oldHeight) {
 					rowInfo.heightReal = AscCommonExcel.convertPxToPt(newHeight);
-					rowInfo.height = newHeight * this.getZoom();
+					rowInfo.height = Asc.round(newHeight * this.getZoom());
 					History.TurnOff();
                   this.model.setRowHeight(rowInfo.heightReal, row, row, false);
 					History.TurnOn();
@@ -5256,7 +5257,7 @@
             case Asc.c_oAscVAlign.Top:
                 return y1 - 1;
             default:
-                return baseline - tm.baseline;
+                return baseline - Asc.round(tm.baseline * this.getZoom());
         }
     };
 
@@ -11986,7 +11987,7 @@
 			oldHeight = AscCommonExcel.convertPtToPx(this.rows[r].heightReal);
             if (Math.abs(h - oldHeight) > 0.000001 && !this.rows[r].isCustomHeight) {
 				this.rows[r].heightReal = AscCommonExcel.convertPxToPt(h);
-				this.rows[r].height = h * this.getZoom();
+				this.rows[r].height = Asc.round(h * this.getZoom());
 				History.TurnOff();
                 this.model.setRowHeight(this.rows[r].heightReal, r, r, false);
 				History.TurnOn();
