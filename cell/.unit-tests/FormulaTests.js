@@ -6500,6 +6500,22 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "#REF!" );
 
+		oParser = new parserFormula( "INDEX(A651:C651,1,3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 11 );
+
+		oParser = new parserFormula( "INDEX(A651:C651,1,2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 6 );
+
+		oParser = new parserFormula( "INDEX(A651:C651,0,1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 1 );
+
+		oParser = new parserFormula( "INDEX(A651:C651,1,1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 1 );
+
     } );
 
     test( "Test: \"OFFSET\"", function () {
