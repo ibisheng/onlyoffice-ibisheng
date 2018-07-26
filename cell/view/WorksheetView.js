@@ -4753,7 +4753,7 @@
 			var rowInfo = this.rows[row];
 			// update row's descender
 			if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged && !angle) {
-			    rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
+			    rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline - 1);
 			}
 
 			// update row's height
@@ -11979,7 +11979,7 @@
                 }
 
                 if (ct.cellVA !== Asc.c_oAscVAlign.Top && ct.cellVA !== Asc.c_oAscVAlign.Center && !isMerged && !ct.angle) {
-                    d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
+                    d = Math.max(d, ct.metrics.height - ct.metrics.baseline - 1);
                 }
             }
 			h = Math.min(h, this.maxRowHeightPx);
