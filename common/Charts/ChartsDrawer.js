@@ -2140,8 +2140,10 @@ CChartsDrawer.prototype =
 			}
 			case AscFormat.SYMBOL_DOT:
 			{
-				path.moveTo((x - halfSize / 2) * pathW, y * pathW);
-				path.lnTo((x + halfSize / 2) * pathW, y * pathW);
+				path.moveTo((x) * pathW, (y - dashDotHeight/2) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y - dashDotHeight/2) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y + dashDotHeight/2) * pathW);
+				path.lnTo((x) * pathW, (y + dashDotHeight/2) * pathW);
 				break;
 			}
 			
