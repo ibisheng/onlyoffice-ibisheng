@@ -4422,7 +4422,6 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         else{
                             aStrings.push(i + 1 + "");
                         }
-                        oAxis.scale.push(i);
                     }
                 }
                 else{
@@ -4433,7 +4432,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         aStrings.push("");
                     }
                     for(i = 0; i < aScale.length; ++i){
-                        if(aScale[i] >= 0){
+                        if(aScale[i] > 0){
                             break;
                         }
                         aStrings.splice(0, 0, "");
@@ -4565,6 +4564,8 @@ CChartSpace.prototype.getValAxisCrossType = function()
             }
 
             var bCrossAt = false;
+
+            var oCrossGrid = oCrossAxis.grid;
             if(AscFormat.isRealNumber(oCurAxis.crossesAt) && oCrossAxis.scale[0] <= oCurAxis.crossesAt && oCrossAxis.scale[oCrossAxis.scale.length - 1] >= oCurAxis.crossesAt){
 
                 if(oCrossAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
@@ -4580,6 +4581,9 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 switch (oCurAxis.crosses) {
                     case AscFormat.CROSSES_MAX:{
                         fCrossValue = oCrossAxis.scale[oCrossAxis.scale.length - 1];
+                        if(!oCrossGrid.bOnTickMark){
+                            fCrossValue += 1;
+                        }
                         if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
                             fDistance = -fDistance;
                             bLabelsExtremePosition = true;
@@ -4590,6 +4594,9 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         fCrossValue = oCrossAxis.scale[0];
                         if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
                             bLabelsExtremePosition = true;
+                        }
+                        if(!oCrossGrid.bOnTickMark){
+                            fCrossValue -= 1;
                         }
                     }
                     default:{ //includes AutoZero
@@ -4609,13 +4616,16 @@ CChartSpace.prototype.getValAxisCrossType = function()
             if(AscFormat.fApproxEqual(fCrossValue, oCrossAxis.scale[0]) || AscFormat.fApproxEqual(fCrossValue, oCrossAxis.scale[oCrossAxis.scale.length - 1])){
                 bLabelsExtremePosition = true;
             }
-            var oCrossGrid = oCrossAxis.grid;
             var fTickAdd = 0.0;
-            if(!oCrossGrid.bOnTickMark && bCrossAt){
-                fTickAdd = 1.0;
-            }
-            var fScale = ((oCrossGrid.nCount)*oCrossGrid.fStride)/(oCrossAxis.scale[oCrossAxis.scale.length - 1] - oCrossAxis.scale[0] + fTickAdd);
-            fAxisPos = oCrossGrid.fStart + (fCrossValue - oCrossAxis.scale[0])*fScale;
+            // if(!oCrossGrid.bOnTickMark && bCrossAt){
+            //     fTickAdd = 1.0;
+            // }
+            // if(oCrossGrid.bOnTickMark){
+                fAxisPos = oCrossGrid.fStart + (fCrossValue - oCrossAxis.scale[0])*(oCrossGrid.fStride)/(oCrossAxis.scale[1] - oCrossAxis.scale[0]);
+            // }
+            // else{
+            //     fAxisPos = oCrossGrid.fStart + (fCrossValue + 1 - oCrossAxis.scale[0])*(oCrossGrid.fStride)/(oCrossAxis.scale[1] - oCrossAxis.scale[0]);
+            // }
 
 
             var nOrientation = isRealObject(oCrossAxis.scaling) && AscFormat.isRealNumber(oCrossAxis.scaling.orientation) ? oCrossAxis.scaling.orientation : AscFormat.ORIENTATION_MIN_MAX;
@@ -11127,8 +11137,6 @@ CChartSpace.prototype.recalculateAxisTickMark = function()
             }
             axis.compiledLn = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.spPr, subtleLine, parents);
             axis.compiledTickMarkLn = axis.compiledLn.createDuplicate();
-            if(AscFormat.isRealNumber(axis.compiledTickMarkLn.w))
-                axis.compiledTickMarkLn.w/=2;
             axis.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, oThis.clrMapOvr);
             checkBlackUnifill(axis.compiledTickMarkLn.Fill, true);
         };
