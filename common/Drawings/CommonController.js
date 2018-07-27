@@ -147,13 +147,14 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
 
 	function fSolveQuadraticEquation(a, b, c){
-		var oResult = {x1: null, x2: null, bError: true}
+		var oResult = {x1: null, x2: null, bError: true};
 		var D = b*b - 4*a*c;
         if(D < 0){
             return oResult;
         }
 		oResult.bError = false;
-        oResult.x1 = (-b + Math.sqrt(D))/(2*a), oResult.x2 = (-b - Math.sqrt(D))/(2*a);
+        oResult.x1 = (-b + Math.sqrt(D))/(2*a);
+        oResult.x2 = (-b - Math.sqrt(D))/(2*a);
 		return oResult;
 	}
 

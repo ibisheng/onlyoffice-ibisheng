@@ -425,7 +425,7 @@ function CreateUniFillSchemeColorWidthTint(schemeColorId, tintVal)
 
 function checkFiniteNumber(num)
 {
-    if(AscFormat.isRealNumber(num) && isFinite(num))
+    if(AscFormat.isRealNumber(num) && isFinite(num) && num > 0)
     {
         return num;
     }
@@ -7286,7 +7286,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         var nSkip = 1;
                         if(!bTickSkip && fMaxContentStringH > 0){
                             nMaxCount = diagram_width/fMaxContentStringH;
-                            nSkip = ((cat_ax.labels.aLabels.length/nMaxCount + 1) >> 0);
+                            nSkip = Math.max(1, ((cat_ax.labels.aLabels.length/nMaxCount + 1) >> 0));
                         }
                         else{
                             bTickSkip = true;
