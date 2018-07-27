@@ -1333,13 +1333,13 @@
 
 	CellEditor.prototype._drawSelection = function () {
 		var ctx = this.overlayCtx;
-		var begPos, endPos, top, top1, top2, begInfo, endInfo, line1, line2, i, selection = [];
+		var zoom = this.getZoom();
+		var begPos, endPos, top, topLine, begInfo, endInfo, line, i, y, h, selection = [];
 
-		function drawRect( x, y, w, h ) {
-			if ( window['IS_NATIVE_EDITOR'] ) {
+		function drawRect(x, y, w, h) {
+			if (window['IS_NATIVE_EDITOR']) {
 				selection.push([x, y, w, h]);
-			}
-			else {
+			} else {
 				ctx.fillRect(x, y, w, h);
 			}
 		}
@@ -1347,30 +1347,31 @@
 		begPos = this.selectionBegin;
 		endPos = this.selectionEnd;
 
-		if ( !window['IS_NATIVE_EDITOR'] ) {
-			ctx.setFillStyle( this.defaults.selectColor ).clear();
+		if (!window['IS_NATIVE_EDITOR']) {
+			ctx.setFillStyle(this.defaults.selectColor).clear();
 		}
 
-		if ( begPos !== endPos && !this.isTopLineActive ) {
-			top = this.textRender.calcLineOffset( this.topLineIndex );
-			begInfo = this.textRender.calcCharOffset( Math.min( begPos, endPos ) );
-			line1 = this.textRender.getLineInfo( begInfo.lineIndex );
-			top1 = this.textRender.calcLineOffset( begInfo.lineIndex );
-			endInfo = this.textRender.calcCharOffset( Math.max( begPos, endPos ) );
-			if ( begInfo.lineIndex === endInfo.lineIndex ) {
-				drawRect( begInfo.left, top1 - top, endInfo.left - begInfo.left, line1.th );
-			}
-			else {
-				line2 = this.textRender.getLineInfo( endInfo.lineIndex );
-				top2 = this.textRender.calcLineOffset( endInfo.lineIndex );
-				drawRect( begInfo.left, top1 - top, line1.tw - begInfo.left + line1.startX, line1.th );
-				if ( line2 ) {
-					drawRect( line2.startX, top2 - top, endInfo.left - line2.startX, line2.th );
+		if (begPos !== endPos && !this.isTopLineActive) {
+			top = this.textRender.calcLineOffset(this.topLineIndex);
+			begInfo = this.textRender.calcCharOffset(Math.min(begPos, endPos));
+			line = this.textRender.getLineInfo(begInfo.lineIndex);
+			topLine = this.textRender.calcLineOffset(begInfo.lineIndex);
+			endInfo = this.textRender.calcCharOffset(Math.max(begPos, endPos));
+			h = asc_round(line.th * zoom);
+			y = topLine - top;
+			if (begInfo.lineIndex === endInfo.lineIndex) {
+				drawRect(begInfo.left, y, endInfo.left - begInfo.left, h);
+			} else {
+				drawRect(begInfo.left, y, line.tw - begInfo.left + line.startX, h);
+				for (i = begInfo.lineIndex + 1, y += h; i < endInfo.lineIndex; ++i, y += h) {
+					line = this.textRender.getLineInfo(i);
+					h = asc_round(line.th * zoom);
+					drawRect(line.startX, y, line.tw, h);
 				}
-				top = top1 - top + line1.th;
-				for ( i = begInfo.lineIndex + 1; i < endInfo.lineIndex; ++i, top += line1.th ) {
-					line1 = this.textRender.getLineInfo( i );
-					drawRect( line1.startX, top, line1.tw, line1.th );
+				line = this.textRender.getLineInfo(endInfo.lineIndex);
+				topLine = this.textRender.calcLineOffset(endInfo.lineIndex);
+				if (line) {
+					drawRect(line.startX, topLine - top, endInfo.left - line.startX, asc_round(line.th * zoom));
 				}
 			}
 		}
@@ -1429,6 +1430,7 @@
 		var curTop = asc_round(((cur !== null ? cur.top : 0) + y) * this.ky);
 		var curHeight = asc_round((cur !== null ? cur.height : this._getContentHeight()) * this.ky);
 		var i, dy, nCount = this.textRender.getLinesCount();
+		var zoom = this.getZoom();
 
 		while (1 < nCount) {
 			if (curTop + curHeight - 1 > h) {
@@ -1436,7 +1438,7 @@
 				if (i === nCount) {
 					break;
 				}
-				dy = this.textRender.getLineInfo(i).th;
+				dy = asc_round(this.textRender.getLineInfo(i).th * zoom);
 				y -= dy;
 				curTop -= asc_round(dy * this.ky);
 				++this.topLineIndex;
@@ -1444,7 +1446,7 @@
 			}
 			if (curTop < 0) {
 				--this.topLineIndex;
-				dy = this.textRender.getLineInfo(this.topLineIndex).th;
+				dy = asc_round(this.textRender.getLineInfo(this.topLineIndex).th * zoom);
 				y += dy;
 				curTop += asc_round(dy * this.ky);
 				continue;
@@ -1542,9 +1544,10 @@
 		var t = this;
 		var lc = t.textRender.getLinesCount();
 		var i, h, w, li, chw;
+		var zoom = this.getZoom();
 		for ( h = 0, i = Math.max( t.topLineIndex, 0 ); i < lc; ++i ) {
 			li = t.textRender.getLineInfo( i );
-			h += li.th;
+			h += asc_round(li.th * zoom);
 			if ( coord.y <= h ) {
 				for ( w = li.startX, i = li.beg; i <= li.end; ++i ) {
 					chw = t.textRender.getCharWidth( i );

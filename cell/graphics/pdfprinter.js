@@ -100,7 +100,6 @@ CPdfPrinter.prototype =
 
     getZoom : function()
     {
-        console.log("error");
         return 1;
     },
     changeZoom : function()

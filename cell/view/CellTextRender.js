@@ -82,8 +82,9 @@
 		};
 
 		CellTextRender.prototype.calcLineOffset = function (index) {
+			var zoom = this.drawingCtx.getZoom();
 			for (var i = 0, h = 0, l = this.lines; i < index; ++i) {
-				h += l[i].th;
+				h += Asc.round(l[i].th * zoom);
 			}
 			return h;
 		};
