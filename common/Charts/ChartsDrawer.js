@@ -2113,6 +2113,7 @@ CChartsDrawer.prototype =
 	{
 		size = size / 2.69;
 		var halfSize = size / 2;
+		var dashDotHeight = size / 5;
 		var pathId = this.cChartSpace.AllocPath();
 		var path  = this.cChartSpace.GetPath(pathId);
 		var pathH = this.calcProp.pathH;
@@ -2131,8 +2132,10 @@ CChartsDrawer.prototype =
 		{
 			case AscFormat.SYMBOL_DASH:
 			{
-				path.moveTo((x - halfSize) * pathW, y * pathW);
-				path.lnTo((x + halfSize) * pathW, y * pathW);
+				path.moveTo((x - halfSize) * pathW, (y - dashDotHeight/2) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y - dashDotHeight/2) * pathW);
+				path.lnTo((x + halfSize) * pathW, (y + dashDotHeight/2) * pathW);
+				path.lnTo((x - halfSize) * pathW, (y + dashDotHeight/2) * pathW);
 				break;
 			}
 			case AscFormat.SYMBOL_DOT:
