@@ -4405,7 +4405,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         }
                     }
                 }
-                var nCrossBetween = this.getAxisCrossType(oAxis.crossAx);
+                var nCrossBetween = this.getAxisCrossType(oAxis);
                 if(nCrossBetween === AscFormat.CROSS_BETWEEN_MID_CAT && nPtsLength < 2){
                     nPtsLength = 2;
                 }
@@ -4621,7 +4621,11 @@ CChartSpace.prototype.getValAxisCrossType = function()
             //     fTickAdd = 1.0;
             // }
             // if(oCrossGrid.bOnTickMark){
-                fAxisPos = oCrossGrid.fStart + (fCrossValue - oCrossAxis.scale[0])*(oCrossGrid.fStride)/(oCrossAxis.scale[1] - oCrossAxis.scale[0]);
+            var bKoeff = 1.0;
+            if(oCrossAxis.scale.length > 1){
+                bKoeff = oCrossAxis.scale[1] - oCrossAxis.scale[0];
+            }
+                fAxisPos = oCrossGrid.fStart + (fCrossValue - oCrossAxis.scale[0])*(oCrossGrid.fStride)/bKoeff;
             // }
             // else{
             //     fAxisPos = oCrossGrid.fStart + (fCrossValue + 1 - oCrossAxis.scale[0])*(oCrossGrid.fStride)/(oCrossAxis.scale[1] - oCrossAxis.scale[0]);
