@@ -303,7 +303,7 @@ CChartsDrawer.prototype =
 				var type = chartModel.getObjectType();
 				var isLinesChart = type === AscDFH.historyitem_type_LineChart || type === AscDFH.historyitem_type_ScatterChart;
 				//рисуем линейные диаграммы после отрисовки сетки
-				if((isLinesChart && bBeforeAxes) || (!isLinesChart && !bBeforeAxes)) {
+				if(t.nDimensionCount !== 3 && ((isLinesChart && bBeforeAxes) || (!isLinesChart && !bBeforeAxes))) {
 					continue;
 				} 
 
