@@ -816,8 +816,19 @@ function (window, undefined) {
 		}
 
 		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber();
-		var arg3 = 3 < arg.length ? arg[3].tocNumber() : new cNumber(-1);
-		var arg4 = 5 === arg.length ? arg[4].tocNumber() : new cNumber(-1);
+		var arg3;
+		if(cElementType.empty === arg[3].type) {
+			arg3 = new cNumber(1);
+		} else {
+			arg3 = 3 < arg.length ? arg[3].tocNumber() : new cNumber(-1);
+		}
+
+		var arg4;
+		if(cElementType.empty === arg[4].type) {
+			arg4 = new cNumber(1);
+		} else {
+			arg4 = 5 === arg.length ? arg[4].tocNumber() : new cNumber(-1);
+		}
 
 		var argError;
 		if (argError = this._checkErrorArg([arg0, arg1, arg2, arg3, arg4])) {
@@ -848,6 +859,17 @@ function (window, undefined) {
 				box.c2 = box.c1 + arg2 + arg4 - 1;
 				box.r1 = box.r1 + arg1;
 				box.c1 = box.c1 + arg2;
+
+				//TODO сделать для отрицательных arg3/arg4
+				/*var r2 = box.r1 + arg1 + arg3 - 1;
+				var c2 = box.c1 + arg2 + arg4 - 1;
+				var r1 = box.r1 + arg1;
+				var c1 = box.c1 + arg2;
+
+				box.r2 = r2 > r1 ? r2 : r1;
+				box.c2 = c2 > c1 ? c2 : c1;
+				box.r1 = r2 > r1 ? r1 : r2;
+				box.c1 = c2 > c1 ? c1 : c2;*/
 
 				if (!validBBOX(box)) {
 					return new cError(cErrorType.bad_reference);
