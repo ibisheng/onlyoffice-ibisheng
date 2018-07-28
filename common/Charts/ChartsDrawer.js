@@ -10337,7 +10337,7 @@ drawStockChart.prototype = {
 				this.paths.values[i] = {};
 			}
 
-			xVal = this.cChartDrawer.getYPosition(i, this.catAx);
+			xVal = this.cChartDrawer.getYPosition(i + 1, this.catAx);
 			yVal1 = this.cChartDrawer.getYPosition(val1, this.valAx);
 			yVal2 = this.cChartDrawer.getYPosition(val2, this.valAx);
 			yVal3 = this.cChartDrawer.getYPosition(val3, this.valAx);
