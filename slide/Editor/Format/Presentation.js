@@ -7421,6 +7421,8 @@ CPresentation.prototype =
                 editor.sync_EndAddShape();
             }
 
+            editor.WordControl.Thumbnails && editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+
             History.Create_NewPoint(AscDFH.historydescription_Document_AddTextArt);
             var oTextArt = this.Slides[this.CurPage].graphicObjects.createTextArt(nStyle, false);
             oTextArt.addToDrawingObjects();
