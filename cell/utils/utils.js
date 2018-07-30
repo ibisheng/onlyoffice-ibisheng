@@ -1921,12 +1921,16 @@
 		function asc_CAdjustPrint () {
 			// Вид печати
 			this.printType = Asc.c_oAscPrintType.ActiveSheets;
+			this.pageOptionsMap = null;
+
 			// ToDo сюда же start и end page index
 
 			return this;
 		}
 		asc_CAdjustPrint.prototype.asc_getPrintType = function () { return this.printType; };
 		asc_CAdjustPrint.prototype.asc_setPrintType = function (val) { this.printType = val; };
+		asc_CAdjustPrint.prototype.asc_getPageOptionsMap = function () { return this.pageOptionsMap; };
+		asc_CAdjustPrint.prototype.asc_setPageOptionsMap = function (val) { this.pageOptionsMap = val; };
 
 		/** @constructor */
 		function asc_CLockInfo () {
@@ -2532,6 +2536,8 @@
 		prot = asc_CAdjustPrint.prototype;
 		prot["asc_getPrintType"] = prot.asc_getPrintType;
 		prot["asc_setPrintType"] = prot.asc_setPrintType;
+		prot["asc_getPageOptionsMap"] = prot.asc_getPageOptionsMap;
+		prot["asc_setPageOptionsMap"] = prot.asc_setPageOptionsMap;
 
 		window["AscCommonExcel"].asc_CLockInfo = asc_CLockInfo;
 

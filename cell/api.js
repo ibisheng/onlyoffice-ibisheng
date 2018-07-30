@@ -626,6 +626,10 @@ var editor;
     this.wb.getWorksheet(sheetIndex).setPageOptions(options);
   };
 
+  spreadsheet_api.prototype.asc_savePagePrintOptions = function(arrPagesPrint) {
+      this.wb.savePagePrintOptions(arrPagesPrint);
+  };
+
   spreadsheet_api.prototype.asc_getPageOptions = function(index) {
     var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
     return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
@@ -3480,6 +3484,7 @@ var editor;
 	prot["asc_setRestriction"] = prot.asc_setRestriction;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
+  prot["asc_savePagePrintOptions"] = prot.asc_savePagePrintOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
   prot["asc_changeDocSize"] = prot.asc_changeDocSize;
   prot["asc_changePageMargins"] = prot.asc_changePageMargins;

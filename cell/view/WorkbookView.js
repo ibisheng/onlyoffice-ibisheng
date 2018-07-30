@@ -2480,26 +2480,27 @@
     return pdfPrinter;
   };
 
-  WorkbookView.prototype._calcPagesPrintSheet = function (index, printPagesData, onlySelection) {
+  WorkbookView.prototype._calcPagesPrintSheet = function (index, printPagesData, onlySelection, adjustPrint) {
   	var ws = this.model.getWorksheet(index);
   	var wsView = this.getWorksheet(index);
   	if (!ws.getHidden()) {
-  		wsView.calcPagesPrint(ws.PagePrintOptions, onlySelection, index, printPagesData.arrPages);
+  		var pagePrintOptions = adjustPrint && adjustPrint[index] ? adjustPrint[index] : ws.PagePrintOptions;
+  		wsView.calcPagesPrint(pagePrintOptions, onlySelection, index, printPagesData.arrPages);
   	}
   };
   WorkbookView.prototype.calcPagesPrint = function (adjustPrint) {
     var printPagesData = new asc_CPrintPagesData();
     var printType = adjustPrint.asc_getPrintType();
     if (printType === Asc.c_oAscPrintType.ActiveSheets) {
-      this._calcPagesPrintSheet(this.model.getActive(), printPagesData, false);
+      this._calcPagesPrintSheet(this.model.getActive(), printPagesData, false, adjustPrint);
     } else if (printType === Asc.c_oAscPrintType.EntireWorkbook) {
       // Колличество листов
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
-      	this._calcPagesPrintSheet(i, printPagesData, false);
+      	this._calcPagesPrintSheet(i, printPagesData, false, adjustPrint);
       }
     } else if (printType === Asc.c_oAscPrintType.Selection) {
-      this._calcPagesPrintSheet(this.model.getActive(), printPagesData, true);
+      this._calcPagesPrintSheet(this.model.getActive(), printPagesData, true, adjustPrint);
     }
 
     if (AscCommonExcel.c_kMaxPrintPages === printPagesData.arrPages.length) {
@@ -3052,6 +3053,38 @@
 			}
 			this.handlers.trigger("asc_onToggleAutoCorrectOptions");
 		}
+	};
+
+	WorkbookView.prototype.savePagePrintOptions = function (arrPagesPrint) {
+		var t = this;
+
+		if(!arrPagesPrint) {
+			return;
+		}
+
+		var callback = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+			for(var i in arrPagesPrint) {
+				t.getWorksheet(i).savePageOptions(arrPagesPrint[i]);
+			}
+
+			History.EndTransaction();
+		};
+
+		var lockInfoArr = [];
+		var lockInfo;
+		for(var i in arrPagesPrint) {
+			lockInfo = this.getWorksheet(i).getLayoutLockInfo();
+			lockInfoArr.push(lockInfo);
+		}
+
+		this.collaborativeEditing.lock(lockInfoArr, callback);
 	};
 
   //------------------------------------------------------------export---------------------------------------------------

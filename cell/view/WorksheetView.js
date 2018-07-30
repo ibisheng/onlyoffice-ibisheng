@@ -10273,6 +10273,12 @@
 		this.collaborativeEditing.lock([lockInfo], callback);
 	};
 
+	WorksheetView.prototype.getLayoutLockInfo = function () {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
+			AscCommonExcel.c_oAscLockLayoutOptions);
+		return lockInfo;
+	};
+
 	// Залочена ли панель для закрепления
 	WorksheetView.prototype._isLockedFrozenPane = function (callback) {
 		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
@@ -14443,15 +14449,22 @@
 				return;
 			}
 
-			History.Create_NewPoint();
-			History.StartTransaction();
-
-			pageOptions.asc_setOptions(obj);
-
-			History.EndTransaction();
+			t.savePageOptions(obj);
 		};
 
 		return this._isLockedLayoutOptions(onChangeDocSize);
+	};
+
+	WorksheetView.prototype.savePageOptions = function (obj) {
+		var t = this;
+		var pageOptions = t.model.PagePrintOptions;
+
+		History.Create_NewPoint();
+		History.StartTransaction();
+
+		pageOptions.asc_setOptions(obj);
+
+		History.EndTransaction();
 	};
 
     //------------------------------------------------------------export---------------------------------------------------
