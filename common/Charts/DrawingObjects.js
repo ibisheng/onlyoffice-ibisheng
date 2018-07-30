@@ -4359,6 +4359,10 @@ function DrawingObjects() {
         _this.controller.setGraphicObjectLayer(layerType);
     };
 
+    _this.setGraphicObjectAlign = function(alignType) {
+        _this.controller.setGraphicObjectAlign(alignType);
+    };
+
     _this.saveSizeDrawingObjects = function() {
 
         for (var i = 0; i < aObjects.length; i++) {

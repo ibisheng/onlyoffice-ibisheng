@@ -9070,6 +9070,10 @@ DrawingObjectsController.prototype =
         //oAscDrawingLayerType
     },
 
+    setGraphicObjectAlign: function(alignType)
+    {
+        this.checkSelectedObjectsAndCallback(this.setGraphicObjectAlignCallBack, [alignType], false, AscDFH.historydescription_Spreadsheet_GraphicObjectLayer);
+    },
 
     setGraphicObjectLayerCallBack: function(layerType)
     {
@@ -9093,6 +9097,43 @@ DrawingObjectsController.prototype =
             case 3:
             {
                 this.bringBackward();
+            }
+        }
+    },
+
+    setGraphicObjectAlignCallBack: function(alignType)
+    {
+        switch (alignType)
+        {
+            case 0:
+            {
+                this.alignLeft(true);
+                break;
+            }
+            case 1:
+            {
+                this.alignRight(true);
+                break;
+            }
+            case 2:
+            {
+                this.alignBottom(true);
+                break;
+            }
+            case 3:
+            {
+                this.alignTop(true);
+                break;
+            }
+            case 4:
+            {
+                this.alignCenter(true);
+                break;
+            }
+            case 5:
+            {
+                this.alignMiddle(true);
+                break;
             }
         }
     },
