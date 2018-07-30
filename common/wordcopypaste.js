@@ -3642,6 +3642,11 @@ PasteProcessor.prototype =
 			oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent &&
 			oThis.oDocument.Parent.parent.parent.getObjectType &&
 			oThis.oDocument.Parent.parent.parent.getObjectType() == AscDFH.historyitem_type_Chart) {
+
+			//не грузим изображения при вставке в заголовок диаграммы
+			aContent.images = [];
+			aContent.aPastedImages = [];
+
 			var newContent = [];
 			for (var i = 0; i < aContent.content.length; i++) {
 				if (type_Paragraph === aContent.content[i].Get_Type()) {
