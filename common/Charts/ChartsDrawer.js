@@ -5381,7 +5381,7 @@ drawAreaChart.prototype = {
 	_calculate: function () {
 		var y, x, val, seria, dataSeries, numCache;
 		var pxToMm = this.chartProp.pxToMM;
-		var nullPositionOX = this.catAx.posY * this.chartProp.pxToMM;
+		var nullPositionOX = this.catAx.posY;
 
 		for (var i = 0; i < this.chart.series.length; i++) {
 
