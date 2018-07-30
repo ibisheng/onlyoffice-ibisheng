@@ -3650,10 +3650,10 @@ CPresentation.prototype =
                 if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
                 {
                     var ParaPr = this.GetCalculatedParaPr();
-                    if ( null != ParaPr )
+                    if ( null != ParaPr &&  ParaPr.Jc !== AscCommon.align_Center )
                     {
                         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
-                        this.SetParagraphAlign( ParaPr.Jc === AscCommon.align_Center ? align_Left : AscCommon.align_Center );
+                        this.SetParagraphAlign(AscCommon.align_Center);
                         this.Document_UpdateInterfaceState();
                     }
                 }
@@ -3697,9 +3697,9 @@ CPresentation.prototype =
         else if ( e.KeyCode == 74 && true === e.CtrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
         {
             var ParaPr = this.GetCalculatedParaPr();
-            if ( null != ParaPr && this.CanEdit())
+            if ( null != ParaPr && this.CanEdit() && ParaPr.Jc !== align_Justify)
             {
-                this.SetParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
+                this.SetParagraphAlign(align_Justify );
                 bRetValue = keydownresult_PreventAll;
             }
         }
@@ -3725,9 +3725,9 @@ CPresentation.prototype =
                 var ParaPr = this.GetCalculatedParaPr();
                 if ( null != ParaPr )
                 {
-                    if(this.CanEdit())
+                    if(this.CanEdit() && ParaPr.Jc !== align_Left)
                     {
-                        this.SetParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
+                        this.SetParagraphAlign(align_Left);
                     }
                     bRetValue = keydownresult_PreventAll;
                 }
@@ -3777,9 +3777,9 @@ CPresentation.prototype =
             var ParaPr = this.GetCalculatedParaPr();
             if ( null != ParaPr )
             {
-                if(this.CanEdit())
+                if(this.CanEdit() && ParaPr.Jc !== AscCommon.align_Right)
                 {
-                    this.SetParagraphAlign( ParaPr.Jc === AscCommon.align_Right ? align_Left : AscCommon.align_Right );
+                    this.SetParagraphAlign(AscCommon.align_Right);
                 }
                 bRetValue = keydownresult_PreventAll;
             }
