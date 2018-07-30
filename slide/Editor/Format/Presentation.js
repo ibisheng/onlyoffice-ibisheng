@@ -709,6 +709,8 @@ function CPresentation(DrawingDocument)
 
     this.NotesWidth = -10;
     this.FocusOnNotes = false;
+
+    this.lastMaster = null;
 }
 
 CPresentation.prototype =
@@ -4975,6 +4977,9 @@ CPresentation.prototype =
             return true;
         }
 
+        if(this.Slides[this.CurPage] && this.Slides[this.CurPage].Layout && this.Slides[this.CurPage].Layout.Master){
+            this.lastMaster = this.Slides[this.CurPage].Layout.Master;
+        }
         return false;
     },
 
@@ -6615,8 +6620,11 @@ CPresentation.prototype =
         }
         else
         {
-            var master = this.slideMasters[0];
 
+            var master = this.slideMasters[0];
+            if(this.lastMaster){
+                master = this.lastMaster;
+            }
             layout = AscFormat.isRealNumber(layoutIndex) ? (master.sldLayoutLst[layoutIndex] ?  master.sldLayoutLst[layoutIndex]:  master.sldLayoutLst[0]) : master.sldLayoutLst[0];
 
 
