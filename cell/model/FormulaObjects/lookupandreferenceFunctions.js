@@ -816,19 +816,8 @@ function (window, undefined) {
 		}
 
 		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber();
-		var arg3;
-		if(cElementType.empty === arg[3].type) {
-			arg3 = new cNumber(1);
-		} else {
-			arg3 = 3 < arg.length ? arg[3].tocNumber() : new cNumber(-1);
-		}
-
-		var arg4;
-		if(cElementType.empty === arg[4].type) {
-			arg4 = new cNumber(1);
-		} else {
-			arg4 = 5 === arg.length ? arg[4].tocNumber() : new cNumber(-1);
-		}
+		var arg3 = 3 < arg.length ? (cElementType.empty === arg[3].type ? new cNumber(1) : arg[3].tocNumber()) : new cNumber(-1);
+		var arg4 = 4 < arg.length ? (cElementType.empty === arg[4].type ? new cNumber(1) : arg[4].tocNumber()) : new cNumber(-1);
 
 		var argError;
 		if (argError = this._checkErrorArg([arg0, arg1, arg2, arg3, arg4])) {
