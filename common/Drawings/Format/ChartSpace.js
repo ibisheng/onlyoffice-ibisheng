@@ -7961,7 +7961,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 cat_ax.xPoints = [];
                 for(i = 0; i <arr_cat_labels_points.length; ++i)
                 {
-                    cat_ax.xPoints[i] = {val: i, pos: arr_cat_labels_points[i]};
+                    cat_ax.xPoints[i] = {val: i + 1, pos: arr_cat_labels_points[i]};
                 }
                 if(cat_ax.labels)
                 {
@@ -8972,7 +8972,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 cat_ax.yPoints = [];
                 for(i = 0; i <arr_cat_labels_points.length; ++i)
                 {
-                    cat_ax.yPoints[i] = {val: i, pos: arr_cat_labels_points[i]};
+                    cat_ax.yPoints[i] = {val: i + 1, pos: arr_cat_labels_points[i]};
                 }
                 if(cat_ax.labels)
                 {
