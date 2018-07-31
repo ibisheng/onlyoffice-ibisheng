@@ -3067,20 +3067,15 @@
 				return;
 			}
 
-			History.Create_NewPoint();
-			History.StartTransaction();
-
 			for(var i in arrPagesPrint) {
-				t.getWorksheet(i).savePageOptions(arrPagesPrint[i]);
+				t.getWorksheet(parseInt(i)).savePageOptions(arrPagesPrint[i]);
 			}
-
-			History.EndTransaction();
 		};
 
 		var lockInfoArr = [];
 		var lockInfo;
 		for(var i in arrPagesPrint) {
-			lockInfo = this.getWorksheet(i).getLayoutLockInfo();
+			lockInfo = this.getWorksheet(parseInt(i)).getLayoutLockInfo();
 			lockInfoArr.push(lockInfo);
 		}
 

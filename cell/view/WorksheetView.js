@@ -14463,6 +14463,7 @@
 		History.StartTransaction();
 
 		pageOptions.asc_setOptions(obj);
+		//window["Asc"]["editor"]._onUpdateLayoutMenu(this.model.nSheetId);
 
 		History.EndTransaction();
 	};
