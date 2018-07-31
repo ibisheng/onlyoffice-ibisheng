@@ -2592,7 +2592,7 @@
 			var x2 = x1 + w - (isTrimmedR ? 0 : gridlineSize);
 			var y2 = y1 + h - gridlineSize;
 			var bl = y2 - Asc.round(
-					(isMerged ? (ct.metrics.height + ct.metrics.baseline - 1) : this.rows[rowB].descender) *
+					(isMerged ? (ct.metrics.height - ct.metrics.baseline - 1) : this.rows[rowB].descender) *
 					this.getZoom());
 			var x1ct = isMerged ? x1 : this.cols[col].left - offsetX;
 			var x2ct = isMerged ? x2 : x1ct + this.cols[col].width - gridlineSize;
