@@ -12524,11 +12524,13 @@ plotAreaChart.prototype =
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
+		//смещаем на px все точки, посольку рисуем прямоугольную область
+		var px = 1/this.chartProp.pxToMM;
 		var plotAreaPoints = this.cChartDrawer.getPlotAreaPoints();
-		var left = plotAreaPoints.left;
-		var right = plotAreaPoints.right;
-		var top = plotAreaPoints.top;
-		var bottom = plotAreaPoints.bottom;
+		var left = plotAreaPoints.left - px;
+		var right = plotAreaPoints.right - px;
+		var top = plotAreaPoints.top - px;
+		var bottom = plotAreaPoints.bottom - px;
 		
 		path.moveTo(left * pathW, bottom * pathH);
 		path.lnTo(right * pathW, bottom * pathH);
@@ -12550,10 +12552,10 @@ plotAreaChart.prototype =
 		var pxToMm = this.chartProp.pxToMM;
 
 		var plotAreaPoints = this.cChartDrawer.getPlotAreaPoints();
-		var left = plotAreaPoints.left * pxToMm;
-		var right = plotAreaPoints.right * pxToMm;
-		var top = plotAreaPoints.top * pxToMm;
-		var bottom = plotAreaPoints.bottom * pxToMm;
+		var left = plotAreaPoints.left * pxToMm - 1;
+		var right = plotAreaPoints.right * pxToMm - 1;
+		var top = plotAreaPoints.top * pxToMm - 1;
+		var bottom = plotAreaPoints.bottom * pxToMm - 1;
 
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
