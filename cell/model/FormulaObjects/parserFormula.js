@@ -5396,7 +5396,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				//если осталось только закрыть скобки за функции с нулевым количеством аргументов
 				if(ph.pCurrPos === this.Formula.length){
 					if(elemArr[elemArr.length - 2] && 0 === elemArr[elemArr.length - 2].argumentsMax){
-						this.operand_expected = false;
+						parseResult.operand_expected = false;
 					}
 				}
 
@@ -5419,7 +5419,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 		}
 
-		if (this.operand_expected) {
+		if (parseResult.operand_expected) {
 			this.outStack = [];
 			parseResult.setError(c_oAscError.ID.FrmlOperandExpected);
 			return false;
