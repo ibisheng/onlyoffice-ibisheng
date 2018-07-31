@@ -1944,6 +1944,11 @@ background-repeat: no-repeat;\
 	    if (!this.canEdit())
     	    return;
 
+		//slide show
+		if(this.WordControl && this.WordControl.DemonstrationManager && this.WordControl.DemonstrationManager.Mode) {
+			return;
+		}
+
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content, null, false)) {
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 
