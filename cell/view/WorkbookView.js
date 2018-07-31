@@ -2484,7 +2484,8 @@
   	var ws = this.model.getWorksheet(index);
   	var wsView = this.getWorksheet(index);
   	if (!ws.getHidden()) {
-  		var pagePrintOptions = adjustPrint && adjustPrint[index] ? adjustPrint[index] : ws.PagePrintOptions;
+		var pageOptionsMap = adjustPrint ? adjustPrint.asc_getPageOptionsMap() : null;
+  		var pagePrintOptions = pageOptionsMap && pageOptionsMap[index] ? pageOptionsMap[index] : ws.PagePrintOptions;
   		wsView.calcPagesPrint(pagePrintOptions, onlySelection, index, printPagesData.arrPages);
   	}
   };
