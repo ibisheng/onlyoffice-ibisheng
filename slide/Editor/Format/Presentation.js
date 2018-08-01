@@ -5683,9 +5683,12 @@ CPresentation.prototype =
                                         g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;
                                         g.transform(1,0,0,1,0,0);
 
+
+                                        AscCommon.IsShapeToImageConverter = true;
                                         for(i = 0; i < oController2.selectedObjects.length; ++i){
                                             oController2.selectedObjects[i].draw(g);
                                         }
+                                        AscCommon.IsShapeToImageConverter = false;
 
                                         try
                                         {
