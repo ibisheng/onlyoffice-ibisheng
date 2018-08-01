@@ -1777,6 +1777,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
         if(this.selection.title){
             this.selection.textSelection = this.selection.title;
             this.selection.textSelection.checkDocContent();
+            this.selection.textSelection.txBody.content.SelectAll();
             this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
         }
     }
