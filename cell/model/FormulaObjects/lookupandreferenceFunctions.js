@@ -829,12 +829,9 @@ function (window, undefined) {
 		arg3 = arg3.getValue();
 		arg4 = arg4.getValue();
 
-
-		if (arg3 < 0) {
-			arg3 = 1;
-		}
-		if (arg4 < 0) {
-			arg4 = 1;
+		if (arg3 == 0 || arg4 == 0)
+		{
+			return new cError(cErrorType.bad_reference);
 		}
 
 		var res;
@@ -844,21 +841,36 @@ function (window, undefined) {
 			if (box) {
 				box = box.clone(true);
 
-				box.r2 = box.r1 + arg1 + arg3 - 1;
-				box.c2 = box.c1 + arg2 + arg4 - 1;
-				box.r1 = box.r1 + arg1;
-				box.c1 = box.c1 + arg2;
+				if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
+					if (arg.length === 3 || (arg4 < 0 && arg3 < 0)) {
+						box.c1 = box.c1 + arg2;
+						box.r1 = box.r1 + arg1;
+					} else {
+						if (arg4 < 0) {
+							arg4 = 1;
+						}
+						if (arg3 < 0) {
+							arg3 = 1;
+						}
 
-				//TODO сделать для отрицательных arg3/arg4
-				/*var r2 = box.r1 + arg1 + arg3 - 1;
-				var c2 = box.c1 + arg2 + arg4 - 1;
-				var r1 = box.r1 + arg1;
-				var c1 = box.c1 + arg2;
+						box.c1 = box.c1 + arg2;
+						box.r1 = box.r1 + arg1;
+						box.c2 = box.c1 + arg4 - 1;
+						box.r2 = box.r1 + arg3 - 1;
+					}
+				} else {
+					if (arg4 < 0) {
+						arg4 = box.c2 - box.c1 + 1;
+					}
+					if (arg3 < 0) {
+						arg3 = box.r2 - box.r1 + 1;
+					}
 
-				box.r2 = r2 > r1 ? r2 : r1;
-				box.c2 = c2 > c1 ? c2 : c1;
-				box.r1 = r2 > r1 ? r1 : r2;
-				box.c1 = c2 > c1 ? c1 : c2;*/
+					box.c1 = box.c1 + arg2;
+					box.r1 = box.r1 + arg1;
+					box.c2 = box.c1 + arg4 - 1;
+					box.r2 = box.r1 + arg3 - 1;
+				}
 
 				if (!validBBOX(box)) {
 					return new cError(cErrorType.bad_reference);
