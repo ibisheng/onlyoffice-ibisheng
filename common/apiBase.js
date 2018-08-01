@@ -1899,6 +1899,12 @@
 			return window["AscDesktopEditor"]["IsSignaturesSupport"]();
 		return false;
 	};
+    baseEditorsApi.prototype.asc_isProtectionSupport = function()
+    {
+        if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsProtectionSupport"])
+            return window["AscDesktopEditor"]["IsProtectionSupport"]();
+        return false;
+    };
 
 	baseEditorsApi.prototype.asc_gotoSignature = function(guid)
 	{
