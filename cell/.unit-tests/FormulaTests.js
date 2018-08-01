@@ -6544,6 +6544,74 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().toString(), "B1" );
 
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -1, 1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -1, -1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0,,)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, 1,)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -2, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A2:B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -1, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A3:B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, 0, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "#REF!" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, 2, 0)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "#REF!" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, 2, 2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "C3:D4" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, 3, 3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "C3:E5" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 2, 2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "E5:F6" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4,2,2,3,3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "E5:G7" );
+
+		oParser = new parserFormula( "OFFSET(C3:E6, 0, 0, 3, 3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "C3:E5" );
+
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, -2, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B2:C3" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, -3, -3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A1:C3" );
+
+		oParser = new parserFormula( "OFFSET(C3:E6, 0, 0, -3, -3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A1:C3" );
+
+		oParser = new parserFormula( "OFFSET(F10:M17, 0, 0, -7,-5)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B4:F10" );
     } );
 
     /*
