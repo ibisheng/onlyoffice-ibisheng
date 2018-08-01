@@ -401,7 +401,16 @@ CShape.prototype.getCanvasContext = function()
 };
 CShape.prototype.getCompiledStyle = function()
 {
-    return this.style;
+    if(this.style){
+        return this.style;
+    }
+    var hierarchy = this.getHierarchy();
+    for (var i = 0; i < hierarchy.length; ++i) {
+        if (hierarchy[i] && hierarchy[i].style) {
+            return hierarchy[i].style;
+        }
+    }
+    return null;
 };
 CShape.prototype.getParentObjects = function ()
 {
