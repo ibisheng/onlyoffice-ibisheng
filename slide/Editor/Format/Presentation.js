@@ -6762,9 +6762,11 @@ CPresentation.prototype =
         if(this.Document_Is_SelectionLocked(AscCommon.changestype_Layout) === false)
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ChangeLayout);
+            var oSelectionStateState = null;
             if(this.Slides[this.CurPage])
             {
-                this.Slides[this.CurPage].graphicObjects.resetSelection();
+                oSelectionStateState = {};
+                this.Slides[this.CurPage].graphicObjects.Save_DocumentStateBeforeLoadChanges(oSelectionStateState);
             }
             var layout = MasterLayouts.sldLayoutLst[layout_index];
             for(var i = 0; i < _array.length; ++i)
@@ -6868,6 +6870,11 @@ CPresentation.prototype =
                         }
                     }
                 }
+            }
+            if(oSelectionStateState)
+            {
+                this.Slides[this.CurPage].graphicObjects.resetSelection();
+                this.Slides[this.CurPage].graphicObjects.loadDocumentStateAfterLoadChanges(oSelectionStateState, this.CurPage);
             }
             this.Recalculate();
             this.Document_UpdateInterfaceState();
