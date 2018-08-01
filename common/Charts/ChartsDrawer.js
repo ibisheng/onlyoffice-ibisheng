@@ -1117,7 +1117,7 @@ CChartsDrawer.prototype =
 					}
 				}
 
-				if(sum) {
+				if(sum && data[0]) {
 					for (var j = 0; j < (data[0].length); j++) {
 						for (var i = 0; i < data.length; i++) {
 							if (sum[j] == 0) {
@@ -1143,10 +1143,12 @@ CChartsDrawer.prototype =
 					}
 				}
 			} else {
-				for (var j = 0; j < (data[0].length); j++) {
-					res[j] = 0;
-					for (var i = 0; i < data.length; i++) {
-						res[j] += Math.abs(data[i][j]);
+				if(data[0]) {
+					for (var j = 0; j < (data[0].length); j++) {
+						res[j] = 0;
+						for (var i = 0; i < data.length; i++) {
+							res[j] += Math.abs(data[i][j]);
+						}
 					}
 				}
 			}
