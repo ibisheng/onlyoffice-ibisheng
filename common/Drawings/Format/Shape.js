@@ -4377,7 +4377,11 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
         var drawingObjects = this.getDrawingObjectsController();
         if (typeof editor !== "undefined" && editor && graphics.m_oContext !== undefined && graphics.m_oContext !== null && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
         {
-            if (global_MatrixTransformer.IsIdentity2(_transform))
+            var angle = _transform.GetRotation();
+            if (AscFormat.fApproxEqual(angle, 0.0, 0.0) ||
+                AscFormat.fApproxEqual(angle, 90.0, 0.0) ||
+                AscFormat.fApproxEqual(angle, 180.0, 0.0) ||
+                AscFormat.fApproxEqual(angle, 270.0, 0.0))
             {
                 graphics.transform3(_transform, false);
                 var tr = graphics.m_oFullTransform;
@@ -4388,11 +4392,15 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
                 var _r = tr.TransformPointX(this.extX, this.extY);
                 var _b = tr.TransformPointY(this.extX, this.extY);
 
+                var __x = Math.min(_x, _r);
+                var __y = Math.min(_y, _b);
+                var __r = Math.max(_x, _r);
+                var __b = Math.max(_y, _b);
                 graphics.m_oContext.lineWidth = 1;
                 graphics.p_color(127, 127, 127, 255);
 
                 graphics._s();
-                editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(graphics.m_oContext, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2, true);
+                editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(graphics.m_oContext, __x >> 0, __y >> 0, __r >> 0, __b >> 0, 2, 2, true);
                 graphics._s();
             }
             else {
