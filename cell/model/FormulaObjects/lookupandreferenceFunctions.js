@@ -841,35 +841,44 @@ function (window, undefined) {
 			if (box) {
 				box = box.clone(true);
 
-				if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
-					if (arg.length === 3 || (arg4 < 0 && arg3 < 0)) {
-						box.c1 = box.c1 + arg2;
-						box.r1 = box.r1 + arg1;
-					} else {
-						if (arg4 < 0) {
-							arg4 = 1;
-						}
-						if (arg3 < 0) {
-							arg3 = 1;
+				//в документации написано, что в отрицательных значений в 4 и 5 аргументах быть не может
+				//но на деле ms рассчитывает такие формулы
+				//сделал аналогично
+
+				box.c1 = box.c1 + arg2;
+				box.r1 = box.r1 + arg1;
+				box.c2 = box.c2 + arg2;
+				box.r2 = box.r2 + arg1;
+				if(cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
+					if (arg.length > 3) {
+						if(arg4 < 0) {
+							box.c1 = box.c1 + arg4 + 1;
+						} else {
+							box.c2 = box.c1 + arg4 - 1;
 						}
 
-						box.c1 = box.c1 + arg2;
-						box.r1 = box.r1 + arg1;
-						box.c2 = box.c1 + arg4 - 1;
-						box.r2 = box.r1 + arg3 - 1;
+						if(arg3 < 0) {
+							box.r1 = box.r1 + arg3 + 1;
+						} else {
+							box.r2 = box.r1 + arg3 - 1;
+						}
 					}
 				} else {
-					if (arg4 < 0) {
-						arg4 = box.c2 - box.c1 + 1;
-					}
-					if (arg3 < 0) {
-						arg3 = box.r2 - box.r1 + 1;
-					}
+					if (arg.length > 3) {
+						if(arg4 < 0) {
+							box.c1 = box.c1 + arg4 + 1;
+							box.c2 = box.c1 - arg4 - 1;
+						} else {
+							box.c2 = box.c1 + arg4 - 1;
+						}
 
-					box.c1 = box.c1 + arg2;
-					box.r1 = box.r1 + arg1;
-					box.c2 = box.c1 + arg4 - 1;
-					box.r2 = box.r1 + arg3 - 1;
+						if(arg3 < 0) {
+							box.r1 = box.r1 + arg3 + 1;
+							box.r2 = box.r1 - arg3 - 1;
+						} else {
+							box.r2 = box.r1 + arg3 - 1;
+						}
+					}
 				}
 
 				if (!validBBOX(box)) {
