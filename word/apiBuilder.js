@@ -74,10 +74,10 @@
 	}
 
 
-	/*
+	/**
 	 * Class representing paragraph bullet
 	 * @constructor
-	 * */
+	 */
 	function ApiBullet(Bullet)
 	{
 		this.Bullet = Bullet;
