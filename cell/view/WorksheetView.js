@@ -6103,7 +6103,7 @@
 	WorksheetView.prototype.getCursorTypeFromXY = function (x, y) {
 	    var canEdit = this.handlers.trigger('canEdit');
 		this.handlers.trigger("checkLastWork");
-		var res, c, r, f, i, offsetX, offsetY, cellCursor;
+		var res, c, r, f, offsetX, offsetY, cellCursor;
 		var sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink;
 		var widthDiff = 0, heightDiff = 0, isLocked = false, target = c_oTargetType.Cells, row = -1, col = -1,
 			isSelGraphicObject, isNotFirst;
@@ -12789,6 +12789,9 @@
         return arrResult;
     };
 
+	WorksheetView.prototype.getFilterButtonSize = function () {
+	    return AscBrowser.isRetina ? AscCommon.AscBrowser.convertToRetinaValue(filterSizeButton, true) : filterSizeButton;
+	};
     WorksheetView.prototype.af_drawButtons = function (updatedRange, offsetX, offsetY) {
         var i, aWs = this.model;
         var t = this;
@@ -12893,13 +12896,8 @@
 		var row = props.row;
         var col = props.col;
 
-		var widthButtonPx = filterSizeButton;
-		var heightButtonPx = filterSizeButton;
-		if (AscBrowser.isRetina)
-		{
-			widthButtonPx = AscCommon.AscBrowser.convertToRetinaValue(widthButtonPx, true);
-			heightButtonPx = AscCommon.AscBrowser.convertToRetinaValue(heightButtonPx, true);
-		}
+        var widthButtonPx, heightButtonPx;
+		widthButtonPx = heightButtonPx = this.getFilterButtonSize();
 
 		var widthBorder = 1;
 		var scaleIndex = 1;
@@ -13192,8 +13190,8 @@
 	WorksheetView.prototype._hitCursorFilterButton = function(x, y, col, row)
 	{
 		var ws = this;
-		var width = filterSizeButton;
-		var height = filterSizeButton;
+		var width, height;
+		width = height = this.getFilterButtonSize();
 		var rowHeight = ws.rows[row].height;
 		if (rowHeight < height) {
 			width = width * (rowHeight / height);
@@ -13277,8 +13275,8 @@
         };
 
         if (isCellContainsAutoFilterButton(c, r)) {
-            var height = filterSizeButton;
-            var width = filterSizeButton;
+			var width, height;
+			width = height = this.getFilterButtonSize();
             var rowHeight = ws.rows[r].height;
             var index = 1;
             if (rowHeight < height) {
