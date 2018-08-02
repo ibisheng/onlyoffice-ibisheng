@@ -2661,7 +2661,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
             hierarchy_styles.splice(0, 0, ownStyle);
         }
         var shape_text_style;
-        var compiled_style = this.getCompiledStyle();
+        var compiled_style = this.getCompiledStyle && this.getCompiledStyle();
         if (isRealObject(compiled_style) && isRealObject(compiled_style.fontRef)) {
             shape_text_style = new CStyle("shapeTextStyle", null, null, null, true);
             var first_name;
