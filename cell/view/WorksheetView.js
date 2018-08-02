@@ -11051,7 +11051,19 @@
         return oldColWidth !== cc ? cw : -1;
     };
 
-    WorksheetView.prototype.autoFitColumnWidth = function () {
+    WorksheetView.prototype._autoFitColumnWidth = function (col) {
+    	var res = false;
+		var w = this.onChangeWidthCallback(col, null, null);
+		if (-1 !== w) {
+			this._calcColWidth(0, col);
+			this.cols[col].isCustomWidth = false;
+			res = true;
+
+			this._cleanCache(new asc_Range(col, 0, col, this.rows.length - 1));
+		}
+		return res;
+	};
+    WorksheetView.prototype.autoFitColumnsWidth = function (col) {
         var t = this;
         var max = this.model.getColsCount();
 		var selectionRanges = t.model.selectionRange.clone().ranges;
@@ -11061,25 +11073,26 @@
                 return;
             }
 
-            var c1, c2, w, bUpdate = false;
+            var c1, c2, bUpdate = false;
 
 			History.Create_NewPoint();
 			History.StartTransaction();
 
-            for (var i = 0; i < selectionRanges.length; ++i) {
-                c1 = selectionRanges[i].c1;
-				c2 = Math.min(selectionRanges[i].c2, max);
-				for (; c1 <= c2; ++c1) {
-					w = t.onChangeWidthCallback(c1, null, null);
-					if (-1 !== w) {
-						t._calcColWidth(0, c1);
-						t.cols[c1].isCustomWidth = false;
-						bUpdate = true;
-
-						t._cleanCache(new asc_Range(c1, 0, c1, t.rows.length - 1));
+			if (null !== col) {
+				if (t._autoFitColumnWidth(col)) {
+					bUpdate = true;
+				}
+			} else {
+				for (var i = 0; i < selectionRanges.length; ++i) {
+					c1 = selectionRanges[i].c1;
+					c2 = Math.min(selectionRanges[i].c2, max);
+					for (; c1 <= c2; ++c1) {
+						if (t._autoFitColumnWidth(c1)) {
+							bUpdate = true;
+						}
 					}
 				}
-            }
+			}
 
 			if (bUpdate) {
 				t._updateColumnPositions();

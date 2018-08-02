@@ -2184,7 +2184,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_autoFitColumnWidth = function() {
-    this.wb.getWorksheet().autoFitColumnWidth();
+    this.wb.getWorksheet().autoFitColumnsWidth(null);
   };
 
   spreadsheet_api.prototype.asc_getRowHeight = function() {
