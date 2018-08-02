@@ -3016,6 +3016,14 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     {
                         this.x = 0;
                         this.y = 0;
+
+                        if(oParaDrawing.Extent && AscFormat.isRealNumber(oParaDrawing.Extent.W) && AscFormat.isRealNumber(oParaDrawing.Extent.H))
+                        {
+                            this.x = 0;
+                            this.y = 0;
+                            this.extX = oParaDrawing.Extent.W;
+                            this.extY = oParaDrawing.Extent.H;
+                        }
                         if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)
                         {
                             this.m_oSectPr = null;
