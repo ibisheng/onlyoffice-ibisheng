@@ -2520,7 +2520,7 @@
             var ws, ref, defNameRef, defName;
             for(var i = 0; i < wb.aWorksheets.length; i++) {
 				ws = wb.aWorksheets[i];
-                if(ws && ws.AutoFilter) {
+                if(ws && ws.AutoFilter && ws.AutoFilter.Ref) {
                     ref = ws.AutoFilter.Ref;
 					defNameRef = AscCommon.parserHelp.get3DRef(ws.getName(), ref.getAbsName());
 					defName = new Asc.asc_CDefName(filterDefName, defNameRef, ws.index, false, true);
