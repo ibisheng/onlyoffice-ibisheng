@@ -7656,7 +7656,7 @@ $( function () {
 
 		oParser = new parserFormula( 'CONVERT(1, "lbm", "kg")', "A2", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.4535923 );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.4535924 );
 
 		oParser = new parserFormula( 'CONVERT(1, "lbm", "mg")', "A2", ws );
 		ok( oParser.parse() );
