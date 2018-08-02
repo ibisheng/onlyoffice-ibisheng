@@ -1677,6 +1677,7 @@ CPresentation.prototype =
     Remove_ForeignCursor: function(UserId)
     {
         this.DrawingDocument.Collaborative_RemoveTarget(UserId);
+        AscCommon.CollaborativeEditing.Remove_ForeignCursor(UserId);
     },
 
 

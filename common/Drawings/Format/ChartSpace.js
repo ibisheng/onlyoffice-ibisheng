@@ -3891,7 +3891,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                                 pt = new AscFormat.CStringPoint();
                                 pt.setIdx(pt_index);
                                 pt.setVal(cell.getValueWithFormat());
-                                
+
                                 if(str_cache.pts.length === 0){
                                     pt.formatCode = cell.getNumFormatStr()
                                 }
