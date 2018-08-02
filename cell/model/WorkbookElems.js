@@ -3222,6 +3222,13 @@ Hyperlink.prototype = {
 		if (null != this.xfs) {
 			oNewCol.xfs = this.xfs;
 		}
+
+		if (null != this.widthPx) {
+			oNewCol.widthPx = this.widthPx;
+		}
+		if (null != this.charCount) {
+			oNewCol.charCount = this.charCount;
+		}
 		return oNewCol;
 	};
 	Col.prototype.getWidthProp = function () {

@@ -3300,6 +3300,8 @@
 		if (null !== column.width) {
 			column.widthPx = this.modelColWidthToColWidth(column.width);
 			column.charCount = this.colWidthToCharCount(column.widthPx);
+		} else {
+			column.widthPx = column.charCount = null;
 		}
 	};
 	Worksheet.prototype.initColumns = function () {
@@ -10834,6 +10836,7 @@
 								var oOldProps = col.getWidthProp();
 								if (false == oOldProps.isEqual(oNewProps)) {
 									col.setWidthProp(oNewProps);
+									wsTo.initColumn(col);
 									History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, wsTo.getId(), new Asc.Range(nCurIndex, 0, nCurIndex, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(nCurIndex, false, oOldProps, oNewProps));
 								}
 							}

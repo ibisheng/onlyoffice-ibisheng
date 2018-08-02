@@ -1955,11 +1955,8 @@ function (window, undefined) {
 				wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
 			var col = ws._getCol(index);
-			if (bUndo) {
-				col.setWidthProp(Data.oOldVal);
-			} else {
-				col.setWidthProp(Data.oNewVal);
-			}
+			col.setWidthProp(bUndo ? Data.oOldVal : Data.oNewVal);
+			ws.initColumn(col);
 		} else if (AscCH.historyitem_Worksheet_RowProp == Type) {
 			index = Data.index;
 			if (wb.bCollaborativeChanges) {
