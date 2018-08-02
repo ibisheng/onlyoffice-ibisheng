@@ -2089,6 +2089,55 @@ CChartsDrawer.prototype =
 		}
 	},
 
+	drawPathsByIdx: function (paths, series, useNextPoint, bIsYVal) {
+
+		var seria, brush, pen, numCache, point;
+		var seriesPaths = paths.series;
+
+		if(!seriesPaths) {
+			return;
+		}
+
+		for (var i = 0; i < seriesPaths.length; i++) {
+
+			if (!seriesPaths[i]) {
+				continue;
+			}
+
+			seria = series[i];
+			brush = seria.brush;
+			pen = seria.pen;
+
+			for (var j = 0; j < seriesPaths[i].length; j++) {
+
+				if (bIsYVal) {
+					numCache = this.getNumCache(seria.yVal);
+				} else {
+					numCache = this.getNumCache(seria.val);
+				}
+
+				var idx = seriesPaths[i][j].idx;
+				if(useNextPoint) {
+					idx = seriesPaths[i][j + 1] ? seriesPaths[i][j + 1].idx : seriesPaths[i][j].idx;
+					point = numCache.getPtByIndex(idx);
+				} else {
+					point = numCache.getPtByIndex(idx);
+				}
+
+				if (point && point.pen) {
+					pen = point.pen;
+				}
+				if (point && point.brush) {
+					brush = point.brush;
+				}
+
+				if (seriesPaths[i][j]) {
+					this.drawPath(seriesPaths[i][j].path, pen, brush);
+				}
+			}
+		}
+	},
+
 	drawPath: function(path, pen, brush)
 	{
 		if(!AscFormat.isRealNumber(path)){
@@ -10059,6 +10108,78 @@ drawScatterChart.prototype = {
 		this._calculateAllLines(points);
 	},
 
+
+	_recalculateScatter2: function () {
+		var xPoints = this.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
+		var betweenAxisCross = this.valAx.crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN;
+
+		var seria, yVal, xVal, points, yNumCache, compiledMarkerSize, compiledMarkerSymbol, yPoint, idx, xPoint;
+		for (var i = 0; i < this.chart.series.length; i++) {
+			seria = this.chart.series[i];
+			yNumCache = this.cChartDrawer.getNumCache(seria.yVal);
+
+			if (!yNumCache) {
+				continue;
+			}
+
+			for (var n = 0; n < yNumCache.ptCount; n++) {
+				//idx - индекс точки по оси OY
+				idx = yNumCache.pts && undefined !== yNumCache.pts[n] ? yNumCache.pts[n].idx : null;
+				if(null === idx) {
+					continue;
+				}
+
+				//вычисляем yVal
+				//пытаемся вычислить xVal  в зависимости от idx точки по OY
+				yVal = this._getYVal(n, i);
+				xPoint = this.cChartDrawer.getIdxPoint(seria, idx, true);
+				if (xPoint) {
+					xVal = xPoint.val;
+					if (!isNaN(parseFloat(xVal))) {
+						xVal = parseFloat(xVal);
+					} else {
+						xVal = n + 1;
+					}
+				} else {
+					//xVal = betweenAxisCross ? n : n + 1;
+					//xVal = this.catAx instanceof AscFormat.CCatAx ? n : n + 1;
+					xVal = n + 1;
+				}
+
+
+				yPoint = this.cChartDrawer.getIdxPoint(seria, idx);
+				compiledMarkerSize = yPoint && yPoint.compiledMarker ? yPoint.compiledMarker.size : null;
+				compiledMarkerSymbol = yPoint && yPoint.compiledMarker ? yPoint.compiledMarker.symbol : null;
+
+
+				if (!this.paths.points) {
+					this.paths.points = [];
+				}
+				if (!this.paths.points[i]) {
+					this.paths.points[i] = [];
+				}
+
+				if (!points) {
+					points = [];
+				}
+				if (!points[i]) {
+					points[i] = [];
+				}
+
+				if (yVal != null) {
+					this.paths.points[i][n] = this.cChartDrawer.calculatePoint(this.cChartDrawer.getYPosition(xVal, this.catAx, true), this.cChartDrawer.getYPosition(yVal, this.valAx), compiledMarkerSize, compiledMarkerSymbol);
+					points[i][n] = {x: xVal, y: yVal};
+				} else {
+					this.paths.points[i][n] = null;
+					points[i][n] = null;
+				}
+			}
+		}
+
+		this._calculateAllLines(points);
+	},
+
 	_calculateAllLines: function (points) {
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
@@ -10095,6 +10216,7 @@ drawScatterChart.prototype = {
 						var x3 = points[i][n + 2] ? points[i][n + 2].x : points[i][n + 1] ? points[i][n + 1].x : points[i][n].x;
 						var y3 = points[i][n + 2] ? points[i][n + 2].y : points[i][n + 1] ? points[i][n + 1].y : points[i][n].y;
 
+						//this.paths.series[i][n] = {path: this.cChartDrawer.calculateSplineLine(x, y, x1, y1, x2, y2, x3, y3, this.catAx, this.valAx), idx: points[i][n].idx};
 						this.paths.series[i][n] = this.cChartDrawer.calculateSplineLine(x, y, x1, y1, x2, y2, x3, y3, this.catAx, this.valAx);
 					} else {
 						x = this.cChartDrawer.getYPosition(points[i][n].x, this.catAx);
@@ -10103,6 +10225,7 @@ drawScatterChart.prototype = {
 						x1 = this.cChartDrawer.getYPosition(points[i][n + 1].x, this.catAx);
 						y1 = this.cChartDrawer.getYPosition(points[i][n + 1].y, this.valAx);
 
+						//this.paths.series[i][n] = {path: this._calculateLine(x, y, x1, y1), idx: points[i][n].idx};
 						this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
 					}
 				}
@@ -10127,6 +10250,7 @@ drawScatterChart.prototype = {
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
 		//draw lines
+		//this.cChartDrawer.drawPathsByIdx(this.paths, this.chart.series, true, true);
 		this.cChartDrawer.drawPaths(this.paths, this.chart.series, true, true);
 		//end clip rect
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
