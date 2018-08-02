@@ -13098,11 +13098,11 @@
 			width = colWidth;
 			height = height * scaleIndex;
 		}
-		else if (rowHeight < height)
+		else if ((rowHeight - widthBorder * 2) < height)
 		{
-			scaleIndex = rowHeight / height;
+			scaleIndex = rowHeight / (height + widthBorder * 2);
 			width = width * scaleIndex;
-			height = rowHeight;
+			height = rowHeight -  widthBorder * 2;
 		}
 
 
