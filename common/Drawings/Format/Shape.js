@@ -2661,10 +2661,11 @@ CShape.prototype.recalculateTextStyles = function (level) {
             hierarchy_styles.splice(0, 0, ownStyle);
         }
         var shape_text_style;
-        if (isRealObject(this.style) && isRealObject(this.style.fontRef)) {
+        var compiled_style = this.getCompiledStyle();
+        if (isRealObject(compiled_style) && isRealObject(compiled_style.fontRef)) {
             shape_text_style = new CStyle("shapeTextStyle", null, null, null, true);
             var first_name;
-            if (this.style.fontRef.idx === AscFormat.fntStyleInd_major)
+            if (compiled_style.fontRef.idx === AscFormat.fntStyleInd_major)
                 first_name = "+mj-";
             else
                 first_name = "+mn-";
@@ -2674,10 +2675,10 @@ CShape.prototype.recalculateTextStyles = function (level) {
             shape_text_style.TextPr.RFonts.CS = {Name: first_name + "cs", Index: -1};
             shape_text_style.TextPr.RFonts.HAnsi = {Name: first_name + "lt", Index: -1};
 
-            if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) {
+            if (compiled_style.fontRef.Color != null && compiled_style.fontRef.Color.color != null) {
                 var unifill = new AscFormat.CUniFill();
                 unifill.fill = new AscFormat.CSolidFill();
-                unifill.fill.color = this.style.fontRef.Color;
+                unifill.fill.color = compiled_style.fontRef.Color;
                 shape_text_style.TextPr.Unifill = unifill;
             }
         }
