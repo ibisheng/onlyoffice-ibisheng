@@ -304,7 +304,7 @@
 				var coord = t._getCoordinates(event);
 				t.handlers.trigger("mouseDblClick", coord.x, coord.y, isHideCursor, function () {
 					// Мы изменяли размеры колонки/строки, не редактируем ячейку. Обновим состояние курсора
-					t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, ctrlKey,
+					t.handlers.trigger("updateWorksheet", coord.x, coord.y, ctrlKey,
 						function (info) {t.targetInfo = info;});
 				});
 			}, 100);
@@ -1328,7 +1328,7 @@
 			}
 
 			if (!this.targetInfo) {
-				this.handlers.trigger("updateWorksheet", this.element, coord.x, coord.y, false, function (info) {
+				this.handlers.trigger("updateWorksheet", coord.x, coord.y, false, function (info) {
 					t.targetInfo = info;
 				});
 			}
@@ -1559,11 +1559,11 @@
 			if (t.isShapeAction || graphicsInfo) {
 				event.isLocked = t.isMousePressed;
 				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
-				t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, ctrlKey, function(info){t.targetInfo = info;});
+				t.handlers.trigger("updateWorksheet", coord.x, coord.y, ctrlKey, function(info){t.targetInfo = info;});
 				return true;
 			}
 
-			t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, ctrlKey, function(info){t.targetInfo = info;});
+			t.handlers.trigger("updateWorksheet", coord.x, coord.y, ctrlKey, function(info){t.targetInfo = info;});
 			return true;
 		};
 
@@ -1573,7 +1573,7 @@
 			this.hasCursor = false;
 			if (!this.isSelectMode && !this.isResizeMode && !this.isMoveResizeRange) {
 				this.targetInfo = undefined;
-				this.handlers.trigger("updateWorksheet", this.element);
+				this.handlers.trigger("updateWorksheet");
 			}
 			if (this.isMoveRangeMode) {
 				t.moveRangeTimerId = window.setTimeout(function(){t._moveRangeHandle2(event)},0);
@@ -1629,7 +1629,7 @@
 				deltaY = 0;
 			}
 
-			this.handlers.trigger("updateWorksheet", this.element, /*x*/undefined, /*y*/undefined, /*ctrlKey*/undefined,
+			this.handlers.trigger("updateWorksheet", /*x*/undefined, /*y*/undefined, /*ctrlKey*/undefined,
 				function () {
 					if (deltaX) {
 						deltaX = Math.sign(deltaX) * Math.ceil(Math.abs(deltaX / 3));

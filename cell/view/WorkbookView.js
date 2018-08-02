@@ -1075,13 +1075,13 @@
     asc_applyFunction(callback, d);
   };
 
-  WorkbookView.prototype._onUpdateWorksheet = function(canvasElem, x, y, ctrlKey, callback) {
+  WorkbookView.prototype._onUpdateWorksheet = function(x, y, ctrlKey, callback) {
     var ws = this.getWorksheet(), ct = undefined;
     var arrMouseMoveObjects = [];					// Теперь это массив из объектов, над которыми курсор
 
     //ToDo: включить определение target, если находимся в режиме редактирования ячейки.
     if (this.getCellEditMode() && !this.controller.isFormulaEditMode) {
-      canvasElem.style.cursor = "";
+      this.element.style.cursor = "";
     } else if (x === undefined && y === undefined) {
       ws.cleanHighlightedHeaders();
     } else {
@@ -1171,10 +1171,7 @@
         ct.cursor = "copy";
       }
 
-      var newHtmlCursor = AscCommon.g_oHtmlCursor.value(ct.cursor);
-      if (canvasElem.style.cursor !== newHtmlCursor) {
-        canvasElem.style.cursor = newHtmlCursor;
-      }
+      this._onUpdateCursor(ct.cursor);
       if (ct.target === c_oTargetType.ColumnHeader || ct.target === c_oTargetType.RowHeader) {
         ws.drawHighlightedHeaders(ct.col, ct.row);
       } else {
@@ -1182,6 +1179,13 @@
       }
     }
     asc_applyFunction(callback, ct);
+  };
+  
+  WorkbookView.prototype._onUpdateCursor = function (cursor) {
+  	var newHtmlCursor = AscCommon.g_oHtmlCursor.value(cursor);
+  	if (this.element.style.cursor !== newHtmlCursor) {
+		this.element.style.cursor = newHtmlCursor;
+  	}
   };
 
   WorkbookView.prototype._onResizeElement = function(target, x, y) {
