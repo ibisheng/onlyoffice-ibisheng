@@ -3305,11 +3305,6 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
-
-            if(editor.sync_EndAddShape)
-            {
-                editor.sync_EndAddShape();
-            }
             if(oController && !this.FocusOnNotes)
             {
                 var oDrawingObjects = oController;
@@ -3319,13 +3314,13 @@ CPresentation.prototype =
                     || oDrawingObjects.curState instanceof  AscFormat.AddPolyLine2State
                     || oDrawingObjects.arrTrackObjects.length > 0)
                 {
+                    editor.sync_EndAddShape();
                     oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
                     if( oDrawingObjects.arrTrackObjects.length > 0)
                     {
                         oDrawingObjects.clearTrackObjects();
                         oDrawingObjects.updateOverlay();
                     }
-                    editor.sync_EndAddShape();
                     this.UpdateCursorType( 0, 0,  new AscCommon.CMouseEventHandler() );
                     return;
                 }
@@ -7404,7 +7399,8 @@ CPresentation.prototype =
         {
             if(!(_is_apply === false))
             {
-
+                this.FocusOnNotes = false;
+                editor.WordControl.Thumbnails && editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
                 editor.sync_HideComment();
                 this.Slides[this.CurPage].graphicObjects.startTrackNewShape(preset);
             }
