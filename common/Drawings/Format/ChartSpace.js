@@ -3867,6 +3867,9 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                                 pt.setIdx(pt_index);
                                 pt.setVal(value_width_format);
 
+                                if(str_cache.pts.length === 0){
+                                    pt.formatCode = cell.getNumFormatStr()
+                                }
                                 str_cache.addPt(pt);
                                 //addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
                             }
@@ -3888,6 +3891,10 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                                 pt = new AscFormat.CStringPoint();
                                 pt.setIdx(pt_index);
                                 pt.setVal(cell.getValueWithFormat());
+                                
+                                if(str_cache.pts.length === 0){
+                                    pt.formatCode = cell.getNumFormatStr()
+                                }
                                 str_cache.addPt(pt);
                                 //addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
                             }
@@ -3964,6 +3971,7 @@ CChartSpace.prototype.recalculateReferences = function()
                 this.checkValByNumRef(this.worksheet.workbook, ser, ser.xVal, bVert);
                 this.checkValByNumRef(this.worksheet.workbook, ser, ser.yVal);
                 this.checkCatByNumRef(this, ser, ser.tx, AscFormat.isRealBool(bVert) ? !bVert : undefined);
+                this.checkCatByNumRef(this, ser, ser.xVal, bVert);
 
                 if(ser.isHidden)
                 {
@@ -4314,11 +4322,11 @@ CChartSpace.prototype.getValAxisCrossType = function()
         var aStrings = [];
         var oPlotArea = this.chart.plotArea, i;
         var nAxisType = oAxis.getObjectType();
+        var oSeries = oPlotArea.getSeriesWithSmallestIndexForAxis(oAxis);
         switch(nAxisType){
             case AscDFH.historyitem_type_DateAx:
             case AscDFH.historyitem_type_CatAx:{
                 //расчитаем подписи для горизонтальной оси
-                var oSeries = oPlotArea.getSeriesWithSmallestIndexForAxis(oAxis);
                 var nPtsLen = 0;
                 var aScale = [];
                 if(Array.isArray(oAxis.scale)){
@@ -4455,6 +4463,14 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 var oNumFormat = null;
                 if(oNumFmt && typeof oNumFmt.formatCode === "string"){
                     oNumFormat = oNumFormatCache.get(oNumFmt.formatCode);
+                }
+                else{
+                    if(oSeries && oSeries.xVal){
+                        var strCache = oSeries.xVal.strRef && oSeries.xVal.strRef.strCache;
+                        if(strCache && strCache.pts[0] && typeof strCache.pts[0].formatCode === "string"){
+                            oNumFormat = oNumFormatCache.get(strCache.pts[0].formatCode);
+                        }
+                    }
                 }
                 for(var t = 0; t < aVal.length; ++t){
                     var fCalcValue = aVal[t]*fMultiplier;
