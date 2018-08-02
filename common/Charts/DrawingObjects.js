@@ -1290,6 +1290,8 @@ function DrawingObjects() {
     _this.asyncImagesDocumentEndLoaded = null;
     _this.CompositeInput = null;
 
+    _this.lastX = 0;
+    _this.lastY = 0;
 
     _this.nCurPointItemsLength = -1;
     // Task timer
@@ -4163,6 +4165,8 @@ function DrawingObjects() {
     _this.graphicObjectMouseMove = function(e, x, y) {
         e.IsLocked = e.isLocked;
 
+        _this.lastX = x;
+        _this.lastY = y;
         var offsets = _this.drawingArea.getOffsets(x, y, true);
         if ( offsets )
             _this.controller.onMouseMove( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );

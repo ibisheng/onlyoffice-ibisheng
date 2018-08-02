@@ -6717,6 +6717,13 @@ DrawingObjectsController.prototype =
             if(Asc["editor"])
             {
                 Asc["editor"].asc_endAddShape();
+                var ws = Asc["editor"].wb.getWorksheet();
+                if(ws){
+                    var ct = ws.getCursorTypeFromXY(ws.objectRender.lastX, ws.objectRender.lastY);
+                    if(ct){
+                        Asc["editor"].wb._onUpdateCursor(ct.cursor);
+                    }
+                }
             }
             return true;
         }
