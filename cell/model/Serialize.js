@@ -8380,9 +8380,11 @@
                 }
 				bwtr.ReadSheetDataExternal(false);
                 wb.init(this.oReadResult.tableCustomFunc, false, true);
-            } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){
+            } else {
 				bwtr.ReadSheetDataExternal(true);
-                wb.init(this.oReadResult.tableCustomFunc, true);
+				if(window["Asc"] && window["Asc"]["editor"] !== undefined) {
+					wb.init(this.oReadResult.tableCustomFunc, true);
+				}
             }
             return res;
         };
