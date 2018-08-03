@@ -787,6 +787,11 @@ CChartsDrawer.prototype =
 		var pxTop = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		var pxBottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
+		//TODO позже пересмотреть правку
+		if(topMainTitle && topMainTitle * pxToMM > pxTop) {
+			pxTop = (this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) / 2 + topMainTitle) * pxToMM;
+		}
+
 		//TODO пересмотреть!!!
 		if(pieChart && plotArea.charts.length === 1) {
 			if (plotArea.layout) {
