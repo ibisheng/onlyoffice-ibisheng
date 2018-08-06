@@ -207,7 +207,10 @@ StartAddNewShape.prototype =
         this.drawingObjects.updateOverlay();
         if(Asc["editor"])
         {
-            Asc["editor"].asc_endAddShape();
+            if(!e.fromWindow)
+            {
+                Asc["editor"].asc_endAddShape();
+            }
         }
         else if(editor && editor.sync_EndAddShape)
         {
