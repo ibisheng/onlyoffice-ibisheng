@@ -5944,6 +5944,7 @@ DrawingObjectsController.prototype =
         if(!this.canEdit())
             return;
 
+        var oldCurState = this.curState;
         this.checkSelectedObjectsForMove(this.selection.groupSelection ? this.selection.groupSelection : null);
         this.swapTrackObjects();
         var move_state;
@@ -5956,6 +5957,7 @@ DrawingObjectsController.prototype =
             this.arrTrackObjects[i].track(dx, dy, this.arrTrackObjects[i].originalObject.selectStartPage);
         var nPageIndex  = (this.arrTrackObjects[0] && this.arrTrackObjects[0].originalObject && AscFormat.isRealNumber(this.arrTrackObjects[0].originalObject.selectStartPage)) ? this.arrTrackObjects[0].originalObject.selectStartPage : 0;
         move_state.onMouseUp({}, 0, 0, nPageIndex);
+        this.curState = oldCurState;
     },
 
     cursorMoveToStartPos: function()
