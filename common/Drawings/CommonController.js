@@ -1342,7 +1342,9 @@ DrawingObjectsController.prototype =
                             }
                         }
                         else if(this.handleDblClickEmptyShape){
-                            this.handleDblClickEmptyShape(object);
+                            if(!object.getDocContent()){
+                                this.handleDblClickEmptyShape(object);
+                            }
                         }
                     }
                     if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleOleObjectDoubleClick){

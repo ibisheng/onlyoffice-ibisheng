@@ -1768,13 +1768,10 @@ background-repeat: no-repeat;\
 		if (!this.WordControl.m_oLogicDocument)
 			return false;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props))
-		{
-			if (AscCommon.g_clipboardBase.IsWorking())
-				return false;
+		if (AscCommon.g_clipboardBase.IsWorking())
+			return false;
 
-			return AscCommon.g_clipboardBase.Button_Paste();
-		}
+		return AscCommon.g_clipboardBase.Button_Paste();
 	};
 
 	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)
