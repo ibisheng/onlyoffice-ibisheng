@@ -3297,11 +3297,13 @@
 		}
 	};
 	Worksheet.prototype.initColumn = function (column) {
-		if (null !== column.width) {
-			column.widthPx = this.modelColWidthToColWidth(column.width);
-			column.charCount = this.colWidthToCharCount(column.widthPx);
-		} else {
-			column.widthPx = column.charCount = null;
+		if (column) {
+			if (null !== column.width) {
+				column.widthPx = this.modelColWidthToColWidth(column.width);
+				column.charCount = this.colWidthToCharCount(column.widthPx);
+			} else {
+				column.widthPx = column.charCount = null;
+			}
 		}
 	};
 	Worksheet.prototype.initColumns = function () {
