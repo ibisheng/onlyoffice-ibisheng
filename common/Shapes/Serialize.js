@@ -5382,6 +5382,9 @@ function BinaryPPTYLoader()
             switch (nSquare){
                 case 0:
                 {
+                    oCopyBodyPr = shape.txBody.bodyPr ? shape.txBody.bodyPr.createDuplicate() : new AscFormat.CBodyPr();
+                    oCopyBodyPr.rot = (rot2/AscFormat.cToRad + 0.5) >> 0;
+                    shape.txBody.setBodyPr(oCopyBodyPr);
                     break;
                 }
                 case 1:
@@ -5393,6 +5396,9 @@ function BinaryPPTYLoader()
                 }
                 case 2:
                 {
+                    oCopyBodyPr = shape.txBody.bodyPr ? shape.txBody.bodyPr.createDuplicate() : new AscFormat.CBodyPr();
+                    oCopyBodyPr.rot = (rot2/AscFormat.cToRad + 0.5) >> 0;
+                    shape.txBody.setBodyPr(oCopyBodyPr);
                     break;
                 }
                 case 3:
