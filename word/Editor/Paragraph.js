@@ -350,6 +350,10 @@ Paragraph.prototype.Get_FirstTextPr2 = function()
 					return HyperlinkPr;
 				}
 			}
+			else if(para_Math === this.Content[i].Type)
+			{
+				return this.Content[i].GetFirstRPrp();
+			}
 		}
 	}
     return this.Get_CompiledPr2(false).TextPr;
