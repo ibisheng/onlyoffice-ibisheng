@@ -606,6 +606,20 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
     }
 };
 
+CTable.prototype.Internal_UpdateFlowPosition = function(X, Y)
+{
+    this.X_origin = 0.0;
+
+    this.X = 0.0;
+    this.Y = 0.0;
+    var oGraphicFrame = this.Parent;
+    if (oGraphicFrame.spPr && oGraphicFrame.spPr.xfrm && oGraphicFrame.spPr.xfrm.isNotNull()) {
+        var xfrm = oGraphicFrame.spPr.xfrm;
+        xfrm.setOffX(xfrm.offX + X);
+        xfrm.setOffY(xfrm.offY + Y);
+    }
+};
+
 CTableCell.prototype.Content_DrawSelectionOnPage = function(CurPage)
 {
     var Transform       = this.private_GetTextDirectionTransform();
