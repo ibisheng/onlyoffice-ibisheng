@@ -8053,6 +8053,11 @@ background-repeat: no-repeat;\
 		oLogicDocument.GetDrawingDocument().ClearCachePages();
 		oLogicDocument.GetDrawingDocument().FirePaint();
 	};
+	asc_docs_api.prototype.sync_OnChangeSdtGlobalSettings = function()
+	{
+		console.log("Ilya");
+		this.sendEvent("asc_onChangeSdtGlobalSettings");
+	};
 	asc_docs_api.prototype.asc_GetGlobalContentControlHighlightColor = function()
 	{
 		var oLogicDocument = this.private_GetLogicDocument();

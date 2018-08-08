@@ -12508,6 +12508,8 @@ CDocument.prototype.SetSdtGlobalColor = function(r, g, b)
 
 		this.History.Add(new CChangesDocumentSdtGlobalSettings(this, this.Settings.SdtSettings, oNewSettings));
 		this.Settings.SdtSettings = oNewSettings;
+
+		this.OnChangeSdtGlobalSettings();
 	}
 };
 CDocument.prototype.GetSdtGlobalShowHighlight = function()
@@ -12523,7 +12525,13 @@ CDocument.prototype.SetSdtGlobalShowHighlight = function(isShow)
 
 		this.History.Add(new CChangesDocumentSdtGlobalSettings(this, this.Settings.SdtSettings, oNewSettings));
 		this.Settings.SdtSettings = oNewSettings;
+
+		this.OnChangeSdtGlobalSettings();
 	}
+};
+CDocument.prototype.OnChangeSdtGlobalSettings = function()
+{
+	this.GetApi().sync_OnChangeSdtGlobalSettings();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Math

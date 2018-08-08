@@ -529,6 +529,7 @@ CChangesDocumentSdtGlobalSettings.prototype.Type = AscDFH.historyitem_Document_S
 CChangesDocumentSdtGlobalSettings.prototype.private_SetValue = function(Value)
 {
 	this.Class.Settings.SdtSettings = Value;
+	this.Class.OnChangeSdtGlobalSettings();
 };
 CChangesDocumentSdtGlobalSettings.prototype.private_CreateObject = function()
 {
