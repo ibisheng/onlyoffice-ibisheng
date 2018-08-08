@@ -8055,7 +8055,6 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_OnChangeSdtGlobalSettings = function()
 	{
-		console.log("Ilya");
 		this.sendEvent("asc_onChangeSdtGlobalSettings");
 	};
 	asc_docs_api.prototype.asc_GetGlobalContentControlHighlightColor = function()
