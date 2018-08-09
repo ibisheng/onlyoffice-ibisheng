@@ -3374,10 +3374,6 @@ CStyle.prototype.CreateQuote = function()
 		Ind : {
 			Left  : 720 * g_dKoef_twips_to_mm,
 			Right : 720 * g_dKoef_twips_to_mm
-		},
-
-		Spacing : {
-			After : 0
 		}
 	});
 };
@@ -3394,24 +3390,48 @@ CStyle.prototype.CreateIntenseQuote = function()
 	});
 
 	this.SetParaPr({
+
+		ContextualSpacing : false,
+
 		Ind : {
 			Left  : 720 * g_dKoef_twips_to_mm,
 			Right : 720 * g_dKoef_twips_to_mm
 		},
 
+		Shd : {
+			Value : c_oAscShdClear,
+			Color : {r : 0xF2, g : 0xF2, b : 0xF2}
+		},
+
 		Brd : {
 
 			Left : {
-				Color   : {r : 0x59, g : 0x59, b : 0x59},
+				Color   : {r : 0xFF, g : 0xFF, b : 0xFF},
 				Space   : 10 * g_dKoef_pt_to_mm,
-				Size    : 3 * g_dKoef_pt_to_mm,
-				Value   : border_Single,
-				Unifill : AscFormat.CreateUniFillSchemeColorWidthTint(0, 0)
-			}
-		},
+				Size    : 0.5 * g_dKoef_pt_to_mm,
+				Value   : border_Single
+			},
 
-		Spacing : {
-			After : 0
+			Top : {
+				Color   : {r : 0xFF, g : 0xFF, b : 0xFF},
+				Space   : 5 * g_dKoef_pt_to_mm,
+				Size    : 0.5 * g_dKoef_pt_to_mm,
+				Value   : border_Single
+			},
+
+			Right : {
+				Color   : {r : 0xFF, g : 0xFF, b : 0xFF},
+				Space   : 10 * g_dKoef_pt_to_mm,
+				Size    : 0.5 * g_dKoef_pt_to_mm,
+				Value   : border_Single
+			},
+
+			Bottom : {
+				Color   : {r : 0xFF, g : 0xFF, b : 0xFF},
+				Space   : 5 * g_dKoef_pt_to_mm,
+				Size    : 0.5 * g_dKoef_pt_to_mm,
+				Value   : border_Single
+			}
 		}
 	});
 };
