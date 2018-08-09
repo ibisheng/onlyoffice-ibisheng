@@ -6125,25 +6125,28 @@ CPresentation.prototype =
                     this.Slides[this.CurPage].graphicObjects.resetSelection();
                     for(i = 0; i < Content.Drawings.length; ++i)
                     {
-                        if(Content.Drawings[i].Drawing.bDeleted)
+                        if(!Content.Drawings[i].Drawing.isEmptyPlaceholder())
                         {
-                            if(Content.Drawings[i].Drawing.setBDeleted2)
+                            if(Content.Drawings[i].Drawing.bDeleted)
                             {
-                                Content.Drawings[i].Drawing.setBDeleted2(false);
+                                if(Content.Drawings[i].Drawing.setBDeleted2)
+                                {
+                                    Content.Drawings[i].Drawing.setBDeleted2(false);
+                                }
+                                else if(Content.Drawings[i].Drawing.setBDeleted)
+                                {
+                                    Content.Drawings[i].Drawing.setBDeleted(false);
+                                }
                             }
-                            else if(Content.Drawings[i].Drawing.setBDeleted)
+                            Content.Drawings[i].Drawing.setParent2(this.Slides[this.CurPage]);
+                            if(Content.Drawings[i].Drawing.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
                             {
-                                Content.Drawings[i].Drawing.setBDeleted(false);
+                                this.Check_GraphicFrameRowHeight(Content.Drawings[i].Drawing);
                             }
+                            Content.Drawings[i].Drawing.addToDrawingObjects();
+                            Content.Drawings[i].Drawing.checkExtentsByDocContent && Content.Drawings[i].Drawing.checkExtentsByDocContent();
+                            this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, 0);
                         }
-                        Content.Drawings[i].Drawing.setParent2(this.Slides[this.CurPage]);
-                        if(Content.Drawings[i].Drawing.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
-                        {
-                            this.Check_GraphicFrameRowHeight(Content.Drawings[i].Drawing);
-                        }
-                        Content.Drawings[i].Drawing.addToDrawingObjects();
-                        Content.Drawings[i].Drawing.checkExtentsByDocContent && Content.Drawings[i].Drawing.checkExtentsByDocContent();
-                        this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, 0);
                     }
                     if(Content.DocContent && Content.DocContent.Elements.length > 0)
                     {
