@@ -1742,8 +1742,8 @@
 		this.LvlNum  = nLvlNum;
 		this.Format  = Asc.c_oAscNumberingFormat.Bullet;
 		this.Text    = [];
-		this.TextPr  = new CTextPr();
-		this.ParaPr  = new CParaPr();
+		this.TextPr  = new AscCommonWord.CTextPr();
+		this.ParaPr  = new AscCommonWord.CParaPr();
 		this.Start   = 1;
 		this.Restart = -1;
 		this.Suff    = Asc.c_oAscNumberingSuff.Tab;
