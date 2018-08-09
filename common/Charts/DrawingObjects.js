@@ -4227,7 +4227,7 @@ function DrawingObjects() {
             if (selectedRange)
             {
                 var box = selectedRange.getBBox0();
-                settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
+                settings.putInColumns((box.r2 - box.r1 > box.c2 - box.c1));
             }
             var oRangeValue = worksheet.getSelectionRangeValue();
             if(oRangeValue){
