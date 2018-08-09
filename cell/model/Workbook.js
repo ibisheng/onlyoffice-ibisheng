@@ -3540,7 +3540,7 @@
 										});
 										return (-1 !== val.indexOf(text)) ? rule.dxf : null;
 									};
-							})(oRule, oRule.text.toLowerCase());
+							})(oRule, oRule.text && oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.notContainsText:
 								compareFunction = (function(rule, text) {
@@ -3551,7 +3551,7 @@
 										});
 										return (-1 === val.indexOf(text)) ? rule.dxf : null;
 									};
-							})(oRule, oRule.text.toLowerCase());
+							})(oRule, oRule.text && oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.beginsWith:
 								compareFunction = (function(rule, text) {
@@ -3562,7 +3562,7 @@
 										});
 										return val.startsWith(text) ? rule.dxf : null;
 									};
-								})(oRule, oRule.text.toLowerCase());
+								})(oRule, oRule.text && oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.endsWith:
 								compareFunction = (function(rule, text) {
@@ -3573,7 +3573,7 @@
 										});
 										return val.endsWith(text) ? rule.dxf : null;
 									};
-								})(oRule, oRule.text.toLowerCase());
+								})(oRule, oRule.text && oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.containsErrors:
 								compareFunction = (function(rule) {
@@ -3646,6 +3646,14 @@
 								}
 								break;
 							case AscCommonExcel.ECfType.cellIs:
+								var val1 = oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this);
+								var val2 = oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this);
+								if (val1 && val1.toLowerCase) {
+									val1 = val1.toLowerCase();
+								}
+								if (val2 && val2.toLowerCase) {
+									val2 = val2.toLowerCase();
+								}
 								compareFunction = (function(rule, v1, v2) {
 									return function(row, col) {
 										var val;
@@ -3654,8 +3662,7 @@
 										});
 										return rule.cellIs(val, v1, v2) ? rule.dxf : null;
 									};
-								})(oRule, oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this).toLowerCase(),
-									oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this).toLowerCase());
+								})(oRule, val1, val2);
 								break;
 							case AscCommonExcel.ECfType.expression:
 								var offset = new AscCommon.CellBase(0, 0);
