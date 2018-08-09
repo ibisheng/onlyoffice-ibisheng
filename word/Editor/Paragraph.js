@@ -12505,6 +12505,11 @@ Paragraph.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTe
 	{
 		var oParaTextPr = new ParaTextPr();
 		oParaTextPr.Value.Set_FromObject(new CTextPr(), true);
+
+		// Highlight и Lang не сбрасываются при очистке текстовых настроек
+		oParaTextPr.Value.Lang      = undefined;
+		oParaTextPr.Value.HighLight = undefined;
+
 		this.Add(oParaTextPr);
 	}
 };
