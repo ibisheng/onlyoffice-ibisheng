@@ -7461,7 +7461,7 @@ function CDrawingDocument()
 			var sStyleId = arrLevels[nLvl].StyleId;
 			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
 			{
-				var sStyleName = arrLevels[nLvl].Styles[nIndex];
+				var sStyleName = AscCommon.translateManager.getValue(arrLevels[nLvl].Styles[nIndex]);
 
 				var oParagraph = new Paragraph(this, oDocumentContent, false);
 				oDocumentContent.AddToContent(oParaIndex++, oParagraph);
