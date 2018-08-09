@@ -1630,7 +1630,7 @@ CDocumentContent.prototype.Is_Empty = function()
 	if (this.Content.length > 1 || type_Paragraph !== this.Content[0].GetType())
 		return false;
 
-	return this.Content[0].IsEmpty();
+	return this.Content[0].IsEmpty({SkipPlcHldr : false});
 };
 CDocumentContent.prototype.IsEmpty = function()
 {

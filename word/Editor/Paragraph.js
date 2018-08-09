@@ -7300,6 +7300,9 @@ Paragraph.prototype.Is_Empty = function(Props)
 
 		if (Props.SkipComplexFields)
 			Pr.SkipComplexFields = true;
+
+		if (undefined !== Props.SkipPlcHldr)
+			Pr.SkipPlcHldr = Props.SkipPlcHldr;
 	}
 
 	var ContentLen = this.Content.length;

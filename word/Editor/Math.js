@@ -1105,15 +1105,17 @@ ParaMath.prototype.Get_Text = function(Text)
 		Text.Text = null;
 };
 
-ParaMath.prototype.Is_Empty = function()
+ParaMath.prototype.Is_Empty = function(oPr)
 {
 	if (this.Root.Content.length <= 0)
 		return true;
 
+	var isSkipPlcHldr = oPr && undefined !== oPr.SkipPlcHldr ? oPr.SkipPlcHldr : true;
+
 	for (var nIndex = 0, nCount = this.Root.Content.length; nIndex < nCount; ++nIndex)
 	{
 		var oItem = this.Root.Content[nIndex];
-		if (para_Math_Run !== oItem.Type || !oItem.Is_Empty({SkipPlcHldr : true}))
+		if (para_Math_Run !== oItem.Type || !oItem.Is_Empty({SkipPlcHldr : isSkipPlcHldr}))
 			return false;
 	}
 
