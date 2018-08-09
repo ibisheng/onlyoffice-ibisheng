@@ -1329,7 +1329,7 @@ CGraphicObjects.prototype =
 		if(drawing && drawing.ParaMath){
 			drawing.Convert_ToMathObject();
 		}
-        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
+        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props) || !this.document.CanEdit())
         {
             var pluginData = new Asc.CPluginData();
             pluginData.setAttribute("data", oleObject.m_sData);

@@ -351,7 +351,7 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
 {
     var drawingObjects = this.drawingObjects;
     var oThis = this;
-    this.checkSelectedObjectsAndFireCallback(function(){
+    var fCallback = function(){
         var pluginData = new Asc.CPluginData();
         pluginData.setAttribute("data", oleObject.m_sData);
         pluginData.setAttribute("guid", oleObject.m_sApplicationId);
@@ -365,7 +365,12 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
         oThis.clearPreTrackObjects();
         oThis.changeCurrentState(new AscFormat.NullState(this));
         this.onMouseUp(e, x, y);
-    }, []);
+    };
+    if(!this.canEdit()){
+        fCallback();
+        return;
+    }
+    this.checkSelectedObjectsAndFireCallback(fCallback, []);
 };
 
 DrawingObjectsController.prototype.addChartDrawingObject = function(options)

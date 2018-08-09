@@ -820,7 +820,7 @@ CPresentation.prototype =
 
     IsViewMode: function()
     {
-        return this.Api.isViewMode;
+        return this.Api.getViewMode();
     },
 
 
