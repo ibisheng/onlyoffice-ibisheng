@@ -1424,7 +1424,12 @@ CChartsDrawer.prototype =
 				seria = series[0];
 				numCache = t.getNumCache(seria.val);
 				min = 1;
-				max = numCache.ptCount;
+				if(numCache){
+					max = numCache.ptCount;
+				}
+				else{
+					max = 1;
+				}
 			}
 		};
 
@@ -2034,14 +2039,15 @@ CChartsDrawer.prototype =
 					numCache = this.getNumCache(seria.val);
 				}
 
-				point = numCache.getPtByIndex(j + pointDiff);
-				if (point && point.pen) {
-					pen = point.pen;
+				if(numCache){
+					point = numCache.getPtByIndex(j + pointDiff);
+					if (point && point.pen) {
+						pen = point.pen;
+					}
+					if (point && point.brush) {
+						brush = point.brush;
+					}
 				}
-				if (point && point.brush) {
-					brush = point.brush;
-				}
-
 				if (seriesPaths[i][j]) {
 					this.drawPath(seriesPaths[i][j], pen, brush);
 				}
@@ -2122,11 +2128,13 @@ CChartsDrawer.prototype =
 				}
 
 				var idx = seriesPaths[i][j].idx;
-				if(useNextPoint) {
-					idx = seriesPaths[i][j + 1] ? seriesPaths[i][j + 1].idx : seriesPaths[i][j].idx;
-					point = numCache.getPtByIndex(idx);
-				} else {
-					point = numCache.getPtByIndex(idx);
+				if(numCache){
+					if(useNextPoint) {
+						idx = seriesPaths[i][j + 1] ? seriesPaths[i][j + 1].idx : seriesPaths[i][j].idx;
+						point = numCache.getPtByIndex(idx);
+					} else {
+						point = numCache.getPtByIndex(idx);
+					}
 				}
 
 				if (point && point.pen) {
@@ -9675,8 +9683,10 @@ drawDoughnutChart.prototype = {
 		var centerY = yCenter - newRadius * Math.sin(-1 * stAng - swAng / 2);
 
 		var numCache = this.cChartDrawer.getNumCache(this.chart.series[ser].val);
-		var point = numCache.pts[val];
-
+		var point = null;
+		if(numCache){
+			point = numCache.pts[val];
+		}
 		if (!point) {
 			return;
 		}
