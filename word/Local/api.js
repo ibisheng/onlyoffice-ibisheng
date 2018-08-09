@@ -79,8 +79,6 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data,
 		this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
 	}
 
-	this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
-
 	DesktopOfflineUpdateLocalName(this);
 
 	window["DesktopAfterOpen"](this);
