@@ -94,7 +94,7 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
 
             if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
             {
-                ret = handleInternalChart(selected_objects[i], drawingObjectsController, e, x, y, group, pageIndex, bWord);
+                ret = handleInternalChart(selected_objects[i], drawingObjectsController, e, tx, ty, group, pageIndex, bWord);
                 if(ret)
                 {
                     drawing = selected_objects[i];
@@ -131,7 +131,7 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
             }
             if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
             {
-                ret = handleInternalChart(selected_objects[i], drawingObjectsController, e, x, y, group, pageIndex, bWord);
+                ret = handleInternalChart(selected_objects[i], drawingObjectsController, e, tx, ty, group, pageIndex, bWord);
                 drawing = selected_objects[i];
             }
             if(!ret)
