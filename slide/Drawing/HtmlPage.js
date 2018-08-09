@@ -727,6 +727,9 @@ function CEditorPage(api)
 				this.reporterTranslates[0] = _translates[0];
 				this.reporterTranslates[1] = _translates[1];
 				this.reporterTranslates[2] = _translates[2];
+
+				if (_translates[3])
+					this.m_oApi.DemonstrationEndShowMessage(_translates[3]);
 			}
 
 			var _buttonsContent = "";

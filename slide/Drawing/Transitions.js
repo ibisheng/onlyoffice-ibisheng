@@ -2976,9 +2976,9 @@ function CDemonstrationManager(htmlpage)
             {
                 oThis.DivEndPresentation = document.createElement('div');
                 oThis.DivEndPresentation.setAttribute("style", "position:absolute;margin:0px;padding:0px;left:0px;top:0px;width:100%;height:100%;z-index:4;background-color:#000000;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
-                oThis.DivEndPresentation.innerHTML = oThis.EndShowMessage;
+                oThis.DivEndPresentation.innerHTML = AscCommon.translateManager.getValue(oThis.EndShowMessage);
                 if ("" == oThis.EndShowMessage)
-                    oThis.DivEndPresentation.innerHTML = "The end of slide preview. Click to exit.";
+                    oThis.DivEndPresentation.innerHTML = AscCommon.translateManager.getValue("The end of slide preview. Click to exit.");
 
                 //oThis.DemonstrationDivEndPresentation.onmousedown  = oThis.onMouseDownDemonstration;
                 //oThis.DemonstrationDivEndPresentation.onmousemove  = oThis.onMouseMoveDemonstration;

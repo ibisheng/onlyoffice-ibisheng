@@ -6250,7 +6250,7 @@ background-repeat: no-repeat;\
 		if (data["translate"])
 			this.translateManager = AscCommon.translateManager.init(data["translate"]);
 
-		this.reporterTranslates = [data["translations"]["reset"], data["translations"]["slideOf"], data["translations"]["endSlideshow"]];
+		this.reporterTranslates = [data["translations"]["reset"], data["translations"]["slideOf"], data["translations"]["endSlideshow"], data["translations"]["finalMessage"]];
 		if (!this.WordControl)
 			return;
 
