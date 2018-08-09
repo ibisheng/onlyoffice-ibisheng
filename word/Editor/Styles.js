@@ -4429,7 +4429,7 @@ CStyles.prototype =
 					if (-1 != nLvl)
 						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, nLvl));
 					else if (undefined !== Style.ParaPr.NumPr.Lvl)
-						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, tyle.ParaPr.NumPr.Lvl));
+						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, Style.ParaPr.NumPr.Lvl));
 					else
 						Pr.ParaPr.NumPr = undefined;
 				}
