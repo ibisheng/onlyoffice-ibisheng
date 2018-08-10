@@ -9136,7 +9136,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         {
 			var ANum = this.m_oANums[this.stream.GetULongLE()];
 			if (ANum) {
-				tmpNum.Num.AbstractNumId = ANum.GetId();
+				tmpNum.Num.SetAbstractNumId(ANum.GetId());
 				this.oReadResult.numToANumClass[ANum.GetId()] = ANum;
 			}
         }
