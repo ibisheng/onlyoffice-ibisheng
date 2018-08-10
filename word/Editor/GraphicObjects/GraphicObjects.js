@@ -1306,6 +1306,7 @@ CGraphicObjects.prototype =
     getTextArtPreviewManager: DrawingObjectsController.prototype.getTextArtPreviewManager,
     getEditorApi: DrawingObjectsController.prototype.getEditorApi,
     resetConnectors: DrawingObjectsController.prototype.resetConnectors,
+    checkDlblsPosition: DrawingObjectsController.prototype.checkDlblsPosition,
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {
