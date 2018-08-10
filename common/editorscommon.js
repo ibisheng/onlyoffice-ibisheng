@@ -665,6 +665,25 @@
 			editor.CoAuthoringApi.openDocument(rdata);
 			return;
 		}
+        var mimeType = AscCommon.getExtentionByFormat(rdata["outputformat"])
+        window["session"]["downloadAs"](rdata["savetype"],rdata["saveindex"],mimeType,
+            dataContainer.part || dataContainer.data,
+            function(err,res){
+                if(err){
+                    if (fCallback)
+                    {
+                        fCallback(null, true);
+                    }
+                }else {
+                    if (fCallback)
+                    {
+                        fCallback(res, true);
+                    }
+                }
+            });
+
+        return;
+
 		rdata["userconnectionid"] = editor.CoAuthoringApi.getUserConnectionId();
 		asc_ajax({
 			type:        'POST',
