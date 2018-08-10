@@ -9545,11 +9545,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 		MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
 		MMData.Hyperlink = new Asc.CHyperlinkProperty(oHyperlink);
 
-		if (oHyperlink.GetAnchor())
-			MMData.Hyperlink.ToolTip = oHyperlink.GetToolTip();
-		else
-			MMData.Hyperlink.ToolTip = oHyperlink.GetValue();
-
+		MMData.Hyperlink.ToolTip = oHyperlink.GetToolTip();
 	}
 	else if (null !== Footnote && this.Parent instanceof CDocument)
 	{
