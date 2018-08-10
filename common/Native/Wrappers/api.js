@@ -3293,7 +3293,7 @@ function asc_menu_WriteAscValAxisSettings(_type, _settings, _stream)
 
 function asc_menu_ReadChartPr(_params, _cursor)
 {
-    var _settings = new AscCommon.asc_ChartSettings();
+    var _settings = new Asc.asc_ChartSettings();
 
     var _continue = true;
     while (_continue)

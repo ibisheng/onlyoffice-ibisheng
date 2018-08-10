@@ -10247,7 +10247,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
 
     function builder_CreateChart(nW, nH, sType, aCatNames, aSeriesNames, aSeries, nStyleIndex){
-        var settings = new AscCommon.asc_ChartSettings();
+        var settings = new Asc.asc_ChartSettings();
         switch (sType)
         {
             case "bar" :

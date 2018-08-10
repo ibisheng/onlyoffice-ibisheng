@@ -638,7 +638,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 {
     AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
-        var settings = new AscCommon.asc_ChartSettings();
+        var settings = new Asc.asc_ChartSettings();
         var nSparklineType = oSparklineGroup.asc_getType();
         switch(nSparklineType)
         {
@@ -2748,7 +2748,7 @@ function DrawingObjects() {
 
         worksheet.setSelectionShape(true);
 
-        if ( chart instanceof AscCommon.asc_ChartSettings )
+        if ( chart instanceof Asc.asc_ChartSettings )
         {
             if(api.isChartEditor)
             {
@@ -3598,7 +3598,7 @@ function DrawingObjects() {
             {
                 var editChart = function (drawingObject)
                 {
-					var options = new AscCommon.asc_ChartSettings();
+					var options = new Asc.asc_ChartSettings();
 					var catHeadersBBox, serHeadersBBox;
                     var final_bbox = oBBoxTo.clone();
                     var bOneCell = false;
@@ -4222,7 +4222,7 @@ function DrawingObjects() {
         settings = _this.controller.getChartProps();
         if ( !settings )
         {
-            settings = new AscCommon.asc_ChartSettings();
+            settings = new Asc.asc_ChartSettings();
             var selectedRange = worksheet.getSelectedRange();
             if (selectedRange)
             {

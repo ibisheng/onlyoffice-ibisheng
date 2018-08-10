@@ -1107,6 +1107,22 @@
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
 					}
+					var oHorAxisProps = this.getHorAxisProps();
+						if(oHorAxisProps && oHorAxisProps.getAxisType() === c_oAscAxisType.cat){
+							if(type === c_oAscChartTypeSettings.areaNormal ||
+							type === c_oAscChartTypeSettings.areaStacked ||
+							type === c_oAscChartTypeSettings.areaStackedPer||
+							type === c_oAscChartTypeSettings.stock ||
+							type === c_oAscChartTypeSettings.surfaceNormal ||
+							type === c_oAscChartTypeSettings.surfaceWireframe ||
+							type === c_oAscChartTypeSettings.contourNormal ||
+							type === c_oAscChartTypeSettings.contourWireframe){
+								oHorAxisProps.putLabelsPosition(Asc.c_oAscLabelsPosition.byDivisions);
+							}
+							else{
+								oHorAxisProps.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
+							}
+						}
 					break;
 				}
 				case c_oAscChartTypeSettings.hBarNormal          :
@@ -1126,6 +1142,11 @@
 						var bTemp = this.showHorAxis;
 						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
+					}
+
+					var oVertAxisProps = this.getVertAxisProps();
+					if(oVertAxisProps && oVertAxisProps.getAxisType() === c_oAscAxisType.cat){
+						oVertAxisProps.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
 					}
 					//this.putHorGridLines(c_oAscGridLinesSettings.none);
 					//this.putVertGridLines(c_oAscGridLinesSettings.major);
@@ -4164,7 +4185,7 @@
 	prot["getCrossMinVal"] = prot.getCrossMinVal;
 	prot["setDefault"] = prot.setDefault;
 
-	window["AscCommon"].asc_ChartSettings = asc_ChartSettings;
+	window["Asc"]["asc_ChartSettings"] = window["Asc"].asc_ChartSettings = asc_ChartSettings;
 	prot = asc_ChartSettings.prototype;
 	prot["putStyle"] = prot.putStyle;
 	prot["putTitle"] = prot.putTitle;

@@ -2441,7 +2441,7 @@
 
 				if (Asc.c_oAscChartTypeSettings.stock === chartType)
 				{
-					var chartSettings = new AscCommon.asc_ChartSettings();
+					var chartSettings = new Asc.asc_ChartSettings();
 					chartSettings.putType(Asc.c_oAscChartTypeSettings.stock);
 					chartSettings.putRange(sDataRange);
 					chartSettings.putInColumns(!isRows);

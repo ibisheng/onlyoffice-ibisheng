@@ -182,7 +182,7 @@
 			this.Position        = undefined;
 			this.Locked          = false;
 			this.lockAspect      = undefined;
-			this.ChartProperties = new AscCommon.asc_ChartSettings();
+			this.ChartProperties = new Asc.asc_ChartSettings();
 
 			this.severalCharts      = false;
 			this.severalChartTypes  = undefined;

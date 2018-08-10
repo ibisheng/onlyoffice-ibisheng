@@ -1272,7 +1272,7 @@ function asc_menu_WriteAscCatAxisSettings(_type, _settings, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadChartPr(_params, _cursor){
-    var _settings = new AscCommon.asc_ChartSettings();
+    var _settings = new Asc.asc_ChartSettings();
 
     var _continue = true;
     while (_continue)

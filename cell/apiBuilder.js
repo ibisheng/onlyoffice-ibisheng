@@ -708,7 +708,7 @@
 	 */
 	ApiWorksheet.prototype.AddChart =
 		function (sDataRange, bInRows, sType, nStyleIndex, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset) {
-			var settings = new AscCommon.asc_ChartSettings();
+			var settings = new Asc.asc_ChartSettings();
 			switch (sType) {
 				case "bar" :
 				{

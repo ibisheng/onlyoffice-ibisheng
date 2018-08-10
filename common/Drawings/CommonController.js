@@ -3486,7 +3486,7 @@ DrawingObjectsController.prototype =
         var type = chartSettings.getType();
         if(oPr.getType() === type){
             chartSettings.type = null;
-            var testChartSettings = new AscCommon.asc_ChartSettings();
+            var testChartSettings = new Asc.asc_ChartSettings();
             if(testChartSettings.isEqual(chartSettings)){
                 chartSettings.type = type;
                 return;
@@ -4928,7 +4928,7 @@ DrawingObjectsController.prototype =
     getPropsFromChart: function(chart_space)
     {
         var chart = chart_space.chart, plot_area = chart_space.chart.plotArea;
-        var ret = new AscCommon.asc_ChartSettings();
+        var ret = new Asc.asc_ChartSettings();
         var range_obj = chart_space.getRangeObjectStr();
         if(range_obj)
         {
@@ -6778,7 +6778,7 @@ DrawingObjectsController.prototype =
         {
             return AscFormat.ExecuteNoHistory(function()
             {
-                var options = new AscCommon.asc_ChartSettings();
+                var options = new Asc.asc_ChartSettings();
                 options.type = type;
                 options.style = 1;
                 options.putTitle(c_oAscChartTitleShowSettings.noOverlay);

@@ -719,7 +719,7 @@
 		var oLogicDocument = private_GetLogicDocument();
 		var nW = private_EMU2MM(nWidth);
 		var nH = private_EMU2MM(nHeight);
-		var settings = new AscCommon.asc_ChartSettings();
+		var settings = new Asc.asc_ChartSettings();
 		switch (sType)
 		{
 			case "bar" :
