@@ -2270,10 +2270,10 @@ var editor;
     return false;
   };
 
-  spreadsheet_api.prototype.asc_getChartObject = function() {		// Return new or existing chart. For image return null
+  spreadsheet_api.prototype.asc_getChartObject = function(bNoLock) {		// Return new or existing chart. For image return null
     this.asc_onOpenChartFrame();
     var ws = this.wb.getWorksheet();
-    return ws.objectRender.getAscChartObject();
+    return ws.objectRender.getAscChartObject(bNoLock);
   };
 
   spreadsheet_api.prototype.asc_addChartDrawingObject = function(chart) {

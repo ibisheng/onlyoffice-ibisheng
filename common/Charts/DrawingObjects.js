@@ -4212,7 +4212,7 @@ function DrawingObjects() {
         return null;
     };
 
-    _this.getAscChartObject = function() {
+    _this.getAscChartObject = function(bNoLock) {
 
         var settings;
         if(api.isChartEditor)
@@ -4267,7 +4267,9 @@ function DrawingObjects() {
             hor_axis_settings.setDefault();
         }
         else{
-            this.controller.checkSelectedObjectsAndFireCallback(function(){});
+            if(true !== bNoLock){
+                this.controller.checkSelectedObjectsAndFireCallback(function(){});
+            }
         }
         return settings;
     };
