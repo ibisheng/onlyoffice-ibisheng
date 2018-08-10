@@ -9661,6 +9661,9 @@ CDocument.prototype.Viewer_OnChangePosition = function()
 		var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
 		this.Api.sync_UpdateCommentPosition(Comment.Get_Id(), Coords.X, Coords.Y);
 	}
+	else if( this.CanAddComment()){
+		this.sync_UpdateCommentPosition(Comment.Get_Id());
+	}
     window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
 	this.TrackRevisionsManager.Update_VisibleChangesPosition(this.Api);
 };
