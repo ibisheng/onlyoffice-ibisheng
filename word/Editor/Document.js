@@ -4916,7 +4916,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 		var oLvl;
 
 		var oLastNumPr = this.GetLastBulletList();
-		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId))
+		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId) && this.Numbering.GetNum(oLastNumPr.NumId).GetLvl(oLastNumPr.Lvl).IsBulleted())
 		{
 			var oLastNum = this.Numbering.GetNum(oLastNumPr.NumId);
 			oLvl         = oLastNum.GetLvl(oLastNumPr.Lvl).Copy();
@@ -4940,7 +4940,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 	if (!sNumId)
 	{
 		var oLastNumPr = this.GetLastBulletList();
-		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId))
+		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId) && this.Numbering.GetNum(oLastNumPr.NumId).GetLvl(0).IsBulleted())
 		{
 			var oPrevNum = this.Numbering.GetNum(oLastNumPr.NumId);
 
@@ -5178,7 +5178,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 		var oLvl;
 
 		var oLastNumPr = this.GetLastNumberedList();
-		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId))
+		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId) && this.Numbering.GetNum(oLastNumPr.NumId).GetLvl(oNumPr.Lvl).IsNumbered())
 		{
 			var oPrevNum = this.Numbering.GetNum(oLastNumPr.NumId);
 
@@ -5207,7 +5207,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 			oLvl.ParaPr = oNum.GetLvl(oNumPr.Lvl).ParaPr.Copy();
 
 			oNum.SetLvl(oLvl, oNumPr.Lvl);
-			this.SetLastBulletList(oNumPr.NumId, oNumPr.Lvl);
+			this.SetLastNumberedList(oNumPr.NumId, oNumPr.Lvl);
 		}
 
 		return;
@@ -5216,7 +5216,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 	if (!sNumId)
 	{
 		var oLastNumPr = this.GetLastNumberedList();
-		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId))
+		if (oLastNumPr && this.Numbering.GetNum(oLastNumPr.NumId) && this.Numbering.GetNum(oLastNumPr.NumId).GetLvl(0).IsNumbered())
 		{
 			var oLastNum = this.Numbering.GetNum(oLastNumPr.NumId);
 

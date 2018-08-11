@@ -972,6 +972,23 @@ CNumberingLvl.prototype.private_ReadLvlTextFromBinary = function(oReader)
 	oElement.ReadFromBinary(oReader);
 	return oElement;
 };
+/**
+ * Проверяем является ли данный уровень маркированным
+ * @returns {boolean}
+ */
+CNumberingLvl.prototype.IsBulleted = function()
+{
+	return this.GetFormat() === Asc.c_oAscNumberingFormat.Bullet;
+};
+/**
+ * Проверяем является ли данный уровень нумерованным
+ * @returns {boolean}
+ */
+CNumberingLvl.prototype.IsNumbered = function()
+{
+	var nFormat = this.GetFormat();
+	return (nFormat !== Asc.c_oAscNumberingFormat.Bullet && nFormat !== Asc.c_oAscNumberingFormat.None);
+};
 
 
 function CNumberingLvlTextString(Val)
