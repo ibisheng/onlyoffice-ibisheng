@@ -9662,7 +9662,7 @@ CDocument.prototype.Viewer_OnChangePosition = function()
 		this.Api.sync_UpdateCommentPosition(Comment.Get_Id(), Coords.X, Coords.Y);
 	}
 	else if( this.CanAddComment()){
-		this.sync_UpdateCommentPosition(Comment.Get_Id());
+		this.api.sync_UpdateCommentPosition();
 	}
     window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
 	this.TrackRevisionsManager.Update_VisibleChangesPosition(this.Api);
