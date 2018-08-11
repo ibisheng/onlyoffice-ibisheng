@@ -10617,7 +10617,7 @@ CDocument.prototype.Get_SectionPageNumInfo2 = function(Page_abs)
 	var StartInfo = [];
 	StartInfo.push({FirstPage : FirstPage, BreakType : BreakType});
 
-	while (PageNumStart < 0 && SectIndex > 0)
+	while ((PageNumStart < 0 || c_oAscSectionBreakType.Continuous === BreakType) && SectIndex > 0)
 	{
 		SectIndex--;
 
