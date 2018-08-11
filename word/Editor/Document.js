@@ -17019,8 +17019,10 @@ CDocument.prototype.RestartNumbering = function(nRestartValue)
 	if (undefined === nRestartValue || null === nRestartValue)
 		nRestartValue = 1;
 
+	var isNumberingSelection = this.IsNumberingSelection();
+
 	var oParagraph = this.GetCurrentParagraph(true);
-	if (!oParagraph || !oParagraph.GetNumPr() || this.IsSelectionUse())
+	if (!oParagraph || !oParagraph.GetNumPr() || (this.IsSelectionUse() && !isNumberingSelection))
 		return false;
 
 	var oNumPr = oParagraph.GetNumPr();
@@ -17116,6 +17118,9 @@ CDocument.prototype.RestartNumbering = function(nRestartValue)
 
 				oPara.SetNumPr(sNewId, oCurNumPr.Lvl);
 			}
+
+			if (isNumberingSelection)
+				this.SelectNumbering(oParagraph.GetNumPr(), oParagraph);
 
 			this.Recalculate();
 			this.Document_UpdateInterfaceState();
