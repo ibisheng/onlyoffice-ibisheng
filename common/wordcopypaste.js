@@ -1968,6 +1968,11 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
   }
 
+  if (AscCommon.EncryptionWorker && AscCommon.EncryptionWorker.isCryptoImages())
+  {
+      return AscCommon.EncryptionWorker.addCryproImagesFromUrls(images, callback);
+  }
+
   var rData = {"id": api.documentId, "c": "imgurls", "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 
@@ -4100,7 +4105,7 @@ PasteProcessor.prototype =
 	    return AscFormat.ExecuteNoHistory(function(){
             var presentationSelectedContent = null;
             var fonts = [];
-            var arr_Images = {};
+            var arr_Images = [];
             var oThis = this;
 
             var readContent = function () {
@@ -4143,7 +4148,7 @@ PasteProcessor.prototype =
                     fonts.push(new CFont(i, 0, "", 0));
                 }
 
-                arr_Images = objects.arrImages;
+				arr_Images = arr_Images.concat(objects.arrImages);
             };
 
             var readSlideObjects = function () {
@@ -4184,7 +4189,7 @@ PasteProcessor.prototype =
                     fonts.push(new CFont(i, 0, "", 0));
                 }
 
-                var arr_Images = loader.End_UseFullUrl();
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
 
                 presentationSelectedContent.SlideObjects = slideCopyObjects;
             };
@@ -4192,6 +4197,9 @@ PasteProcessor.prototype =
 
             var readLayouts = function(){
                 var loader = new AscCommon.BinaryPPTYLoader();
+				if (!(bDuplicate === true)) {
+					loader.Start_UseFullUrl();
+				}
                 loader.stream = stream;
                 loader.presentation = editor.WordControl.m_oLogicDocument;
 
@@ -4220,11 +4228,15 @@ PasteProcessor.prototype =
                     fonts.push(new CFont(i, 0, "", 0));
                 }*/
 
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
                 presentationSelectedContent.Layouts = layouts;
             };
 
             var readMasters = function(){
                 var loader = new AscCommon.BinaryPPTYLoader();
+				if (!(bDuplicate === true)) {
+					loader.Start_UseFullUrl();
+				}
                 loader.stream = stream;
                 loader.presentation = editor.WordControl.m_oLogicDocument;
 
@@ -4240,6 +4252,7 @@ PasteProcessor.prototype =
                     }
                 }
 
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
                 presentationSelectedContent.Masters = array;
             };
 
@@ -4301,6 +4314,9 @@ PasteProcessor.prototype =
 
             var readThemes = function(){
                 var loader = new AscCommon.BinaryPPTYLoader();
+				if (!(bDuplicate === true)) {
+					loader.Start_UseFullUrl();
+				}
                 loader.stream = stream;
                 loader.presentation = editor.WordControl.m_oLogicDocument;
 
@@ -4312,6 +4328,7 @@ PasteProcessor.prototype =
                     array.push(loader.ReadTheme());
                 }
 
+				arr_Images = arr_Images.concat(loader.End_UseFullUrl());
                 presentationSelectedContent.Themes = array;
             };
 
@@ -4424,11 +4441,10 @@ PasteProcessor.prototype =
 				var targetDocContent =  oController  && oController.getTargetDocContent();
 				if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
 				{
-					if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
-					{
-						var aNewContent = arrShapes[0].Drawing.txBody.content.Content;
-						oThis.InsertInPlacePresentation(aNewContent);
-					}
+                    //не проверяем на лок т. к. это делается в asc_docs_api.prototype.asc_PasteData.
+                    // При двух последовательных проверках в совместном редактировании вторая проверка всегда будет возвращать лок
+                    var aNewContent = arrShapes[0].Drawing.txBody.content.Content;
+                    oThis.InsertInPlacePresentation(aNewContent);
 				}
 				else
 				{

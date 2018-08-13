@@ -94,9 +94,8 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 			AscCommon.g_oDocumentUrls.documentUrl = "/" + AscCommon.g_oDocumentUrls.documentUrl;
 		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
-	
-    editor._OfflineAppDocumentEndLoad(_url, _data, _len);
 
+    editor._OfflineAppDocumentEndLoad(_url, _data, _len);
 	editor.sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
 };
 
@@ -223,12 +222,12 @@ Asc['asc_docs_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 			window["DesktopOfflineAppDocumentStartSave"](isSaveAs);
 	}
 };
-window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
+window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce, docinfo)
 {
 	window.doadssIsSaveAs = isSaveAs;
-	if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+	if (true !== isForce && window.g_asc_plugins && AscCommon.EncryptionWorker.isNeedCrypt())
 	{
-		window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "generatePassword" });
+		window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
 		return;
 	}
 
@@ -240,7 +239,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isFo
 	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
-	window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? editor.currentPassword : password);
+	window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? editor.currentPassword : password, docinfo);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 {
@@ -268,9 +267,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 
 	if (hash !== null && hash !== undefined && hash != "")
 	{
-		if (window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+		if (window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
 		{
-			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", {"type": "setPasswordByFile", "hash": hash, "password": password});
+			window.g_asc_plugins.sendToEncryption({"type": "setPasswordByFile", "hash": hash, "password": password});
 		}
 	}
 

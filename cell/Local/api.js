@@ -234,12 +234,12 @@ var c_oAscError = Asc.c_oAscError;
 			asc["editor"].CoAuthoringApi.onSaveChanges(_changes[i], null, true);
 		}
 	};
-	window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
+	window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce, docinfo)
 	{
 		window.doadssIsSaveAs = isSaveAs;
-		if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+		if (true !== isForce && window.g_asc_plugins && AscCommon.EncryptionWorker.isNeedCrypt())
 		{
-			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "generatePassword" });
+			window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
 			return;
 		}
 
@@ -251,7 +251,7 @@ var c_oAscError = Asc.c_oAscError;
 		if (AscCommon.AscBrowser.isRetina)
 			_param += "retina=true;";
 
-		window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? asc["editor"].currentPassword : password);
+		window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? asc["editor"].currentPassword : password, docinfo);
 	};
 	window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 	{
@@ -279,9 +279,9 @@ var c_oAscError = Asc.c_oAscError;
 
 		if (hash !== null && hash !== undefined && hash != "")
 		{
-			if (window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+			if (window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
 			{
-				window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", {"type": "setPasswordByFile", "hash": hash, "password": password});
+				window.g_asc_plugins.sendToEncryption({"type": "setPasswordByFile", "hash": hash, "password": password});
 			}
 		}
 
@@ -297,7 +297,7 @@ var c_oAscError = Asc.c_oAscError;
 		if (ws)
 		{
 			var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-			ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
+			ws.objectRender.addImageDrawingObject([AscCommon.g_oDocumentUrls.getImageUrl(_url)] , null);
 		}
 	};
 	window["on_editor_native_message"] = function(sCommand, sParam)
@@ -322,8 +322,7 @@ var c_oAscError = Asc.c_oAscError;
 			AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 		}
 
-		asc["editor"]._OfflineAppDocumentEndLoad(_data, _len);
-
-		asc["editor"].sendEvent("asc_onDocumentPassword", ("" != asc["editor"].currentPassword) ? true : false);
+        asc["editor"]._OfflineAppDocumentEndLoad(_data, _len);
+        asc["editor"].sendEvent("asc_onDocumentPassword", ("" != asc["editor"].currentPassword) ? true : false);
 	};
 })(jQuery, window);

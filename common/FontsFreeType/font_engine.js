@@ -39344,7 +39344,7 @@ function t1_parse_subrs(face, loader)
         if (_strncmp_data(parser.root.cursor, "put", 3) == 0)
         {
             parser.root.funcs.skip_PS_token(parser.root);
-            parser.root.funcs.skip_spaces(parser);
+            parser.root.funcs.skip_spaces(parser.root);
         }
 
         /* with synthetic fonts it is possible we get here twice */

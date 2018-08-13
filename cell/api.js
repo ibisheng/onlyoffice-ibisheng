@@ -570,6 +570,10 @@ var editor;
    exp:	asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new Asc.asc_CCSVAdvancedOptions(1200, c_oAscCsvDelimiter.Comma) );
    */
   spreadsheet_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
+
+    if (AscCommon.EncryptionWorker.asc_setAdvancedOptions(this, idOption, option))
+      return;
+
     switch (idOption) {
       case c_oAscAdvancedOptionsID.CSV:
         // Проверяем тип состояния в данный момент
@@ -1461,6 +1465,11 @@ var editor;
 			return;
 		}
 
+        if (AscCommon.EncryptionWorker && !AscCommon.EncryptionWorker.isChangesHandled)
+        {
+            return AscCommon.EncryptionWorker.handleChanges(this.collaborativeEditing.m_arrChanges, this, this._openDocumentEndCallback);
+        }
+
 		if (0 === this.wbModel.getWorksheetCount()) {
 			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
 			return;
@@ -2080,7 +2089,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_autoFitColumnWidth = function() {
-    this.wb.getWorksheet().autoFitColumnWidth(null);
+    this.wb.getWorksheet().autoFitColumnWidth();
   };
 
   spreadsheet_api.prototype.asc_getRowHeight = function() {
@@ -2189,48 +2198,18 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_addImageDrawingObject = function (imageUrl) {
-    var rData = {
-      "id": this.documentId,
-      "userid": this.documentUserId,
-      "c": "imgurl",
-      "saveindex": g_oDocumentUrls.getMaxIndex(),
-      "data": imageUrl
-    };
 
     var t = this;
-    this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-    this.fCurCallback = function (input) {
-      if (null != input && "imgurl" == input["type"]) {
-        if ("ok" == input["status"]) {
-          var data = input["data"];
-          var urls = {};
-          var firstUrl;
-          for (var i = 0; i < data.length; ++i) {
-            var elem = data[i];
-            if (elem.url) {
-              if (!firstUrl) {
-                firstUrl = elem.url;
-              }
-              urls[elem.path] = elem.url;
-            }
-          }
-          g_oDocumentUrls.addUrls(urls);
-          if (firstUrl) {
-            var ws = t.wb.getWorksheet();
-            ws.objectRender.addImageDrawingObject([firstUrl], null);
-          } else {
-            t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-          }
-        } else {
-          t.handlers.trigger("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])),
-              c_oAscError.Level.NoCritical);
-        }
-      } else {
-        t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+    AscCommon.sendImgUrls(this, [imageUrl], function(data) {
+
+      if (data && data[0])
+      {
+        var ws = t.wb.getWorksheet();
+        ws.objectRender.addImageDrawingObject([data[0].url], null);
       }
-      t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-    };
-    sendCommand(this, null, rData);
+
+    }, true);
+
   };
 
 
@@ -2504,61 +2483,30 @@ var editor;
         }
       }
     }
-    if(fReplaceCallback){
+    if(fReplaceCallback) {
 
-      if (window["AscDesktopEditor"])
-      {
+      if (window["AscDesktopEditor"]) {
         var firstUrl = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
-		firstUrl = g_oDocumentUrls.getImageUrl(firstUrl);
+        firstUrl = g_oDocumentUrls.getImageUrl(firstUrl);
         fReplaceCallback(firstUrl);
         ws.objectRender.setGraphicObjectProps(props);
         return;
       }
 
-      var rData = {
-        "id": this.documentId,
-        "userid": this.documentUserId,
-        "c": "imgurl",
-        "saveindex": g_oDocumentUrls.getMaxIndex(),
-        "data": sImageUrl};
+      AscCommon.sendImgUrls(this, [sImageUrl], function (data) {
 
-      var t = this;
-      this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-      this.fCurCallback = function(input) {
-        if (null != input && "imgurl" == input["type"]) {
-          if ("ok" == input["status"]) {
-            var data = input["data"];
-            var urls = {};
-            var firstUrl;
-            for (var i = 0; i < data.length; ++i) {
-              var elem = data[i];
-              if (elem.url) {
-                if (!firstUrl) {
-                  firstUrl = elem.url;
-                }
-                urls[elem.path] = elem.url;
-              }
-            }
-            g_oDocumentUrls.addUrls(urls);
-            if (firstUrl) {
-              fReplaceCallback(firstUrl);
-              ws.objectRender.setGraphicObjectProps(props);
-            } else {
-              t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-            }
-          } else {
-            t.handlers.trigger("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
-          }
-        } else {
-          t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+        if (data && data[0]) {
+          fReplaceCallback(data[0].url);
+          ws.objectRender.setGraphicObjectProps(props);
         }
-        t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-      };
-      sendCommand(this, null, rData);
+
+      }, true);
     }
     else{
       ws.objectRender.setGraphicObjectProps(props);
     }
+
+
   };
 
   spreadsheet_api.prototype.asc_getOriginalImageSize = function() {
@@ -3204,6 +3152,12 @@ var editor;
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
   };
+  spreadsheet_api.prototype.asc_nativeGetFile3 = function()
+  {
+      var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
+      oBinaryFileWriter.Write(true, true);
+      return { data: oBinaryFileWriter.Write(true, true), header: oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition(), Asc.c_nVersionNoBase64) };
+  };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     oBinaryFileWriter.Write(true);
@@ -3331,6 +3285,12 @@ var editor;
 		this.asc_setLocale(this.tmpLocale);
 		this.asc_setLocalization(this.tmpLocalization);
 		this.asc_setViewMode(this.isViewMode);
+
+        if (this.openFileCryptBinary)
+        {
+            window.openFileCryptCallback(this.openFileCryptBinary);
+            this.openFileCryptBinary = null;
+        }
 	};
 
 	spreadsheet_api.prototype.asc_OnShowContextMenu = function() {

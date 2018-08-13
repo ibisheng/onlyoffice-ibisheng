@@ -137,8 +137,8 @@
 
     var kCurCells = "se-cells";
     var kCurFormatPainterExcel = "se-formatpainter";
-    AscCommon.g_oHtmlCursor.register(kCurCells, "plus", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFJJREFUeNpidHFxYcAC/qPxGdEVMDHgALt37wZjXACnRkKA/hpZsAQEMYHFwAAM1f+kApAeipzK4OrqijU6cMnBNDJSNQEMznjECnAFCgwABBgAcX1BU/hbd0sAAAAASUVORK5CYII=') 6 6", "cell");
-	AscCommon.g_oHtmlCursor.register(kCurFormatPainterExcel, "plus_copy", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAK1JREFUeNrUk+ESxBAMhG3Hm+GpeTfF0Eld0uLcj9uZTP3xdZMsxBjVRhXYsRNora2n5HSxbjLGtKPSX7uqCiHkD1adUlcfLnMdKw6zq94plXbOiVskKm1575GAF1iS6DQBSjECdUp+gFcoJ9LyBe6B09BuluCA09A8fwCK7AHsopiljCxOBLY5xVnVO2KWd779W/uKy2qLk5DjVyhGwz+qn7T/P1D9FPRVnQIMABDnBAmTp4GtAAAAAElFTkSuQmCC') 6 12", "pointer");
+    AscCommon.g_oHtmlCursor.register(kCurCells, "plus", ["plus", 6, 6], "cell");
+	AscCommon.g_oHtmlCursor.register(kCurFormatPainterExcel, "plus_copy", ["plus_copy", 6, 12], "pointer");
 
     var kNewLine = "\n";
 
@@ -10788,40 +10788,45 @@
         return oldColWidth !== cc ? cw : -1;
     };
 
-    WorksheetView.prototype.autoFitColumnWidth = function (col1, col2) {
+    WorksheetView.prototype.autoFitColumnWidth = function () {
         var t = this;
+        var max = this.model.getColsCount();
+		var selectionRanges = t.model.selectionRange.clone().ranges;
+
         return this._isLockedAll(function (isSuccess) {
             if (false === isSuccess) {
                 return;
             }
-            if (null === col1) {
-                var lastSelection = t.model.selectionRange.getLast();
-                col1 = lastSelection.c1;
-                col2 = lastSelection.c2;
+
+            var c1, c2, w, bUpdate = false;
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+            for (var i = 0; i < selectionRanges.length; ++i) {
+                c1 = selectionRanges[i].c1;
+				c2 = Math.min(selectionRanges[i].c2, max);
+				for (; c1 <= c2; ++c1) {
+					w = t.onChangeWidthCallback(c1, null, null);
+					if (-1 !== w) {
+						t.cols[c1] = t._calcColWidth(w);
+						t.cols[c1].isCustomWidth = false;
+						bUpdate = true;
+
+						t._cleanCache(new asc_Range(c1, 0, c1, t.rows.length - 1));
+					}
+				}
             }
 
-            var w, bUpdate = false;
-            History.Create_NewPoint();
-            History.StartTransaction();
-            for (var c = col1; c <= col2; ++c) {
-                w = t.onChangeWidthCallback(c, null, null);
-                if (-1 !== w) {
-                    t.cols[c] = t._calcColWidth(w);
-                    t.cols[c].isCustomWidth = false;
-                    bUpdate = true;
-
-                    t._cleanCache(new asc_Range(c, 0, c, t.rows.length - 1));
-                }
-            }
-            if (bUpdate) {
-                t._updateColumnPositions();
-                t._updateVisibleColsCount();
-                t._calcHeightRows(AscCommonExcel.recalcType.recalc);
-                t._updateVisibleRowsCount();
-                t.objectRender.drawingArea.reinitRanges();
-                t.changeWorksheet("update");
-            }
-            History.EndTransaction();
+			if (bUpdate) {
+				t._updateColumnPositions();
+				t._updateVisibleColsCount();
+				t._calcHeightRows(AscCommonExcel.recalcType.recalc);
+				t._updateVisibleRowsCount();
+				t.objectRender.drawingArea.reinitRanges();
+				t.changeWorksheet("update");
+			}
+			History.EndTransaction();
         });
     };
 

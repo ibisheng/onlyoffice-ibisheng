@@ -122,7 +122,8 @@ StartAddNewShape.prototype =
 
     onMouseUp: function(e, x, y)
     {
-        if(this.bStart)
+        var bView = this.drawingObjects.isViewMode() === true || (this.drawingObjects.isEditSignatureMode && this.drawingObjects.isEditSignatureMode());
+        if(this.bStart && !bView)
         {
             if(this.drawingObjects.drawingObjects.objectLocker)
             {
@@ -514,7 +515,7 @@ ChangeAdjState.prototype =
                 }
                 var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
                 for(i = 0; i < aAllConnectors.length; ++i){
-                    if(!oMapOriginalsIds[aAllConnectors.Get_Id()]){
+                    if(!oMapOriginalsIds[aAllConnectors[i].Get_Id()]){
                         aAllConnectors[i].calculateTransform();
                     }
                 }
@@ -594,7 +595,7 @@ RotateState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.isViewMode() === false)
+        if(this.drawingObjects.isViewMode() === false && !(this.drawingObjects.isEditSignatureMode && this.drawingObjects.isEditSignatureMode()))
         {
             var tracks = [].concat(this.drawingObjects.arrTrackObjects);
             var group = this.group;

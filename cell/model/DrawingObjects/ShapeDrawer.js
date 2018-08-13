@@ -1258,7 +1258,7 @@ CShapeDrawer.prototype =
                         var _url64 = "";
                         try
                         {
-                            _url64 = _pattern.Canvas.toDataURL("image/png");
+                            _url64 = _pattern.toDataURL();
                         }
                         catch (err)
                         {

@@ -58,6 +58,15 @@ pHText[0][AscFormat.phType_subTitle] = "Slide subtitle";// "Подзаголов
 pHText[0][AscFormat.phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
 pHText[0][AscFormat.phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
 
+AscFormat.checkPlaceholdersText = function()
+{
+    if (AscFonts.IsCheckSymbols)
+    {
+        for (var i = pHText[0].length - 1; i >= 0; i--)
+            AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(pHText[0][i]));
+    }
+};
+
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };

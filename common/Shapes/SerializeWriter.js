@@ -873,7 +873,7 @@ function CBinaryFileWriter()
         return ret + this.GetBase64Memory();
     }
 	
-	this.WriteDocument3 = function(presentation) {
+	this.WriteDocument3 = function(presentation, base64) {
 		var _memory = new AscCommon.CMemory(true);
 		_memory.ImData = this.ImData;
 		_memory.data = this.data;
@@ -893,8 +893,10 @@ function CBinaryFileWriter()
 		_memory.data = this.data;
 		_memory.len = this.len;
 		_memory.pos = this.pos;
-		
-		return _memory.GetData();
+
+		if (!base64)
+		    return _memory.GetData();
+		return _memory.GetBase64Memory();
 	}
 	this.WriteByMemory = function(callback) {
 		var _memory = new AscCommon.CMemory(true);
