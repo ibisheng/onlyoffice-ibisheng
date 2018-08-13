@@ -7497,11 +7497,13 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 			}
 			else
 			{
-				// Выставляем заданную нумерацию и сдвиги Ind.Left = X + NumPr.ParaPr.Ind.Left
+				// Выставляем заданную нумерацию и сдвиги. Сдвиг делаем на ближайшую остановку стандартного таба
+
 				var oNumParaPr = oNum.GetLvl(nLvl).GetParaPr();
 				if (undefined != oNumParaPr.Ind && undefined != oNumParaPr.Ind.Left)
 				{
-					oNum.ShiftLeftInd(X + oNumParaPr.Ind.Left);
+					oNum.ShiftLeftInd(X + 12.5);
+					//oNum.ShiftLeftInd(X + oNumParaPr.Ind.Left);
 
 					History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, undefined));
 					History.Add(new CChangesParagraphIndLeft(this, this.Pr.Ind.Left, undefined));
