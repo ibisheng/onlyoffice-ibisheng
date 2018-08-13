@@ -1848,7 +1848,7 @@ function CBinaryFileWriter()
             }
 
 
-            var defTab = pPr.DefaultTabSize;
+            var defTab = pPr.DefaultTab;
             if (defTab !== undefined && defTab != null)
             {
                 oThis._WriteInt1(1, defTab * 36000);

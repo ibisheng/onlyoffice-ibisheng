@@ -502,7 +502,7 @@
         oTxLstStyle.levels[0] =  new CParaPr();
         oTxLstStyle.levels[0].Ind.Left = 0;
         oTxLstStyle.levels[0].Jc = AscCommon.align_Left;
-        oTxLstStyle.levels[0].DefaultTabSize = 914400/36000;
+        oTxLstStyle.levels[0].DefaultTab = 914400/36000;
 
         oTxLstStyle.levels[0].DefaultRunPr = new AscCommonWord.CTextPr();
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;

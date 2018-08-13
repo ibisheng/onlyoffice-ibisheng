@@ -2603,7 +2603,7 @@ background-repeat: no-repeat;\
 
 				if (undefined != Props.DefaultTab)
 				{
-					_presentation.Set_DocumentDefaultTab(Props.DefaultTab);
+					graphicObjects.setDefaultTabSize(Props.DefaultTab);
 				}
 				var TextPr = new AscCommonWord.CTextPr();
 

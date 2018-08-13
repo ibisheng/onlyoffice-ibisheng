@@ -9875,7 +9875,7 @@ function CParaPr()
     this.DefaultRunPr      = undefined;
     this.Bullet            = undefined;
     this.Lvl               = undefined;
-    this.DefaultTabSize    = undefined;
+    this.DefaultTab    = undefined;
 
     this.PrChange          = undefined;
 }
@@ -9945,8 +9945,8 @@ CParaPr.prototype =
         if(undefined != this.Lvl)
             ParaPr.Lvl = this.Lvl;
 
-        if(undefined != this.DefaultTabSize)
-            ParaPr.DefaultTabSize = this.DefaultTabSize;
+        if(undefined != this.DefaultTab)
+            ParaPr.DefaultTab = this.DefaultTab;
 
         if (true === bCopyPrChange && undefined !== this.PrChange)
         {
@@ -10088,8 +10088,8 @@ CParaPr.prototype =
         if(undefined != ParaPr.Lvl)
             this.Lvl = ParaPr.Lvl;
 
-        if(undefined != ParaPr.DefaultTabSize)
-            this.DefaultTabSize = ParaPr.DefaultTabSize;
+        if(undefined != ParaPr.DefaultTab)
+            this.DefaultTab = ParaPr.DefaultTab;
 
         if (undefined !== ParaPr.OutlineLvl)
         	this.OutlineLvl = ParaPr.OutlineLvl;
@@ -10130,7 +10130,7 @@ CParaPr.prototype =
 
         this.DefaultRunPr              = undefined;
         this.Bullet                    = undefined;
-        this.DefaultTabSize            = undefined;
+        this.DefaultTab            = undefined;
     },
 
     Set_FromObject : function(ParaPr)
@@ -10247,9 +10247,9 @@ CParaPr.prototype =
             this.Bullet.Set_FromObject(ParaPr.Bullet);
         }
 
-        if(undefined != ParaPr.DefaultTabSize)
+        if(undefined != ParaPr.DefaultTab)
         {
-            this.DefaultTabSize = ParaPr.DefaultTabSize;
+            this.DefaultTab = ParaPr.DefaultTab;
         }
 
         if (undefined !== ParaPr.OutlineLvl)
@@ -10368,8 +10368,8 @@ CParaPr.prototype =
             Result_ParaPr.Lvl = this.Lvl;
 
 
-        if(undefined != this.DefaultTabSize && undefined != ParaPr.DefaultTabSize && ParaPr.DefaultTabSize === this.DefaultTabSize)
-            Result_ParaPr.DefaultTabSize = this.DefaultTabSize;
+        if(undefined != this.DefaultTab && undefined != ParaPr.DefaultTab && ParaPr.DefaultTab === this.DefaultTab)
+            Result_ParaPr.DefaultTab = this.DefaultTab;
 
         if (undefined !== this.Tabs && undefined !== ParaPr.Tabs && this.Tabs.Is_Equal(ParaPr.Tabs))
         	Result_ParaPr.Tabs = this.Tabs.Copy();
@@ -10512,9 +10512,9 @@ CParaPr.prototype =
             Flags |= 1048576;
         }
 
-        if(undefined != this.DefaultTabSize)
+        if(undefined != this.DefaultTab)
         {
-            Writer.WriteDouble(this.DefaultTabSize);
+            Writer.WriteDouble(this.DefaultTab);
             Flags |= 2097152;
         }
 
@@ -10640,7 +10640,7 @@ CParaPr.prototype =
 
         if(Flags & 2097152)
         {
-            this.DefaultTabSize = Reader.GetDouble();
+            this.DefaultTab = Reader.GetDouble();
         }
 
         if (Flags & 4194304)

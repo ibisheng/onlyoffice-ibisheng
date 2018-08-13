@@ -1386,6 +1386,7 @@
 	window['AscDFH'].historyitem_Paragraph_PrChange                  = window['AscDFH'].historyitem_type_Paragraph | 35;
 	window['AscDFH'].historyitem_Paragraph_PrReviewInfo              = window['AscDFH'].historyitem_type_Paragraph | 36;
 	window['AscDFH'].historyitem_Paragraph_OutlineLvl                = window['AscDFH'].historyitem_type_Paragraph | 37;
+	window['AscDFH'].historyitem_Paragraph_DefaultTabSize            = window['AscDFH'].historyitem_type_Paragraph | 38;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaTextPr
 	//------------------------------------------------------------------------------------------------------------------

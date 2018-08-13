@@ -4286,6 +4286,46 @@ CDocumentContent.prototype.SetParagraphAlign = function(Align)
 		}
 	}
 };
+CDocumentContent.prototype.SetParagraphDefaultTabSize = function(TabSize)
+{
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphDefaultTabSize(TabSize);
+			Item.Set_ApplyToAll(false);
+		}
+
+		return;
+	}
+
+	if (this.CurPos.ContentPos < 0)
+		return false;
+
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (EndPos < StartPos)
+		{
+			var Temp = StartPos;
+			StartPos = EndPos;
+			EndPos   = Temp;
+		}
+
+		for (var Index = StartPos; Index <= EndPos; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.SetParagraphDefaultTabSize(TabSize);
+		}
+	}
+	else
+	{
+		this.Content[this.CurPos.ContentPos].SetParagraphDefaultTabSize(TabSize);
+	}
+};
 CDocumentContent.prototype.SetParagraphSpacing = function(Spacing)
 {
 	if (true === this.ApplyToAll)
@@ -5498,8 +5538,10 @@ CDocumentContent.prototype.Interface_Update_ParaPr    = function()
                 ParaPr.CanAddImage = true;
         }
 
-        if (undefined != ParaPr.Tabs && editor)
-            editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
+        if (undefined != ParaPr.Tabs && editor){
+			var DefaultTab = ParaPr.DefaultTab != null ? ParaPr.DefaultTab : AscCommonWord.Default_Tab_Stop;
+			editor.Update_ParaTab(DefaultTab, ParaPr.Tabs);
+		}
 
         if (this.LogicDocument)
         {

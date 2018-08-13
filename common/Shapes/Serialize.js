@@ -7888,7 +7888,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    para_pr.DefaultTabSize = s.GetLong()/36000;
+                    para_pr.DefaultTab = s.GetLong()/36000;
                     break;
                 }
                 case 2:

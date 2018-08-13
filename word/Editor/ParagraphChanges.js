@@ -74,6 +74,7 @@ AscDFH.changesFactory[AscDFH.historyitem_Paragraph_SectionPr]                 = 
 AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PrChange]                  = CChangesParagraphPrChange;
 AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PrReviewInfo]              = CChangesParagraphPrReviewInfo;
 AscDFH.changesFactory[AscDFH.historyitem_Paragraph_OutlineLvl]                = CChangesParagraphOutlineLvl;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_DefaultTabSize]            = CChangesParagraphDefaultTabSize;
 
 function private_ParagraphChangesOnLoadPr(oColor)
 {
@@ -106,6 +107,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Numbering]               
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Align]                     = [
 	AscDFH.historyitem_Paragraph_Align,
+	AscDFH.historyitem_Paragraph_Pr
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_DefaultTabSize]            = [
+	AscDFH.historyitem_Paragraph_DefaultTabSize,
 	AscDFH.historyitem_Paragraph_Pr
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Ind_First]                 = [
@@ -218,6 +223,7 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Pr]                      
 	AscDFH.historyitem_Paragraph_Pr,
 	AscDFH.historyitem_Paragraph_Numbering,
 	AscDFH.historyitem_Paragraph_Align,
+	AscDFH.historyitem_Paragraph_DefaultTabSize,
 	AscDFH.historyitem_Paragraph_Ind_First,
 	AscDFH.historyitem_Paragraph_Ind_Right,
 	AscDFH.historyitem_Paragraph_Ind_Left,
@@ -590,6 +596,32 @@ CChangesParagraphIndFirst.prototype.private_SetValue = function(Value)
 };
 CChangesParagraphIndFirst.prototype.Merge = private_ParagraphChangesOnMergePr;
 CChangesParagraphIndFirst.prototype.Load = private_ParagraphChangesOnLoadPr;
+
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseDoubleProperty}
+ */
+function CChangesParagraphDefaultTabSize(Class, Old, New, Color)
+{
+	AscDFH.CChangesBaseDoubleProperty.call(this, Class, Old, New, Color);
+}
+CChangesParagraphDefaultTabSize.prototype = Object.create(AscDFH.CChangesBaseDoubleProperty.prototype);
+CChangesParagraphDefaultTabSize.prototype.constructor = CChangesParagraphDefaultTabSize;
+CChangesParagraphDefaultTabSize.prototype.Type = AscDFH.historyitem_Paragraph_DefaultTabSize;
+CChangesParagraphDefaultTabSize.prototype.private_SetValue = function(Value)
+{
+	var oParagraph = this.Class;
+
+
+	oParagraph.Pr.DefaultTab = Value;
+
+	oParagraph.CompiledPr.NeedRecalc = true;
+	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
+	private_ParagraphChangesOnSetValue(this.Class);
+};
+CChangesParagraphDefaultTabSize.prototype.Merge = private_ParagraphChangesOnMergePr;
+CChangesParagraphDefaultTabSize.prototype.Load = private_ParagraphChangesOnLoadPr;
+
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseDoubleProperty}
@@ -1279,6 +1311,11 @@ CChangesParagraphPr.prototype.Merge = function(oChange)
 		case AscDFH.historyitem_Paragraph_Align:
 		{
 			this.New.Jc = oChange.New;
+			break;
+		}
+		case AscDFH.historyitem_Paragraph_DefaultTabSize:
+		{
+			this.New.DefaultTab = oChange.New;
 			break;
 		}
 		case AscDFH.historyitem_Paragraph_Ind_First:

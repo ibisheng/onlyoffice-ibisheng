@@ -443,6 +443,9 @@ CDocumentContentElementBase.prototype.StartSelectionFromCurPos = function()
 CDocumentContentElementBase.prototype.SetParagraphAlign = function(Align)
 {
 };
+CDocumentContentElementBase.prototype.SetParagraphDefaultTabSize = function(TabSize)
+{
+};
 CDocumentContentElementBase.prototype.SetParagraphSpacing = function(Spacing)
 {
 };

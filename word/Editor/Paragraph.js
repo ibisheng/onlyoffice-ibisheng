@@ -8799,6 +8799,21 @@ Paragraph.prototype.Set_Align = function(Align)
 		}
 	}
 };
+Paragraph.prototype.Set_DefaultTabSize = function(TabSize)
+{
+	if (this.Pr.DefaultTab != TabSize)
+	{
+		this.private_AddPrChange();
+
+		History.Add(new CChangesParagraphDefaultTabSize(this, this.Pr.DefaultTab, TabSize));
+		this.Pr.DefaultTab = TabSize;
+
+		// Надо пересчитать конечный стиль
+		this.CompiledPr.NeedRecalc = true;
+		this.private_UpdateTrackRevisionOnChangeParaPr(true);
+
+	}
+};
 Paragraph.prototype.Set_Shd = function(_Shd, bDeleteUndefined)
 {
 	if (undefined === _Shd)
@@ -10758,6 +10773,7 @@ Paragraph.prototype.Refresh_RecalcData = function(Data)
 		}
 
 		case AscDFH.historyitem_Paragraph_Align:
+		case AscDFH.historyitem_Paragraph_DefaultTabSize:
 		case AscDFH.historyitem_Paragraph_Ind_First:
 		case AscDFH.historyitem_Paragraph_Ind_Left:
 		case AscDFH.historyitem_Paragraph_Ind_Right:
@@ -12514,6 +12530,10 @@ Paragraph.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTe
 Paragraph.prototype.SetParagraphAlign = function(Align)
 {
 	this.Set_Align(Align);
+};
+Paragraph.prototype.SetParagraphDefaultTabSize = function(TabSize)
+{
+	this.Set_DefaultTabSize(TabSize);
 };
 Paragraph.prototype.SetParagraphSpacing = function(Spacing)
 {

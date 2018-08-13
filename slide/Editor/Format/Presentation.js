@@ -3014,8 +3014,10 @@ CPresentation.prototype =
 
             if ( null != ParaPr )
             {
-                if ( undefined != ParaPr.Tabs )
-                    editor.Update_ParaTab( AscCommonWord.Default_Tab_Stop, ParaPr.Tabs );
+                if ( undefined != ParaPr.Tabs ){
+                    var DefaultTab = ParaPr.DefaultTab != null ? ParaPr.DefaultTab : AscCommonWord.Default_Tab_Stop;
+                    editor.Update_ParaTab( DefaultTab, ParaPr.Tabs );
+                }
 
                 editor.UpdateParagraphProp( ParaPr );
             }
@@ -3950,8 +3952,8 @@ CPresentation.prototype =
 
     Set_DocumentDefaultTab: function(DTab)
     {
-       //History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
-		AscCommonWord.Default_Tab_Stop = DTab;
+        var oController = this.GetCurrentController();
+        return oController && oController.setDefaultTabSize(DTab);
     },
 
     Set_DocumentMargin: function()

@@ -2372,6 +2372,10 @@ DrawingObjectsController.prototype =
     {
         this.applyDocContentFunction(CDocumentContent.prototype.IncreaseDecreaseIndent, [bIncrease], CTable.prototype.IncreaseDecreaseIndent);
     },
+    setDefaultTabSize: function(TabSize)
+    {
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphDefaultTabSize, [TabSize], CTable.prototype.SetParagraphDefaultTabSize);
+    },
 
     setParagraphAlign: function(align)
     {
@@ -9036,8 +9040,8 @@ DrawingObjectsController.prototype =
 
             if ( undefined != Props.DefaultTab )
             {
-                AscCommonWord.Default_Tab_Stop = Props.DefaultTab;
-                //this.setDefaltTabSize( Props.DefaultTab );
+                //AscCommonWord.Default_Tab_Stop = Props.DefaultTab;
+                this.setDefaultTabSize( Props.DefaultTab );
             }
 
 
