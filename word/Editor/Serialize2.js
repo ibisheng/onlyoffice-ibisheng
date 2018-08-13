@@ -901,7 +901,9 @@ var c_oSerSdt = {
 	TabIndex: 32,
 	Tag: 33,
 	Temporary: 34,
-	MultiLine: 35
+	MultiLine: 35,
+	Appearance: 36,
+	Color: 37
 };
 var c_oSerFFData = {
 	CalcOnExit: 0,
@@ -5604,9 +5606,17 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteByte(c_oSerSdt.Alias);
 			this.memory.WriteString2(val.Alias);
 		}
+		if (null != val.Appearance) {
+			oThis.bs.WriteItem(c_oSerSdt.Appearance, function (){oThis.memory.WriteByte(val.Appearance);});
+		}
 		// if (null != val.ComboBox) {
 		// 	oThis.bs.WriteItem(c_oSerSdt.ComboBox, function (){oThis.WriteSdtComboBox(val.ComboBox);});
 		// }
+		if (null != val.Color) {
+			var rPr = new CTextPr();
+			rPr.Color = val.Color
+			oThis.bs.WriteItem(c_oSerSdt.Color, function (){oThis.brPrs.Write_rPr(rPr, null, null);});
+		}
 		// if (null != val.DataBinding) {
 		// 	oThis.bs.WriteItem(c_oSerSdt.DataBinding, function (){oThis.WriteSdtPrDataBinding(val.DataBinding);});
 		// }
@@ -11139,11 +11149,22 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			oSdtPr.Type = this.stream.GetByte();
 		} else */if (c_oSerSdt.Alias === type) {
 			oSdtPr.Alias = this.stream.GetString2LE(length);
+		} else if (c_oSerSdt.Appearance === type) {
+			var Appearance = this.stream.GetByte();
+			if(Appearance == Asc.c_oAscSdtAppearance.Frame || Appearance == Asc.c_oAscSdtAppearance.Hidden){
+				oSdtPr.Appearance = Appearance;
+			}
 		// } else if (c_oSerSdt.ComboBox === type) {
 		// 	oSdtPr.ComboBox = {};
 		// 	res = this.bcr.Read1(length, function(t, l) {
 		// 		return oThis.ReadSdtComboBox(t, l, oSdtPr.ComboBox);
 		// 	});
+		} else if (c_oSerSdt.Color === type) {
+			var textPr = new CTextPr();
+			res = this.brPrr.Read(length, textPr, null);
+			if(textPr.Color){
+				oSdtPr.Color = textPr.Color;
+			}
 		// } else if (c_oSerSdt.DataBinding === type) {
 		// 	oSdtPr.DataBinding = {};
 		// 	res = this.bcr.Read1(length, function(t, l) {
