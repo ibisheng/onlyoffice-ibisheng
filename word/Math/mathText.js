@@ -143,7 +143,7 @@ CMathBaseText.prototype.IsJustDraw = function()
 // For ParaRun
 CMathBaseText.prototype.Is_Punctuation = function()
 {
-    var bPunc     = 1 === g_aPunctuation[this.value],
+    var bPunc     = 1 === AscCommon.g_aPunctuation[this.value],
         bMathSign = this.value ==  0x2217 || this.value == 0x2212;
 
     return bPunc || bMathSign;

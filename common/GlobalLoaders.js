@@ -444,7 +444,42 @@
         this.loadImageCallBack = null;
         this.loadImageCallBackArgs = null;
 
-		var oThis = this;
+        this.isBlockchainSupport = false;
+        var oThis = this;
+
+        if (window["AscDesktopEditor"] &&
+            window["AscDesktopEditor"]["IsLocalFile"] &&
+            window["AscDesktopEditor"]["isBlockchainSupport"])
+        {
+            this.isBlockchainSupport = (window["AscDesktopEditor"]["isBlockchainSupport"]() && !window["AscDesktopEditor"]["IsLocalFile"]());
+
+            if (this.isBlockchainSupport)
+            {
+                Image.prototype.preload_crypto = function(_url)
+                {
+                    window["crypto_images_map"] = window["crypto_images_map"] || {};
+                    if (!window["crypto_images_map"][_url])
+                        window["crypto_images_map"][_url] = [];
+                    window["crypto_images_map"][_url].push(this);
+
+                    window["AscDesktopEditor"]["PreloadCryptoImage"](_url, AscCommon.g_oDocumentUrls.getLocal(_url));
+
+                    oThis.Api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
+                };
+
+                Image.prototype["onload_crypto"] = function(_src, _crypto_data)
+                {
+                    if (_crypto_data && AscCommon.EncryptionWorker && AscCommon.EncryptionWorker.isCryptoImages())
+                    {
+                        // TODO: send to plugin for decryption & call this method with empty _crypto_data
+                        AscCommon.EncryptionWorker.decryptImage(_src, this, _crypto_data);
+                        return;
+                    }
+                    this.src = _src;
+                    oThis.Api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
+                };
+            }
+        }
 
         this.put_Api = function(_api)
         {
@@ -495,6 +530,19 @@
                     this.Api.asyncImagesDocumentEndLoaded();
                 else
                     this.ThemeLoader.asyncImagesEndLoaded();
+            }
+        };
+
+        this.loadImageByUrl = function(_image, _url, oImage)
+        {
+            if (this.isBlockchainSupport)
+                _image.preload_crypto(_url);
+            else {
+                if(_url.indexOf(".zip")>0){
+                    window["getMediaSrc"](_url,oImage)
+                }else{
+                    _image.src = _url;
+                }
             }
         };
 
@@ -568,11 +616,7 @@
 					}
 				};
 				//oImage.Image.crossOrigin = 'anonymous';
-                if(oImage.src.indexOf(".zip")>0){
-                    window["getMediaSrc"](oImage.src,oImage)
-                }else{
-                    oImage.Image.src = oImage.src;
-                }
+				oThis.loadImageByUrl(oImage.Image, oImage.src, oImage);
 
 				if (!oThis.bIsLoadDocumentImagesNoByOrder)
                     return;
@@ -603,12 +647,7 @@
                 oThis.Api.asyncImageEndLoaded(oImage);
             };
             //oImage.Image.crossOrigin = 'anonymous';
-            if(oImage.src.indexOf(".zip")>0){
-                window["getMediaSrc"](oImage.src,oImage)
-            }else{
-                oImage.Image.src = oImage.src;
-            }
-            // oImage.Image.src = oImage.src;
+            this.loadImageByUrl(oImage.Image, oImage.src, oImage);
             return null;
         };
 
@@ -629,12 +668,7 @@
                 oThis.Api.asyncImageEndLoadedBackground(oImage);
             };
             //oImage.Image.crossOrigin = 'anonymous';
-            // oImage.Image.src = oImage.src;
-            if(oImage.src.indexOf(".zip")>0){
-                window["getMediaSrc"](oImage.src,oImage)
-            }else{
-                oImage.Image.src = oImage.src;
-            }
+            oThis.loadImageByUrl(oImage.Image, oImage.src, oImage);
         };
 
         this.LoadImagesWithCallback = function(arr, loadImageCallBack, loadImageCallBackArgs)
@@ -683,12 +717,7 @@
 						oThis.LoadImagesWithCallbackEnd();
 				};
 				//oImage.Image.crossOrigin = 'anonymous';
-				// oImage.Image.src = oImage.src;
-                if(oImage.src.indexOf(".zip")>0){
-                    window["getMediaSrc"](oImage.src,oImage)
-                }else{
-                    oImage.Image.src = oImage.src;
-                }
+                this.loadImageByUrl(oImage.Image, oImage.src, oImage);
 			}
         };
 
