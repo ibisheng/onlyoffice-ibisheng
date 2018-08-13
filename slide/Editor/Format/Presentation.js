@@ -3425,7 +3425,7 @@ CPresentation.prototype =
                     }
                 }
                 else if ( true === e.CtrlKey ) {
-                    this.ClearParagraphFormatting();
+                    this.ClearParagraphFormatting(false, true);
                 }
                 else
                 {
