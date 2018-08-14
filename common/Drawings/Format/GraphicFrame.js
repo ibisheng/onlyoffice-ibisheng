@@ -710,13 +710,12 @@ CGraphicFrame.prototype.selectionSetStart = function(e, x, y, slideIndex)
             {
                 if(this.graphicObject.IsTableBorder( tx, ty, 0))
                 {
-                    if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
+                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) !== false)
                     {
-                        History.Create_NewPoint(AscDFH.historydescription_Presentation_TableBorder);
+                        return;
                     }
                     else
                     {
-                        return;
                     }
                 }
             }
