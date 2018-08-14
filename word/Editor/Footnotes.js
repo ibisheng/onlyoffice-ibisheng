@@ -2613,6 +2613,13 @@ CFootnotesController.prototype.IsSelectionUse = function()
 {
 	return this.Selection.Use;
 };
+CFootnotesController.prototype.IsNumberingSelection = function()
+{
+	if (this.CurFootnote)
+		return this.CurFootnote.IsNumberingSelection();
+
+	return false;
+};
 CFootnotesController.prototype.IsTextSelectionUse = function()
 {
 	if (true !== this.Selection.Use)

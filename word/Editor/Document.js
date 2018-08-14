@@ -7960,29 +7960,29 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-	else if (e.KeyCode === 112 && true === e.CtrlKey)
-	{
-		// TODO: Добавлено для теста
-		//
-		// this.Create_NewHistoryPoint();
-		// this.AddField(fieldtype_TOC);
-		// this.Recalculate();
-
-		this.ContinueNumbering();
-
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 113 && true === e.CtrlKey)
-	{
-		// TODO: Добавлено для теста
-		// var arrFields = this.GetComplexFieldsByContentPos(this.GetContentPosition(false));
-		// if (arrFields && arrFields.length > 0)
-		// 	this.UpdateComplexField(arrFields[arrFields.length - 1]);
-
-		this.RestartNumbering(3);
-
-		bRetValue = keydownresult_PreventAll;
-	}
+	// else if (e.KeyCode === 112 && true === e.CtrlKey)
+	// {
+	// 	// TODO: Добавлено для теста
+	// 	//
+	// 	// this.Create_NewHistoryPoint();
+	// 	// this.AddField(fieldtype_TOC);
+	// 	// this.Recalculate();
+	//
+	// 	this.ContinueNumbering();
+	//
+	// 	bRetValue = keydownresult_PreventAll;
+	// }
+	// else if (e.KeyCode === 113 && true === e.CtrlKey)
+	// {
+	// 	// TODO: Добавлено для теста
+	// 	// var arrFields = this.GetComplexFieldsByContentPos(this.GetContentPosition(false));
+	// 	// if (arrFields && arrFields.length > 0)
+	// 	// 	this.UpdateComplexField(arrFields[arrFields.length - 1]);
+	//
+	// 	this.RestartNumbering(3);
+	//
+	// 	bRetValue = keydownresult_PreventAll;
+	// }
 	// else if (e.KeyCode === 114 && true === e.CtrlKey)
 	// {
 	// 	this.Create_NewHistoryPoint();
@@ -9099,6 +9099,10 @@ CDocument.prototype.Is_DrawingShape = function(bRetShape)
 CDocument.prototype.IsSelectionUse = function()
 {
 	return this.Controller.IsSelectionUse();
+};
+CDocument.prototype.IsNumberingSelection = function()
+{
+	return this.Controller.IsNumberingSelection();
 };
 CDocument.prototype.IsTextSelectionUse = function()
 {
@@ -15320,6 +15324,10 @@ CDocument.prototype.controller_IsSelectionUse = function()
 		return true;
 
 	return false;
+};
+CDocument.prototype.controller_IsNumberingSelection = function()
+{
+	return CDocumentContentBase.prototype.IsNumberingSelection.apply(this, arguments);
 };
 CDocument.prototype.controller_IsTextSelectionUse = function()
 {

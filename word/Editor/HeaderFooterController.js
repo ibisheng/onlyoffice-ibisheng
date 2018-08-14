@@ -278,6 +278,10 @@ CHdrFtrController.prototype.IsSelectionUse = function()
 {
 	return this.HdrFtr.IsSelectionUse();
 };
+CHdrFtrController.prototype.IsNumberingSelection = function()
+{
+	return this.HdrFtr.IsNumberingSelection();
+};
 CHdrFtrController.prototype.IsTextSelectionUse = function()
 {
 	return this.HdrFtr.IsTextSelectionUse();

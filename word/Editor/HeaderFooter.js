@@ -506,6 +506,11 @@ CHeaderFooter.prototype =
 		return this.Content.IsSelectionUse();
 	},
 
+	IsNumberingSelection : function()
+	{
+		return this.Content.IsNumberingSelection();
+	},
+
 	IsTextSelectionUse : function()
 	{
 		return this.Content.IsTextSelectionUse();
@@ -1796,6 +1801,14 @@ CHeaderFooterController.prototype =
 	{
 		if (null != this.CurHdrFtr)
 			return this.CurHdrFtr.IsSelectionUse();
+
+		return false;
+	},
+
+	IsNumberingSelection : function()
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.IsNumberingSelection();
 
 		return false;
 	},

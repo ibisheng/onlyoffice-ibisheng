@@ -595,6 +595,11 @@ CDocumentControllerBase.prototype.PasteFormatting = function(TextPr, ParaPr){};
  */
 CDocumentControllerBase.prototype.IsSelectionUse = function(){return false;};
 /**
+ * Проверяем выделена ли у нас нумерация в данный момент
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.IsNumberingSelection = function(){return false;};
+/**
  * Проверяем выделен ли именно текст сейчас.
  * @returns {boolean}
  */

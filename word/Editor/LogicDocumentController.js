@@ -248,6 +248,10 @@ CLogicDocumentController.prototype.IsSelectionUse = function()
 {
 	return this.LogicDocument.controller_IsSelectionUse();
 };
+CLogicDocumentController.prototype.IsNumberingSelection = function()
+{
+	return this.LogicDocument.controller_IsNumberingSelection();
+};
 CLogicDocumentController.prototype.IsTextSelectionUse = function()
 {
 	return this.LogicDocument.controller_IsTextSelectionUse();
