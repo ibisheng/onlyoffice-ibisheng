@@ -543,5 +543,8 @@ CDrawingsController.prototype.GetStyleFromFormatting = function()
 };
 CDrawingsController.prototype.GetSimilarNumbering = function(oEngine)
 {
-	// TODO: Реализовать
+	var oDocContent = this.DrawingObjects.getTargetDocContent();
+
+	if (oDocContent && oDocContent.GetSimilarNumbering)
+		oDocContent.GetSimilarNumbering(oEngine);
 };

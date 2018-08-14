@@ -16951,8 +16951,10 @@ CDocument.prototype.GetSelectedNum = function(isCheckSelection)
  */
 CDocument.prototype.ContinueNumbering = function()
 {
+	var isNumberingSelection = this.IsNumberingSelection();
+
 	var oParagraph = this.GetCurrentParagraph(true);
-	if (!oParagraph || !oParagraph.GetNumPr() || this.IsSelectionUse())
+	if (!oParagraph || !oParagraph.GetNumPr() || (this.IsSelectionUse() && !isNumberingSelection))
 		return false;
 
 	var oNumPr = oParagraph.GetNumPr();
