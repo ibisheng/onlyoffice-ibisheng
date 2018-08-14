@@ -233,7 +233,7 @@ var editor;
               }
             });
 		} else {
-			res = numFormat.formatToChart(value, cultureInfo);
+			res = numFormat.formatToChart(value, undefined, cultureInfo);
 		}
 		return res;
 	};
