@@ -4033,42 +4033,44 @@ CChartSpace.prototype.recalculateReferences = function()
 
 CChartSpace.prototype.checkEmptySeries = function()
 {
-    var chart_type = this.chart.plotArea.charts[0];
-    var series = this.getAllSeries();
-    var checkEmptyVal = function(val)
-    {
-        if(val.numRef)
+    for(var t = 0; t < this.chart.plotArea.charts.length; ++t){
+        var chart_type = this.chart.plotArea.charts[t];
+        var series = this.getAllSeries();
+        var checkEmptyVal = function(val)
         {
-            if(!val.numRef.numCache)
+            if(val.numRef)
+            {
+                if(!val.numRef.numCache)
+                    return true;
+                if(val.numRef.numCache.pts.length === 0)
+                    return true;
+            }
+            else if(val.numLit)
+            {
+                if(val.numLit.pts.length === 0)
+                    return true;
+            }
+            else
+            {
                 return true;
-            if(val.numRef.numCache.pts.length === 0)
-                return true;
-        }
-        else if(val.numLit)
+            }
+            return false;
+        };
+        var nChartType = chart_type.getObjectType();
+        var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) && this.chart.plotArea.charts.length === 1 ? Math.min(1, series.length) : series.length;
+        for(var i = 0; i < nSeriesLength; ++i)
         {
-            if(val.numLit.pts.length === 0)
-                return true;
-        }
-        else
-        {
-            return true;
-        }
-        return false;
-    };
-    var nChartType = chart_type.getObjectType();
-    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) && this.chart.plotArea.charts.length === 1 ? Math.min(1, series.length) : series.length;
-    for(var i = 0; i < nSeriesLength; ++i)
-    {
-        var ser = series[i];
-        if(ser.val)
-        {
-            if(!checkEmptyVal(ser.val))
-                return false;
-        }
-        if(ser.yVal)
-        {
-            if(!checkEmptyVal(ser.yVal))
-                return false;
+            var ser = series[i];
+            if(ser.val)
+            {
+                if(!checkEmptyVal(ser.val))
+                    return false;
+            }
+            if(ser.yVal)
+            {
+                if(!checkEmptyVal(ser.yVal))
+                    return false;
+            }
         }
     }
     return true;
@@ -4880,6 +4882,18 @@ CChartSpace.prototype.getValAxisCrossType = function()
         this.plotAreaRect = null;
         this.bEmptySeries = this.checkEmptySeries();
         if(this.chart && this.chart.plotArea){
+
+            var oPlotArea = this.chart.plotArea;
+            for(i = 0; i < oPlotArea.axId.length; ++i){
+                oCurAxis = oPlotArea.axId[i];
+                oCurAxis.posY  = null;
+                oCurAxis.posX  = null;
+                oCurAxis.xPoints = null;
+                oCurAxis.yPoints  = null;
+            }
+            if(this.bEmptySeries){
+                return;
+            }
             if(!this.chartObj){
                 this.chartObj = new AscFormat.CChartsDrawer()
             }
@@ -4917,7 +4931,6 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
                 }
             }
-            var oPlotArea = this.chart.plotArea;
             var aAxes = [].concat(oPlotArea.axId);
             var aAllAxes = [];//array of axes sets
 
@@ -4938,13 +4951,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 }
             }
 
-            for(i = 0; i < oPlotArea.axId.length; ++i){
-                oCurAxis = oPlotArea.axId[i];
-                oCurAxis.posY  = null;
-                oCurAxis.posX  = null;
-                oCurAxis.xPoints = null;
-                oCurAxis.yPoints  = null;
-            }
+
             var oSize = this.getChartSizes();
             var oRect = new CRect(oSize.startX, oSize.startY, oSize.w, oSize.h);
             var oBaseRect = oRect;

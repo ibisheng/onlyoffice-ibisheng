@@ -1420,15 +1420,17 @@ CChartsDrawer.prototype =
 					}
 				}
 			} else {
-				//возможно стоит пройтись по всем сериям
-				seria = series[0];
-				numCache = t.getNumCache(seria.val);
-				min = 1;
-				if(numCache){
-					max = numCache.ptCount;
-				}
-				else{
-					max = 1;
+				if(series.length > 0) {
+					//возможно стоит пройтись по всем сериям
+					seria = series[0];
+					numCache = t.getNumCache(seria.val);
+					min = 1;
+					if(numCache){
+						max = numCache.ptCount;
+					}
+					else{
+						max = 1;
+					}
 				}
 			}
 		};
