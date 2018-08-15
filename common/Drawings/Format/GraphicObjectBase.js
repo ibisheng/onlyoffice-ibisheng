@@ -663,6 +663,26 @@
         }
     };
 
+    CGraphicObjectBase.prototype.getPlaceholderType = function()
+    {
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.getPlaceholderIndex = function()
+    {
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.getPhType = function()
+    {
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.getPhIndex = function()
+    {
+        return null;
+    };
+
 
 
     CGraphicObjectBase.prototype.checkDrawingBaseCoords = function()

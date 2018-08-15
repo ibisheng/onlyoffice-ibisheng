@@ -6057,7 +6057,7 @@ CPresentation.prototype =
                 }
             }
         }
-        this.Insert_Content(oContent);
+        var bRet = this.Insert_Content(oContent);
         if(bNeedGenerateThumbnails)
         {
             for(i = 0; i < this.slideMasters.length; ++i)
@@ -6066,10 +6066,12 @@ CPresentation.prototype =
             }
             this.SendThemesThumbnails();
         }
+        return bRet;
     },
 
     Insert_Content : function(Content)
     {
+        var bInsert = false;
         var selected_slides = this.GetSelectedSlides(), i;
         if(Content.SlideObjects.length > 0)
         {
@@ -6086,6 +6088,7 @@ CPresentation.prototype =
             this.bNeedUpdateTh = true;
             this.FocusOnNotes = false;
             this.CheckEmptyPlaceholderNotes();
+            bInsert = true;
 
         }
         else if(this.Slides[this.CurPage])
@@ -6127,7 +6130,23 @@ CPresentation.prototype =
                     this.Slides[this.CurPage].graphicObjects.resetSelection();
                     for(i = 0; i < Content.Drawings.length; ++i)
                     {
-                        if(!Content.Drawings[i].Drawing.isEmptyPlaceholder())
+                        var bInsertShape = true;
+                        if(Content.Drawings[i].Drawing.isEmptyPlaceholder()){
+                            var oInfo = {};
+                            var nType = Content.Drawings[i].Drawing.getPlaceholderType();
+                            var nIdx = Content.Drawings[i].Drawing.getPlaceholderIndex();
+                            var oLayoutPlaceholder = this.Slides[this.CurPage].Layout.getMatchingShape(nType, nIdx, false, oInfo);
+                            if(!oLayoutPlaceholder ||  oInfo.bBadMatch){
+                                bInsertShape = false;
+                            }
+                            else{
+                                var oSlidePh = this.Slides[this.CurPage].getMatchingShape(nType, nIdx, false, oInfo);
+                                if(oSlidePh){
+                                    bInsertShape = false;
+                                }
+                            }
+                        }
+                        if(bInsertShape)
                         {
                             if(Content.Drawings[i].Drawing.bDeleted)
                             {
@@ -6148,12 +6167,14 @@ CPresentation.prototype =
                             Content.Drawings[i].Drawing.addToDrawingObjects();
                             Content.Drawings[i].Drawing.checkExtentsByDocContent && Content.Drawings[i].Drawing.checkExtentsByDocContent();
                             this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, 0);
+                            bInsert = true;
                         }
                     }
                     if(Content.DocContent && Content.DocContent.Elements.length > 0)
                     {
                         var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
                         this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
+                        bInsert = true;
                     }
                 }
             }
@@ -6245,6 +6266,7 @@ CPresentation.prototype =
                         }
                         var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
                         oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
+                        bInsert = true;
                     }
                     else
                     {
@@ -6253,10 +6275,12 @@ CPresentation.prototype =
                         this.Slides[this.CurPage].graphicObjects.resetSelection();
                         this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                         this.CheckEmptyPlaceholderNotes();
+                        bInsert = true;
                     }
                 }
             }
         }
+        return bInsert;
     },
 
     SendThemesThumbnails: function()

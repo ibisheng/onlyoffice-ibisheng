@@ -446,10 +446,16 @@ Slide.prototype =
 
                 if(_input_reduced_type == _final_type && _input_reduced_index == _final_index)
                 {
+                    if(info){
+                        info.bBadMatch = !(_type === type && _index === idx);
+                    }
                     return _glyph;
                 }
                 if(_input_reduced_type == AscFormat.phType_title && _input_reduced_type == _final_type)
                 {
+                    if(info){
+                        info.bBadMatch = !(_type === type && _index === idx);
+                    }
                     return _glyph;
                 }
                 if(AscFormat.phType_body === _type)
@@ -483,6 +489,9 @@ Slide.prototype =
 
                     if(_input_reduced_type == _type)
                     {
+                        if(info){
+                            info.bBadMatch = !(_type === type && _index === idx);
+                        }
                         return _glyph;
                     }
                 }
@@ -494,6 +503,9 @@ Slide.prototype =
         }
         if(body_count === 1 && _input_reduced_type === AscFormat.phType_body && bSingleBody)
         {
+            if(info){
+                info.bBadMatch = !(_type === type && _index === idx);
+            }
             return last_body;
         }
 
@@ -540,6 +552,9 @@ Slide.prototype =
 
         if(body_count === 1 && bSingleBody)
         {
+            if(info){
+                info.bBadMatch = !(_type === type && _index === idx);
+            }
             return last_body;
         }
 
