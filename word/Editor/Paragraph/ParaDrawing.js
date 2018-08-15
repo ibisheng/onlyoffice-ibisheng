@@ -2397,11 +2397,9 @@ ParaDrawing.prototype.getDrawingArrayType = function()
 {
 	if (this.Is_Inline())
 		return DRAWING_ARRAY_TYPE_INLINE;
-	if (this.behindDoc === true && this.wrappingType === WRAPPING_TYPE_NONE)
+	if (this.behindDoc === true)
 		return DRAWING_ARRAY_TYPE_BEHIND;
-	if (this.wrappingType === WRAPPING_TYPE_NONE)
-		return DRAWING_ARRAY_TYPE_BEFORE;
-	return DRAWING_ARRAY_TYPE_WRAPPING;
+	return DRAWING_ARRAY_TYPE_BEFORE;
 };
 ParaDrawing.prototype.documentSearch = function(String, search_Common)
 {

@@ -361,22 +361,6 @@ NullState.prototype =
 
             if(!bTextFlag)
             {
-                ret = AscFormat.handleFloatObjects(this.drawingObjects, drawing_page.wrappingObjects, e, x, y, null, pageIndex, true);
-                if(ret)
-                {
-                    if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-                    {
-                        end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-                        if ((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
-                        {
-                            this.drawingObjects.checkChartTextSelection(true);
-                            this.drawingObjects.drawingDocument.OnRecalculatePage(pageIndex, this.drawingObjects.document.Pages[pageIndex]);
-                            this.drawingObjects.drawingDocument.OnEndRecalculate(false, true);
-                        }
-                    }
-                    return ret;
-                }
-
                 ret = AscFormat.handleFloatObjects(this.drawingObjects, drawing_page.behindDocObjects, e, x, y, null, pageIndex, true);
                 if(ret)
                 {
@@ -991,7 +975,7 @@ MoveState.prototype =
 
         var startPage = this.drawingObjects.graphicPages[this.majorObject.selectStartPage];
         var startPos = {x: this.startX, y: this.startY};
-        var start_arr = startPage.beforeTextObjects.concat(startPage.wrappingObjects, startPage.inlineObjects, startPage.behindDocObjects);
+        var start_arr = startPage.beforeTextObjects.concat(startPage.inlineObjects, startPage.behindDocObjects);
         var min_dx = null, min_dy = null;
         var dx, dy;
         var snap_x = null, snap_y = null;

@@ -2019,10 +2019,6 @@ CDocument.prototype.Get_ColorMap                   = function()
 {
     return this.clrSchemeMap;
 };
-CDocument.prototype.Get_AllBoundsRectOnPageForMath = function(nPageIndex)
-{
-    return this.DrawingObjects.getAllBoundsRectOnPageForMath(nPageIndex);
-};
 /**
  * Данная функция предназначена для отключения пересчета. Это может быть полезно, т.к. редактор всегда запускает
  * пересчет после каждого действия.
@@ -3999,7 +3995,6 @@ CDocument.prototype.Draw                                     = function(nPageInd
         }
     }
 
-    this.DrawingObjects.drawWrappingObjects(nPageIndex, pGraphics);
     this.DrawingObjects.drawBeforeObjects(nPageIndex, pGraphics);
 
     // Рисуем границы вокруг страницы (если границы надо рисовать перед текстом)
