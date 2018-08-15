@@ -2021,6 +2021,45 @@ CTableCell.prototype.GetFirstElementInNextCell = function()
 
 	return oCellContent.GetElement(0);
 };
+/**
+ * Получаем предыдущий параграф
+ * @returns {?Paragraph}
+ */
+CTableCell.prototype.GetPrevParagraph = function()
+{
+	var oTable     = this.GetTable();
+	var oRow       = this.GetRow();
+	var nCellIndex = this.GetIndex();
+
+	if (0 === nCellIndex)
+	{
+		var nRowIndex = oRow.GetIndex();
+
+		if (0 === nRowIndex)
+		{
+			return oTable.GetPrevParagraph();
+		}
+		else
+		{
+			var oPrevRow  = oTable.GetRow(nRowIndex - 1);
+			var oPrevCell = oPrevRow.GetCell(oPrevRow.GetCellsCount() - 1);
+
+			if (!oPrevCell)
+				return null;
+
+			return oPrevCell.GetContent().GetLastParagraph();
+		}
+	}
+	else
+	{
+		var oPrevCell = oRow.GetCell(nCellIndex - 1);
+
+		if (!oPrevCell)
+			return null;
+
+		return oPrevCell.GetContent().GetLastParagraph();
+	}
+};
 
 function CTableCellRecalculateObject()
 {
