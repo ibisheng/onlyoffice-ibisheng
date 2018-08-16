@@ -1492,6 +1492,10 @@
 
 		this.ComplexField = oComplexField;
 	};
+	CTableOfContentsPr.prototype.InitFromSdtTOC = function(oSdtTOC)
+	{
+		this.ComplexField = oSdtTOC;
+	};
 	CTableOfContentsPr.prototype.CheckStylesType = function(oStyles)
 	{
 		if (oStyles)

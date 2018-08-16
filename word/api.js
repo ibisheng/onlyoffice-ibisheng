@@ -8203,7 +8203,18 @@ background-repeat: no-repeat;\
 			return;
 
 		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
-			oTOC = oTOC.GetInnerTableOfContents();
+		{
+			var oInnerTOC = oTOC.GetInnerTableOfContents();
+
+			if (!(oInnerTOC instanceof AscCommonWord.CComplexField))
+			{
+				// Специальнный случай, когда у нас есть контейнер помеченный как TOC, но самого TOC внутри нет
+				// посылаем в интерфейс класс так, чтобы с ним все равно можно было работать (например, удалить его)
+				var oPr = new Asc.CTableOfContentsPr();
+				oPr.InitFromSdtTOC(oTOC);
+				return oPr;
+			}
+		}
 
 		if (oTOC instanceof AscCommonWord.CComplexField)
 		{
@@ -8230,13 +8241,13 @@ background-repeat: no-repeat;\
 			oTOC = oLogicDocument.GetTableOfContents();
 			if (!oTOC)
 				return;
-
-			if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
-				oTOC = oTOC.GetInnerTableOfContents();
-
-			if (!oTOC)
-				return;
 		}
+
+		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
+			oTOC = oTOC.GetInnerTableOfContents();
+
+		if (!oTOC)
+			return;
 
 		var oStyles     = oLogicDocument.GetStyles();
 		var nStylesType = oPr.get_StylesType();
@@ -8283,13 +8294,13 @@ background-repeat: no-repeat;\
 			oTOC = oLogicDocument.GetTableOfContents();
 			if (!oTOC)
 				return;
-
-			if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
-				oTOC = oTOC.GetInnerTableOfContents();
-
-			if (!oTOC)
-				return;
 		}
+
+		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
+			oTOC = oTOC.GetInnerTableOfContents();
+
+		if (!oTOC)
+			return;
 
 		oTOC.SelectField();
 		if (isUpdatePageNumbers)
