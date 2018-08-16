@@ -592,7 +592,9 @@ var c_oSer_SettingsType = {
 	MathPr: 2,
 	TrackRevisions: 3,
 	FootnotePr: 4,
-	EndnotePr: 5
+	EndnotePr: 5,
+	SdtGlobalColor: 6,
+	SdtGlobalShowHighlight: 7
 };
 var c_oSer_MathPrType = {
 	BrkBin: 0,
@@ -5614,7 +5616,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		// }
 		if (null != val.Color) {
 			var rPr = new CTextPr();
-			rPr.Color = val.Color
+			rPr.Color = val.Color;
 			oThis.bs.WriteItem(c_oSerSdt.Color, function (){oThis.brPrs.Write_rPr(rPr, null, null);});
 		}
 		// if (null != val.DataBinding) {
@@ -5846,6 +5848,7 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
 	this.saveParams = saveParams;
     this.bs = new BinaryCommonWriter(this.memory);
 	this.bpPrs = new Binary_pPrWriter(this.memory, null, null, saveParams);
+	this.brPrs = new Binary_rPrWriter(this.memory, saveParams);
     this.Write = function()
     {
         var oThis = this;
@@ -5859,6 +5862,10 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
 		this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
 		this.bs.WriteItem(c_oSer_SettingsType.TrackRevisions, function(){oThis.memory.WriteBool(oThis.Document.Is_TrackRevisions());});
 		this.bs.WriteItem(c_oSer_SettingsType.FootnotePr, function(){oThis.WriteFootnotePr();});
+		var rPr = new CTextPr();
+		rPr.Color = oThis.Document.GetSdtGlobalColor();
+		this.bs.WriteItem(c_oSer_SettingsType.SdtGlobalColor, function (){oThis.brPrs.Write_rPr(rPr, null, null);});
+		this.bs.WriteItem(c_oSer_SettingsType.SdtGlobalShowHighlight, function(){oThis.memory.WriteBool(oThis.Document.GetSdtGlobalShowHighlight());});
     }
 	this.WriteFootnotePr = function()
 	{
@@ -14051,6 +14058,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 	this.trackRevisions = null;
     this.bcr = new Binary_CommonReader(this.stream);
 	this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
+	this.brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
     this.Read = function()
     {
         var oThis = this;
@@ -14108,6 +14116,18 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 					footnotes.SetFootnotePrPos(props.pos);
 				}
 			}
+		}
+		else if ( c_oSer_SettingsType.SdtGlobalColor === type )
+		{
+			var textPr = new CTextPr();
+			res = this.brPrr.Read(length, textPr, null);
+			if (textPr.Color && !textPr.Color.Auto) {
+				this.Document.SetSdtGlobalColor(textPr.Color.r, textPr.Color.g, textPr.Color.b);
+			}
+		}
+		else if ( c_oSer_SettingsType.SdtGlobalShowHighlight === type )
+		{
+			this.Document.SetSdtGlobalShowHighlight(this.stream.GetBool());
 		}
         else
             res = c_oSerConstants.ReadUnknown;
