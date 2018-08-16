@@ -336,7 +336,8 @@ var c_oSerProp_cellPrType = {
     textDirection: 11,
     hideMark: 12,
     noWrap:13,
-    tcFitText: 14
+    tcFitText: 14,
+	HMerge:15
 };
 var c_oSerProp_secPrType = {
     pgSz: 0,
@@ -4022,6 +4023,12 @@ Binary_tblPrWriter.prototype =
             this.memory.WriteByte(c_oSerPropLenType.Byte);
             this.memory.WriteByte(nVMerge);
         }
+		if(null != cellPr.HMerge)
+		{
+			this.memory.WriteByte(c_oSerProp_cellPrType.HMerge);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteByte(cellPr.HMerge);
+		}
         var textDirection = cell ? cell.Get_TextDirection() : null;
         if(null != textDirection)
         {
@@ -9031,6 +9038,10 @@ Binary_tblPrReader.prototype =
         {
             Pr.VMerge = this.stream.GetUChar();
         }
+		else if( c_oSerProp_cellPrType.HMerge === type )
+		{
+			Pr.HMerge = this.stream.GetUChar();
+		}
         else if( c_oSerProp_cellPrType.CellDel === type ){
             res = c_oSerConstants.ReadUnknown;//todo
         }
