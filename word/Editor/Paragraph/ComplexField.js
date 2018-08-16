@@ -641,7 +641,8 @@ CComplexField.prototype.private_UpdateTOC = function()
 	};
 	oParagraph.Check_NearestPos(oNearPos);
 
-	oSelectedContent.ForceSplit = true;
+	oSelectedContent.DoNotAddEmptyPara = true;
+
 	oParagraph.Parent.Insert_Content(oSelectedContent, oNearPos);
 };
 CComplexField.prototype.private_UpdatePAGEREF = function()

@@ -7033,7 +7033,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
 
-			if (true === Para.IsCursorAtEnd() && true !== SelectedContent.ForceSplit)
+			if (true === Para.IsCursorAtEnd())
 			{
 				bConcatE = false;
 
@@ -7051,7 +7051,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
 					bAddEmptyPara = true;
 			}
-			else if (true === Para.IsCursorAtBegin() && true !== SelectedContent.ForceSplit)
+			else if (true === Para.IsCursorAtBegin())
 			{
 				bConcatS = false;
 			}
@@ -7067,7 +7067,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			}
 
 			var NewEmptyPara = null;
-			if (true === bAddEmptyPara)
+			if (true === bAddEmptyPara && true !== SelectedContent.DoNotAddEmptyPara)
 			{
 				// Создаем новый параграф
 				NewEmptyPara = new Paragraph(this.DrawingDocument, this);
