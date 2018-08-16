@@ -1498,6 +1498,7 @@
 	window['AscDFH'].historyitem_TableCell_Pr            = window['AscDFH'].historyitem_type_TableCell | 11;
 	window['AscDFH'].historyitem_TableCell_TextDirection = window['AscDFH'].historyitem_type_TableCell | 12;
 	window['AscDFH'].historyitem_TableCell_NoWrap        = window['AscDFH'].historyitem_type_TableCell | 13;
+	window['AscDFH'].historyitem_TableCell_HMerge        = window['AscDFH'].historyitem_type_TableCell | 14;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CDocumentContent
 	//------------------------------------------------------------------------------------------------------------------

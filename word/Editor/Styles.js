@@ -6393,6 +6393,7 @@ function CTableCellPr()
     this.VMerge           = undefined;
     this.TextDirection    = undefined;
     this.NoWrap           = undefined;
+    this.HMerge           = undefined;
 }
 
 CTableCellPr.prototype =
@@ -6438,6 +6439,8 @@ CTableCellPr.prototype =
         CellPr.VMerge        = this.VMerge;
         CellPr.TextDirection = this.TextDirection;
         CellPr.NoWrap        = this.NoWrap;
+        CellPr.HMerge        = this.HMerge;
+
         return CellPr;
     },
 
@@ -6489,6 +6492,9 @@ CTableCellPr.prototype =
 
         if (undefined !== CellPr.NoWrap)
             this.NoWrap = CellPr.NoWrap;
+
+        if (undefined != CellPr.HMerge)
+        	this.HMerge = CellPr.HMerge;
     },
 
     Is_Equal : function(CellPr)
@@ -6517,7 +6523,8 @@ CTableCellPr.prototype =
             || this.VAlign !== CellPr.VAlign
             || this.VMerge !== CellPr.VMerge
             || this.TextDirection !== CellPr.TextDirection
-            || this.NoWrap !== CellPr.NoWrap)
+            || this.NoWrap !== CellPr.NoWrap
+			|| this.HMerge !== CellPr.HMerge)
             return false;
 
         return true;
@@ -6537,6 +6544,7 @@ CTableCellPr.prototype =
         this.VMerge                  = vmerge_Restart;
         this.TextDirection           = textdirection_LRTB;
         this.NoWrap                  = false;
+        this.HMerge                  = vmerge_Restart;
     },
 
     Set_FromObject : function(CellPr)
@@ -6632,6 +6640,8 @@ CTableCellPr.prototype =
         this.VMerge = CellPr.VMerge;
         this.TextDirection = CellPr.TextDirection;
         this.NoWrap = CellPr.NoWrap;
+        this.HMerge = CellPr.HMerge;
+
     },
 
     Check_PresentationPr : function(Theme)
@@ -6766,6 +6776,12 @@ CTableCellPr.prototype =
             Flags |= 65536;
         }
 
+        if (undefined !== this.HMerge)
+		{
+			Writer.WriteLong(this.HMerge);
+			Flags |= 131072;
+		}
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -6856,6 +6872,9 @@ CTableCellPr.prototype =
 
         if (65536 & Flags)
             this.NoWrap = Reader.GetBool();
+
+		if (131072 & Flags)
+			this.HMerge = Reader.GetLong();
     }
 };
 CTableCellPr.prototype.Is_Empty = function()
@@ -6871,7 +6890,8 @@ CTableCellPr.prototype.Is_Empty = function()
 		|| undefined !== this.VAlign
 		|| undefined !== this.VMerge
 		|| undefined !== this.TextDirection
-		|| undefined !== this.NoWrap)
+		|| undefined !== this.NoWrap
+		|| undefined !== this.HMerge)
 		return false;
 
 	return true;
