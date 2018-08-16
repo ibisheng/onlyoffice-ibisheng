@@ -17297,6 +17297,18 @@ CDocument.prototype.IsAutoCorrectHyphensWithDash = function()
 {
 	return this.AutoCorrectSettings.HyphensWithDash;
 };
+/**
+ * Получаем идентификатор текущего пользователя
+ * @param [isConnectionId=false] {boolean} true - Id соединения пользователя или false - Id пользователя
+ * @returns {string}
+ */
+CDocument.prototype.GetUserId = function(isConnectionId)
+{
+	if (isConnectionId)
+		return this.GetApi().CoAuthoringApi.getUserConnectionId();
+
+	return this.GetApi().DocInfo.get_UserId();
+};
 
 function CDocumentSelectionState()
 {
@@ -17898,6 +17910,29 @@ CTrackRevisionsManager.prototype.Have_Changes = function()
     }
 
     return false;
+};
+/**
+ * Проверяем есть ли изменения, сделанные другими пользователями
+ * @returns {boolean}
+ */
+CTrackRevisionsManager.prototype.HaveOtherUsersChanges = function()
+{
+	var sUserId = this.LogicDocument.GetUserId(false);
+	for (var sParaId in this.Changes)
+	{
+		var oParagraph = AscCommon.g_oTableId.Get_ById(sParaId);
+		if (!oParagraph || !oParagraph.Is_UseInDocument())
+			continue;
+
+		for (var nIndex = 0, nCount = this.Changes[sParaId].length; nIndex < nCount; ++nIndex)
+		{
+			var oChange = this.Changes[sParaId][nIndex];
+			if (oChange.get_UserId() !== sUserId)
+				return true;
+		}
+	}
+
+	return false;
 };
 CTrackRevisionsManager.prototype.Clear_CurrentChange = function()
 {

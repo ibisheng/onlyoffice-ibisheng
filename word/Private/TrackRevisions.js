@@ -730,7 +730,7 @@ CDocument.prototype.RejectRevisionChanges = function(Type, bAll)
 CDocument.prototype.Have_RevisionChanges = function()
 {
     this.TrackRevisionsManager.Continue_TrackRevisions();
-    return this.TrackRevisionsManager.Have_Changes();
+    return this.TrackRevisionsManager.HaveOtherUsersChanges();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // CHeaderFooterController
