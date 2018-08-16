@@ -4932,6 +4932,7 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 		return;
 	}
 
+	var isCheckPrev = false;
 	if (!sNumId)
 	{
 		var oLastNumPr = this.GetLastBulletList();
@@ -4945,6 +4946,8 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 
 			sNumId  = oNum.GetId();
 			nNumLvl = 0;
+
+			isCheckPrev = true;
 		}
 	}
 
@@ -4956,6 +4959,18 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 
 		sNumId  = oNum.GetId();
 		nNumLvl = 0;
+
+		isCheckPrev = true;
+	}
+
+	if (isCheckPrev)
+	{
+		var oResult = this.private_CheckPrevNumberingOnAdd(arrParagraphs, sNumId, nNumLvl);
+		if (oResult)
+		{
+			sNumId  = oResult.NumId;
+			nNumLvl = oResult.Lvl;
+		}
 	}
 
 	this.SetLastBulletList(sNumId, nNumLvl);
@@ -5075,9 +5090,13 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 		}
 	}
 
+	var isCheckPrev = false;
+
 	var sNumId = null;
 	if (oNumPr)
 	{
+		nPrevLvl = oNumPr.Lvl;
+
 		oNum = this.Numbering.GetNum(oNumPr.NumId);
 		if (oNum)
 		{
@@ -5088,11 +5107,15 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 	}
 	else if (true === bDiffLvl)
 	{
+		nPrevLvl = 0;
+
 		var oNum = this.Numbering.CreateNum();
 		oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 		oNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, sLvlText, oLvlTextPr);
 
 		sNumId = oNum.GetId();
+
+		isCheckPrev = true;
 	}
 	else if (true === bDiffId || true != this.Numbering.CheckFormat(sPrevId, nPrevLvl, Asc.c_oAscNumberingFormat.Bullet))
 	{
@@ -5101,6 +5124,8 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 		oNum.SetLvlByType(nPrevLvl, c_oAscNumberingLevel.Bullet, sLvlText, oLvlTextPr);
 
 		sNumId = oNum.GetId();
+
+		isCheckPrev = true;
 	}
 	else
 	{
@@ -5111,6 +5136,13 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 		}
 
 		this.SetLastBulletList(sPrevId, nPrevLvl);
+	}
+
+	if (isCheckPrev)
+	{
+		var oResult = this.private_CheckPrevNumberingOnAdd(arrParagraphs, sNumId, nPrevLvl);
+		if (oResult)
+			sNumId = oResult.NumId;
 	}
 
 	if (sNumId)
@@ -5208,6 +5240,8 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 		return;
 	}
 
+	var isCheckPrev = false;
+
 	if (!sNumId)
 	{
 		var oLastNumPr = this.GetLastNumberedList();
@@ -5232,6 +5266,8 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 
 			sNumId  = oNum.GetId();
 			nNumLvl = 0;
+
+			isCheckPrev = true;
 		}
 	}
 
@@ -5242,6 +5278,18 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 
 		sNumId  = oNum.GetId();
 		nNumLvl = 0;
+
+		isCheckPrev = true;
+	}
+
+	if (isCheckPrev)
+	{
+		var oResult = this.private_CheckPrevNumberingOnAdd(arrParagraphs, sNumId, nNumLvl);
+		if (oResult)
+		{
+			sNumId  = oResult.NumId;
+			nNumLvl = oResult.Lvl;
+		}
 	}
 
 	this.SetLastNumberedList(sNumId, nNumLvl);
@@ -5308,6 +5356,8 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 	var sNumId     = null;
 	var nChangeLvl = 0;
 
+	var isCheckPrev = false;
+
 	if (oNumPr)
 	{
 		oNum       = this.Numbering.GetNum(oNumPr.NumId);
@@ -5320,6 +5370,8 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 
 		sNumId     = oNum.GetId();
 		nChangeLvl = 0;
+
+		isCheckPrev = true;
 	}
 	else if (true === bDiffId)
 	{
@@ -5328,6 +5380,8 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 
 		sNumId     = oNum.GetId();
 		nChangeLvl = nPrevLvl;
+
+		isCheckPrev = true;
 	}
 	else
 	{
@@ -5374,6 +5428,13 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 			oNum.SetLvlByType(nChangeLvl, c_oAscNumberingLevel.LowerRomanDot_Right);
 			break;
 		}
+	}
+
+	if (isCheckPrev)
+	{
+		var oResult = this.private_CheckPrevNumberingOnAdd(arrParagraphs, sNumId, nChangeLvl);
+		if (oResult)
+			sNumId = oResult.NumId;
 	}
 
 	if (sNumId)
@@ -5466,6 +5527,38 @@ CDocument.prototype.private_SetParagraphNumberingMultiLevel = function(arrParagr
 				arrParagraphs[nIndex].ApplyNumPr(sNumId, 0);
 		}
 	}
+};
+CDocument.prototype.private_CheckPrevNumberingOnAdd = function(arrParagraphs, sNumId, nLvl)
+{
+	var sResultNumId = sNumId;
+	var nResultLvl   = nLvl;
+
+	if (arrParagraphs.length !== 1 || this.IsSelectionUse())
+		return {NumId : sResultNumId, Lvl : nResultLvl};
+
+	var oPrevPara = arrParagraphs[0].GetPrevParagraph();
+	while (oPrevPara)
+	{
+		if (oPrevPara.GetNumPr() || !oPrevPara.IsEmpty())
+			break;
+
+		oPrevPara = oPrevPara.GetPrevParagraph();
+	}
+
+	if (oPrevPara && oPrevPara.GetNumPr())
+	{
+		var oPrevNumPr = oPrevPara.GetNumPr();
+		var oPrevLvl   = this.Numbering.GetNum(oPrevNumPr.NumId).GetLvl(oPrevNumPr.Lvl);
+		var oCurrLvl   = this.Numbering.GetNum(sNumId).GetLvl(nLvl);
+
+		if (oPrevLvl.IsSimilar(oCurrLvl))
+		{
+			sResultNumId = oPrevNumPr.NumId;
+			nResultLvl   = oPrevNumPr.Lvl;
+		}
+	}
+
+	return {NumId : sResultNumId, Lvl : nResultLvl};
 };
 CDocument.prototype.SetParagraphShd = function(Shd)
 {
