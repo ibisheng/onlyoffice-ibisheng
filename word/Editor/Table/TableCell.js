@@ -1879,6 +1879,14 @@ CTableCell.prototype.GetGridSpan = function()
 	return this.Get_GridSpan();
 };
 /**
+ * Выставляем количество промежутков, которое занимает данная ячейка
+ * @param nGridSpan
+ */
+CTableCell.prototype.SetGridSpan = function(nGridSpan)
+{
+	return this.Set_GridSpan(nGridSpan);
+};
+/**
  * Получаем информацию о границе ячейки
  * @param {number} nType - 0 - Top, 1 - Right, 2- Bottom, 3- Left
  */
