@@ -1597,15 +1597,17 @@ CChangesParagraphSectPr.prototype.Type = AscDFH.historyitem_Paragraph_SectionPr;
 CChangesParagraphSectPr.prototype.Undo = function()
 {
 	var oParagraph = this.Class;
+	var oOldSectPr = oParagraph.SectPr;
 	oParagraph.SectPr = this.Old;
-	oParagraph.LogicDocument.Update_SectionsInfo();
+	oParagraph.LogicDocument.UpdateSectionInfo(oOldSectPr, this.Old, false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
 CChangesParagraphSectPr.prototype.Redo = function()
 {
 	var oParagraph = this.Class;
+	var oOldSectPr = oParagraph.SectPr;
 	oParagraph.SectPr = this.New;
-	oParagraph.LogicDocument.Update_SectionsInfo();
+	oParagraph.LogicDocument.UpdateSectionInfo(oOldSectPr, this.New, false);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
 CChangesParagraphSectPr.prototype.WriteToBinary = function(Writer)

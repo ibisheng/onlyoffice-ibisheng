@@ -1776,7 +1776,7 @@ CDocument.prototype.Init                           = function()
 CDocument.prototype.On_EndLoad                     = function()
 {
     // Обновляем информацию о секциях
-    this.Update_SectionsInfo();
+    this.UpdateAllSectionsInfo();
 
     // Проверяем последний параграф на наличие секции
     this.Check_SectionLastParagraph();
@@ -10516,7 +10516,10 @@ CDocument.prototype.Viewer_OnChangePosition = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с секциями
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Update_SectionsInfo = function()
+/**
+ * Обновляем информацию о всех секциях в данном документе
+ */
+CDocument.prototype.UpdateAllSectionsInfo = function()
 {
 	this.SectionsInfo.Clear();
 
@@ -10532,6 +10535,17 @@ CDocument.prototype.Update_SectionsInfo = function()
 
 	// Когда полностью обновляются секции надо пересчитывать с самого начала
 	this.RecalcInfo.Set_NeedRecalculateFromStart(true);
+};
+/**
+ * Обновляем информацию о заданной секции
+ * @param oSectPr {CSectionPr} - Если не задано, значит добавляется новая секция
+ * @param oNewSectPr {CSectionPr} - Если не задано, тогда секция удаляется
+ * @param isCheckHdrFtr {boolean} - Проверять ли колонтитулы при удалении секции
+ */
+CDocument.prototype.UpdateSectionInfo = function(oSectPr, oNewSectPr, isCheckHdrFtr)
+{
+	if (!this.SectionsInfo.UpdateSection(oSectPr, oNewSectPr, isCheckHdrFtr))
+		this.UpdateAllSectionsInfo();
 };
 CDocument.prototype.Check_SectionLastParagraph = function()
 {
@@ -16397,7 +16411,7 @@ CDocument.prototype.private_CheckCursorPosInFillingFormMode = function()
 };
 CDocument.prototype.OnEndLoadScript = function()
 {
-	this.Update_SectionsInfo();
+	this.UpdateAllSectionsInfo();
 	this.Check_SectionLastParagraph();
 	this.Styles.Check_StyleNumberingOnLoad(this.Numbering);
 
@@ -17630,7 +17644,7 @@ CDocumentSectionsInfo.prototype =
                 {
                     var CurrSectPr = this.Elements[Index].SectPr;
                     var NextSectPr = this.Elements[Index + 1].SectPr;
-                    if (true === NextSectPr.Is_AllHdrFtrNull() && true !== CurrSectPr.Is_AllHdrFtrNull())
+                    if (true === NextSectPr.IsAllHdrFtrNull() && true !== CurrSectPr.IsAllHdrFtrNull())
                     {
                         NextSectPr.Set_Header_First(CurrSectPr.Get_Header_First());
                         NextSectPr.Set_Header_Even(CurrSectPr.Get_Header_Even());
@@ -17676,6 +17690,56 @@ CDocumentSectionsInfo.prototype.GetAllContentControls = function(arrContentContr
 		if (null != SectPr.FooterEven)
 			SectPr.FooterEven.GetAllContentControls(arrContentControls);
 	}
+};
+/**
+ * Обновляем заданную секцию
+ * @param oSectPr {CSectionPr} - Секция, которую нужно обновить
+ * @param oNewSectPr {?CSectionPr} - Либо новое значение секции, либо undefined для удалении секции
+ * @param isCheckHdrFtr {boolean} - Нужно ли проверять колонтитулы при удалении секции
+ * @returns {boolean} Если не смогли обновить, возвращаем false
+ */
+CDocumentSectionsInfo.prototype.UpdateSection = function(oSectPr, oNewSectPr, isCheckHdrFtr)
+{
+	if (oSectPr === oNewSectPr || !oSectPr)
+		return false;
+
+	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		if (oSectPr === this.Elements[nIndex].SectPr)
+		{
+			if (!oNewSectPr)
+			{
+				// Копируем поведение Word: Если у следующей секции не задан вообще ни один колонтитул,
+				// тогда копируем ссылки на колонтитулы из удаляемой секции. Если задан хоть один колонтитул,
+				// тогда этого не делаем.
+				if (true === isCheckHdrFtr && nIndex < nCount - 1)
+				{
+					var oCurrSectPr = this.Elements[nIndex].SectPr;
+					var oNextSectPr = this.Elements[nIndex + 1].SectPr;
+
+					if (true === oNextSectPr.IsAllHdrFtrNull() && true !== oCurrSectPr.IsAllHdrFtrNull())
+					{
+						oNextSectPr.Set_Header_First(oCurrSectPr.Get_Header_First());
+						oNextSectPr.Set_Header_Even(oCurrSectPr.Get_Header_Even());
+						oNextSectPr.Set_Header_Default(oCurrSectPr.Get_Header_Default());
+						oNextSectPr.Set_Footer_First(oCurrSectPr.Get_Footer_First());
+						oNextSectPr.Set_Footer_Even(oCurrSectPr.Get_Footer_Even());
+						oNextSectPr.Set_Footer_Default(oCurrSectPr.Get_Footer_Default());
+					}
+				}
+
+				this.Elements.splice(nIndex, 1);
+			}
+			else
+			{
+				this.Elements[nIndex].SectPr = oNewSectPr;
+			}
+
+			return true;
+		}
+	}
+
+	return false;
 };
 
 function CDocumentSectionsInfoElement(SectPr, Index)

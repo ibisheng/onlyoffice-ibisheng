@@ -11252,10 +11252,11 @@ Paragraph.prototype.Set_SectionPr = function(SectPr, bUpdate)
 	{
 		History.Add(new CChangesParagraphSectPr(this, this.SectPr, SectPr));
 
+		var oOldSectPr = this.SectPr;
 		this.SectPr = SectPr;
 
 		if (false !== bUpdate)
-			this.LogicDocument.Update_SectionsInfo();
+			this.LogicDocument.UpdateSectionInfo(oOldSectPr, SectPr, true);
 
 		// TODO: Когда избавимся от ParaEnd переделать тут
 		if (this.Content.length > 0 && para_Run === this.Content[this.Content.length - 1].Type)
