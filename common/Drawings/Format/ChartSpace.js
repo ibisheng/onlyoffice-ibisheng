@@ -898,16 +898,56 @@ function checkPointInMap(map, worksheet, row, col)
 
     CLabelsBox.prototype.layoutHorRotated = function(fAxisY, fDistance, fXStart, fInterval, bOnTickMark){
 
+
+        var bTickLblSkip = AscFormat.isRealNumber(this.axis.tickLblSkip) ? true : false;
+        if(bTickLblSkip){
+            this.layoutHorRotated2(this.aLabels, fAxisY, fDistance, fXStart, fInterval, bOnTickMark);
+        }
+        else{
+
+            var fAngle = Math.PI/4.0, fMultiplier = Math.sin(fAngle);
+            var aLabelsSource = [].concat(this.aLabels);
+            var oLabel = aLabelsSource[0];
+            var i = 1;
+            while(!oLabel && i < aLabelsSource.length){
+                oLabel = aLabelsSource[i];
+            }
+            if(oLabel){
+                var oContent = oLabel.tx.rich.content;
+                oContent.Set_ApplyToAll(true);
+                oContent.SetParagraphAlign(AscCommon.align_Left);
+                oContent.SetParagraphIndent({FirstLine: 0.0, Left: 0.0});
+                oContent.Set_ApplyToAll(false);
+                var oSize = oLabel.tx.rich.getContentOneStringSizes();
+                var fInset = fMultiplier*(oSize.h);
+                fInset *= 1.4;
+                if(fInset <= fInterval){
+                    this.layoutHorRotated2(this.aLabels, fAxisY, fDistance, fXStart, fInterval, bOnTickMark);
+                }
+                else{
+                    var nLblTickSkip = (fInset/fInterval + 0.5) >> 0;
+                    var aLabels = [].concat(aLabelsSource);
+                    for(i = 0; i < aLabels.length; ++i){
+                        if((i % nLblTickSkip) !== 0){
+                            aLabels[i] = null;
+                        }
+                    }
+                    this.layoutHorRotated2(aLabels, fAxisY, fDistance, fXStart, fInterval, bOnTickMark);
+                }
+            }
+        }
+
+    };
+
+    CLabelsBox.prototype.layoutHorRotated2 = function (aLabels, fAxisY, fDistance, fXStart, fInterval, bOnTickMark) {
+        var i;
         var fMaxHeight = 0.0;
         var fCurX = bOnTickMark ? fXStart : fXStart + fInterval/2.0;
         var fAngle = Math.PI/4.0, fMultiplier = Math.sin(fAngle);
-        // if(fInterval < 0.0){
-        //     fCurX += fInterval;
-        // }
         var fMinLeft = null, fMaxRight = null;
-        for(var i = 0; i < this.aLabels.length; ++i){
-            if(this.aLabels[i]){
-                var oLabel = this.aLabels[i];
+        for(i = 0; i < aLabels.length; ++i){
+            if(aLabels[i]){
+                var oLabel = aLabels[i];
                 var oContent = oLabel.tx.rich.content;
                 oContent.Set_ApplyToAll(true);
                 oContent.SetParagraphAlign(AscCommon.align_Left);
@@ -944,9 +984,10 @@ function checkPointInMap(map, worksheet, row, col)
             }
             fCurX += fInterval;
         }
+        this.aLabels = aLabels;
         var aPoints = [];
         aPoints.push(fXStart);
-        var nIntervalCount = bOnTickMark ? this.aLabels.length - 1 : this.aLabels.length;
+        var nIntervalCount = bOnTickMark ? aLabels.length - 1 : aLabels.length;
         aPoints.push(fXStart + fInterval*nIntervalCount);
         if(null !== fMinLeft){
             aPoints.push(fMinLeft);
@@ -3612,7 +3653,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
 
         }
         var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
-        var pt_index = 0, i, j, cell, pt, row_hidden, col_hidden, nPtCount, t;
+        var pt_index = 0, i, j, cell, pt, row_hidden, col_hidden, nPtCount = 0, t;
         for(i = 0; i < aParsedRef.length; ++i)
         {
             var oCurRef = aParsedRef[i];
@@ -3808,7 +3849,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
             }
         }
         if(aParsedRef.length > 0){
-            num_cache.setPtCount(pt_index);
+            num_cache.setPtCount(num_cache.pts.length);
         }
         val.numRef.setNumCache(num_cache);
         if(!(val instanceof AscFormat.CCat))
@@ -3907,7 +3948,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                 fParseTableDataString(oCurRef);
             }
         }
-        str_cache.setPtCount(pt_index);
+        str_cache.setPtCount(str_cache.pts.length);
         cat.strRef.setStrCache(str_cache);
     }
 };
@@ -4361,7 +4402,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         nPtsLen = oLit.ptCount;
 
                         var bTickSkip =  AscFormat.isRealNumber(oAxis.tickLblSkip);
-                        var nTickLblSkip = AscFormat.isRealNumber(oAxis.tickLblSkip) ? oAxis.tickLblSkip : (nPtsLen < SKIP_LBL_LIMIT ?  1 :  Math.floor(nPtsLen/SKIP_LBL_LIMIT));
+                        var nTickLblSkip = AscFormat.isRealNumber(oAxis.tickLblSkip) ? oAxis.tickLblSkip : 1;
                         for(i = 0; i < nPtsLen; ++i){
                             if(!bTickSkip || ((i % nTickLblSkip) === 0)){
                                 var oPt = oLit.getPtByIndex(i);

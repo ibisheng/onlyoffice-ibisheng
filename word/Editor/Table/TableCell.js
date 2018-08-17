@@ -1879,6 +1879,14 @@ CTableCell.prototype.GetGridSpan = function()
 	return this.Get_GridSpan();
 };
 /**
+ * Выставляем количество промежутков, которое занимает данная ячейка
+ * @param nGridSpan
+ */
+CTableCell.prototype.SetGridSpan = function(nGridSpan)
+{
+	return this.Set_GridSpan(nGridSpan);
+};
+/**
  * Получаем информацию о границе ячейки
  * @param {number} nType - 0 - Top, 1 - Right, 2- Bottom, 3- Left
  */
@@ -2060,6 +2068,28 @@ CTableCell.prototype.GetPrevParagraph = function()
 		return oPrevCell.GetContent().GetLastParagraph();
 	}
 };
+/**
+ * Участвует ли в вертикальном объединении данная ячейка
+ * @returns {vmerge_Restart | vmerge_Continue}
+ */
+CTableCell.prototype.GetHMerge = function()
+{
+	return this.Get_CompiledPr(false).HMerge;
+};
+/**
+ * Задаем настройку участия данной ячейки в вертикальном объединении
+ * @param {vmerge_Restart | vmerge_Continue} nType
+ */
+CTableCell.prototype.SetHMerge = function(nType)
+{
+	if (nType === this.Pr.HMerge)
+		return;
+
+	History.Add(new CChangesTableCellHMerge(this, this.Pr.HMerge, nType));
+	this.Pr.HMerge = nType;
+	this.Recalc_CompiledPr();
+};
+
 
 function CTableCellRecalculateObject()
 {

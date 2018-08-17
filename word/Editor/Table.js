@@ -12324,6 +12324,78 @@ CTable.prototype.Correct_BadTable = function()
     //       из вертикально объединенных ячеек).
     this.Internal_Check_TableRows(false);
 	this.CorrectBadGrid();
+	this.CorrectHMerge();
+};
+/**
+ * Специальная функция, которая обрабатывает устаревший параметр HMerge и заменяет его на GridSpan во время открытия файла
+ */
+CTable.prototype.CorrectHMerge = function()
+{
+	// HACK: При загрузке мы запрещаем компилировать стили, но нам все-таки это здесь нужно
+	var bLoad = AscCommon.g_oIdCounter.m_bLoad;
+	var bRead = AscCommon.g_oIdCounter.m_bRead;
+	AscCommon.g_oIdCounter.m_bLoad = false;
+	AscCommon.g_oIdCounter.m_bRead = false;
+
+	var nColsCount = this.TableGrid.length;
+
+	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.GetRow(nCurRow);
+
+		var nCurGridCol = oRow.GetBefore().Grid;
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oRow.GetCell(nCurCell);
+
+			var nGridSpan = oCell.GetGridSpan();
+
+			var nWType    = oCell.GetW().Type;
+			var nWValue   = oCell.GetW().W;
+
+			if (nCurCell < nCellsCount - 1)
+			{
+				var nNextCurCell = nCurCell + 1;
+				while (nNextCurCell < nCellsCount)
+				{
+					var oNextCell = oRow.GetCell(nNextCurCell);
+
+					if (vmerge_Continue === oNextCell.GetHMerge())
+					{
+						nGridSpan += oNextCell.GetGridSpan();
+						oRow.RemoveCell(nNextCurCell);
+						nCellsCount--;
+						nNextCurCell--;
+
+						if (nWType === oNextCell.GetW().Type)
+							nWValue += oNextCell.GetW().Value;
+					}
+					else
+					{
+						break;
+					}
+
+					nNextCurCell++;
+				}
+			}
+
+			if (nGridSpan !== oCell.GetGridSpan())
+			{
+				if (nGridSpan + nCurGridCol > nColsCount)
+					nGridSpan = Math.max(1, nColsCount - nCurGridCol);
+
+				oCell.SetGridSpan(nGridSpan);
+				oCell.SetW(new CTableMeasurement(nWType, nWValue));
+			}
+
+			nCurGridCol += nGridSpan;
+		}
+	}
+
+	// HACK: Восстанавливаем флаги и выставляем, что стиль всей таблицы нужно пересчитать
+	AscCommon.g_oIdCounter.m_bLoad = bLoad;
+	AscCommon.g_oIdCounter.m_bRead = bRead;
+	this.Recalc_CompiledPr2();
 };
 CTable.prototype.GetNumberingInfo = function(oNumberingEngine)
 {

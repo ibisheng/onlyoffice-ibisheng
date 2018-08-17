@@ -50,6 +50,7 @@ AscDFH.changesFactory[AscDFH.historyitem_TableCell_W]             = CChangesTabl
 AscDFH.changesFactory[AscDFH.historyitem_TableCell_Pr]            = CChangesTableCellPr;
 AscDFH.changesFactory[AscDFH.historyitem_TableCell_TextDirection] = CChangesTableCellTextDirection;
 AscDFH.changesFactory[AscDFH.historyitem_TableCell_NoWrap]        = CChangesTableCellNoWrap;
+AscDFH.changesFactory[AscDFH.historyitem_TableCell_HMerge]        = CChangesTableCellHMerge;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
@@ -107,7 +108,8 @@ AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_Pr]            = [
 	AscDFH.historyitem_TableCell_W,
 	AscDFH.historyitem_TableCell_Pr,
 	AscDFH.historyitem_TableCell_TextDirection,
-	AscDFH.historyitem_TableCell_NoWrap
+	AscDFH.historyitem_TableCell_NoWrap,
+	AscDFH.historyitem_TableCell_HMerge
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_TextDirection] = [
 	AscDFH.historyitem_TableCell_TextDirection,
@@ -115,6 +117,10 @@ AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_TextDirection] = [
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_NoWrap]        = [
 	AscDFH.historyitem_TableCell_NoWrap,
+	AscDFH.historyitem_TableCell_Pr
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_TableCell_HMerge]        = [
+	AscDFH.historyitem_TableCell_HMerge,
 	AscDFH.historyitem_TableCell_Pr
 ];
 /**
@@ -811,6 +817,11 @@ CChangesTableCellPr.prototype.Merge = function(oChange)
 			this.New.NoWrap = oChange.New;
 			break;
 		}
+		case AscDFH.historyitem_TableCell_HMerge:
+		{
+			this.New.HMerge = oChange.New;
+			break;
+		}
 	}
 
 	return true;
@@ -851,3 +862,21 @@ CChangesTableCellNoWrap.prototype.private_SetValue = function(Value)
 	oCell.Recalc_CompiledPr();
 };
 CChangesTableCellNoWrap.prototype.Merge = private_TableCellChangesOnMergePr;
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesTableCellHMerge(Class, Old, New, Color)
+{
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
+}
+CChangesTableCellHMerge.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesTableCellHMerge.prototype.constructor = CChangesTableCellHMerge;
+CChangesTableCellHMerge.prototype.Type = AscDFH.historyitem_TableCell_HMerge;
+CChangesTableCellHMerge.prototype.private_SetValue = function(Value)
+{
+	var oCell = this.Class;
+	oCell.Pr.HMerge = Value;
+	oCell.Recalc_CompiledPr();
+};
+CChangesTableCellHMerge.prototype.Merge = private_TableCellChangesOnMergePr;

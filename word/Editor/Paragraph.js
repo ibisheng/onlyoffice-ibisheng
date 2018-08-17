@@ -267,6 +267,10 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 	for (var Index = 0; Index < Count; Index++)
 	{
 		var Item = this.Content[Index];
+
+		if (para_Comment === Item.Type && true === oPr.SkipComments)
+			continue;
+
 		Para.Internal_Content_Add(Para.Content.length, Item.Copy(false, oPr), false);
 	}
 
