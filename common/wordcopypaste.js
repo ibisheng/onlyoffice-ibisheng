@@ -7271,15 +7271,24 @@ PasteProcessor.prototype =
     _StartExecuteTable : function(node, pPr)
     {
         var oDocument = this.oDocument;
-        var tableNode = node;
-		var newNode;
+        var tableNode = node, newNode, headNode;
+
 		//Ищем если есть tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
-            if("tbody" === node.childNodes[i].nodeName.toLowerCase())
+			 var nodeName = node.childNodes[i].nodeName.toLowerCase();
+			if("tbody" === nodeName)
             {
                 if(!newNode)
+				{
 					newNode = node.childNodes[i];
+					if(headNode) {
+						for(var j = 0; j < headNode.childNodes.length; j++)
+						{
+							newNode.insertBefore(headNode.childNodes[0], newNode.childNodes[0]);
+						}
+					}
+				}
 				else
 				{
 					var lengthChild = node.childNodes[i].childNodes.length;
@@ -7288,9 +7297,13 @@ PasteProcessor.prototype =
 						newNode.appendChild(node.childNodes[i].childNodes[0]);
 					}
 				}
-
             }
+            else if("thead" === nodeName)
+			{
+				headNode = node.childNodes[i];
+			}
         }
+
 		if(newNode)
 		{
 			node = newNode;
