@@ -7847,9 +7847,11 @@ Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
         this.Pr.Bullet = _OldBullet;
 		this.Set_Bullet(oBullet2.createDuplicate());
 		LeftInd = Math.min(ParaPr.Ind.Left, ParaPr.Ind.Left + ParaPr.Ind.FirstLine);
+		var oFirstRunPr = this.Get_FirstTextPr2();
+		var Indent = oFirstRunPr.FontSize*0.305954545 + 2.378363636;
 		if (NewType === numbering_presentationnumfrmt_Char)
 		{
-			this.Set_Ind({Left : LeftInd + 14.3, FirstLine : -14.3}, false);
+			this.Set_Ind({Left : LeftInd + Indent, FirstLine : -Indent}, false);
 		}
 		else if (NewType === numbering_presentationnumfrmt_None)
 		{
@@ -7875,11 +7877,11 @@ Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 			{
 				if (oArabicAlphaMap[NewType])
 				{
-					this.Set_Ind({Left : LeftInd + 14.3, FirstLine : -14.3}, false);
+					this.Set_Ind({Left : LeftInd + Indent, FirstLine : -Indent}, false);
 				}
 				else
 				{
-					this.Set_Ind({Left : LeftInd + 15.9, FirstLine : -15.9}, false);
+					this.Set_Ind({Left : LeftInd + Indent, FirstLine : -Indent}, false);
 				}
 			}
 			else
