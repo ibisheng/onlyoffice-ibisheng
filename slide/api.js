@@ -5760,7 +5760,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.ClearFormating           = function()
 	{
-		this.WordControl.m_oLogicDocument.ClearParagraphFormatting();
+		this.WordControl.m_oLogicDocument.ClearParagraphFormatting(false, true);
 	};
 
 	window.ID_KEYBOARD_AREA = undefined;

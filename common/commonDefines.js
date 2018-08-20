@@ -1408,7 +1408,12 @@
 		Text : 0x00,
 		Num  : 0x01
 	};
-	
+
+	var c_oAscSdtAppearance = {
+		Frame  : 1,
+		Hidden : 2
+	};
+
 	//------------------------------------------------------------export--------------------------------------------------
 	var prot;
 	window['Asc']                          = window['Asc'] || {};
@@ -2156,4 +2161,8 @@
 	prot = c_oAscNumberingLvlTextType;
 	prot['Text'] = c_oAscNumberingLvlTextType.Text;
 	prot['Num']  = c_oAscNumberingLvlTextType.Num;
+
+	prot = window['Asc']['c_oAscSdtAppearance'] = window['Asc'].c_oAscSdtAppearance = c_oAscSdtAppearance;
+	prot['Frame']  = c_oAscSdtAppearance.Frame;
+	prot['Hidden'] = c_oAscSdtAppearance.Hidden;
 })(window);
