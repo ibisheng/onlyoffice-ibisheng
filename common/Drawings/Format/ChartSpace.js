@@ -920,7 +920,7 @@ function checkPointInMap(map, worksheet, row, col)
                 oContent.Set_ApplyToAll(false);
                 var oSize = oLabel.tx.rich.getContentOneStringSizes();
                 var fInset = fMultiplier*(oSize.h);
-                fInset *= 1.4;
+                fInset *= 2;
                 if(fInset <= fInterval){
                     this.layoutHorRotated2(this.aLabels, fAxisY, fDistance, fXStart, fInterval, bOnTickMark);
                 }
@@ -3743,6 +3743,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                     }
                                 }
                             }
+                            nPtCount++;
                         }
                         pt_index++;
                     }
@@ -3811,6 +3812,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                     }
                                 }
                             }
+                            nPtCount++;
                         }
                         pt_index++;
                     }
@@ -3819,37 +3821,37 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
             }
             else{
                 pt_index = 0;
-                var fCollectArray = function(oRef, oNumCache){
-                    if(Array.isArray(oRef)){
-                        for(var i = 0; i < oRef.length; ++i){
-                            if(Array.isArray(oRef[i])){
-                                fCollectArray(oRef[i], oNumCache);
-                            }
-                            else{
-                                cell = source_worksheet.getCell3(j, range.c1);
-                                var value = cell.getNumberValue();
-                                if(AscFormat.isRealNumber(value))
-                                {
-                                    hidden = false;
-                                    pt = new AscFormat.CNumericPoint();
-                                    pt.setIdx(pt_index);
-                                    pt.setVal(value);
-                                    if(cell.getNumFormatStr() !== lit_format_code)
-                                    {
-                                        pt.setFormatCode(cell.getNumFormatStr());
-                                    }
-                                    num_cache.addPt(pt);
-
-                                }
-                            }
-                        }
-                    }
-
-                };
+                // var fCollectArray = function(oRef, oNumCache){
+                //     if(Array.isArray(oRef)){
+                //         for(var i = 0; i < oRef.length; ++i){
+                //             if(Array.isArray(oRef[i])){
+                //                 fCollectArray(oRef[i], oNumCache);
+                //             }
+                //             else{
+                //                 cell = source_worksheet.getCell3(j, range.c1);
+                //                 var value = cell.getNumberValue();
+                //                 if(AscFormat.isRealNumber(value))
+                //                 {
+                //                     hidden = false;
+                //                     pt = new AscFormat.CNumericPoint();
+                //                     pt.setIdx(pt_index);
+                //                     pt.setVal(value);
+                //                     if(cell.getNumFormatStr() !== lit_format_code)
+                //                     {
+                //                         pt.setFormatCode(cell.getNumFormatStr());
+                //                     }
+                //                     num_cache.addPt(pt);
+                //
+                //                 }
+                //             }
+                //         }
+                //     }
+                //
+                // };
             }
         }
         if(aParsedRef.length > 0){
-            num_cache.setPtCount(num_cache.pts.length);
+            num_cache.setPtCount(nPtCount);
         }
         val.numRef.setNumCache(num_cache);
         if(!(val instanceof AscFormat.CCat))
@@ -3868,7 +3870,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
         var aParsedRef = this.parseChartFormula(cat.strRef.f);
         var str_cache = new AscFormat.CStrCache();
         //str_cache.setFormatCode("General");
-        var pt_index = 0, i, j, cell, pt, value_width_format, row_hidden, col_hidden;
+        var pt_index = 0, i, j, cell, pt, value_width_format, row_hidden, col_hidden, nPtCount = 0;
 
         var fParseTableDataString = function(oRef, oCache){
             if(Array.isArray(oRef)){
@@ -3882,6 +3884,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                         pt.setVal(oRef[i].value);
                         str_cache.addPt(pt);
                         ++pt_index;
+                        ++nPtCount;
                     }
                 }
             }
@@ -3914,6 +3917,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                                 str_cache.addPt(pt);
                                 //addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
                             }
+                            ++nPtCount;
                         }
                         pt_index++;
                     }
@@ -3939,6 +3943,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                                 str_cache.addPt(pt);
                                 //addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
                             }
+                            ++nPtCount;
                         }
                         pt_index++;
                     }
@@ -3948,7 +3953,7 @@ CChartSpace.prototype.checkCatByNumRef = function(oThis, ser, cat, bVertical)
                 fParseTableDataString(oCurRef);
             }
         }
-        str_cache.setPtCount(str_cache.pts.length);
+        str_cache.setPtCount(nPtCount);
         cat.strRef.setStrCache(str_cache);
     }
 };

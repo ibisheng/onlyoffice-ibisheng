@@ -194,19 +194,6 @@ CSectionPr.prototype =
         this.Set_Footer_Default(null);
     },
 
-    Is_AllHdrFtrNull : function()
-    {
-        if (null !== this.FooterFirst
-            || null !== this.HeaderFirst
-            || null !== this.FooterDefault
-            || null !== this.HeaderDefault
-            || null !== this.FooterEven
-            || null !== this.HeaderEven)
-            return false;
-
-        return true;
-    },
-
     Get_AllHdrFtrs : function(HdrFtrs)
     {
         if (!HdrFtrs)
@@ -928,6 +915,22 @@ CSectionPr.prototype =
         this.Columns.Read_FromBinary(Reader);
 		this.FootnotePr.ReadFromBinary(Reader);
     }
+};
+/**
+ * Проверяем, есть ли хоть один колонтитул в данной секции
+ * @returns {boolean}
+ */
+CSectionPr.prototype.IsAllHdrFtrNull = function()
+{
+	if (null !== this.FooterFirst
+		|| null !== this.HeaderFirst
+		|| null !== this.FooterDefault
+		|| null !== this.HeaderDefault
+		|| null !== this.FooterEven
+		|| null !== this.HeaderEven)
+		return false;
+
+	return true;
 };
 CSectionPr.prototype.GetFootnotePr = function()
 {

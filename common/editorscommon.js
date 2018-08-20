@@ -2585,7 +2585,7 @@
 	function asc_ajax(obj)
 	{
 		var url                                       = "", type                            = "GET",
-			async                                     = true, data                        = null, dataType = "text/xml",
+			async                                     = true, data                        = null, dataType,
 			error = null, success = null, httpRequest = null,
 			contentType                               = "application/x-www-form-urlencoded",
 			responseType = '',
@@ -2632,7 +2632,7 @@
 				if (window.XMLHttpRequest)
 				{ // Mozilla, Safari, ...
 					httpRequest = new XMLHttpRequest();
-					if (httpRequest.overrideMimeType)
+					if (httpRequest.overrideMimeType && dataType)
 					{
 						httpRequest.overrideMimeType(dataType);
 					}
