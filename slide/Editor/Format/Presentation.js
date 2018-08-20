@@ -3700,8 +3700,8 @@ CPresentation.prototype =
             if ( null != ParaPr && this.CanEdit() && ParaPr.Jc !== align_Justify)
             {
                 this.SetParagraphAlign(align_Justify );
-                bRetValue = keydownresult_PreventAll;
             }
+            bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 75 && true === e.CtrlKey ) // Ctrl + K - добавление гиперссылки
         {
