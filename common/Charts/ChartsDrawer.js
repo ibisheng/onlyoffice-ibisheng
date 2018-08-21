@@ -4164,14 +4164,18 @@ drawBarChart.prototype = {
 				if (this.catAx.scaling.orientation === ORIENTATION_MIN_MAX) {
 					if (xPoints[1] && xPoints[1].pos) {
 						startXPosition = xPoints[idx].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
-					} else {
+					} else if(xPoints[idx]){
 						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.valAx.posX);
+					} else {
+						startXPosition = xPoints[0].pos - Math.abs(xPoints[0].pos - this.valAx.posX);
 					}
 				} else {
 					if (xPoints[1] && xPoints[1].pos) {
 						startXPosition = xPoints[idx].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
-					} else {
+					} else if(xPoints[idx]){
 						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.valAx.posX);
+					} else {
+						startXPosition = xPoints[0].pos + Math.abs(xPoints[0].pos - this.valAx.posX);
 					}
 				}
 
@@ -6989,14 +6993,18 @@ drawHBarChart.prototype = {
 				if (this.catAx.scaling.orientation === ORIENTATION_MIN_MAX) {
 					if (yPoints[1] && yPoints[1].pos) {
 						startYPosition = yPoints[idx].pos + Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
-					} else {
+					} else if(yPoints[idx]){
 						startYPosition = yPoints[idx].pos + Math.abs(yPoints[0].pos - this.valAx.posY);
+					} else {
+						startYPosition = yPoints[0].pos + Math.abs(yPoints[0].pos - this.valAx.posY);
 					}
 				} else {
 					if (yPoints[1] && yPoints[1].pos) {
 						startYPosition = yPoints[idx].pos - Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
-					} else {
+					} else if(yPoints[idx]){
 						startYPosition = yPoints[idx].pos - Math.abs(yPoints[0].pos - this.valAx.posY);
+					} else {
+						startYPosition = yPoints[0].pos - Math.abs(yPoints[0].pos - this.valAx.posY);
 					}
 				}
 
