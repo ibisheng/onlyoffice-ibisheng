@@ -565,12 +565,15 @@
         return null;
     };
 
+	WorksheetView.prototype._getRowTop = function (i) {
+		// ToDo check hidden all rows
+		var l = this.rows.length;
+		return (i < l) ? this.rows[i].top :
+			this.rows[l - 1].top + this.rows[l - 1].height + Asc.round(this.defaultRowHeightPx * this.getZoom()) * (i - l);
+	};
     WorksheetView.prototype.getCellTop = function (row, units) {
-        if (row >= 0 && row < this.rows.length) {
-            var u = units >= 0 && units <= 3 ? units : 0;
-            return this.rows[row].top * asc_getcvt(0/*px*/, u, this._getPPIY());
-        }
-        return null;
+		var u = units >= 0 && units <= 3 ? units : 0;
+		return this._getRowTop(row) * asc_getcvt(0/*px*/, u, this._getPPIY());
     };
 
     WorksheetView.prototype.getCellLeftRelative = function (col, units) {
@@ -649,14 +652,14 @@
         return res;
     };
 
+	WorksheetView.prototype._getRowHeight = function (i) {
+		// ToDo check hidden all rows
+		return (i < this.rows.length) ? this.rows[i].height : Asc.round(this.defaultRowHeightPx * this.getZoom());
+	};
     WorksheetView.prototype.getRowHeight = function (index, units) {
-        if (index >= 0 && index < this.rows.length) {
-            var u = units >= 0 && units <= 3 ? units : 0;
-            return this.rows[index].height * asc_getcvt(0/*px*/, u, this._getPPIY());
-        }
-        return null;
+		var u = units >= 0 && units <= 3 ? units : 0;
+		return this._getRowHeight(index) * asc_getcvt(0/*px*/, u, this._getPPIY());
     };
-
 
     WorksheetView.prototype.getSelectedRange = function () {
         // ToDo multiselect ?
@@ -1725,7 +1728,7 @@
                 newPagePrint.topFieldInPx = topFieldInPx;
 
                 for (rowIndex = currentRowIndex; rowIndex < maxRows; ++rowIndex) {
-                    var currentRowHeight = this.rows[rowIndex].height;
+                    var currentRowHeight = this._getRowHeight(rowIndex);
                     if (!bFitToHeight && currentHeight + currentRowHeight > pageHeightWithFieldsHeadings) {
                         // Закончили рисовать страницу
                         break;
@@ -1847,7 +1850,7 @@
             var offsetCols = printPagesData.startOffsetPx;
             var range = printPagesData.pageRange;
             var offsetX = this.cols[range.c1].left - printPagesData.leftFieldInPx + offsetCols;
-            var offsetY = this.rows[range.r1].top - printPagesData.topFieldInPx;
+            var offsetY = this._getRowTop(range.r1) - printPagesData.topFieldInPx;
 
             var tmpVisibleRange = this.visibleRange;
             // Сменим visibleRange для прохождения проверок отрисовки
@@ -2077,13 +2080,13 @@
         var vr = this.visibleRange;
         var r = this.rows;
         var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : this.headersLeft;
-        var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : r[vr.r1].top - this.cellsTop;
+        var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : this._getRowTop(vr.r1) - this.cellsTop;
         if (null === drawingCtx && this.topLeftFrozenCell && undefined === offsetYForDraw) {
             var rFrozen = this.topLeftFrozenCell.getRow0();
             if (start < vr.r1) {
-                offsetY = r[0].top - this.cellsTop;
+                offsetY = 0;
             } else {
-                offsetY -= r[rFrozen].top - r[0].top;
+                offsetY -= this._getRowTop(rFrozen) - this.cellsTop;
             }
         }
 
@@ -2100,8 +2103,11 @@
         this._setFont(drawingCtx, this.model.getDefaultFontName(), this.model.getDefaultFontSize());
 
         // draw row headers
+        var t = this._getRowTop(start) - offsetY, h;
         for (var i = start; i <= end; ++i) {
-            this._drawHeader(drawingCtx, offsetX, r[i].top - offsetY, this.headersWidth, r[i].height, style, false, i);
+			h = this._getRowHeight(i);
+            this._drawHeader(drawingCtx, offsetX, t, this.headersWidth, h, style, false, i);
+			t += h;
         }
     };
 
@@ -2149,11 +2155,11 @@
                     // Отрисуем только границу
                     h = 1;
                     // Возможно мы уже рисовали границу невидимой строки (для последовательности невидимых)
-                    if (0 < index && 0 === this.rows[index - 1].height) {
+                    if (0 < index && 0 === this._getRowHeight(index - 1)) {
                         // Мы уже нарисовали border для невидимой границы
                         return;
                     }
-                } else if (0 < index && 0 === this.rows[index - 1].height) {
+                } else if (0 < index && this._getRowHeight(index - 1)) {
                     // Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
                     h -= 1;
                     y += 1;
@@ -2203,7 +2209,9 @@
         var text = isColHeader ? this._getColumnTitle(index) : this._getRowTitle(index);
         var sr = this.stringRender;
         var tm = this._roundTextMetrics(sr.measureString(text));
-        var bl = y2WithoutBorder - Asc.round((isColHeader ? this.defaultRowDescender : this.rows[index].descender) * this.getZoom());
+		var bl = y2WithoutBorder - Asc.round(
+			((isColHeader || index >= this.rows.length) ? this.defaultRowDescender : this.rows[index].descender) *
+			this.getZoom());
         var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
         var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
 
@@ -2299,25 +2307,24 @@
 		}
 		var ctx = drawingCtx || this.drawingCtx;
 		var c = this.cols;
-		var r = this.rows;
 		var widthCtx = (width) ? width : ctx.getWidth();
 		var heightCtx = (height) ? height : ctx.getHeight();
 		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
-		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : this._getRowTop(this.visibleRange.r1) - this.cellsTop;
 		if (null === drawingCtx && this.topLeftFrozenCell) {
 			if (undefined === leftFieldInPx) {
 				var cFrozen = this.topLeftFrozenCell.getCol0();
-				offsetX -= c[cFrozen].left - c[0].left;
+				offsetX -= c[cFrozen].left - this.cellsLeft;
 			}
 			if (undefined === topFieldInPx) {
 				var rFrozen = this.topLeftFrozenCell.getRow0();
-				offsetY -= r[rFrozen].top - r[0].top;
+				offsetY -= this._getRowTop(rFrozen) - this.cellsTop;
 			}
 		}
 		var x1 = c[range.c1].left - offsetX;
-		var y1 = r[range.r1].top - offsetY;
+		var y1 = this._getRowTop(range.r1) - offsetY;
 		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
-		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
+		var y2 = Math.min(this._getRowTop(range.r2 + 1) - offsetY, heightCtx);
 		ctx.setFillStyle(this.settings.cells.defaultState.background)
 			.fillRect(x1, y1, x2 - x1, y2 - y1);
 
@@ -2336,7 +2343,7 @@
 			}
 		}
 		for (i = range.r1, d = y1; i <= range.r2 && d <= y2; ++i) {
-			l = r[i].height;
+			l = this._getRowHeight(i);
 			d += l;
 			if (0 < l) {
 				ctx.lineHorPrevPx(x1, d, x2);
@@ -2352,11 +2359,11 @@
 			clearRange = clearRanges[i];
 			pivotRange = clearRanges[i + 1];
 			x1 = c[clearRange.c1].left - offsetX + (clearRange.c1 === pivotRange.c1 ? 1 : 0);
-			y1 = r[clearRange.r1].top - offsetY + (clearRange.r1 === pivotRange.r1 ? 1 : 0);
+			y1 = this._getRowTop(clearRange.r1) - offsetY + (clearRange.r1 === pivotRange.r1 ? 1 : 0);
 			x2 = Math.min(c[clearRange.c2].left - offsetX + c[clearRange.c2].width -
 				(clearRange.c2 === pivotRange.c2 ? 1 : 0), widthCtx);
-			y2 = Math.min(r[clearRange.r2].top - offsetY + r[clearRange.r2].height -
-				(clearRange.r2 === pivotRange.r2 ? 1 : 0), heightCtx);
+			y2 = Math.min(this._getRowTop(clearRange.r2 + 1) - offsetY - (clearRange.r2 === pivotRange.r2 ? 1 : 0),
+				heightCtx);
 
 			ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
@@ -2374,25 +2381,28 @@
 
         var left, top, cFrozen, rFrozen;
         var offsetX = (undefined === offsetXForDraw) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetXForDraw;
-        var offsetY = (undefined === offsetYForDraw) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetYForDraw;
+        var offsetY = (undefined === offsetYForDraw) ? this._getRowTop(this.visibleRange.r1) - this.cellsTop : offsetYForDraw;
         if ( null === drawingCtx && this.topLeftFrozenCell ) {
             if ( undefined === offsetXForDraw ) {
                 cFrozen = this.topLeftFrozenCell.getCol0();
-                offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+                offsetX -= this.cols[cFrozen].left - this.cellsLeft;
             }
             if ( undefined === offsetYForDraw ) {
                 rFrozen = this.topLeftFrozenCell.getRow0();
-                offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+                offsetY -= this._getRowTop(rFrozen) - this.cellsTop;
             }
         }
 
         if ( !drawingCtx && !window['IS_NATIVE_EDITOR'] ) {
             left = this.cols[range.c1].left;
-            top = this.rows[range.r1].top;
+            top = this._getRowTop(range.r1);
             // set clipping rect to cells area
             this.drawingCtx.save()
                 .beginPath()
-                .rect( left - offsetX, top - offsetY, Math.min( this.cols[range.c2].left - left + this.cols[range.c2].width, this.drawingCtx.getWidth() - this.cellsLeft ), Math.min( this.rows[range.r2].top - top + this.rows[range.r2].height, this.drawingCtx.getHeight() - this.cellsTop ) )
+				.rect(left - offsetX, top - offsetY,
+					Math.min(this.cols[range.c2].left - left + this.cols[range.c2].width,
+						this.drawingCtx.getWidth() - this.cellsLeft),
+					Math.min(this._getRowTop(range.r2 + 1) - top, this.drawingCtx.getHeight() - this.cellsTop))
                 .clip();
         }
 
@@ -2436,10 +2446,12 @@
     /** Рисует фон ячеек в строке */
     WorksheetView.prototype._drawRowBG = function ( drawingCtx, row, colStart, colEnd, offsetX, offsetY, oMergedCell ) {
         var mergedCells = [];
-        if ( 0 === this.rows[row].height && null === oMergedCell ) {
+        var height = this._getRowHeight(row);
+        if ( 0 === height && null === oMergedCell ) {
             return mergedCells;
         }
 
+		var top = this._getRowTop(row);
         var ctx = drawingCtx || this.drawingCtx;
         for ( var col = colStart; col <= colEnd; ++col ) {
             if ( 0 === this.cols[col].width && null === oMergedCell ) {
@@ -2475,7 +2487,7 @@
                     mwidth += this.cols[i].width;
                 }
                 for ( var j = mc.r1 + 1; j <= mc.r2 && j < this.rows.length; ++j ) {
-                    mheight += this.rows[j].height;
+                    mheight += this.getRowHeight(j);
                 }
             }
             else {
@@ -2485,13 +2497,13 @@
                             var bg2 = c2.getFill();
                             if ( bg2 !== null ) {
                                 ctx.setFillStyle( bg2 )
-                                    .fillRect( this.cols[col + 1].left - offsetX - 1, this.rows[row].top - offsetY - 1, 1, this.rows[row].height + 1 );
+                                    .fillRect( this.cols[col + 1].left - offsetX - 1, top - offsetY - 1, 1, height + 1 );
                             }
                         var c3 = this._getVisibleCell( col, row + 1 );
                             var bg3 = c3.getFill();
                             if ( bg3 !== null ) {
                                 ctx.setFillStyle( bg3 )
-                                    .fillRect( this.cols[col].left - offsetX - 1, this.rows[row + 1].top - offsetY - 1, this.cols[col].width + 1, 1 );
+                                    .fillRect( this.cols[col].left - offsetX - 1, this._getRowTop(row + 1) - offsetY - 1, this.cols[col].width + 1, 1 );
                             }
                         }
                     continue;
@@ -2499,9 +2511,9 @@
             }
 
             var x = this.cols[col].left - (bg !== null ? 1 : 0);
-            var y = this.rows[row].top - (bg !== null ? 1 : 0);
+            var y = top - (bg !== null ? 1 : 0);
             var w = this.cols[col].width + (bg !== null ? +1 : -1) + mwidth;
-            var h = this.rows[row].height + (bg !== null ? +1 : -1) + mheight;
+            var h = height + (bg !== null ? +1 : -1) + mheight;
             var color = bg !== null ? bg : this.settings.cells.defaultState.background;
             ctx.setFillStyle( color ).fillRect( x - offsetX, y - offsetY, w, h );
 
@@ -2515,7 +2527,7 @@
     /** Рисует текст ячеек в строке */
     WorksheetView.prototype._drawRowText = function ( drawingCtx, row, colStart, colEnd, offsetX, offsetY ) {
         var mergedCells = [];
-        if ( 0 === this.rows[row].height ) {
+        if ( 0 === this._getRowHeight(row) ) {
             return mergedCells;
         }
 
@@ -3094,10 +3106,9 @@
 		var t = this;
 		var ctx = drawingCtx || this.drawingCtx;
 		var c = this.cols;
-		var r = this.rows;
 
 		var objectMergedCells = {}; // Двумерный map вида строка-колонка {1: {1: range, 4: range}}
-		var i, mergeCellInfo, startCol, endRow, endCol, col, row;
+		var h, i, mergeCellInfo, startCol, endRow, endCol, col, row;
 		for (i in mergedCells) {
 			mergeCellInfo = mergedCells[i];
 			startCol = Math.max(range.c1, mergeCellInfo.c1);
@@ -3200,7 +3211,7 @@
 
 		// Сначала пройдемся по верхней строке (над отрисовываемым диапазоном)
 		while (0 <= row) {
-			if (r[row].height > 0) {
+			if (this._getRowHeight(row) > 0) {
 				objMCPrevRow = objectMergedCells[row];
 				for (col = prevCol; col <= range.c2 && col < t.nColsCount; ++col) {
 					if (0 > col || c[col].width <= 0) {
@@ -3217,14 +3228,15 @@
 
 		var mc = null, nextRow, isFirstRow = true;
 		var isPrevColExist = (0 <= prevCol);
-		for (row = range.r1; row <= range.r2 && row < t.nRowsCount; row = nextRow) {
+		for (row = range.r1; row <= range.r2; row = nextRow) {
 			nextRow = row + 1;
-			if (0 === r[row].height) {
+			h = this._getRowHeight(row);
+			if (0 === h) {
 				continue;
 			}
 			// Нужно отсеять пустые снизу
 			for (; nextRow <= range.r2 && nextRow < t.nRowsCount; ++nextRow) {
-				if (0 < r[nextRow].height) {
+				if (0 < this._getRowHeight(nextRow)) {
 					break;
 				}
 			}
@@ -3236,8 +3248,8 @@
 			objMCNextRow = objectMergedCells[nextRow];
 
 			var rowCache = t._fetchRowCache(row);
-			var y1 = r[row].top - offsetY;
-			var y2 = y1 + r[row].height - gridlineSize;
+			var y1 = this._getRowTop(row) - offsetY;
+			var y2 = y1 + h - gridlineSize;
 
 			var nextCol, isFirstCol = true;
 			for (col = range.c1; col <= range.c2 && col < t.nColsCount; col = nextCol) {
@@ -3320,7 +3332,7 @@
 					if (mc) {
 						// Merge cells
 						x2Diagonal = c[mc.c2].left + c[mc.c2].width - offsetX - 1;
-						y2Diagonal = r[mc.r2].top + r[mc.r2].height - offsetY - 1;
+						y2Diagonal = this._getRowTop(mc.r2 + 1) - offsetY - 1;
 					}
 					// ToDo Clip diagonal borders
                     /*ctx.save()
