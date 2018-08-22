@@ -2381,25 +2381,28 @@
 
         var left, top, cFrozen, rFrozen;
         var offsetX = (undefined === offsetXForDraw) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetXForDraw;
-        var offsetY = (undefined === offsetYForDraw) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetYForDraw;
+        var offsetY = (undefined === offsetYForDraw) ? this._getRowTop(this.visibleRange.r1) - this.cellsTop : offsetYForDraw;
         if ( null === drawingCtx && this.topLeftFrozenCell ) {
             if ( undefined === offsetXForDraw ) {
                 cFrozen = this.topLeftFrozenCell.getCol0();
-                offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+                offsetX -= this.cols[cFrozen].left - this.cellsLeft;
             }
             if ( undefined === offsetYForDraw ) {
                 rFrozen = this.topLeftFrozenCell.getRow0();
-                offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+                offsetY -= this._getRowTop(rFrozen) - this.cellsTop;
             }
         }
 
         if ( !drawingCtx && !window['IS_NATIVE_EDITOR'] ) {
             left = this.cols[range.c1].left;
-            top = this.rows[range.r1].top;
+            top = this._getRowTop(range.r1);
             // set clipping rect to cells area
             this.drawingCtx.save()
                 .beginPath()
-                .rect( left - offsetX, top - offsetY, Math.min( this.cols[range.c2].left - left + this.cols[range.c2].width, this.drawingCtx.getWidth() - this.cellsLeft ), Math.min( this.rows[range.r2].top - top + this.rows[range.r2].height, this.drawingCtx.getHeight() - this.cellsTop ) )
+				.rect(left - offsetX, top - offsetY,
+					Math.min(this.cols[range.c2].left - left + this.cols[range.c2].width,
+						this.drawingCtx.getWidth() - this.cellsLeft),
+					Math.min(this._getRowTop(range.r2 + 1) - top, this.drawingCtx.getHeight() - this.cellsTop))
                 .clip();
         }
 
@@ -3225,7 +3228,7 @@
 
 		var mc = null, nextRow, isFirstRow = true;
 		var isPrevColExist = (0 <= prevCol);
-		for (row = range.r1; row <= range.r2 && row < t.nRowsCount; row = nextRow) {
+		for (row = range.r1; row <= range.r2; row = nextRow) {
 			nextRow = row + 1;
 			h = this._getRowHeight(row);
 			if (0 === h) {
