@@ -2302,7 +2302,6 @@
 		}
 		var ctx = drawingCtx || this.drawingCtx;
 		var c = this.cols;
-		var r = this.rows;
 		var widthCtx = (width) ? width : ctx.getWidth();
 		var heightCtx = (height) ? height : ctx.getHeight();
 		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
