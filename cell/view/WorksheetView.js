@@ -2306,21 +2306,21 @@
 		var widthCtx = (width) ? width : ctx.getWidth();
 		var heightCtx = (height) ? height : ctx.getHeight();
 		var offsetX = (undefined !== leftFieldInPx) ? leftFieldInPx : c[this.visibleRange.c1].left - this.cellsLeft;
-		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : r[this.visibleRange.r1].top - this.cellsTop;
+		var offsetY = (undefined !== topFieldInPx) ? topFieldInPx : this._getRowTop(this.visibleRange.r1) - this.cellsTop;
 		if (null === drawingCtx && this.topLeftFrozenCell) {
 			if (undefined === leftFieldInPx) {
 				var cFrozen = this.topLeftFrozenCell.getCol0();
-				offsetX -= c[cFrozen].left - c[0].left;
+				offsetX -= c[cFrozen].left - this.cellsLeft;
 			}
 			if (undefined === topFieldInPx) {
 				var rFrozen = this.topLeftFrozenCell.getRow0();
-				offsetY -= r[rFrozen].top - r[0].top;
+				offsetY -= this._getRowTop(rFrozen) - this.cellsTop;
 			}
 		}
 		var x1 = c[range.c1].left - offsetX;
-		var y1 = r[range.r1].top - offsetY;
+		var y1 = this._getRowTop(range.r1) - offsetY;
 		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
-		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
+		var y2 = Math.min(this._getRowTop(range.r2 + 1) - offsetY, heightCtx);
 		ctx.setFillStyle(this.settings.cells.defaultState.background)
 			.fillRect(x1, y1, x2 - x1, y2 - y1);
 
@@ -2339,7 +2339,7 @@
 			}
 		}
 		for (i = range.r1, d = y1; i <= range.r2 && d <= y2; ++i) {
-			l = r[i].height;
+			l = this._getRowHeight(i);
 			d += l;
 			if (0 < l) {
 				ctx.lineHorPrevPx(x1, d, x2);
@@ -2355,11 +2355,11 @@
 			clearRange = clearRanges[i];
 			pivotRange = clearRanges[i + 1];
 			x1 = c[clearRange.c1].left - offsetX + (clearRange.c1 === pivotRange.c1 ? 1 : 0);
-			y1 = r[clearRange.r1].top - offsetY + (clearRange.r1 === pivotRange.r1 ? 1 : 0);
+			y1 = this._getRowTop(clearRange.r1) - offsetY + (clearRange.r1 === pivotRange.r1 ? 1 : 0);
 			x2 = Math.min(c[clearRange.c2].left - offsetX + c[clearRange.c2].width -
 				(clearRange.c2 === pivotRange.c2 ? 1 : 0), widthCtx);
-			y2 = Math.min(r[clearRange.r2].top - offsetY + r[clearRange.r2].height -
-				(clearRange.r2 === pivotRange.r2 ? 1 : 0), heightCtx);
+			y2 = Math.min(this._getRowTop(clearRange.r2 + 1) - offsetY - (clearRange.r2 === pivotRange.r2 ? 1 : 0),
+				heightCtx);
 
 			ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
         }
