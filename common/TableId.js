@@ -264,6 +264,7 @@
 		this.m_oFactoryClass[AscDFH.historyitem_type_BlockLevelSdt]          = AscCommonWord.CBlockLevelSdt;
 		this.m_oFactoryClass[AscDFH.historyitem_type_InlineLevelSdt]         = AscCommonWord.CInlineLevelSdt;
 		this.m_oFactoryClass[AscDFH.historyitem_type_ParaBookmark]           = AscCommonWord.CParagraphBookmark;
+		this.m_oFactoryClass[AscDFH.historyitem_type_Num]                    = AscCommonWord.CNum;
 
 
 		if (window['AscCommonSlide'])

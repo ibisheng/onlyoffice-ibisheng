@@ -141,10 +141,11 @@ function CContentControlButtonIcons()
 var g_oContentControlButtonIcons = new CContentControlButtonIcons();
 g_oContentControlButtonIcons.register(1, "toc");
 
-function CContentControlTrack(_id, _type, _data, _transform, _name, _name_advanced, _button_types)
+function CContentControlTrack(_id, _type, _data, _transform, _name, _name_advanced, _button_types, _color)
 {
 	this.id = (undefined == _id) ? -1 : _id;
 	this.type = (undefined == _type) ? -1 : _type;
+	this.color = _color;
 
 	this.rects = undefined;
 	this.paths = undefined;
@@ -211,7 +212,11 @@ CContentControlTrack.prototype.getXY = function()
 };
 CContentControlTrack.prototype.Copy = function()
 {
-	return new CContentControlTrack(this.id, this.type, this.rects ? this.rects : this.paths, this.transform);
+	return new CContentControlTrack(this.id, this.type, this.rects ? this.rects : this.paths, this.transform, this.color);
+};
+CContentControlTrack.prototype.getColor = function()
+{
+	return this.color;
 };
 
 function CColumnsMarkupColumn()
@@ -2666,6 +2671,8 @@ function CDrawingDocument()
 	this.IsTextMatrixUse = false;
 	this.IsTextSelectionOutline = false;
 
+	this.OverlaySelection2 = {};
+
 	this.HorVerAnchors = [];
 
 	this.MathMenuLoad = false;
@@ -4459,12 +4466,26 @@ function CDrawingDocument()
 		var _x, _y, _r, _b;
 		var _transform, offset_x, offset_y;
 		var _curPage;
+		var _color;
 
 		for (var nIndexContentControl = 0; nIndexContentControl < this.ContentControlObjects.length; nIndexContentControl++)
 		{
 			_object = this.ContentControlObjects[nIndexContentControl];
 			_transform = _object.transform;
 			_curPage = _object.getPage();
+			_color = _object.getColor();
+
+			if (_color)
+			{
+				ctx.strokeStyle = "rgba(" + _color.r + ", " + _color.g + ", " + _color.b + ", 1)";
+				ctx.fillStyle = "rgba(" + _color.r + ", " + _color.g + ", " + _color.b + ", 0.25)";
+			}
+			else
+			{
+				ctx.strokeStyle = "#ADADAD";
+				ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+			}
+
 
 			offset_x = 0;
 			offset_y = 0;
@@ -4504,7 +4525,7 @@ function CDrawingDocument()
 
 						if (_object.type == c_oContentControlTrack.Hover)
 						{
-							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							//ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
 							ctx.fill();
 						}
 						ctx.stroke();
@@ -4551,7 +4572,7 @@ function CDrawingDocument()
 
 						if (_object.type == c_oContentControlTrack.Hover)
 						{
-							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							//ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
 							ctx.fill();
 						}
 
@@ -4614,7 +4635,7 @@ function CDrawingDocument()
 
 						if (_object.type == c_oContentControlTrack.Hover)
 						{
-							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							//ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
 							ctx.fill();
 						}
 						ctx.stroke();
@@ -4661,7 +4682,7 @@ function CDrawingDocument()
 
 						if (_object.type == c_oContentControlTrack.Hover)
 						{
-							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							//ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
 							ctx.fill();
 						}
 
@@ -5131,7 +5152,7 @@ function CDrawingDocument()
 		this.ContentControlsSaveLast();
 	};
 
-	this.OnDrawContentControl = function(id, type, rects, transform, name, name_advanced, button_types)
+	this.OnDrawContentControl = function(id, type, rects, transform, name, name_advanced, button_types, color)
 	{
 		var isActiveRemove = false;
 		// всегда должен быть максимум один hover и in
@@ -5164,9 +5185,9 @@ function CDrawingDocument()
 				this.ContentControlObjects.splice(0, 1);
 			}
 			if (this.m_oWordControl.m_oApi.isViewMode)
-				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name));
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, undefined, undefined, color));
 			else
-				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types, color));
 		}
 		else
 		{
@@ -5174,9 +5195,9 @@ function CDrawingDocument()
 				return;
 
 			if (this.m_oWordControl.m_oApi.isViewMode)
-				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name));
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, undefined, undefined, color));
 			else
-				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types, color));
 		}
 
 		if (isActiveRemove)
@@ -5919,7 +5940,7 @@ function CDrawingDocument()
 		this.IsTextSelectionOutline = isSelectionOutline;
 	}
 
-	this.private_StartDrawSelection = function (overlay)
+	this.private_StartDrawSelection = function (overlay, isSelect2)
 	{
 		this.Overlay = overlay;
 		this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
@@ -5927,7 +5948,7 @@ function CDrawingDocument()
 		this.Overlay.m_oContext.fillStyle = "rgba(51,102,204,255)";
 		this.Overlay.m_oContext.beginPath();
 
-		if (this.m_oWordControl.MobileTouchManager)
+		if (this.m_oWordControl.MobileTouchManager && (true !== isSelect2))
 		{
 			this.m_oWordControl.MobileTouchManager.RectSelect1 = null;
 			this.m_oWordControl.MobileTouchManager.RectSelect2 = null;
@@ -6035,6 +6056,33 @@ function CDrawingDocument()
 			ctx.lineTo(x4, y4);
 			ctx.closePath();
 		}
+	}
+
+    this.AddPageSelection2 = function (pageIndex, x, y, w, h)
+    {
+        if (!this.OverlaySelection2.Data)
+            this.OverlaySelection2.Data = [];
+
+        this.OverlaySelection2.Data.push([pageIndex, x, y, w, h]);
+    }
+
+    this.DrawPageSelection2 = function(overlay)
+	{
+		if (this.OverlaySelection2.Data)
+		{
+			this.private_StartDrawSelection(overlay, true);
+
+			var len = this.OverlaySelection2.Data.length;
+			var value;
+			for (var i = 0; i < len; i++)
+			{
+				value = this.OverlaySelection2.Data[i];
+				this.AddPageSelection(value[0], value[1], value[2], value[3], value[4]);
+			}
+
+            this.private_EndDrawSelection();
+		}
+        this.OverlaySelection2 = {};
 	}
 
 	this.CheckSelectMobile = function (overlay)
@@ -7413,7 +7461,7 @@ function CDrawingDocument()
 			var sStyleId = arrLevels[nLvl].StyleId;
 			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
 			{
-				var sStyleName = arrLevels[nLvl].Styles[nIndex];
+				var sStyleName = AscCommon.translateManager.getValue(arrLevels[nLvl].Styles[nIndex]);
 
 				var oParagraph = new Paragraph(this, oDocumentContent, false);
 				oDocumentContent.AddToContent(oParaIndex++, oParagraph);
@@ -9104,6 +9152,9 @@ CStylesPainter.prototype =
 			par.Style_Add(style.Id, false);
 			par.Set_Align(AscCommon.align_Left);
 			par.Set_Tabs(new CParaTabs());
+
+			if (!textPr.Color || (255 === textPr.Color.r && 255 === textPr.Color.g && 255 === textPr.Color.b))
+				run.Set_Color(new CDocumentColor(0, 0, 0, false));
 
 			var _brdL = style.ParaPr.Brd.Left;
 			if (undefined !== _brdL && null !== _brdL)

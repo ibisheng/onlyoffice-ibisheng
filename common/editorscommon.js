@@ -245,7 +245,7 @@
 		for (var i = 0; i < AscCommon.c_oAscEncodings.length; ++i)
 		{
 			var encoding = AscCommon.c_oAscEncodings[i];
-			var newElem = {'codepage': encoding[0], 'name': encoding[3]};
+			var newElem = {'codepage': encoding[0], 'lcid': encoding[1], 'name': encoding[3]};
 			res.push(newElem);
 		}
 		return res;
@@ -1159,7 +1159,7 @@
 		var t = cBoolLocal.t = local['t'].toUpperCase();
 		var f = cBoolLocal.f = local['f'].toUpperCase();
 
-		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),]|$)", "i");
+		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),}]|$)", "i");
 	}
 
 	function build_rx_error(local)
@@ -1295,6 +1295,7 @@
 		switch (format)
 		{
 			case c_oAscFileType.PDF:
+			case c_oAscFileType.PDFA:
 				return 'pdf';
 				break;
 			case c_oAscFileType.HTML:
@@ -2467,7 +2468,7 @@
 
 				if (Asc.c_oAscChartTypeSettings.stock === chartType)
 				{
-					var chartSettings = new AscCommon.asc_ChartSettings();
+					var chartSettings = new Asc.asc_ChartSettings();
 					chartSettings.putType(Asc.c_oAscChartTypeSettings.stock);
 					chartSettings.putRange(sDataRange);
 					chartSettings.putInColumns(!isRows);
@@ -2611,7 +2612,7 @@
 	function asc_ajax(obj)
 	{
 		var url                                       = "", type                            = "GET",
-			async                                     = true, data                        = null, dataType = "text/xml",
+			async                                     = true, data                        = null, dataType,
 			error = null, success = null, httpRequest = null,
 			contentType                               = "application/x-www-form-urlencoded",
 			responseType = '',
@@ -2658,7 +2659,7 @@
 				if (window.XMLHttpRequest)
 				{ // Mozilla, Safari, ...
 					httpRequest = new XMLHttpRequest();
-					if (httpRequest.overrideMimeType)
+					if (httpRequest.overrideMimeType && dataType)
 					{
 						httpRequest.overrideMimeType(dataType);
 					}
@@ -3050,6 +3051,74 @@
 	function MMToTwips(mm)
 	{
 		return (((mm * 20 * 72 / 25.4) + 0.5) | 0);
+	}
+
+	/**
+	 * Конвертируем число из римской системы исчисления в обычное десятичное число
+	 * @param sRoman {string}
+	 * @returns {number}
+	 */
+	function RomanToInt(sRoman)
+	{
+		sRoman = sRoman.toUpperCase();
+		if (sRoman < 1)
+		{
+			return 0;
+		}
+		else if (!/^M*(?:D?C{0,3}|C[MD])(?:L?X{0,3}|X[CL])(?:V?I{0,3}|I[XV])$/i.test(sRoman))
+		{
+			return NaN;
+		}
+
+		var chars  = {
+			"M"  : 1000,
+			"CM" : 900,
+			"D"  : 500,
+			"CD" : 400,
+			"C"  : 100,
+			"XC" : 90,
+			"L"  : 50,
+			"XL" : 40,
+			"X"  : 10,
+			"IX" : 9,
+			"V"  : 5,
+			"IV" : 4,
+			"I"  : 1
+		};
+		var arabic = 0;
+		sRoman.replace(/[MDLV]|C[MD]?|X[CL]?|I[XV]?/g, function(i)
+		{
+			arabic += chars[i];
+		});
+
+		return arabic;
+	}
+
+	/**
+	 * Конвертируем нумерацию {a b ... z aa bb ... zz aaa bbb ... zzz ...} в число
+	 * @param sLetters
+	 * @constructor
+	 */
+	function LatinNumberingToInt(sLetters)
+	{
+		sLetters = sLetters.toUpperCase();
+
+		if (sLetters.length <= 0)
+			return NaN;
+
+		var nLen = sLetters.length;
+
+		var nFirstCharCode = sLetters.charCodeAt(0);
+		if (65 > nFirstCharCode || nFirstCharCode > 90)
+			return NaN;
+
+		for (var nPos = 1; nPos < nLen; ++nPos)
+		{
+			if (sLetters.charCodeAt(nPos) !== nFirstCharCode)
+				return NaN;
+		}
+
+		return (nFirstCharCode - 64) + 26 * (nLen - 1);
 	}
 
 	var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
@@ -4062,6 +4131,8 @@
 	window["AscCommon"].CorrectMMToTwips = CorrectMMToTwips;
 	window["AscCommon"].TwipsToMM = TwipsToMM;
 	window["AscCommon"].MMToTwips = MMToTwips;
+	window["AscCommon"].RomanToInt = RomanToInt;
+	window["AscCommon"].LatinNumberingToInt = LatinNumberingToInt;
 
 	window["AscCommon"].loadSdk = loadSdk;
 	window["AscCommon"].getAltGr = getAltGr;

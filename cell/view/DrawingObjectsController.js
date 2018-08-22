@@ -241,7 +241,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsForMove = function(group)
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
 {
-    if(this.drawingObjects.isViewerMode()){
+    if(!this.canEdit()){
         return;
     }
     var oApi = Asc.editor;
@@ -351,7 +351,7 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
 {
     var drawingObjects = this.drawingObjects;
     var oThis = this;
-    this.checkSelectedObjectsAndFireCallback(function(){
+    var fCallback = function(){
         var pluginData = new Asc.CPluginData();
         pluginData.setAttribute("data", oleObject.m_sData);
         pluginData.setAttribute("guid", oleObject.m_sApplicationId);
@@ -365,7 +365,12 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
         oThis.clearPreTrackObjects();
         oThis.changeCurrentState(new AscFormat.NullState(this));
         this.onMouseUp(e, x, y);
-    }, []);
+    };
+    if(!this.canEdit()){
+        fCallback();
+        return;
+    }
+    this.checkSelectedObjectsAndFireCallback(fCallback, []);
 };
 
 DrawingObjectsController.prototype.addChartDrawingObject = function(options)
@@ -519,14 +524,6 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
     this.startRecalculate();
 };
 
-DrawingObjectsController.prototype.isViewMode = function()
-{
-    return this.drawingObjects.isViewerMode();
-};
-DrawingObjectsController.prototype.canEdit = function()
-{
-    return this.drawingObjects.isViewerMode();
-};
 
 DrawingObjectsController.prototype.getDrawingDocument = function()
 {
@@ -598,8 +595,8 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
                     _x = oPos.X;
                     _y = oPos.Y;
                 }
-                _x = this.drawingObjects.convertMetric(_x, 3, 1);
-                _y = this.drawingObjects.convertMetric(_y, 3, 1);
+                _x = this.drawingObjects.convertMetric(_x, 3, 0);
+                _y = this.drawingObjects.convertMetric(_y, 3, 0);
                 var oCell = oWorksheet.findCellByXY(_x, _y, true, false, false);
                 if(oCell && oCell.col !== null && oCell.row !== null){
                     var oRange = new Asc.Range(oCell.col, oCell.row, oCell.col, oCell.row, false);
@@ -609,20 +606,20 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
                         var _api = window["Asc"]["editor"];
                         if (_api.wb.MobileTouchManager)
 						{
-						    if(oOffset.deltaX < 0){
-                                --oOffset.deltaX;
+						    if(oOffset.col < 0){
+                                --oOffset.col;
                             }
-                            if(oOffset.deltaX > 0){
-						        ++oOffset.deltaX;
+                            if(oOffset.col > 0){
+						        ++oOffset.col;
                             }
 
-                            if(oOffset.deltaY < 0){
-                                --oOffset.deltaY;
+                            if(oOffset.row < 0){
+                                --oOffset.row;
                             }
-                            if(oOffset.deltaY > 0){
-                                ++oOffset.deltaY;
+                            if(oOffset.row > 0){
+                                ++oOffset.row;
                             }
-							_api.wb.MobileTouchManager.scrollBy((oOffset.deltaX) * _api.controller.settings.hscrollStep, (oOffset.deltaY)* _api.controller.settings.vscrollStep);
+							_api.wb.MobileTouchManager.scrollBy((oOffset.col) * _api.controller.settings.hscrollStep, (oOffset.row)* _api.controller.settings.vscrollStep);
 						}
                     }
                 }
@@ -632,7 +629,7 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
 
 DrawingObjectsController.prototype.onKeyPress = function(e)
 {
-    if ( true === this.isViewMode())
+    if (!this.canEdit())
         return false;
     if(e.CtrlKey || e.AltKey)
         return false;

@@ -515,6 +515,12 @@ CEditorPage.prototype.ThemeGenerateThumbnails = function(_master)
 
 CEditorPage.prototype.CheckLayouts = function(bIsAttack)
 {
+    if(!this.m_oLogicDocument || !this.m_oLogicDocument.Api){
+        return;
+    }
+    var slide = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage];
+    var master = slide.Layout.Master;
+    this.m_oLogicDocument.Api.sendColorThemes(master.Theme);
 };
 
 CEditorPage.prototype.GoToPage = function(lPageNum)

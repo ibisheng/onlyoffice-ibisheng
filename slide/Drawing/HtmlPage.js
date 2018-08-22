@@ -727,6 +727,9 @@ function CEditorPage(api)
 				this.reporterTranslates[0] = _translates[0];
 				this.reporterTranslates[1] = _translates[1];
 				this.reporterTranslates[2] = _translates[2];
+
+				if (_translates[3])
+					this.m_oApi.DemonstrationEndShowMessage(_translates[3]);
 			}
 
 			var _buttonsContent = "";
@@ -3581,7 +3584,7 @@ function CEditorPage(api)
 			_c.m_nCurrentTimeClearCache = 0;
 			_c.m_oDrawingDocument.CheckFontCache();
 		}
-        oThis.m_oLogicDocument.Continue_CheckSpelling();
+        oThis.m_oLogicDocument.ContinueCheckSpelling();
 	};
 	this.OnScroll       = function()
 	{

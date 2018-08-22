@@ -399,6 +399,27 @@
 	};
 	baseEditorsApi.prototype.getViewMode                     = function()
 	{
+		return this.isViewMode;
+	};
+	baseEditorsApi.prototype.canEdit                         = function()
+	{
+		return !this.isViewMode && this.restrictions === Asc.c_oAscRestrictionType.None;
+	};
+	baseEditorsApi.prototype.isRestrictionForms              = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlyForms);
+	};
+	baseEditorsApi.prototype.isRestrictionComments           = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+	};
+	baseEditorsApi.prototype.isRestrictionSignatures         = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+	};
+	baseEditorsApi.prototype.isRestrictionView               = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.View);
 	};
 	baseEditorsApi.prototype.isLongAction                    = function()
 	{
@@ -1879,6 +1900,12 @@
 			return window["AscDesktopEditor"]["IsSignaturesSupport"]();
 		return false;
 	};
+    baseEditorsApi.prototype.asc_isProtectionSupport = function()
+    {
+        if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsProtectionSupport"])
+            return window["AscDesktopEditor"]["IsProtectionSupport"]();
+        return false;
+    };
 
 	baseEditorsApi.prototype.asc_gotoSignature = function(guid)
 	{

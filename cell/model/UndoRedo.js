@@ -407,6 +407,8 @@ function (window, undefined) {
 
 		this.PivotTable = 80;
 
+		this.Layout = 90;
+
 		this.Create = function (nType) {
 			switch (nType) {
 				case this.ValueMultiTextElem:
@@ -536,6 +538,8 @@ function (window, undefined) {
 					return new UndoRedoData_DefinedNames();
 				case this.PivotTable:
 					return new UndoRedoData_PivotTable();
+				case this.Layout:
+					return new UndoRedoData_Layout();
 			}
 			return null;
 		};
@@ -1135,6 +1139,42 @@ function (window, undefined) {
 			case this.Properties.pivot:
 				this.pivot = value;
 				break;
+			case this.Properties.from:
+				this.from = value;
+				break;
+			case this.Properties.to:
+				this.to = value;
+				break;
+		}
+	};
+
+	function UndoRedoData_Layout(from, to) {
+		this.from = from;
+		this.to = to;
+	}
+
+	UndoRedoData_Layout.prototype.Properties = {
+		from: 0, to: 1
+	};
+	UndoRedoData_Layout.prototype.getType = function () {
+		return UndoRedoDataTypes.Layout;
+	};
+	UndoRedoData_Layout.prototype.getProperties = function () {
+		return this.Properties;
+	};
+	UndoRedoData_Layout.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.from:
+				return this.from;
+				break;
+			case this.Properties.to:
+				return this.to;
+				break;
+		}
+		return null;
+	};
+	UndoRedoData_Layout.prototype.setProperty = function (nType, value) {
+		switch (nType) {
 			case this.Properties.from:
 				this.from = value;
 				break;
@@ -1750,7 +1790,7 @@ function (window, undefined) {
 		}
 		var nRow = Data.nRow;
 		var nCol = Data.nCol;
-		if (false != this.wb.bCollaborativeChanges) {
+		if (this.wb.bCollaborativeChanges) {
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 			nRow = collaborativeEditing.getLockOtherRow2(nSheetId, nRow);
 			nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
@@ -1822,6 +1862,13 @@ function (window, undefined) {
 				cell.setPivotButton(Val);
 			} else if (AscCH.historyitem_Cell_Style == Type) {
 				cell.setCellStyle(Val);
+			} else if (AscCH.historyitem_Cell_RemoveSharedFormula == Type) {
+				if (null !== Val && bUndo) {
+					var parsed = ws.workbook.workbookFormulas.get(Val);
+					if (parsed) {
+						cell.setFormulaParsed(parsed);
+					}
+				}
 			}
 		});
 	};
@@ -1868,7 +1915,7 @@ function (window, undefined) {
 		if (AscCH.historyitem_Worksheet_RemoveCell == Type) {
 			nRow = Data.nRow;
 			nCol = Data.nCol;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				nRow = collaborativeEditing.getLockOtherRow2(nSheetId, nRow);
 				nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
 				oLockInfo = new AscCommonExcel.asc_CLockInfo();
@@ -1894,7 +1941,7 @@ function (window, undefined) {
 			}
 		} else if (AscCH.historyitem_Worksheet_ColProp == Type) {
 			index = Data.index;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				if (AscCommonExcel.g_nAllColIndex == index) {
 					range = new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
 				} else {
@@ -1908,14 +1955,11 @@ function (window, undefined) {
 				wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
 			var col = ws._getCol(index);
-			if (bUndo) {
-				col.setWidthProp(Data.oOldVal);
-			} else {
-				col.setWidthProp(Data.oNewVal);
-			}
+			col.setWidthProp(bUndo ? Data.oOldVal : Data.oNewVal);
+			ws.initColumn(col);
 		} else if (AscCH.historyitem_Worksheet_RowProp == Type) {
 			index = Data.index;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				index = collaborativeEditing.getLockOtherRow2(nSheetId, index);
 				oLockInfo = new AscCommonExcel.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
@@ -1940,7 +1984,7 @@ function (window, undefined) {
 			to = Data.to;
 			nRow = Data.bRow;
 
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
 
@@ -1962,7 +2006,7 @@ function (window, undefined) {
 		} else if (AscCH.historyitem_Worksheet_AddRows == Type || AscCH.historyitem_Worksheet_RemoveRows == Type) {
 			from = Data.from;
 			to = Data.to;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
 				if (false == ((true == bUndo && AscCH.historyitem_Worksheet_AddRows == Type) ||
@@ -1987,7 +2031,7 @@ function (window, undefined) {
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
-			if (true !== wb.bCollaborativeChanges) {
+			if (!wb.bCollaborativeChanges) {
 				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
 			}
 
@@ -1997,7 +2041,7 @@ function (window, undefined) {
 		} else if (AscCH.historyitem_Worksheet_AddCols == Type || AscCH.historyitem_Worksheet_RemoveCols == Type) {
 			from = Data.from;
 			to = Data.to;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				from = collaborativeEditing.getLockOtherColumn2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherColumn2(nSheetId, to);
 				if (false == ((true == bUndo && AscCH.historyitem_Worksheet_AddCols == Type) ||
@@ -2023,7 +2067,7 @@ function (window, undefined) {
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
-			if (true !== wb.bCollaborativeChanges) {
+			if (!wb.bCollaborativeChanges) {
 				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
 			}
 
@@ -2036,7 +2080,7 @@ function (window, undefined) {
 			c1 = Data.c1;
 			r2 = Data.r2;
 			c2 = Data.c2;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
 				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, c1);
 				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
@@ -2072,7 +2116,7 @@ function (window, undefined) {
 			c1 = Data.c1;
 			r2 = Data.r2;
 			c2 = Data.c2;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
 				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, c1);
 				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
@@ -2105,7 +2149,7 @@ function (window, undefined) {
 		} else if (AscCH.historyitem_Worksheet_Sort == Type) {
 			var bbox = Data.bbox;
 			var places = Data.places;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				bbox.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, bbox.r1);
 				bbox.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, bbox.c1);
 				bbox.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, bbox.r2);
@@ -2137,7 +2181,7 @@ function (window, undefined) {
 				from = to;
 				to = temp;
 			}
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				var coBBoxTo = Asc.Range(0, 0, 0, 0), coBBoxFrom = Asc.Range(0, 0, 0, 0);
 
 				coBBoxTo.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
@@ -2183,7 +2227,7 @@ function (window, undefined) {
 			if (null != Data.from && null != Data.from.r1 && null != Data.from.c1 && null != Data.from.r2 &&
 				null != Data.from.c2) {
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					from.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r1);
 					from.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c1);
 					from.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r2);
@@ -2194,7 +2238,7 @@ function (window, undefined) {
 			if (null != Data.to && null != Data.to.r1 && null != Data.to.c1 && null != Data.to.r2 &&
 				null != Data.to.c2) {
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					to.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
 					to.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c1);
 					to.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r2);
@@ -2225,7 +2269,7 @@ function (window, undefined) {
 			if (null != Data.from && null != Data.from.r1 && null != Data.from.c1 && null != Data.from.r2 &&
 				null != Data.from.c2) {
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					from.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r1);
 					from.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c1);
 					from.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r2);
@@ -2236,7 +2280,7 @@ function (window, undefined) {
 			if (null != Data.to && null != Data.to.r1 && null != Data.to.c1 && null != Data.to.r2 &&
 				null != Data.to.c2) {
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					to.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
 					to.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c1);
 					to.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r2);
@@ -2328,7 +2372,7 @@ function (window, undefined) {
 			return;
 		}
 		var nIndex = Data.index;
-		if (false != this.wb.bCollaborativeChanges) {
+		if (this.wb.bCollaborativeChanges) {
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 			var oLockInfo = new AscCommonExcel.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
@@ -2442,7 +2486,7 @@ function (window, undefined) {
 			cellCommentator.Undo(Type, Data);
 		} else {
 			to = (Data.from || Data.to) ? Data.to : Data;
-			if (to && !to.bDocument && false !== this.wb.bCollaborativeChanges) {
+			if (to && !to.bDocument && this.wb.bCollaborativeChanges) {
 				collaborativeEditing = this.wb.oApi.collaborativeEditing;
 				to.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, to.nRow);
 				to.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, to.nCol);
@@ -2478,7 +2522,7 @@ function (window, undefined) {
 			} else {
 				if (AscCH.historyitem_AutoFilter_ChangeColumnName === Type ||
 					AscCH.historyitem_AutoFilter_ChangeTotalRow === Type) {
-					if (false != this.wb.bCollaborativeChanges) {
+					if (this.wb.bCollaborativeChanges) {
 						var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 						Data.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.nRow);
 						Data.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.nCol);
@@ -2566,6 +2610,104 @@ function (window, undefined) {
 		}
 	};
 
+	function UndoRedoSharedFormula(wb) {
+		this.wb = wb;
+		this.nType = UndoRedoClassTypes.Add(function () {
+			return AscCommonExcel.g_oUndoRedoSharedFormula;
+		});
+	}
+
+	UndoRedoSharedFormula.prototype.getClassType = function () {
+		return this.nType;
+	};
+	UndoRedoSharedFormula.prototype.Undo = function (Type, Data, nSheetId, opt_wb) {
+		this.UndoRedo(Type, Data, nSheetId, true, opt_wb);
+	};
+	UndoRedoSharedFormula.prototype.Redo = function (Type, Data, nSheetId, opt_wb) {
+		this.UndoRedo(Type, Data, nSheetId, false, opt_wb);
+	};
+	UndoRedoSharedFormula.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo, opt_wb) {
+		var wb = opt_wb ? opt_wb : this.wb;
+		var parsed = wb.workbookFormulas.get(Data.index);
+		if (parsed && bUndo) {
+			var val = bUndo ? Data.oOldVal : Data.oNewVal;
+			if (AscCH.historyitem_SharedFormula_ChangeFormula == Type) {
+				parsed.removeDependencies();
+				parsed.setFormula(val);
+				wb.dependencyFormulas.addToBuildDependencyShared(parsed);
+			} else if (AscCH.historyitem_SharedFormula_ChangeShared == Type) {
+				parsed.setSharedRef(val, Data.bRow);
+			}
+		}
+	};
+
+
+	function UndoRedoRedoLayout(wb) {
+		this.wb = wb;
+		this.nType = UndoRedoClassTypes.Add(function () {
+			return AscCommonExcel.g_oUndoRedoLayout;
+		});
+	}
+
+	UndoRedoRedoLayout.prototype.getClassType = function () {
+		return this.nType;
+	};
+	UndoRedoRedoLayout.prototype.Undo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, true);
+	};
+	UndoRedoRedoLayout.prototype.Redo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, false);
+	};
+	UndoRedoRedoLayout.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
+		var ws = this.wb.getWorksheetById(nSheetId);
+		if (!ws) {
+			return;
+		}
+
+		var pageOptions = ws.PagePrintOptions;
+		var pageSetup = pageOptions.asc_getPageSetup();
+		var pageMargins = pageOptions.asc_getPageMargins();
+		var value = bUndo ? Data.from : Data.to;
+		switch (Type) {
+			case AscCH.historyitem_Layout_Left:
+				pageMargins.asc_setLeft(value);
+				break;
+			case AscCH.historyitem_Layout_Right:
+				pageMargins.asc_setRight(value);
+				break;
+			case AscCH.historyitem_Layout_Top:
+				pageMargins.asc_setTop(value);
+				break;
+			case AscCH.historyitem_Layout_Bottom:
+				pageMargins.asc_setBottom(value);
+				break;
+			case AscCH.historyitem_Layout_Width:
+				pageSetup.asc_setWidth(value);
+				break;
+			case AscCH.historyitem_Layout_Height:
+				pageSetup.asc_setHeight(value);
+				break;
+			case AscCH.historyitem_Layout_FitToWidth:
+				pageSetup.asc_setFitToWidth(value);
+				break;
+			case AscCH.historyitem_Layout_FitToHeight:
+				pageSetup.asc_setFitToHeight(value);
+				break;
+			case AscCH.historyitem_Layout_GridLines:
+				pageOptions.asc_setGridLines(value);
+				break;
+			case AscCH.historyitem_Layout_Headings:
+				pageOptions.asc_setHeadings(value);
+				break;
+			case AscCH.historyitem_Layout_Orientation:
+				pageSetup.asc_setOrientation(value);
+				break;
+		}
+
+		this.wb.oApi._onUpdateLayoutMenu(nSheetId);
+	};
+
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
@@ -2582,6 +2724,7 @@ function (window, undefined) {
 	window['AscCommonExcel'].UndoRedoData_BBox = UndoRedoData_BBox;
 	window['AscCommonExcel'].UndoRedoData_SortData = UndoRedoData_SortData;
 	window['AscCommonExcel'].UndoRedoData_PivotTable = UndoRedoData_PivotTable;
+	window['AscCommonExcel'].UndoRedoData_Layout = UndoRedoData_Layout;
 	window['AscCommonExcel'].UndoRedoData_SheetAdd = UndoRedoData_SheetAdd;
 	window['AscCommonExcel'].UndoRedoData_SheetRemove = UndoRedoData_SheetRemove;
 	window['AscCommonExcel'].UndoRedoData_DefinedNames = UndoRedoData_DefinedNames;
@@ -2596,6 +2739,8 @@ function (window, undefined) {
 	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
 	window['AscCommonExcel'].UndoRedoSparklines = UndoRedoSparklines;
 	window['AscCommonExcel'].UndoRedoPivotTables = UndoRedoPivotTables;
+	window['AscCommonExcel'].UndoRedoSharedFormula = UndoRedoSharedFormula;
+	window['AscCommonExcel'].UndoRedoRedoLayout = UndoRedoRedoLayout;
 
 	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
 	window['AscCommonExcel'].g_oUndoRedoCell = null;
@@ -2606,4 +2751,6 @@ function (window, undefined) {
 	window['AscCommonExcel'].g_oUndoRedoAutoFilters = null;
 	window['AscCommonExcel'].g_oUndoRedoSparklines = null;
 	window['AscCommonExcel'].g_oUndoRedoPivotTables = null;
+	window['AscCommonExcel'].g_oUndoRedoSharedFormula = null;
+	window['AscCommonExcel'].g_oUndoRedoLayout = null;
 })(window);

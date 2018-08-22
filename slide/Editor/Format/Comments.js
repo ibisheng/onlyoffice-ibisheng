@@ -128,11 +128,11 @@ ParaComment.prototype =
     {
     },
 
-    Get_NextRunElements : function(RunElements, UseContentPos, Depth)
+    GetNextRunElements : function(RunElements, UseContentPos, Depth)
     {
     },
 
-    Get_PrevRunElements : function(RunElements, UseContentPos, Depth)
+    GetPrevRunElements : function(RunElements, UseContentPos, Depth)
     {
     },
 

@@ -66,7 +66,7 @@ CChangesParaFieldAddItem.prototype.Undo = function()
 {
 	var oField = this.Class;
 	oField.Content.splice(this.Pos, this.Items.length);
-	oField.protected_UpdateSpellChecking();
+	oField.private_UpdateSpellChecking();
 	oField.private_UpdateTrackRevisions();
 	oField.private_CheckUpdateBookmarks(this.Items);
 };
@@ -80,7 +80,7 @@ CChangesParaFieldAddItem.prototype.Redo = function()
 	oField.Content = Array_start.concat(this.Items, Array_end);
 	oField.private_UpdateTrackRevisions();
 	oField.private_CheckUpdateBookmarks(this.Items);
-	oField.protected_UpdateSpellChecking();
+	oField.private_UpdateSpellChecking();
 };
 CChangesParaFieldAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
@@ -106,7 +106,7 @@ CChangesParaFieldAddItem.prototype.Load = function(Color)
 	}
 
 	oField.private_UpdateTrackRevisions();
-	oField.protected_UpdateSpellChecking();
+	oField.private_UpdateSpellChecking();
 };
 CChangesParaFieldAddItem.prototype.IsRelated = function(oChanges)
 {
@@ -138,7 +138,7 @@ CChangesParaFieldRemoveItem.prototype.Undo = function()
 	var Array_end   = oField.Content.slice(this.Pos);
 
 	oField.Content = Array_start.concat(this.Items, Array_end);
-	oField.protected_UpdateSpellChecking();
+	oField.private_UpdateSpellChecking();
 	oField.private_CheckUpdateBookmarks(this.Items);
 	oField.private_UpdateTrackRevisions();
 };
@@ -148,7 +148,7 @@ CChangesParaFieldRemoveItem.prototype.Redo = function()
 	oField.Content.splice(this.Pos, this.Items.length);
 	oField.private_UpdateTrackRevisions();
 	oField.private_CheckUpdateBookmarks(this.Items);
-	oField.protected_UpdateSpellChecking();
+	oField.private_UpdateSpellChecking();
 };
 CChangesParaFieldRemoveItem.prototype.private_WriteItem = function(Writer, Item)
 {
@@ -172,7 +172,7 @@ CChangesParaFieldRemoveItem.prototype.Load = function(Color)
 		AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(oField, ChangesPos, 1);
 	}
 	oField.private_UpdateTrackRevisions();
-	oField.protected_UpdateSpellChecking();
+	oField.private_UpdateSpellChecking();
 };
 CChangesParaFieldRemoveItem.prototype.IsRelated = function(oChanges)
 {

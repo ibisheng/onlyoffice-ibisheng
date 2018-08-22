@@ -1272,7 +1272,7 @@ function asc_menu_WriteAscCatAxisSettings(_type, _settings, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadChartPr(_params, _cursor){
-    var _settings = new AscCommon.asc_ChartSettings();
+    var _settings = new Asc.asc_ChartSettings();
 
     var _continue = true;
     while (_continue)
@@ -3431,14 +3431,14 @@ function OfflineEditor () {
             var isZeroHeader = false;
             if (-1 !== index) {
                 if (isColHeader) {
-                    if (w < this.width_1px) {
+                    if (0 === w) {
                         if (style !== kHeaderDefault) {
                             return;
                         }
                         // Это невидимый столбец
                         isZeroHeader = true;
                         // Отрисуем только границу
-                        w = this.width_1px;
+                        w = 1;
                         // Возможно мы уже рисовали границу невидимого столбца (для последовательности невидимых)
                         if (0 < index && 0 === this.cols[index - 1].width) {
                             // Мы уже нарисовали border для невидимой границы
@@ -3446,18 +3446,18 @@ function OfflineEditor () {
                         }
                     } else if (0 < index && 0 === this.cols[index - 1].width) {
                         // Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседнего столбца)
-                        w -= this.width_1px;
-                        x += this.width_1px;
+                        w -= 1;
+                        x += 1;
                     }
                 } else {
-                    if (h < this.height_1px) {
+                    if (0 === h) {
                         if (style !== kHeaderDefault) {
                             return;
                         }
                         // Это невидимая строка
                         isZeroHeader = true;
                         // Отрисуем только границу
-                        h = this.height_1px;
+                        h = 1;
                         // Возможно мы уже рисовали границу невидимой строки (для последовательности невидимых)
                         if (0 < index && 0 === this.rows[index - 1].height) {
                             // Мы уже нарисовали border для невидимой границы
@@ -3465,8 +3465,8 @@ function OfflineEditor () {
                         }
                     } else if (0 < index && 0 === this.rows[index - 1].height) {
                         // Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
-                        h -= this.height_1px;
-                        y += this.height_1px;
+                        h -= 1;
+                        y += 1;
                     }
                 }
             }
@@ -3475,8 +3475,8 @@ function OfflineEditor () {
             var st = this.settings.header.style[style];
             var x2 = x + w;
             var y2 = y + h;
-            var x2WithoutBorder = x2 - this.width_1px;
-            var y2WithoutBorder = y2 - this.height_1px;
+            var x2WithoutBorder = x2 - 1;
+            var y2WithoutBorder = y2 - 1;
 
             // background только для видимых
             if (!isZeroHeader) {
@@ -3567,10 +3567,10 @@ function OfflineEditor () {
             }
         };
 
-        AscCommonExcel.WorksheetView.prototype.__drawGrid = function (drawingCtx, c1, r1, c2, r2, leftFieldInPt, topFieldInPt, width, height) {
+        AscCommonExcel.WorksheetView.prototype.__drawGrid = function (drawingCtx, c1, r1, c2, r2, leftFieldInPx, topFieldInPx, width, height) {
             var range = new asc_Range(c1, r1, c2, r2);
             this._prepareCellTextMetricsCache(range);
-            this._drawGrid(drawingCtx, range, leftFieldInPt, topFieldInPt, width, height);
+            this._drawGrid(drawingCtx, range, leftFieldInPx, topFieldInPx, width, height);
         };
 
         AscCommonExcel.WorksheetView.prototype.__drawCellsAndBorders = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw, istoplayer) {
@@ -3802,8 +3802,6 @@ function OfflineEditor () {
 
                 var type = 0, left = 0, right = 0, top = 0, bottom = 0;
                 var addt, addl, addr, addb, colsCount = this.cols.length - 1, rowsCount = this.rows.length - 1;
-                var defaultWidth = this.model.getDefaultWidth();
-                defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
                 var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
                 for (i = 0; i < arrRanges.length; ++i) {
@@ -3932,8 +3930,6 @@ function OfflineEditor () {
 
             var type = 0, left = 0, right = 0, top = 0, bottom = 0;
             var addt, addl, addr, addb, colsCount = this.cols.length - 1, rowsCount = this.rows.length - 1;
-            var defaultWidth = this.model.getDefaultWidth();
-            defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
             var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
             for (i = 0; i < arrRanges.length; ++i) {
@@ -4157,7 +4153,7 @@ function OfflineEditor () {
                 var json = JSON.parse(chartData);
                 if (json) {
                     
-                    var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+                    var nativeToEditor = 1.0 / deviceScale;
                    
                     var screenWidth = this.initSettings["screenWidth"] * nativeToEditor / 2.54 - ws.headersWidth;
                     var screenHeight = this.initSettings["screenHeight"] * nativeToEditor / 2.54 - ws.headersHeight;
@@ -4325,7 +4321,6 @@ function OfflineEditor () {
                                   });
 
         _api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
-
             var rData = {
                          "c"             : "open",
                          "id"            : t.initSettings["docKey"],
@@ -4336,7 +4331,7 @@ function OfflineEditor () {
                          "title"         : this.documentTitle,
                          "nobase64"      : true};
 
-                         _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
+            _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
         });
 
         _api.asc_registerCallback("asc_onDocumentUpdateVersion", function(callback) {
@@ -4348,7 +4343,7 @@ function OfflineEditor () {
         _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
-                                  stream["WriteLong"](options.asc_getOptionId());
+                                  stream["WriteString2"](JSON.stringify(options));
                                   window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
                                   });
     };
@@ -4573,7 +4568,7 @@ function OfflineEditor () {
     this._updateRegion = function (worksheet, x, y, width, height) {
 
         var i = 0;
-        var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+        var nativeToEditor = 1.0 / deviceScale;
 
         // координаты в СО редактора
 
@@ -4788,17 +4783,11 @@ function OfflineEditor () {
         function ascCvtRatio(fromUnits, toUnits) {
             return window["Asc"].getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
         }
-        function ptToMm(val) {
-            return val * ascCvtRatio(1, 3);
-        }
-        function pxToPt(val) {
-            return val * ascCvtRatio(0, 1);
-        }
         function pxToMm(val) {
             return val * ascCvtRatio(0, 3);
         }
 
-        if (imageUrl && !objectRender.isViewerMode()) {
+        if (imageUrl && objectRender.canEdit()) {
 
             var _image = new Image();
             _image.src = imageUrl
@@ -4829,23 +4818,23 @@ function OfflineEditor () {
                     width /= metricCoeff;
                 }
                 
-                var findVal = pxToPt(realLeftOffset + width);
+                var findVal = realLeftOffset + width;
                 var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
                 while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
                     worksheet.expandColsOnScroll(true);
                     toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
                 }
                 object.to.col = toCell.col;
-                object.to.colOff = ptToMm(toCell.colOff);
+                object.to.colOff = pxToMm(toCell.colOff);
                 
-                findVal = pxToPt(realTopOffset + height);
+                findVal = realTopOffset + height;
                 toCell = worksheet.findCellByXY(0, findVal, true, true, false);
                 while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
                     worksheet.expandRowsOnScroll(true);
                     toCell = worksheet.findCellByXY(0, findVal, true, true, false);
                 }
                 object.to.row = toCell.row;
-                object.to.rowOff = ptToMm(toCell.rowOff);
+                object.to.rowOff = pxToMm(toCell.rowOff);
             };
 
             var addImageObject = function (_image) {
@@ -4912,12 +4901,6 @@ function OfflineEditor () {
 
         function ascCvtRatio(fromUnits, toUnits) {
             return window["Asc"].getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
-        }
-        function ptToMm(val) {
-            return val * ascCvtRatio(1, 3);
-        }
-        function pxToPt(val) {
-            return val * ascCvtRatio(0, 1);
         }
         function pxToMm(val) {
             return val * ascCvtRatio(0, 3);
@@ -5490,7 +5473,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
     _s.cellPin = pin;
     _s.isFormulaEditMode = isFormulaEditMode;
 
-    var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+    var ct = ws.getCursorTypeFromXY(x, y);
     if (ct.target && ct.target === AscCommonExcel.c_oTargetType.FilterObject) {
         ws.af_setDialogProp(ct.idFilter);
         //var cell = offline_get_cell_in_coord(x, y);
@@ -5501,7 +5484,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
 
         if (!isViewerMode) {
 
-            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(x, y);
 
             ws.startCellMoveResizeRange = null;
 
@@ -5565,7 +5548,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
 
     if (isRangeResize) {
         if (!isViewerMode) {
-            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(x, y);
 
             var rangeChange = new window["Asc"].Range(c1, r1, c2, r2);
             var target = {
@@ -6179,7 +6162,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
     var openEditor = function (res) {
         if (res) {
             // Выставляем переменные, что мы редактируем
-            // t.controller.setCellEditMode(true);
             ws.setCellEditMode(true);
 
             ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editStart);
@@ -6189,7 +6171,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
             if (!ws.openCellEditorWithText(wb.cellEditor, functionName, cursorPos, /*isFocus*/false,
                 /*activeRange*/arn)) {
                 ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editEnd);
-                // t.controller.setCellEditMode(false);
                 // t.controller.setStrictClose(false);
                 // t.controller.setFormulaEditMode(false);
                 ws.setCellEditMode(false);
@@ -6202,7 +6183,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
                 wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 
         } else {
-            //t.controller.setCellEditMode(false);
             //t.controller.setStrictClose(false);
             //t.controller.setFormulaEditMode(false);
             ws.setCellEditMode(false);
@@ -6402,7 +6382,7 @@ window["native"]["offline_calculate_complete_range"] = function(x, y, w, h) {
     range.c2 = range.columnEnd < 0 ? 0 : range.columnEnd;
     range.r2 = range.rowEnd < 0 ? 0 : range.rowEnd;
 
-    var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+    var nativeToEditor = 1.0 / deviceScale;
     w = ( x + w ) * nativeToEditor + ws.headersWidth;
     h = ( y + h ) * nativeToEditor + ws.headersHeight;
     x = x * nativeToEditor + ws.headersWidth;
@@ -7267,9 +7247,8 @@ window["native"]["offline_apply_event"] = function(type,params) {
         {
             var cellX = params[0];
             var cellY = params[1];
-            var isViewerMode = false;
             var ws = _api.wb.getWorksheet();
-            var ct = ws.getCursorTypeFromXY(cellX, cellY, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(cellX, cellY);
 
             var curIndex = _api.asc_getActiveWorksheetIndex();
 
@@ -7450,6 +7429,21 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
             break;
         }
+
+        case 22000: // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
+        {
+            var obj = JSON.parse(params);
+            var type = parseInt(obj["type"]);
+            var encoding = parseInt(obj["encoding"]);
+            var delimiter = parseInt(obj["delimiter"]);
+
+            _api.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
+            _api.documentFormat = "csv";
+           
+            _api.asc_setAdvancedOptions(type, new Asc.asc_CCSVAdvancedOptions(encoding, delimiter, null));
+            
+            break;
+        } 
 
         case 22001: // ASC_MENU_EVENT_TYPE_SET_PASSWORD
         {

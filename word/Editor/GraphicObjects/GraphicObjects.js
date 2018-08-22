@@ -321,6 +321,7 @@ CGraphicObjects.prototype =
     },
 
 	getDefaultText: DrawingObjectsController.prototype.getDefaultText,
+    canEdit: DrawingObjectsController.prototype.canEdit,
     createImage: DrawingObjectsController.prototype.createImage,
     createOleObject: DrawingObjectsController.prototype.createOleObject,
     createTextArt: DrawingObjectsController.prototype.createTextArt,
@@ -1090,7 +1091,7 @@ CGraphicObjects.prototype =
 
     addFloatTable: function(table)
     {
-        var hdr_ftr = table.Table.Parent.Is_HdrFtr(true);
+        var hdr_ftr = table.Table.Parent.IsHdrFtr(true);
         if(!this.graphicPages[table.PageNum + table.PageController])
         {
             this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
@@ -1115,7 +1116,7 @@ CGraphicObjects.prototype =
         var table = g_oTableId.Get_ById(id);
         if(table)
         {
-            var hdr_ftr = table.Parent.Is_HdrFtr(true);
+            var hdr_ftr = table.Parent.IsHdrFtr(true);
             if(!hdr_ftr)
             {
                 this.graphicPages[pageIndex].removeFloatTableById(id);
@@ -1138,7 +1139,7 @@ CGraphicObjects.prototype =
         {
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         }
-        if(!documentContent.Is_HdrFtr())
+        if(!documentContent.IsHdrFtr())
             return this.graphicPages[pageIndex].getTableByXY(x, y, documentContent);
         else
             return this.graphicPages[pageIndex].hdrFtrPage.getTableByXY(x, y, documentContent);
@@ -1252,7 +1253,7 @@ CGraphicObjects.prototype =
         if(!this.graphicPages[pageIndex])
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         var arr, page, i, ret = [];
-        if(!docContent.Is_HdrFtr())
+        if(!docContent.IsHdrFtr())
         {
 
             page = this.graphicPages[pageIndex];
@@ -1282,7 +1283,7 @@ CGraphicObjects.prototype =
         }
 
         var tables, page;
-        if(!docContent.Is_HdrFtr())
+        if(!docContent.IsHdrFtr())
         {
 
             page = this.graphicPages[pageIndex];
@@ -1305,6 +1306,7 @@ CGraphicObjects.prototype =
     getTextArtPreviewManager: DrawingObjectsController.prototype.getTextArtPreviewManager,
     getEditorApi: DrawingObjectsController.prototype.getEditorApi,
     resetConnectors: DrawingObjectsController.prototype.resetConnectors,
+    checkDlblsPosition: DrawingObjectsController.prototype.checkDlblsPosition,
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {
@@ -1328,7 +1330,7 @@ CGraphicObjects.prototype =
 		if(drawing && drawing.ParaMath){
 			drawing.Convert_ToMathObject();
 		}
-        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
+        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props) || !this.document.CanEdit())
         {
             var pluginData = new Asc.CPluginData();
             pluginData.setAttribute("data", oleObject.m_sData);
@@ -1664,7 +1666,7 @@ CGraphicObjects.prototype =
 
     resetDrawingArrays : function(pageIndex, docContent)
     {
-        var hdr_ftr = docContent.Is_HdrFtr(true);
+        var hdr_ftr = docContent.IsHdrFtr(true);
         if(!hdr_ftr)
         {
             if(isRealObject(this.graphicPages[pageIndex]))
@@ -1794,89 +1796,21 @@ CGraphicObjects.prototype =
             if(parent_para)
             {
                 ParaPr = parent_para.Get_CompiledPr2(true).ParaPr;
-                if(ParaPr)
+                if (ParaPr)
                 {
-
-
                     var NumType    = -1;
                     var NumSubType = -1;
-                    if ( !(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId) )
+
+                    var oNumPr = parent_para.GetNumPr();
+                    if (oNumPr && oNumPr.IsValid())
                     {
-                        var Numb = this.document.Numbering.Get_AbstractNum( ParaPr.NumPr.NumId );
-
-                        if ( undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl] )
+                    	var oNum = this.document.GetNumbering().GetNum(oNumPr.NumId);
+                        if (oNum && oNum.GetLvl(oNumPr.Lvl))
                         {
-                            var Lvl = Numb.Lvl[ParaPr.NumPr.Lvl];
-                            var NumFormat = Lvl.Format;
-                            var NumText   = Lvl.LvlText;
+                            var oInfo = oNum.GetLvl(oNumPr.Lvl).GetPresetType();
 
-                            if ( numbering_numfmt_Bullet === NumFormat )
-                            {
-                                NumType    = 0;
-                                NumSubType = 0;
-
-                                var TextLen = NumText.length;
-                                if ( 1 === TextLen && numbering_lvltext_Text === NumText[0].Type )
-                                {
-                                    var NumVal = NumText[0].Value.charCodeAt(0);
-
-                                    if ( 0x00B7 === NumVal )
-                                        NumSubType = 1;
-                                    else if ( 0x006F === NumVal )
-                                        NumSubType = 2;
-                                    else if ( 0x00A7 === NumVal )
-                                        NumSubType = 3;
-                                    else if ( 0x0076 === NumVal )
-                                        NumSubType = 4;
-                                    else if ( 0x00D8 === NumVal )
-                                        NumSubType = 5;
-                                    else if ( 0x00FC === NumVal )
-                                        NumSubType = 6;
-                                    else if ( 0x00A8 === NumVal )
-                                        NumSubType = 7;
-                                }
-                            }
-                            else
-                            {
-                                NumType    = 1;
-                                NumSubType = 0;
-
-                                var TextLen = NumText.length;
-                                if ( 2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type )
-                                {
-                                    var NumVal2 = NumText[1].Value;
-
-                                    if ( numbering_numfmt_Decimal === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 1;
-                                        else if ( ")" === NumVal2 )
-                                            NumSubType = 2;
-                                    }
-                                    else if ( numbering_numfmt_UpperRoman === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 3;
-                                    }
-                                    else if ( numbering_numfmt_UpperLetter === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 4;
-                                    }
-                                    else if ( numbering_numfmt_LowerLetter === NumFormat )
-                                    {
-                                        if ( ")" === NumVal2 )
-                                            NumSubType = 5;
-                                        else if ( "." === NumVal2 )
-                                            NumSubType = 6;
-                                    }
-                                    else if ( numbering_numfmt_LowerRoman === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 7;
-                                    }
-                                }
-                            }
+                            NumType    = oInfo.Type;
+                            NumSubType = oInfo.SubType;
                         }
                     }
 
@@ -2372,7 +2306,7 @@ CGraphicObjects.prototype =
     drawWrappingObjectsInContent: function(pageIndex, graphics, content)
     {
         var page;
-        if(content.Is_HdrFtr())
+        if(content.IsHdrFtr())
         {
             page = this.getHdrFtrObjectsByPageIndex(pageIndex);
         }
@@ -2539,7 +2473,7 @@ CGraphicObjects.prototype =
 
     addObjectOnPage: function(pageIndex, object)
     {
-        var hdr_ftr = object.parent.DocumentContent.Is_HdrFtr(true);
+        var hdr_ftr = object.parent.DocumentContent.IsHdrFtr(true);
         if(!hdr_ftr)
         {
             if(!this.graphicPages[pageIndex])
@@ -3255,7 +3189,7 @@ CGraphicObjects.prototype =
         var object = g_oTableId.Get_ById(id);
         if(isRealObject(object))
         {
-            var hdr_ftr = object.DocumentContent.Is_HdrFtr(true);
+            var hdr_ftr = object.DocumentContent.IsHdrFtr(true);
             var page = !hdr_ftr ? this.graphicPages[pageIndex] : null;
             if(isRealObject(page))
             {
@@ -3296,7 +3230,7 @@ CGraphicObjects.prototype =
         var obj = g_oTableId.Get_ById(id), nPageIndex = pageIndex;
         if(obj && obj.GraphicObj)
         {
-            if(obj.DocumentContent && obj.DocumentContent.Is_HdrFtr())
+            if(obj.DocumentContent && obj.DocumentContent.IsHdrFtr())
             {
                 if(obj.DocumentContent.Get_StartPage_Absolute() !== obj.PageNum)
                 {
@@ -3391,9 +3325,9 @@ CGraphicObjects.prototype =
     addNewParagraph: DrawingObjectsController.prototype.addNewParagraph,
 
 
-    paragraphClearFormatting: function()
+    paragraphClearFormatting: function(isClearParaPr, isClearTextPr)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [isClearParaPr, isClearTextPr], CTable.prototype.ClearParagraphFormatting);
     },
 
     applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,

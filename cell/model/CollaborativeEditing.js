@@ -363,6 +363,8 @@
                     this.handlers.trigger("unlockDefName");
 //                }
 
+				this.handlers.trigger("updateAllLayoutsLock");
+
 				if (0 === this.m_nUseType)
 					this.m_nUseType = 1;
 			} else {

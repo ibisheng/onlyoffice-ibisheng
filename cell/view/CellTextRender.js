@@ -82,8 +82,9 @@
 		};
 
 		CellTextRender.prototype.calcLineOffset = function (index) {
+			var zoom = this.drawingCtx.getZoom();
 			for (var i = 0, h = 0, l = this.lines; i < index; ++i) {
-				h += l[i].th;
+				h += Asc.round(l[i].th * zoom);
 			}
 			return h;
 		};
@@ -186,8 +187,10 @@
 		};
 
 		CellTextRender.prototype.charOffset = function (pos, lineIndex, h) {
+			var zoom = this.drawingCtx.getZoom();
 			var li = this.lines[lineIndex];
-			return new CharOffset(li.startX + (pos > 0 ? this._calcCharsWidth(li.beg, pos - 1) : 0), h, li.th, lineIndex);
+			return new CharOffset(li.startX + (pos > 0 ? this._calcCharsWidth(li.beg, pos - 1) : 0), Asc.round(
+				h * zoom), Asc.round(li.th * zoom), lineIndex);
 		};
 
 		CellTextRender.prototype.calcCharOffset = function (pos) {

@@ -945,8 +945,8 @@ Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
             var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount, [para_Text, para_Space, para_Tab]);
             var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount, [para_Text, para_Space, para_Tab]);
 
-            this.Get_NextRunElements(RunElementsAfter);
-            this.Get_PrevRunElements(RunElementsBefore);
+            this.GetNextRunElements(RunElementsAfter);
+            this.GetPrevRunElements(RunElementsBefore);
 
             var LeaveCount_2 = LeaveCount / 2;
 

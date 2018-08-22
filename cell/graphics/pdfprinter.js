@@ -34,7 +34,8 @@
 
 (function (window, undefined) {
 
-var vector_koef = 25.4 / 72;
+var vector_koef = 25.4 / 96;
+var pxInPt = 0.75;
 
 function CPdfPrinter(fontManager)
 {
@@ -49,9 +50,6 @@ function CPdfPrinter(fontManager)
     this.InvertTransform = new AscCommon.CMatrix();
 
     this.bIsSimpleCommands = false;
-
-	this.width_1px = 0.75;
-	this.height_1px = 0.75;
 }
 
 CPdfPrinter.prototype =
@@ -102,7 +100,6 @@ CPdfPrinter.prototype =
 
     getZoom : function()
     {
-        console.log("error");
         return 1;
     },
     changeZoom : function()
@@ -345,14 +342,14 @@ CPdfPrinter.prototype =
 	},
 	lineHorPrevPx : function (x1, y, x2)
 	{
-		y -= this.height_1px;
+		y -= pxInPt;
 		this.DocumentRenderer._m(x1 * vector_koef, y * vector_koef);
 		this.DocumentRenderer._l(x2 * vector_koef, y * vector_koef);
 		return this;
 	},
 	lineVerPrevPx : function (x, y1, y2)
 	{
-		x -= this.width_1px;
+		x -= pxInPt;
 		this.DocumentRenderer._m(x * vector_koef, y1 * vector_koef);
 		this.DocumentRenderer._l(x * vector_koef, y2 * vector_koef);
 		return this;

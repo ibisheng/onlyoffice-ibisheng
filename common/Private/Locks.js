@@ -160,11 +160,11 @@ if(typeof CDocument !== "undefined")
 			}
 			case selectionflag_Numbering:
 			{
-				var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-				if (null != NumPr)
+				var oNumPr = this.Selection.Data.CurPara.GetNumPr();
+				if (oNumPr)
 				{
-					var AbstrNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-					AbstrNum.Document_Is_SelectionLocked(CheckType);
+					var oNum = this.GetNumbering().GetNum(oNumPr.NumId);
+					oNum.IsSelectionLocked(CheckType);
 				}
 
 				this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -200,26 +200,59 @@ if(typeof CHeaderFooterController !== "undefined")
     };
 }
 
-CAbstractNum.prototype.Document_Is_SelectionLocked = function(CheckType)
+CNum.prototype.Document_Is_SelectionLocked = function(nCheckType)
 {
-    switch ( CheckType )
-    {
-        case AscCommon.changestype_Paragraph_Content:
-        case AscCommon.changestype_Paragraph_Properties:
+	return this.IsSelectionLocked(nCheckType);
+};
+CNum.prototype.IsSelectionLocked = function(nCheckType)
+{
+	switch (nCheckType)
+	{
+		case AscCommon.changestype_Paragraph_Content:
+		case AscCommon.changestype_Paragraph_Properties:
 		case AscCommon.changestype_Paragraph_AddText:
 		case AscCommon.changestype_ContentControl_Add:
-        {
-            this.Lock.Check( this.Get_Id() );
-            break;
-        }
-        case AscCommon.changestype_Document_Content:
-        case AscCommon.changestype_Document_Content_Add:
-        case AscCommon.changestype_Image_Properties:
-        {
-            AscCommon.CollaborativeEditing.Add_CheckLock(true);
-            break;
-        }
-    }
+		{
+			this.Lock.Check(this.Get_Id());
+			break;
+		}
+		case AscCommon.changestype_Document_Content:
+		case AscCommon.changestype_Document_Content_Add:
+		case AscCommon.changestype_Image_Properties:
+		{
+			AscCommon.CollaborativeEditing.Add_CheckLock(true);
+			break;
+		}
+	}
+
+	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+	if (oAbstractNum)
+		oAbstractNum.IsSelectionLocked(nCheckType);
+};
+CAbstractNum.prototype.Document_Is_SelectionLocked = function(nCheckType)
+{
+	return this.IsSelectionLocked(nCheckType);
+};
+CAbstractNum.prototype.IsSelectionLocked = function(nCheckType)
+{
+	switch (nCheckType)
+	{
+		case AscCommon.changestype_Paragraph_Content:
+		case AscCommon.changestype_Paragraph_Properties:
+		case AscCommon.changestype_Paragraph_AddText:
+		case AscCommon.changestype_ContentControl_Add:
+		{
+			this.Lock.Check(this.Get_Id());
+			break;
+		}
+		case AscCommon.changestype_Document_Content:
+		case AscCommon.changestype_Document_Content_Add:
+		case AscCommon.changestype_Image_Properties:
+		{
+			AscCommon.CollaborativeEditing.Add_CheckLock(true);
+			break;
+		}
+	}
 };
 
 if(typeof CGraphicObjects !== "undefined")
@@ -363,11 +396,11 @@ CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
                 }
                 case selectionflag_Numbering:
                 {
-                    var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                    if ( null != NumPr )
+                    var oNumPr = this.Selection.Data.CurPara.GetNumPr();
+                    if (oNumPr)
                     {
-                        var AbstrNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
-                        AbstrNum.Document_Is_SelectionLocked(CheckType);
+                    	var oNum = this.GetNumbering().GetNum(oNumPr.NumId);
+						oNum.IsSelectionLocked(CheckType);
                     }
 
                     this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -440,7 +473,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
             if ( true != this.Selection.Use && true == this.IsCursorAtBegin() )
             {
                 var Pr = this.Get_CompiledPr2(false).ParaPr;
-                if ( undefined != this.Numbering_Get() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001 )
+                if ( undefined != this.GetNumPr() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001 )
                 {
                     // Надо проверить только текущий параграф, а это будет сделано далее
                 }
@@ -974,7 +1007,7 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_SlideBg)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = this.GetSelectedSlides();
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 var check_obj =
@@ -988,7 +1021,7 @@ if(typeof CPresentation !== "undefined")
         }
         if(CheckType === AscCommon.changestype_SlideHide)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = AdditionalData;
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 var check_obj =
@@ -1005,7 +1038,7 @@ if(typeof CPresentation !== "undefined")
         {
             if(!AdditionalData || !AdditionalData.All)
             {
-                var aSelectedSlides = this.Api.WordControl.Thumbnails.GetSelectedArray();
+                var aSelectedSlides = this.GetSelectedSlides();
                 for(var i = 0; i < aSelectedSlides.length; ++i){
                     var check_obj =
                         {
@@ -1051,7 +1084,7 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_RemoveSlide)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = AdditionalData;
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 if(this.Slides[selected_slides[i]].isLockedObject())
@@ -1082,7 +1115,7 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_Layout)
         {
-            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            var selected_slides = this.GetSelectedSlides();
             for(var i = 0; i < selected_slides.length; ++i)
             {
                 var check_obj =

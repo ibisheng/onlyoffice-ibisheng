@@ -64,9 +64,21 @@ CDocumentControllerBase.prototype.Get_DrawingDocument = function()
  * @param {boolean} bReturnHdrFtr Если true, тогда возвращаем ссылку на колонтитул.
  * @returns {boolean | CHeaderFooter}
  */
-CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+CDocumentControllerBase.prototype.IsHdrFtr = function(bReturnHdrFtr)
 {
 	if (bReturnHdrFtr)
+		return null;
+
+	return false;
+};
+/**
+ * Является ли данный класс контроллером для сносок
+ * @param {boolean} bReturnFootnote Если true, тогда возвращаем ссылку на колонтитул
+ * @returns {boolean | CFootEndnote}
+ */
+CDocumentControllerBase.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if (bReturnFootnote)
 		return null;
 
 	return false;
@@ -76,7 +88,7 @@ CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnHdrFtr)
  * @param {boolean} bReturnShape Если true, тогда возвращаем ссылку на автофигуру.
  * @returns {boolean | CShape}
  */
-CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnShape)
+CDocumentControllerBase.prototype.Is_DrawingShape = function(bReturnShape)
 {
 	if (bReturnShape)
 		return null;
@@ -332,9 +344,11 @@ CDocumentControllerBase.prototype.EditChart = function(Chart){};
  */
 CDocumentControllerBase.prototype.AddInlineTable = function(nCols, nRows){};
 /**
- * Очищаем настройки параграфа.
+ * Очищаем форматирование внутри селекта
+ * {boolean} [isClearParaPr=true] Очищать ли настройки параграфа
+ * {boolean} [isClearTextPr=true] Очищать ли настройки текста
  */
-CDocumentControllerBase.prototype.ClearParagraphFormatting = function(){};
+CDocumentControllerBase.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr){};
 /**
  * Добавляем элемент в параграф.
  * @param oItem
@@ -436,11 +450,6 @@ CDocumentControllerBase.prototype.SetParagraphTabs = function(Tabs){};
  * @param Ind
  */
 CDocumentControllerBase.prototype.SetParagraphIndent = function(Ind){};
-/**
- * Установить тип нумерации параграфа.
- * @param NumInfo
- */
-CDocumentControllerBase.prototype.SetParagraphNumbering = function(NumInfo){};
 /**
  * Установить заливку параграфа.
  * @param Shd
@@ -585,6 +594,11 @@ CDocumentControllerBase.prototype.PasteFormatting = function(TextPr, ParaPr){};
  * @returns {boolean}
  */
 CDocumentControllerBase.prototype.IsSelectionUse = function(){return false;};
+/**
+ * Проверяем выделена ли у нас нумерация в данный момент
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.IsNumberingSelection = function(){return false;};
 /**
  * Проверяем выделен ли именно текст сейчас.
  * @returns {boolean}
@@ -747,7 +761,7 @@ CDocumentControllerBase.prototype.RestoreDocumentStateAfterLoadChanges = functio
 CDocumentControllerBase.prototype.GetColumnSize = function(){return {W : 0, H : 0};};
 /**
  * Получаем настройки текущей секции
- * @returns {CSectionPr?}
+ * @returns {?CSectionPr}
  */
 CDocumentControllerBase.prototype.GetCurrentSectionPr = function(){return null;};
 /**
@@ -762,3 +776,8 @@ CDocumentControllerBase.prototype.AddContentControl = function(nContentControlTy
  * Получаем стиль по выделенному фрагменту
  */
 CDocumentControllerBase.prototype.GetStyleFromFormatting = function(){return null;};
+/**
+ * Вплоть до заданного параграфа ищем последнюю похожую нумерацию
+ * @param oContinueEngine {CDocumentNumberingContinueEngine}
+ */
+CDocumentControllerBase.prototype.GetSimilarNumbering = function(oContinueEngine){};

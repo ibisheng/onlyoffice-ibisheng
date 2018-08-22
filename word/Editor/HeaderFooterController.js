@@ -72,9 +72,9 @@ CHdrFtrController.prototype.AddInlineTable = function(Cols, Rows)
 {
 	this.HdrFtr.AddInlineTable(Cols, Rows);
 };
-CHdrFtrController.prototype.ClearParagraphFormatting = function()
+CHdrFtrController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.HdrFtr.ClearParagraphFormatting();
+	this.HdrFtr.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 };
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
@@ -165,10 +165,6 @@ CHdrFtrController.prototype.SetParagraphTabs = function(Tabs)
 CHdrFtrController.prototype.SetParagraphIndent = function(Ind)
 {
 	this.HdrFtr.SetParagraphIndent(Ind);
-};
-CHdrFtrController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	this.HdrFtr.SetParagraphNumbering(NumInfo);
 };
 CHdrFtrController.prototype.SetParagraphShd = function(Shd)
 {
@@ -281,6 +277,10 @@ CHdrFtrController.prototype.PasteFormatting = function(TextPr, ParaPr)
 CHdrFtrController.prototype.IsSelectionUse = function()
 {
 	return this.HdrFtr.IsSelectionUse();
+};
+CHdrFtrController.prototype.IsNumberingSelection = function()
+{
+	return this.HdrFtr.IsNumberingSelection();
 };
 CHdrFtrController.prototype.IsTextSelectionUse = function()
 {
@@ -504,4 +504,8 @@ CHdrFtrController.prototype.AddContentControl = function(nContentControlType)
 CHdrFtrController.prototype.GetStyleFromFormatting = function()
 {
 	return this.HdrFtr.GetStyleFromFormatting();
+};
+CHdrFtrController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	this.HdrFtr.GetSimilarNumbering(oEngine)
 };

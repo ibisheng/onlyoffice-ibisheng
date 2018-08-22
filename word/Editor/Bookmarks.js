@@ -266,7 +266,7 @@ CBookmarksManager.prototype.EndCollectingProcess = function()
 };
 CBookmarksManager.prototype.GetBookmarkById = function(Id)
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -278,7 +278,7 @@ CBookmarksManager.prototype.GetBookmarkById = function(Id)
 };
 CBookmarksManager.prototype.GetBookmarkByName = function(sName)
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -291,7 +291,7 @@ CBookmarksManager.prototype.GetBookmarkByName = function(sName)
 };
 CBookmarksManager.prototype.HaveBookmark = function(sName)
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -302,26 +302,26 @@ CBookmarksManager.prototype.HaveBookmark = function(sName)
 
 	return false;
 };
-CBookmarksManager.prototype.private_CheckValidate = function()
+CBookmarksManager.prototype.Update = function()
 {
 	if (this.NeedUpdate)
 		this.LogicDocument.UpdateBookmarks();
 };
 CBookmarksManager.prototype.GetNewBookmarkId = function()
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	return ("" + ++this.IdCounter);
 };
 CBookmarksManager.prototype.GetNewBookmarkNameTOC = function()
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	return ("_Toc" + ++this.IdCounterTOC);
 };
 CBookmarksManager.prototype.RemoveTOCBookmarks = function()
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -335,9 +335,115 @@ CBookmarksManager.prototype.RemoveTOCBookmarks = function()
 		}
 	}
 };
+CBookmarksManager.prototype.GetCount = function()
+{
+	this.Update();
 
+	return this.Bookmarks.length;
+};
+CBookmarksManager.prototype.GetName = function(nIndex)
+{
+	this.Update();
 
+	if (nIndex < 0 || this.Index >= this.Bookmarks.length)
+		return "";
+
+	return this.Bookmarks[nIndex][0].GetBookmarkName();
+};
+CBookmarksManager.prototype.GetId = function(nIndex)
+{
+	this.Update();
+
+	if (nIndex < 0 || this.Index >= this.Bookmarks.length)
+		return "";
+
+	return this.Bookmarks[nIndex][0].GetBookmarkId();
+};
+CBookmarksManager.prototype.RemoveBookmark = function(sName)
+{
+	this.Update();
+
+	if (!this.GetBookmarkByName(sName))
+		return;
+
+	this.LogicDocument.RemoveBookmark(sName);
+};
+CBookmarksManager.prototype.AddBookmark = function(sName)
+{
+	this.Update();
+
+	if (this.GetBookmarkByName(sName))
+		return;
+
+	this.LogicDocument.AddBookmark(sName);
+};
+CBookmarksManager.prototype.GoToBookmark = function(sName)
+{
+	this.Update();
+
+	var oBookmark = this.GetBookmarkByName(sName);
+	if (oBookmark)
+		oBookmark[0].GoToBookmark();
+};
+CBookmarksManager.prototype.IsHiddenBookmark = function(sName)
+{
+	return (sName && '_' === sName.charAt(0));
+};
+CBookmarksManager.prototype.IsInternalUseBookmark = function(sName)
+{
+	return (sName === "_GoBack");
+};
+CBookmarksManager.prototype.CheckNewBookmarkName = function(sName)
+{
+	if (!sName)
+		return false;
+
+	return (sName === XRegExp.match(sName, new XRegExp('(\\pL)(\\pL|\_|\\pN){0,39}')));
+};
+CBookmarksManager.prototype.GetNameForHeadingBookmark = function(oParagraph)
+{
+	if (!oParagraph)
+		return "";
+
+	var sText = oParagraph.GetText();
+
+	var nPos = 0;
+	while (nPos < sText.length)
+	{
+		var nChar = sText.charCodeAt(nPos);
+		if (0x0020 !== nChar && 0x0009 !== nChar)
+			break;
+	}
+
+	var sName = "";
+	for (var nIndex = nPos, nLen = Math.min(sText.length, nPos + 10); nIndex < nLen; ++nIndex)
+	{
+		var nChar = sText.charCodeAt(nIndex);
+		if (0x0020 === nChar || 0x0009 === nChar)
+			sName += "_";
+		else
+			sName += sText.charAt(nIndex);
+	}
+
+	if (!sName)
+		return "";
+
+	return "_" + sName;
+};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CParagraphBookmark = CParagraphBookmark;
+CBookmarksManager.prototype['asc_GetCount']              = CBookmarksManager.prototype.GetCount;
+CBookmarksManager.prototype['asc_GetName']               = CBookmarksManager.prototype.GetName;
+CBookmarksManager.prototype['asc_GetId']                 = CBookmarksManager.prototype.GetId;
+CBookmarksManager.prototype['asc_AddBookmark']           = CBookmarksManager.prototype.AddBookmark;
+CBookmarksManager.prototype['asc_RemoveBookmark']        = CBookmarksManager.prototype.RemoveBookmark;
+CBookmarksManager.prototype['asc_GoToBookmark']          = CBookmarksManager.prototype.GoToBookmark;
+CBookmarksManager.prototype['asc_HaveBookmark']          = CBookmarksManager.prototype.HaveBookmark;
+CBookmarksManager.prototype['asc_IsHiddenBookmark']      = CBookmarksManager.prototype.IsHiddenBookmark;
+CBookmarksManager.prototype['asc_IsInternalUseBookmark'] = CBookmarksManager.prototype.IsInternalUseBookmark;
+CBookmarksManager.prototype['asc_CheckNewBookmarkName']  = CBookmarksManager.prototype.CheckNewBookmarkName;
+
+
+

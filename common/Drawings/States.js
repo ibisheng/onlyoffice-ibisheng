@@ -122,8 +122,7 @@ StartAddNewShape.prototype =
 
     onMouseUp: function(e, x, y)
     {
-        var bView = this.drawingObjects.isViewMode() === true || (this.drawingObjects.isEditSignatureMode && this.drawingObjects.isEditSignatureMode());
-        if(this.bStart && !bView)
+        if(this.bStart && this.drawingObjects.canEdit())
         {
             if(this.drawingObjects.drawingObjects.objectLocker)
             {
@@ -208,7 +207,10 @@ StartAddNewShape.prototype =
         this.drawingObjects.updateOverlay();
         if(Asc["editor"])
         {
-            Asc["editor"].asc_endAddShape();
+            if(!e.fromWindow)
+            {
+                Asc["editor"].asc_endAddShape();
+            }
         }
         else if(editor && editor.sync_EndAddShape)
         {
@@ -498,7 +500,7 @@ ChangeAdjState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.isViewMode() === false)
+        if(this.drawingObjects.canEdit())
         {
             var trackObjects = [].concat(this.drawingObjects.arrTrackObjects);
             var drawingObjects = this.drawingObjects;
@@ -595,7 +597,7 @@ RotateState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.isViewMode() === false && !(this.drawingObjects.isEditSignatureMode && this.drawingObjects.isEditSignatureMode()))
+        if(this.drawingObjects.canEdit())
         {
             var tracks = [].concat(this.drawingObjects.arrTrackObjects);
             var group = this.group;

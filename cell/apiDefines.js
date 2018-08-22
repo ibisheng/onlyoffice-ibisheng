@@ -115,7 +115,8 @@ var c_oAscMouseMoveType = {
   Comment: 2,
   LockedObject: 3,
   ResizeColumn: 4,
-  ResizeRow: 5
+  ResizeRow: 5,
+  Filter: 6
 };
 
 var c_oAscMouseMoveLockedObjectType = {
@@ -324,6 +325,7 @@ var c_oAscFormulaRangeBorderColor = [
   var c_oAscLockNameFrozenPane = "frozenPane";
   var c_oAscLockNameTabColor = "tabColor";
   var c_oAscLockAddSheet = "addSheet";
+  var c_oAscLockLayoutOptions = "layoutOptions";
 
 var c_oAscGetDefinedNamesList = {
   Worksheet: 0,
@@ -395,6 +397,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
   window['AscCommonExcel'].c_oAscLockAddSheet = c_oAscLockAddSheet;
+  window['AscCommonExcel'].c_oAscLockLayoutOptions = c_oAscLockLayoutOptions;
   window['AscCommonExcel'].c_kMaxPrintPages = c_kMaxPrintPages;
   window['AscCommonExcel'].filteringMode = true;
 
@@ -459,6 +462,7 @@ var c_oAscPopUpSelectorType = {
   prot['LockedObject'] = prot.LockedObject;
   prot['ResizeColumn'] = prot.ResizeColumn;
   prot['ResizeRow'] = prot.ResizeRow;
+  prot['Filter'] = prot.Filter;
   window['Asc']['c_oAscMouseMoveLockedObjectType'] = window['Asc'].c_oAscMouseMoveLockedObjectType = c_oAscMouseMoveLockedObjectType;
   prot = c_oAscMouseMoveLockedObjectType;
   prot['None'] = prot.None;
@@ -526,6 +530,7 @@ var c_oAscPopUpSelectorType = {
   prot['DynamicFilter'] = prot.DynamicFilter;
   prot['Top10'] = prot.Top10;
   prot['Filters'] = prot.Filters;
+  prot['None'] = prot.None;
   window['Asc']['c_oAscFindLookIn'] = window['Asc'].c_oAscFindLookIn = c_oAscFindLookIn;
   prot = c_oAscFindLookIn;
   prot['Formulas'] = prot.Formulas;

@@ -4170,6 +4170,10 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     {
         _result_shape_prop.bFromImage = false;
     }
+    else
+    {
+        _result_shape_prop.bFromImage = true;
+    }
     if(shapeProp1.locked || shapeProp2.locked)
     {
         _result_shape_prop.locked = true;
@@ -9543,6 +9547,12 @@ function CreateAscFill(unifill)
                 ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
                 ret.fill.PathType = 0;
             }
+            else
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+                ret.fill.LinearAngle = 0;
+                ret.fill.LinearScale = false;
+            }
 
             break;
         }
@@ -9754,8 +9764,11 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                     var _angle = _fill.LinearAngle;
                     var _scale = _fill.LinearScale;
 
-                    if (!ret.fill.lin)
+                    if (!ret.fill.lin){
                         ret.fill.lin = new GradLin();
+                        ret.fill.lin.angle = 0;
+                        ret.fill.lin.scale = false;
+                    }
 
                     if (undefined != _angle)
                         ret.fill.lin.angle = _angle;
@@ -10234,7 +10247,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
 
     function builder_CreateChart(nW, nH, sType, aCatNames, aSeriesNames, aSeries, nStyleIndex){
-        var settings = new AscCommon.asc_ChartSettings();
+        var settings = new Asc.asc_ChartSettings();
         switch (sType)
         {
             case "bar" :

@@ -112,7 +112,14 @@
         "../word/Editor/Serialize2.js",
         "../word/Editor/Styles.js",
 		"../slide/Editor/Format/StylesPrototype.js",
-        "../word/Editor/Numbering.js",
+		"../word/Editor/Numbering/NumberingCommon.js",
+		"../word/Editor/Numbering/NumberingLvl.js",
+		"../word/Editor/Numbering/AbstractNum.js",
+		"../word/Editor/Numbering/AbstractNumChanges.js",
+		"../word/Editor/Numbering/Num.js",
+		"../word/Editor/Numbering/NumChanges.js",
+		"../word/Editor/Numbering/PresentationNumbering.js",
+		"../word/Editor/Numbering/Numbering.js",
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/Rulers.js",
         "../word/Editor/Table.js",
@@ -145,8 +152,6 @@
         "../word/Editor/Styles.js",
         "../word/Editor/StylesChanges.js",
 		"../word/Editor/RevisionsChange.js",
-        "../word/Editor/Numbering.js",
-        "../word/Editor/NumberingChanges.js",
         "../word/Editor/ParagraphContent.js",
         "../word/Editor/ParagraphContentBase.js",
         "../word/Editor/Paragraph/ParaTextPr.js",
@@ -243,7 +248,6 @@
         "../slide/Native/Wrappers/api.js",
         "../slide/Native/Wrappers/HtmlPage.js",
         "../slide/Native/Wrappers/DrawingDocument.js",
-		"../cell/native/TextDrawer.js",
         "../slide/Native/Wrappers/native.js"
       ],
       "exclude_mobile": [
@@ -254,8 +258,7 @@
         "../common/FontsFreeType/FontFile.js",
         "../common/FontsFreeType/GlyphString.js",
         "../common/FontsFreeType/FontManager.js",
-        "../common/FontsFreeType/TextMeasurer.js",
-		"../common/Drawings/TextDrawer.js"
+        "../common/FontsFreeType/TextMeasurer.js"
       ],
       "dst": "../slide",
       "externs": [

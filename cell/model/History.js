@@ -118,6 +118,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_ChangeValueUndo = 23;
 	window['AscCH'].historyitem_Cell_Num = 24;
 	window['AscCH'].historyitem_Cell_SetPivotButton = 25;
+	window['AscCH'].historyitem_Cell_RemoveSharedFormula = 26;
 
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;
@@ -146,6 +147,20 @@ function (window, undefined) {
 	window['AscCH'].historyitem_PivotTable_StyleShowRowStripes = 4;
 	window['AscCH'].historyitem_PivotTable_StyleShowColStripes = 5;
 
+	window['AscCH'].historyitem_SharedFormula_ChangeFormula = 1;
+	window['AscCH'].historyitem_SharedFormula_ChangeShared = 2;
+
+	window['AscCH'].historyitem_Layout_Left = 1;
+	window['AscCH'].historyitem_Layout_Right = 2;
+	window['AscCH'].historyitem_Layout_Top = 3;
+	window['AscCH'].historyitem_Layout_Bottom = 4;
+	window['AscCH'].historyitem_Layout_Width = 5;
+	window['AscCH'].historyitem_Layout_Height = 6;
+	window['AscCH'].historyitem_Layout_FitToWidth = 7;
+	window['AscCH'].historyitem_Layout_FitToHeight = 8;
+	window['AscCH'].historyitem_Layout_GridLines = 9;
+	window['AscCH'].historyitem_Layout_Headings = 10;
+	window['AscCH'].historyitem_Layout_Orientation = 11;
 
 
 function CHistory()
@@ -191,6 +206,8 @@ CHistory.prototype.Clear = function()
   this.ForceSave= false;
   this.UserSavedIndex = null;
 
+	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
+	this.workbook.handlers.trigger("toggleAutoCorrectOptions");
 	this._sendCanUndoRedo();
 };
 /** @returns {boolean} */
@@ -480,10 +497,8 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 		
-	if(!window['AscCommon'].g_specialPasteHelper.pasteStart)
-	{
-		this.workbook.handlers.trigger("hideSpecialPasteOptions");
-	}
+
+	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 	this.workbook.handlers.trigger("toggleAutoCorrectOptions", null, true);
 };
 CHistory.prototype.Redo = function()
@@ -739,24 +754,19 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 			AscCommon.CollaborativeEditing.Add_NewDC(Class.Class);
 		}
 	}
+	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
+	this.workbook.handlers.trigger("toggleAutoCorrectOptions");
 };
 
 CHistory.prototype._sendCanUndoRedo = function()
 {
+	if (this.workbook.bCollaborativeChanges) {
+		return;
+	}
+
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
-	//скрываю кнопку специальной вставки при каждом действии/undoredo
-	//при выполнении специальной вставки и при сохранении(-1 !== this.Index) не скрываю кнопку 
-	if(!window['AscCommon'].g_specialPasteHelper.pasteStart && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
-	{
-		this.workbook.handlers.trigger("hideSpecialPasteOptions");
-	}
-	//в данном случае не показываем опции авторазвертывания таблиц
-	if(-1 === this.Index)
-	{
-		this.workbook.handlers.trigger("toggleAutoCorrectOptions");
-	}
 };
 CHistory.prototype.SetSelection = function(range)
 {

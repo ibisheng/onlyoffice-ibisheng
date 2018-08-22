@@ -458,13 +458,18 @@ CHeaderFooter.prototype =
         return false;
     },
 
-    Is_HdrFtr : function(bReturnHdrFtr)
-    {
-        if ( true === bReturnHdrFtr )
-            return this;
+    IsHdrFtr : function(bReturnHdrFtr)
+	{
+		if (true === bReturnHdrFtr)
+			return this;
 
-        return true;
-    },
+		return true;
+	},
+
+	IsFootnote : function(bReturnFootnote)
+	{
+		return (bReturnFootnote ? null : false);
+	},
 
     Get_ParentTextTransform : function()
     {
@@ -499,6 +504,11 @@ CHeaderFooter.prototype =
 	IsSelectionUse : function()
 	{
 		return this.Content.IsSelectionUse();
+	},
+
+	IsNumberingSelection : function()
+	{
+		return this.Content.IsNumberingSelection();
 	},
 
 	IsTextSelectionUse : function()
@@ -706,10 +716,10 @@ CHeaderFooter.prototype =
 		this.Content.AddToParagraph(ParaItem, bRecalculate);
 	},
 
-	ClearParagraphFormatting : function()
-    {
-        this.Content.ClearParagraphFormatting();
-    },
+	ClearParagraphFormatting : function(isClearParaPr, isClearTextPr)
+	{
+		this.Content.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
+	},
 
 	PasteFormatting : function(TextPr, ParaPr, ApplyPara)
 	{
@@ -830,11 +840,6 @@ CHeaderFooter.prototype =
 	SetParagraphIndent : function(Ind)
 	{
 		return this.Content.SetParagraphIndent(Ind);
-	},
-
-	SetParagraphNumbering : function(NumInfo)
-	{
-		return this.Content.SetParagraphNumbering(NumInfo);
 	},
 
 	SetParagraphShd : function(Shd)
@@ -1800,6 +1805,14 @@ CHeaderFooterController.prototype =
 		return false;
 	},
 
+	IsNumberingSelection : function()
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.IsNumberingSelection();
+
+		return false;
+	},
+
 	IsTextSelectionUse : function()
 	{
 		if (null != this.CurHdrFtr)
@@ -1913,11 +1926,11 @@ CHeaderFooterController.prototype =
 			return this.CurHdrFtr.AddToParagraph(ParaItem, bRecalculate);
 	},
 
-	ClearParagraphFormatting : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.ClearParagraphFormatting();
-    },
+	ClearParagraphFormatting : function(isClearParaPr, isClearTextPr)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.ClearParagraphFormatting();
+	},
 
 	PasteFormatting : function(TextPr, ParaPr, ApplyPara)
 	{
@@ -2013,12 +2026,6 @@ CHeaderFooterController.prototype =
 	{
 		if (null != this.CurHdrFtr)
 			return this.CurHdrFtr.SetParagraphIndent(Ind);
-	},
-
-	SetParagraphNumbering : function(NumInfo)
-	{
-		if (null != this.CurHdrFtr)
-			return this.CurHdrFtr.SetParagraphNumbering(NumInfo);
 	},
 
 	SetParagraphShd : function(Shd)
@@ -2562,6 +2569,11 @@ CHeaderFooterController.prototype.GetStyleFromFormatting = function()
         return this.CurHdrFtr.Content.GetStyleFromFormatting();
 
     return null;
+};
+CHeaderFooterController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	if (this.CurHdrFtr)
+		this.CurHdrFtr.Content.GetSimilarNumbering(oEngine)
 };
 CHeaderFooterController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {

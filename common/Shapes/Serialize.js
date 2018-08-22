@@ -1210,7 +1210,7 @@ function BinaryPPTYLoader()
                                         case 0:
                                         {
                                             var _unifill = this.ReadUniFill();
-                                            if (_unifill.fill !== undefined && _unifill.fill != null)
+                                            if (_unifill && _unifill.fill !== undefined && _unifill.fill != null)
                                             {
                                                 if (undefined === _style.TablePr.Shd || null == _style.TablePr.Shd)
                                                 {
@@ -1495,7 +1495,7 @@ function BinaryPPTYLoader()
                                         case 0:
                                         {
                                             var _unifill = this.ReadUniFill();
-                                            if (_unifill.fill !== undefined && _unifill.fill != null)
+                                            if (_unifill && _unifill.fill !== undefined && _unifill.fill != null)
                                             {
                                                 if (undefined === _part.TableCellPr.Shd || null == _part.TableCellPr.Shd)
                                                 {
@@ -2516,6 +2516,9 @@ function BinaryPPTYLoader()
         }
 
         s.Seek2(read_end);
+        if(!uni_fill.fill){
+            return null;
+        }
         return uni_fill;
     }
 
@@ -5379,6 +5382,9 @@ function BinaryPPTYLoader()
             switch (nSquare){
                 case 0:
                 {
+                    oCopyBodyPr = shape.txBody.bodyPr ? shape.txBody.bodyPr.createDuplicate() : new AscFormat.CBodyPr();
+                    oCopyBodyPr.rot = (rot2/AscFormat.cToRad + 0.5) >> 0;
+                    shape.txBody.setBodyPr(oCopyBodyPr);
                     break;
                 }
                 case 1:
@@ -5390,6 +5396,9 @@ function BinaryPPTYLoader()
                 }
                 case 2:
                 {
+                    oCopyBodyPr = shape.txBody.bodyPr ? shape.txBody.bodyPr.createDuplicate() : new AscFormat.CBodyPr();
+                    oCopyBodyPr.rot = (rot2/AscFormat.cToRad + 0.5) >> 0;
+                    shape.txBody.setBodyPr(oCopyBodyPr);
                     break;
                 }
                 case 3:
@@ -7019,7 +7028,7 @@ function BinaryPPTYLoader()
                 {
                     var _unifill = this.ReadUniFill();
 
-                    if (_unifill.fill !== undefined && _unifill.fill != null)
+                    if (_unifill && _unifill.fill !== undefined && _unifill.fill != null)
                     {
                         props.Shd = new CDocumentShd();
                         props.Shd.Value = c_oAscShdClear;
@@ -7134,7 +7143,7 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     var _unifill = this.ReadUniFill();
-                    if (_unifill.fill !== undefined && _unifill.fill != null)
+                    if (_unifill && _unifill.fill !== undefined && _unifill.fill != null)
                     {
                         obj.props.Shd = new CDocumentShd();
                         obj.props.Shd.Value = c_oAscShdClear;
@@ -7444,7 +7453,7 @@ function BinaryPPTYLoader()
                 case 1:
                 {
                     var oUniFill = this.ReadUniFill();
-                    if(oUniFill.fill){
+                    if(oUniFill && oUniFill.fill){
                         rPr.Unifill = oUniFill;
                     }
                     break;
@@ -7879,7 +7888,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    para_pr.DefaultTabSize = s.GetLong()/36000;
+                    para_pr.DefaultTab = s.GetLong()/36000;
                     break;
                 }
                 case 2:

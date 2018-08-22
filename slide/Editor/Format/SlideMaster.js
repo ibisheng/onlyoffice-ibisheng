@@ -561,6 +561,10 @@ function CMasterThumbnailDrawer()
 
     this.GetThumbnail = function(_master, use_background, use_master_shapes)
     {
+        if(window["NATIVE_EDITOR_ENJINE"])
+        {
+            return "";
+        }
         var h_px = 38;
         var w_px = 85;//(this.WidthMM * h_px / this.HeightMM) >> 0;
 
@@ -710,10 +714,12 @@ function CMasterThumbnailDrawer()
 
         var _textPr1 = new CTextPr();
         _textPr1.FontFamily = { Name : _theme.themeElements.fontScheme.majorFont.latin, Index : -1 };
+        _textPr1.RFonts.Ascii = {Name: _theme.themeElements.fontScheme.majorFont.latin, Index: -1};
         _textPr1.FontSize = 18;
         _textPr1.Color = new CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
         var _textPr2 = new CTextPr();
         _textPr2.FontFamily = { Name : _theme.themeElements.fontScheme.minorFont.latin, Index : -1 };
+        _textPr2.RFonts.Ascii = {Name: _theme.themeElements.fontScheme.minorFont.latin, Index: -1};
         _textPr2.FontSize = 18;
         _textPr2.Color = new CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
 
