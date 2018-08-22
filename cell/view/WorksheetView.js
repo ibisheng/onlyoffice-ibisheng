@@ -3099,7 +3099,6 @@
 		var t = this;
 		var ctx = drawingCtx || this.drawingCtx;
 		var c = this.cols;
-		var r = this.rows;
 
 		var objectMergedCells = {}; // Двумерный map вида строка-колонка {1: {1: range, 4: range}}
 		var h, i, mergeCellInfo, startCol, endRow, endCol, col, row;
