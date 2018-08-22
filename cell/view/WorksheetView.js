@@ -2080,13 +2080,13 @@
         var vr = this.visibleRange;
         var r = this.rows;
         var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : this.headersLeft;
-        var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : r[vr.r1].top - this.cellsTop;
+        var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : this._getRowTop(vr.r1) - this.cellsTop;
         if (null === drawingCtx && this.topLeftFrozenCell && undefined === offsetYForDraw) {
             var rFrozen = this.topLeftFrozenCell.getRow0();
             if (start < vr.r1) {
-                offsetY = r[0].top - this.cellsTop;
+                offsetY = 0;
             } else {
-                offsetY -= r[rFrozen].top - r[0].top;
+                offsetY -= this._getRowTop(rFrozen) - this.cellsTop;
             }
         }
 
@@ -2103,8 +2103,11 @@
         this._setFont(drawingCtx, this.model.getDefaultFontName(), this.model.getDefaultFontSize());
 
         // draw row headers
+        var t = this._getRowTop(start) - offsetY, h;
         for (var i = start; i <= end; ++i) {
-            this._drawHeader(drawingCtx, offsetX, r[i].top - offsetY, this.headersWidth, r[i].height, style, false, i);
+			h = this._getRowHeight(i);
+            this._drawHeader(drawingCtx, offsetX, t, this.headersWidth, h, style, false, i);
+			t += h;
         }
     };
 
@@ -2152,11 +2155,11 @@
                     // Отрисуем только границу
                     h = 1;
                     // Возможно мы уже рисовали границу невидимой строки (для последовательности невидимых)
-                    if (0 < index && 0 === this.rows[index - 1].height) {
+                    if (0 < index && 0 === this._getRowHeight(index - 1)) {
                         // Мы уже нарисовали border для невидимой границы
                         return;
                     }
-                } else if (0 < index && 0 === this.rows[index - 1].height) {
+                } else if (0 < index && this._getRowHeight(index - 1)) {
                     // Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
                     h -= 1;
                     y += 1;
@@ -2206,7 +2209,9 @@
         var text = isColHeader ? this._getColumnTitle(index) : this._getRowTitle(index);
         var sr = this.stringRender;
         var tm = this._roundTextMetrics(sr.measureString(text));
-        var bl = y2WithoutBorder - Asc.round((isColHeader ? this.defaultRowDescender : this.rows[index].descender) * this.getZoom());
+		var bl = y2WithoutBorder - Asc.round(
+			((isColHeader || index >= this.rows.length) ? this.defaultRowDescender : this.rows[index].descender) *
+			this.getZoom());
         var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
         var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
 
