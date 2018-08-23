@@ -1727,7 +1727,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 14:
                     {
-                        _imagePr.ChangeLevel = _params[_current.pos++];
+                        _imagePr.put_ChangeLevel(parseInt(_params[_current.pos++]));
                         break;
                     }
                     case 15:
@@ -1764,47 +1764,59 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     {
                         var bIsNeed = _params[_current.pos++];
 
-                        if (bIsNeed)
-                        {
-                            var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
-                            if (currImage && currImage.length) {
+                        if (bIsNeed) {
+                            var properties = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
+                            if (properties) {
+                                for (var i = 0; i < properties.length; i++) {
+                                    if (undefined !== properties[i].ImageUrl && null != properties[i].ImageUrl) {                                
+                                        var section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+                                        var page_width = AscCommon.Page_Width;
+                                        var page_height = AscCommon.Page_Height;
+                                        var page_x_left_margin = AscCommon.X_Left_Margin;
+                                        var page_y_top_margin = AscCommon.Y_Top_Margin;
+                                        var page_x_right_margin = AscCommon.X_Right_Margin;
+                                        var page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
 
-                                var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
+                                        if (section_select) {
+                                            if (section_select.W) {
+                                                page_width = section_select.W;
+                                            }
 
-                                var _w = _originSize[0];
-                                var _h = _originSize[1];
+                                            if (section_select.H) {
+                                                page_height = section_select.H;
+                                            }
+                                        }
+                 
+                                        var boundingWidth  = Math.max(1, page_width  - (page_x_left_margin + page_x_right_margin));
+                                        var boundingHeight = Math.max(1, page_height - (page_y_top_margin  + page_y_bottom_margin));
 
-                                // сбрасываем урл
-                                _imagePr.ImageUrl = undefined;
+                                        var size = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](properties[i].ImageUrl);
 
-                                var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-                                var _page_width = AscCommon.Page_Width;
-                                var _page_height = AscCommon.Page_Height;
-                                var _page_x_left_margin = AscCommon.X_Left_Margin;
-                                var _page_y_top_margin = AscCommon.Y_Top_Margin;
-                                var _page_x_right_margin = AscCommon.X_Right_Margin;
-                                var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
+                                        var w = (undefined !== size[0]) ? Math.max(size[0] * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                        var h = (undefined !== size[1]) ? Math.max(size[1] * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                        
+                                        var mW = boundingWidth  / w;
+                                        var mH = boundingHeight / h;
 
-                                if (_section_select)
-                                {
-                                    if (_section_select.W)
-                                        _page_width = _section_select.W;
+                                        if (mH < mW) {
+                                            boundingWidth  = boundingHeight / h * w;
+                                        } else if (mW < mH) {
+                                            boundingHeight = boundingWidth  / w * h;
+                                        }
 
-                                    if (_section_select.H)
-                                        _page_height = _section_select.H;
+                                        //var __w = Math.max(1, page_width  - (page_x_left_margin + page_x_right_margin));
+                                        //var __h = Math.max(1, page_height - (page_y_top_margin  + page_y_bottom_margin));
+
+                                        //w = Math.max(5, boundingWidth);
+                                        //h = Math.max(5, boundingHeight);
+
+                                        _imagePr.Width  = Math.max(5, boundingWidth);
+                                        _imagePr.Height = Math.max(5, boundingHeight);
+                                        _imagePr.ImageUrl = undefined;
+
+                                        break;
+                                    }
                                 }
-
-                                var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
-                                var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-
-                                var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                                var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-
-                                wI = Math.max(5, Math.min(wI, __w));
-                                hI = Math.max(5, Math.min(hI, __h));
-
-                                _imagePr.Width = wI;
-                                _imagePr.Height = hI;
                             }
                         }
 
@@ -4688,6 +4700,34 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
                 }
             }
         }
+    }
+
+        /* change z-index */
+    if (AscFormat.isRealNumber(ImagePr.ChangeLevel))
+    {
+        switch (ImagePr.ChangeLevel)
+        {
+            case 0:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringToFront();
+                break;
+            }
+            case 1:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringForward();
+                break;
+            }
+            case 2:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.sendToBack();
+                break;
+            }
+            case 3:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringBackward();
+            }
+        }
+        return;
     }
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Image_Properties, AdditionalData) )
