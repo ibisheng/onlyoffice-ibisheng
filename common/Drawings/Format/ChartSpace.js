@@ -4837,7 +4837,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 fDiff = fL;
                 if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.x -= fDiff;
-                    oCorrectedRect.w += fDiff;
+                    //oCorrectedRect.w -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = fR - this.extX;
@@ -4848,7 +4848,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 fDiff = fT;
                 if( fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.y -= fDiff;
-                    oCorrectedRect.h += fDiff;
+                    //oCorrectedRect.h -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = fB - this.extY;
@@ -5083,6 +5083,12 @@ CChartSpace.prototype.getValAxisCrossType = function()
                             }
                         }
                     }
+                }
+                this.plotAreaRect = oRect.copy();
+            }
+            else{
+                if(aRects[0]){
+                    this.plotAreaRect = aRects[0].copy();
                 }
             }
             aAxes = oPlotArea.axId;
@@ -9490,6 +9496,47 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
     }
 };
 
+
+CChartSpace.prototype.layoutLegendEntry = function(oEntry, fX, fY, fDistance){
+    oEntry.localY = fY;
+    var oFirstLine = oEntry.txBody.content.Content[0].Lines[0];
+    var fYFirstLineMiddle = oEntry.localY + oFirstLine.Top + oFirstLine.Metrics.Descent/2.0 + oFirstLine.Metrics.TextAscent - oFirstLine.Metrics.TextAscent2/2.0;// (oFirstLine.Bottom - oFirstLine.Top - oFirstLine.Metrics.Descent - oFirstLine.Metrics.Ascent)/2.0;
+    var fPenWidth;
+    var oUnionMarker = oEntry.calcMarkerUnion;
+    var oLineMarker = oUnionMarker.lineMarker;
+    var oMarker = oUnionMarker.marker;
+    if(oLineMarker){
+        oLineMarker.localX = fX;
+        if(oLineMarker.pen){
+            if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                fPenWidth = oLineMarker.pen.w/36000.0;
+            }
+            else{
+                fPenWidth = 12700.0/36000.0;
+            }
+        }
+        else{
+            fPenWidth = 0.0;
+        }
+        oLineMarker.localY = fYFirstLineMiddle - fPenWidth / 2.0;
+        if(oMarker){
+            oMarker.localX = oLineMarker.localX + oLineMarker.spPr.geometry.gdLst['w']/2.0 - oMarker.spPr.geometry.gdLst['w']/2.0;
+            oMarker.localY = fYFirstLineMiddle - oMarker.spPr.geometry.gdLst['h']/2.0;
+        }
+        oEntry.localX = oLineMarker.localX + oLineMarker.spPr.geometry.gdLst['w'] + fDistance;
+    }
+    else{
+        if(oMarker){
+            oMarker.localX = fX;
+            oMarker.localY = fYFirstLineMiddle - oMarker.spPr.geometry.gdLst['h']/2.0;
+            oEntry.localX = oMarker.localX + oMarker.spPr.geometry.gdLst['w'] + fDistance;
+        }
+        else{
+            oEntry.localX = fX + fDistance;
+        }
+    }
+};
+
 CChartSpace.prototype.hitInTextRect = function()
 {
     return false;
@@ -9877,7 +9924,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         else
                         {
                             cut_index = arr_heights.length;
-                            legend_height = height_summ;
+                            legend_height = height_summ2;
                         }
                         legend.x = 0;
                         legend.y = 0;
@@ -9888,20 +9935,21 @@ CChartSpace.prototype.hitInTextRect = function()
                         for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
-                            if(calc_entry.calcMarkerUnion.marker)
-                            {
-                                calc_entry.calcMarkerUnion.marker.localX = distance_to_text + line_marker_width/2 - calc_entry.calcMarkerUnion.marker.extX/2;
-                                calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
-                                calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width + distance_to_text;
-                            }
-
-                            if(calc_entry.calcMarkerUnion.lineMarker)
-                            {
-                                calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
-                                calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
-                                calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
-                            }
-                            calc_entry.localY = summ_h;
+                            this.layoutLegendEntry(calc_entry, distance_to_text, summ_h, distance_to_text);
+                            // if(calc_entry.calcMarkerUnion.marker)
+                            // {
+                            //     calc_entry.calcMarkerUnion.marker.localX = distance_to_text + line_marker_width/2 - calc_entry.calcMarkerUnion.marker.extX/2;
+                            //     calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                            //     calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width + distance_to_text;
+                            // }
+                            //
+                            // if(calc_entry.calcMarkerUnion.lineMarker)
+                            // {
+                            //     calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
+                            //     calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
+                            //     calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
+                            // }
+                            // calc_entry.localY = summ_h;
 
 
 
@@ -9956,9 +10004,11 @@ CChartSpace.prototype.hitInTextRect = function()
                             legend_width = max_legend_width;
                         }
                         var height_summ = 0;
+                        var height_summ2 = 0;
                         for(i = 0;  i < arr_heights.length; ++i)
                         {
                             height_summ+=arr_heights2[i];
+                            height_summ2+= arr_heights[i];
                             if(height_summ > max_legend_height)
                             {
                                 cut_index = i;
@@ -9971,7 +10021,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         {
                             if(cut_index > 0)
                             {
-                                legend_height = height_summ - arr_heights[cut_index];
+                                legend_height = height_summ2 - arr_heights[cut_index];
                             }
                             else
                             {
@@ -9981,7 +10031,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         else
                         {
                             cut_index = arr_heights.length;
-                            legend_height = height_summ;
+                            legend_height = height_summ2;
                         }
                         legend.x = 0;
                         legend.y = 0;
@@ -10014,13 +10064,14 @@ CChartSpace.prototype.hitInTextRect = function()
                             for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
-                                if(calc_entry.calcMarkerUnion.marker)
-                                {
-                                    calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                                    calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
-                                }
-                                calc_entry.localX = 2*distance_to_text + marker_size;
-                                calc_entry.localY = summ_h;
+                                this.layoutLegendEntry(calc_entry, distance_to_text, summ_h, distance_to_text);
+                                // if(calc_entry.calcMarkerUnion.marker)
+                                // {
+                                //     calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                                //     calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                // }
+                                // calc_entry.localX = 2*distance_to_text + marker_size;
+                                // calc_entry.localY = summ_h;
                                 summ_h+=arr_heights[i];
                             }
                         }
@@ -10030,13 +10081,14 @@ CChartSpace.prototype.hitInTextRect = function()
                             for(i = calc_entryes.length-1; i > -1; --i)
                             {
                                 calc_entry = calc_entryes[i];
-                                if(calc_entry.calcMarkerUnion.marker)
-                                {
-                                    calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                                    calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
-                                }
-                                calc_entry.localX = 2*distance_to_text + marker_size;
-                                calc_entry.localY = summ_h;
+                                this.layoutLegendEntry(calc_entry, distance_to_text, summ_h, distance_to_text);
+                                // if(calc_entry.calcMarkerUnion.marker)
+                                // {
+                                //     calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                                //     calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                // }
+                                // calc_entry.localX = 2*distance_to_text + marker_size;
+                                // calc_entry.localY = summ_h;
                                 summ_h+=arr_heights[i];
                             }
                         }
@@ -10114,37 +10166,38 @@ CChartSpace.prototype.hitInTextRect = function()
                         for(i = 0; i < calc_entryes.length; ++i){
                             fCurPosX += fDistanceBetweenLabels;
                             oCurEntry = calc_entryes[i];
-                            oUnionMarker = oCurEntry.calcMarkerUnion;
-                            oLineMarker = oUnionMarker.lineMarker;
-                            oMarker = oUnionMarker.marker;
-
-                            if(oLineMarker){
-                                oLineMarker.localX = fCurPosX + distance_to_text;
-                                if(oLineMarker.pen){
-                                    if(AscFormat.isRealNumber(oLineMarker.pen.w)){
-                                        fPenWidth = oLineMarker.pen.w/36000.0;
-                                    }
-                                    else{
-                                        fPenWidth = 12700.0/36000.0;
-                                    }
-                                }
-                                else{
-                                    fPenWidth = 0.0;
-                                }
-                                oLineMarker.localY = Math.max(0.0, fLegendHeight/2.0 - fPenWidth/2.0);
-                                if(oMarker){
-                                    oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
-                                    oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
-                                }
-                            }
-                            else{
-                                if(oMarker){
-                                    oMarker.localX = fCurPosX + distance_to_text;
-                                    oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
-                                }
-                            }
-                            oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
-                            oCurEntry.localY = Math.max(0, fLegendHeight/2.0 - aHeights[i]/2.0);
+                            this.layoutLegendEntry(oCurEntry, fCurPosX + distance_to_text, Math.max(0, fLegendHeight/2.0 - aHeights[i]/2.0), distance_to_text);
+                            // oUnionMarker = oCurEntry.calcMarkerUnion;
+                            // oLineMarker = oUnionMarker.lineMarker;
+                            // oMarker = oUnionMarker.marker;
+                            //
+                            // if(oLineMarker){
+                            //     oLineMarker.localX = fCurPosX + distance_to_text;
+                            //     if(oLineMarker.pen){
+                            //         if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                            //             fPenWidth = oLineMarker.pen.w/36000.0;
+                            //         }
+                            //         else{
+                            //             fPenWidth = 12700.0/36000.0;
+                            //         }
+                            //     }
+                            //     else{
+                            //         fPenWidth = 0.0;
+                            //     }
+                            //     oLineMarker.localY = Math.max(0.0, fLegendHeight/2.0 - fPenWidth/2.0);
+                            //     if(oMarker){
+                            //         oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
+                            //         oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
+                            //     }
+                            // }
+                            // else{
+                            //     if(oMarker){
+                            //         oMarker.localX = fCurPosX + distance_to_text;
+                            //         oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
+                            //     }
+                            // }
+                            // oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
+                            // oCurEntry.localY = Math.max(0, fLegendHeight/2.0 - aHeights[i]/2.0);
                             fCurPosX += distance_to_text + fMarkerWidth + distance_to_text + aWidths[i];
                         }
 
@@ -10205,36 +10258,37 @@ CChartSpace.prototype.hitInTextRect = function()
                             for(j = 0; j < nColsCount && (i*nColsCount + j) < calc_entryes.length; ++j){
                                 var nEntryIndex = i*nColsCount + j;
                                 oCurEntry = calc_entryes[nEntryIndex];
-                                oUnionMarker = oCurEntry.calcMarkerUnion;
-                                oLineMarker = oUnionMarker.lineMarker;
-                                oMarker = oUnionMarker.marker;
-                                if(oLineMarker){
-                                    oLineMarker.localX = fCurPosX + distance_to_text;
-                                    if(oLineMarker.pen){
-                                        if(AscFormat.isRealNumber(oLineMarker.pen.w)){
-                                            fPenWidth = oLineMarker.pen.w/36000.0;
-                                        }
-                                        else{
-                                            fPenWidth = 12700.0/36000.0;
-                                        }
-                                    }
-                                    else{
-                                        fPenWidth = 0.0;
-                                    }
-                                    oLineMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - fPenWidth/2.0);
-                                    if(oMarker){
-                                        oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
-                                        oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - marker_size/2.0);
-                                    }
-                                }
-                                else{
-                                    if(oMarker){
-                                        oMarker.localX = fCurPosX + distance_to_text;
-                                        oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0  - marker_size/2.0);
-                                    }
-                                }
-                                oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
-                                oCurEntry.localY = Math.max(0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - aHeights[nEntryIndex]/2.0);
+                                // oUnionMarker = oCurEntry.calcMarkerUnion;
+                                // oLineMarker = oUnionMarker.lineMarker;
+                                // oMarker = oUnionMarker.marker;
+                                // if(oLineMarker){
+                                //     oLineMarker.localX = fCurPosX + distance_to_text;
+                                //     if(oLineMarker.pen){
+                                //         if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                                //             fPenWidth = oLineMarker.pen.w/36000.0;
+                                //         }
+                                //         else{
+                                //             fPenWidth = 12700.0/36000.0;
+                                //         }
+                                //     }
+                                //     else{
+                                //         fPenWidth = 0.0;
+                                //     }
+                                //     oLineMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - fPenWidth/2.0);
+                                //     if(oMarker){
+                                //         oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
+                                //         oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - marker_size/2.0);
+                                //     }
+                                // }
+                                // else{
+                                //     if(oMarker){
+                                //         oMarker.localX = fCurPosX + distance_to_text;
+                                //         oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0  - marker_size/2.0);
+                                //     }
+                                // }
+                                this.layoutLegendEntry(oCurEntry, fCurPosX + distance_to_text, Math.max(0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - aHeights[nEntryIndex]/2.0), distance_to_text);
+                                // oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
+                                // oCurEntry.localY = Math.max(0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - aHeights[nEntryIndex]/2.0);
                                 fCurPosX += (fMaxEntryWidth + fDistanceBetweenLabels);
                             }
                             fCurPosY += (Math.max.apply(Math, aHeights) + fVertDistanceBetweenLabels);
