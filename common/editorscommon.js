@@ -3604,6 +3604,9 @@
 
         this.isNeedCrypt = function()
 		{
+			if (!window.g_asc_plugins)
+				return false;
+
             if (!window.g_asc_plugins.isRunnedEncryption())
                 return false;
 
@@ -4140,16 +4143,28 @@
 	window["AscCommon"].translateManager = new CTranslateManager();
 })(window);
 
-// ONLYPASS
 window["asc_initAdvancedOptions"] = function(_code, _file_hash, _docInfo)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
-    if ((_code == 90 || _code == 91) && AscCommon.EncryptionWorker.isNeedCrypt() && !window.checkPasswordFromPlugin)
+    if (_code == 90 || _code == 91)
     {
-    	window.checkPasswordFromPlugin = true;
-        window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash, "docinfo" : _docInfo });
-        return;
+    	if (window["AscDesktopEditor"] && (0 !== window["AscDesktopEditor"]["CryptoMode"]) && !_editor.isLoadFullApi)
+		{
+            // ждем инициализации
+            _editor.asc_initAdvancedOptions_params = [];
+            _editor.asc_initAdvancedOptions_params.push(_code);
+            _editor.asc_initAdvancedOptions_params.push(_file_hash);
+            _editor.asc_initAdvancedOptions_params.push(_docInfo);
+            return;
+        }
+
+    	if (AscCommon.EncryptionWorker.isNeedCrypt() && !window.checkPasswordFromPlugin)
+    	{
+            window.checkPasswordFromPlugin = true;
+            window.g_asc_plugins.sendToEncryption({ "type": "getPasswordByFile", "hash": _file_hash, "docinfo": _docInfo });
+            return;
+        }
     }
 
     window.checkPasswordFromPlugin = false;
