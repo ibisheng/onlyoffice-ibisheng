@@ -11135,10 +11135,10 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     }
     else{
         if(!bCreate && aPreset[5]){
-            if(!oChartSpace.chart.legend){
-                oChartSpace.chart.setLegend(new AscFormat.CLegend());
-            }
-            oChartSpace.chart.legend.setOverlay(false);
+            // if(!oChartSpace.chart.legend){
+            //     oChartSpace.chart.setLegend(new AscFormat.CLegend());
+            // }
+            oChartSpace.chart.legend && oChartSpace.chart.legend.setOverlay(false);
         }
     }
     ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument, bCreate);
