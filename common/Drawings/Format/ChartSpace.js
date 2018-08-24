@@ -975,6 +975,7 @@ function checkPointInMap(map, worksheet, row, col)
                 global_MatrixTransformer.TranslateAppend(oTransform, -oSize.w/2.0, -oSize.h/2.0);
                 global_MatrixTransformer.RotateRadAppend(oTransform, fAngle);
                 global_MatrixTransformer.TranslateAppend(oTransform, fXC, fYC);
+                oLabel.transformText = oTransform.CreateDublicate();
                 if(null === fMinLeft || (fXC - fBoxW/2.0) < fMinLeft){
                     fMinLeft = fXC - fBoxW/2.0;
                 }
@@ -1037,6 +1038,7 @@ function checkPointInMap(map, worksheet, row, col)
                 else{
                     global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance - oSize.w, fY);
                 }
+                oLabel.transformText = oTransform.CreateDublicate();
                 if(fY < fMinY){
                     fMinY = fY;
                 }
@@ -1080,6 +1082,7 @@ function checkPointInMap(map, worksheet, row, col)
                         fY = fCurY - fContentHeight/2.0;
                         global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance - fContentWidth, fY);
                     }
+                    oLabel.transformText = oTransform.CreateDublicate();
                     if(fY < fMinY){
                         fMinY = fY;
                     }
