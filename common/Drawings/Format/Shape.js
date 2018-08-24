@@ -2774,6 +2774,17 @@ CShape.prototype.recalculateBrush = function () {
     this.brush.merge(this.getCompiledFill());
     this.brush.transparent = this.getCompiledTransparent();
     this.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+    if(this.bWordShape){
+        if(this.brush.fill && this.brush.fill.type === Asc.c_oAscFill.FILL_TYPE_GRAD){
+            var oGradFill = this.brush.fill;
+            if(!oGradFill.lin && !oGradFill.path){
+                var oLin = new AscFormat.GradLin();
+                oLin.setScale(false);
+                oLin.setAngle(5400000);
+                oGradFill.setLin(oLin);
+            }
+        }
+    }
 };
 
 CShape.prototype.recalculatePen = function () {
