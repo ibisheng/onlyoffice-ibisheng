@@ -4256,6 +4256,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
     CChartSpace.prototype.calculateLabelsPositions = function(b_recalc_labels, b_recalc_legend)
     {
         var layout;
+        var checkPts = [];
         for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
         {
             var series = this.getAllSeries();
@@ -4291,12 +4292,92 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         if(pos.y < 0){
                             pos.y = 0;
                         }
+                        if( !oLbl.layout ){
+                            checkPts.push({
+                                "obj": oLbl,
+                                "x": pos.x, 
+                                "y": pos.y,
+                                "w": oLbl.extX,
+                                "h": oLbl.extY
+                            })
+                        }
                         oLbl.setPosition(pos.x, pos.y);
                         break;
                     }
                 }
+
             }
         }
+        //optimize pt's postion if overlaped
+        //check x;
+        var arrange = function( arry ){
+            var first = arry[0];
+            var last =  arry[ arry.length-1];
+            if( Math.abs(last.x + last.w - first.x) > Math.abs(last.y+last.h - first.y) ){
+                //rearrange x 
+                var lastX = 0;
+                var old =last.x + last.w;
+                for( var k=0; k< arry.length; k++ ){
+                    console.log( arry[k].x);
+                    console.log( arry[k].x + arry[k].w );
+                    if( arry[k].x < lastX ){
+                        arry[k].x = lastX;
+                    }
+                    lastX = arry[k].x + arry[k].w;
+                }
+                var move = lastX - old;
+                if( move ){
+                    move = move/2;
+                    for( var k=0; k< arry.length; k++ ){
+                        arry[k].obj.setPosition( arry[k].x - move , arry[k].y);
+                    }
+                }
+            }
+            else{
+                //rearrange y 
+                var lastY = 0;
+                var old =last.y +  last.h;
+                for( var k=0; k< arry.length; k++ ){
+                    console.log( arry[k].x);
+                    console.log( arry[k].x + arry[k].w );
+                    if( arry[k].y < lastY ){
+                        arry[k].y = lastY;
+                    }
+                    lastY = arry[k].y + arry[k].h;
+                }
+                var move = lastY - old;
+                if( move ){
+                    move = move/2;
+                    for( var k=0; k< arry.length; k++ ){
+                        arry[k].obj.setPosition( arry[k].x, arry[k].y - move  );
+                    }
+                }
+            }
+           
+        }
+        var optimize = function(){
+            var overlaped = [];
+            for( var k=0; k< checkPts.length; k++ ){
+                if ( k > 0 && ( checkPts[k].y < checkPts[k-1].y + checkPts[k-1].h ) && (checkPts[k-1].y < checkPts[k].y + checkPts[k].h ) ) {
+                    if( !overlaped.length){
+                        overlaped.push( checkPts[k-1])
+                    }
+                    overlaped.push( checkPts[k] );
+                }
+                else if( overlaped.length ){
+                    if( overlaped.length > 1 ){
+                        arrange(overlaped);
+                    }
+                    overlaped = [];
+                }
+            }
+            if( overlaped.length > 1 ){
+                arrange(overlaped);
+            }
+        }
+        optimize();
+        //end
+
         this.recalcInfo.dataLbls.length = 0;
 
         if(b_recalc_labels)
