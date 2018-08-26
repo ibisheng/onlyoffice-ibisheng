@@ -36170,6 +36170,8 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
 
                     zone++;
                     zones[zone].base = dublicate_pointer(decoder.locals[idx]);
+                    if (zones[zone].base == null)
+                        return 3;
                     zones[zone].limit = (decoder.locals[idx + 1] != null) ? decoder.locals[idx + 1].pos : zones[zone].base.pos;
                     zones[zone].cursor = 0;
 
