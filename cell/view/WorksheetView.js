@@ -1648,10 +1648,6 @@
 		var nCountOffset = 0;
 
 		while (AscCommonExcel.c_kMaxPrintPages > arrPages.length) {
-			if (currentColIndex === range.c2 && currentRowIndex === range.r2) {
-				break;
-			}
-
 			var newPagePrint = new asc_CPagePrint();
 
 			var colIndex = currentColIndex, rowIndex = currentRowIndex;
@@ -1668,14 +1664,14 @@
 			newPagePrint.leftFieldInPx = leftFieldInPx;
 			newPagePrint.topFieldInPx = topFieldInPx;
 
-			for (rowIndex = currentRowIndex; rowIndex < range.r2; ++rowIndex) {
+			for (rowIndex = currentRowIndex; rowIndex <= range.r2; ++rowIndex) {
 				var currentRowHeight = this._getRowHeight(rowIndex);
 				if (!bFitToHeight && currentHeight + currentRowHeight > pageHeightWithFieldsHeadings) {
 					// Закончили рисовать страницу
 					break;
 				}
 				if (isCalcColumnsWidth) {
-					for (colIndex = currentColIndex; colIndex < range.c2; ++colIndex) {
+					for (colIndex = currentColIndex; colIndex <= range.c2; ++colIndex) {
 						var currentColWidth = this.cols[colIndex].width;
 						if (bIsAddOffset) {
 							newPagePrint.startOffset = ++nCountOffset;
@@ -1743,6 +1739,7 @@
 			}
 
 			newPagePrint.pageRange = new asc_Range(currentColIndex, currentRowIndex, colIndex - 1, rowIndex - 1);
+			arrPages.push(newPagePrint);
 
 			if (bIsAddOffset) {
 				// Мы еще не дорисовали колонку
@@ -1751,7 +1748,7 @@
 				nCountOffset = 0;
 			}
 
-			if (colIndex < range.c2) {
+			if (colIndex <= range.c2) {
 				// Мы еще не все колонки отрисовали
 				currentColIndex = colIndex;
 				currentHeight = 0;
@@ -1762,19 +1759,18 @@
 				currentHeight = 0;
 			}
 
-			if (rowIndex === range.r2) {
+			if (rowIndex > range.r2) {
 				// Мы вышли, т.к. дошли до конца отрисовки по строкам
-				if (colIndex < range.c2) {
+				if (colIndex <= range.c2) {
 					currentColIndex = colIndex;
 					currentHeight = 0;
 				} else {
 					// Мы дошли до конца отрисовки
 					currentColIndex = colIndex;
 					currentRowIndex = rowIndex;
+					break;
 				}
 			}
-
-			arrPages.push(newPagePrint);
 		}
     };
 
@@ -1784,16 +1780,14 @@
 		if (printOnlySelection) {
 			for (var i = 0; i < this.model.selectionRange.ranges.length; ++i) {
 				range = this.model.selectionRange.ranges[i];
-				range = new asc_Range(range.c1, range.r1, range.c2 + 1, range.r2 + 1);
 				this._prepareCellTextMetricsCache(range);
 				this._calcPagesPrint(range, pageOptions, indexWorksheet, arrPages);
 			}
         } else {
 			var t = this;
-			var maxCols = this.model.getColsCount();
-			var maxRows = this.model.getRowsCount();
-			var lastC = -1, lastR = -1;
-			range = new asc_Range(0, 0, maxCols, maxRows);
+			var maxCol = -1;
+			var maxRow = -1;
+			range = new asc_Range(0, 0, this.model.getColsCount(), this.model.getRowsCount());
 			this._prepareCellTextMetricsCache(range);
 
 			var rowCache, rightSide, curRow = -1, hiddenRow = false;
@@ -1808,8 +1802,8 @@
 				if(!hiddenRow && 0 < t.cols[c].width){
 					var style = cell.getStyle();
 					if (style && ((style.fill && style.fill.notEmpty()) || (style.border && style.border.notEmpty()))) {
-						lastC = Math.max(lastC, c);
-						lastR = Math.max(lastR, r);
+						maxCol = Math.max(maxCol, c);
+						maxRow = Math.max(maxRow, r);
 					}
 					if (rowCache && rowCache.columnsWithText[c]) {
 						rightSide = 0;
@@ -1819,24 +1813,21 @@
 								rightSide = ct.sideR;
 							}
 
-							lastC = Math.max(lastC, c + rightSide);
-							lastR = Math.max(lastR, r);
+							maxCol = Math.max(maxCol, c + rightSide);
+							maxRow = Math.max(maxRow, r);
 						}
 					}
 				}
 			});
 			var maxCell = this.model.autoFilters.getMaxColRow();
-			lastC = Math.max(lastC, maxCell.col);
-			lastR = Math.max(lastR, maxCell.row);
-
-			maxCols = lastC + 1;
-			maxRows = lastR + 1;
+			maxCol = Math.max(maxCol, maxCell.col);
+			maxRow = Math.max(maxRow, maxCell.row);
 
 			// Получаем максимальную колонку/строку для изображений/чатов
 			maxCell = this.objectRender.getMaxColRow();
-			maxCols = Math.max(maxCols, maxCell.col);
-			maxRows = Math.max(maxRows, maxCell.row);
-			range = new asc_Range(0, 0, maxCols, maxRows);
+			maxCol = Math.max(maxCol, maxCell.col);
+			maxRow = Math.max(maxRow, maxCell.row);
+			range = new asc_Range(0, 0, maxCol, maxRow);
 			this._calcPagesPrint(range, pageOptions, indexWorksheet, arrPages);
 		}
 	};
