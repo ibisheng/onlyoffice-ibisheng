@@ -12644,6 +12644,14 @@ CDocument.prototype.OnChangeSdtGlobalSettings = function()
 {
 	this.GetApi().sync_OnChangeSdtGlobalSettings();
 };
+/**
+ * Проверяем все ли параметры SdtSettings выставлены по умолчанию
+ * @returns {boolean}
+ */
+CDocument.prototype.IsSdtGlobalSettingsDefault = function()
+{
+	return this.Settings.SdtSettings.IsDefault();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Math
 //----------------------------------------------------------------------------------------------------------------------

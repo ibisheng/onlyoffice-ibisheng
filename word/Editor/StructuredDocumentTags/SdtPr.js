@@ -268,6 +268,21 @@ function CSdtGlobalSettings()
 	this.Color         = new AscCommonWord.CDocumentColor(220, 220, 220);
 	this.ShowHighlight = false;
 }
+/**
+ * Проверяем все ли параметры выставлены по умолчанию
+ * @returns {boolean}
+ */
+CSdtGlobalSettings.prototype.IsDefault = function()
+{
+	if (!this.Color
+		|| 220 !== this.Color.r
+		|| 220 !== this.Color.g
+		|| 220 !== this.Color.b
+		|| false !== this.ShowHighlight)
+		return false;
+
+	return true;
+};
 CSdtGlobalSettings.prototype.Copy = function()
 {
 	var oSettings = new CSdtGlobalSettings();
