@@ -5869,10 +5869,12 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
 		this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
 		this.bs.WriteItem(c_oSer_SettingsType.TrackRevisions, function(){oThis.memory.WriteBool(oThis.Document.Is_TrackRevisions());});
 		this.bs.WriteItem(c_oSer_SettingsType.FootnotePr, function(){oThis.WriteFootnotePr();});
-		var rPr = new CTextPr();
-		rPr.Color = oThis.Document.GetSdtGlobalColor();
-		this.bs.WriteItem(c_oSer_SettingsType.SdtGlobalColor, function (){oThis.brPrs.Write_rPr(rPr, null, null);});
-		this.bs.WriteItem(c_oSer_SettingsType.SdtGlobalShowHighlight, function(){oThis.memory.WriteBool(oThis.Document.GetSdtGlobalShowHighlight());});
+		if (!oThis.Document.IsSdtGlobalSettingsDefault()) {
+			var rPr = new CTextPr();
+			rPr.Color = oThis.Document.GetSdtGlobalColor();
+			this.bs.WriteItem(c_oSer_SettingsType.SdtGlobalColor, function (){oThis.brPrs.Write_rPr(rPr, null, null);});
+			this.bs.WriteItem(c_oSer_SettingsType.SdtGlobalShowHighlight, function(){oThis.memory.WriteBool(oThis.Document.GetSdtGlobalShowHighlight());});
+		}
     }
 	this.WriteFootnotePr = function()
 	{
