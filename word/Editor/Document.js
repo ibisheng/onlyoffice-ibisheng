@@ -4646,6 +4646,7 @@ CDocument.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelectio
 
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
+	this.Document_UpdateTracks();
 };
 CDocument.prototype.RemoveBeforePaste = function()
 {
@@ -16365,6 +16366,28 @@ CDocument.prototype.ClearContentControl = function(Id)
 	}
 
 	return oContentControl;
+};
+/**
+ * Выделяем содержимое внутри заданного контейнера
+ * @param {string} sId
+ */
+CDocument.prototype.SelectContentControl = function(sId)
+{
+	var oContentControl = this.TableId.Get_ById(sId);
+	if (!oContentControl)
+		return;
+
+	this.RemoveSelection();
+
+	if (oContentControl.GetContentControlType
+		&& (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType()
+		|| c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType()))
+	{
+		oContentControl.SelectContentControl();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateTracks();
+	}
 };
 CDocument.prototype.GetAllSignatures = function()
 {
