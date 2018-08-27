@@ -566,6 +566,18 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                     drawing.selectTitle(title, pageIndex);
                     drawingObjectsController.updateSelectionState();
                     drawingObjectsController.updateOverlay();
+
+                    if(Asc["editor"] && Asc["editor"].wb)
+                    {
+                        var ws = Asc["editor"].wb.getWorksheet();
+                        if(ws){
+                            var ct = ws.getCursorTypeFromXY(ws.objectRender.lastX, ws.objectRender.lastY);
+                            if(ct){
+                                Asc["editor"].wb._onUpdateCursor(ct.cursor);
+                            }
+                        }
+                    }
+
                     return true;
                 }
                 else
