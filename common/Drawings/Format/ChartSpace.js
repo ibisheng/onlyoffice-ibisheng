@@ -9815,7 +9815,7 @@ CChartSpace.prototype.hitInTextRect = function()
                 {
                     calc_entryes[i].calcMarkerUnion.marker.spPr.geometry.Recalculate(marker_size, marker_size);
                 }
-                distance_to_text = marker_size*0.8;
+                distance_to_text = marker_size*0.7;
             }
             var left_inset = marker_size + 3*distance_to_text;
             var legend_pos = c_oAscChartLegendShowSettings.right;
