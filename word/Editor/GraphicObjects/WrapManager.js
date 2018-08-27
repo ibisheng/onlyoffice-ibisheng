@@ -640,18 +640,18 @@ CWrapPolygon.prototype =
             if(AscFormat.isRealNumber(drawing.rot)){
                 if(AscFormat.checkNormalRotate(drawing.rot))
                 {
-                    W = drawing.parent.Extent.W;
-                    H = drawing.parent.Extent.H;
+                    W = drawing.extX;
+                    H = drawing.extY;
                 }
                 else
                 {
-                    W = drawing.parent.Extent.H;
-                    H = drawing.parent.Extent.W;
+                    W = drawing.extY;
+                    H = drawing.extX;
                 }
             }
             else{
-                W = drawing.parent.Extent.W;
-                H = drawing.parent.Extent.H;
+                W = drawing.parent.extX;
+                H = drawing.parent.extY;
             }
             var xc = drawing.localTransform.TransformPointX(drawing.extX / 2, drawing.extY / 2);
             var yc = drawing.localTransform.TransformPointY(drawing.extX / 2, drawing.extY / 2);
