@@ -1339,6 +1339,13 @@
 			}
 			this.onEndLoadFile(null);
 		}
+
+		// for crypt mode (end waiting all system plugins)
+        if (this.asc_initAdvancedOptions_params)
+        {
+        	window["asc_initAdvancedOptions"].apply(window, this.asc_initAdvancedOptions_params);
+            delete this.asc_initAdvancedOptions_params;
+        }
 	};
 	baseEditorsApi.prototype.onEndLoadFile = function(result)
 	{
