@@ -2370,8 +2370,8 @@ function DrawingObjects() {
     _this.getMaxColRow = function() {
         var r = -1, c = -1;
         aObjects.forEach(function (item) {
-            r = Math.max(r, item.boundsFromTo.to.row + 1);
-            c = Math.max(c, item.boundsFromTo.to.col + 1);
+            r = Math.max(r, item.boundsFromTo.to.row);
+            c = Math.max(c, item.boundsFromTo.to.col);
         });
 
         return new AscCommon.CellBase(r, c);

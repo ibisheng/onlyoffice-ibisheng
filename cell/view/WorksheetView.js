@@ -1556,7 +1556,7 @@
 
     // ----- Drawing for print -----
     WorksheetView.prototype._calcPagesPrint = function(range, pageOptions, indexWorksheet, arrPages) {
-        if (0 === range.r2 || 0 === range.c2) {
+        if (0 > range.r2 || 0 > range.c2) {
 			// Ничего нет
             return;
         }
@@ -1774,52 +1774,67 @@
 		}
     };
 
+	WorksheetView.prototype._checkPrintRange = function (range, printOnlySelection) {
+		this._prepareCellTextMetricsCache(range);
+
+		var maxCol = -1;
+		var maxRow = -1;
+
+		var t = this;
+		var rowCache, rightSide, curRow = -1, hiddenRow = false;
+		this.model.getRange3(range.r1, range.c1, range.r2, range.c2)._foreachNoEmpty(function(cell) {
+			var c = cell.nCol;
+			var r = cell.nRow;
+			if (curRow !== r) {
+				curRow = r;
+				hiddenRow = 0 === t.rows[r].height;
+				rowCache = t._getRowCache(r);
+			}
+			if(!hiddenRow && 0 < t.cols[c].width){
+				var style = cell.getStyle();
+				if (style && ((style.fill && style.fill.notEmpty()) || (style.border && style.border.notEmpty()))) {
+					maxCol = Math.max(maxCol, c);
+					maxRow = Math.max(maxRow, r);
+				}
+				if (rowCache && rowCache.columnsWithText[c]) {
+					rightSide = 0;
+					var ct = t._getCellTextCache(c, r);
+					if (ct !== undefined) {
+						if (!ct.flags.isMerged() && !ct.flags.wrapText) {
+							rightSide = ct.sideR;
+						}
+
+						maxCol = Math.max(maxCol, c + rightSide);
+						maxRow = Math.max(maxRow, r);
+					}
+				}
+			}
+		});
+
+		return new AscCommon.CellBase(maxRow, maxCol);
+	};
+
     WorksheetView.prototype.calcPagesPrint = function (pageOptions, printOnlySelection, indexWorksheet, arrPages) {
-		var range;
+		var range, maxCell;
 
 		if (printOnlySelection) {
 			for (var i = 0; i < this.model.selectionRange.ranges.length; ++i) {
 				range = this.model.selectionRange.ranges[i];
-				this._prepareCellTextMetricsCache(range);
+				if (c_oAscSelectionType.RangeCells === range.getType()) {
+					this._prepareCellTextMetricsCache(range);
+				} else {
+					maxCell = this._checkPrintRange(range);
+					range = new asc_Range(0, 0, maxCell.col, maxCell.row);
+				}
 				this._calcPagesPrint(range, pageOptions, indexWorksheet, arrPages);
 			}
         } else {
-			var t = this;
-			var maxCol = -1;
-			var maxRow = -1;
 			range = new asc_Range(0, 0, this.model.getColsCount(), this.model.getRowsCount());
-			this._prepareCellTextMetricsCache(range);
+			maxCell = this._checkPrintRange(range);
+			var maxCol = maxCell.col;
+			var maxRow = maxCell.row;
 
-			var rowCache, rightSide, curRow = -1, hiddenRow = false;
-			this.model._forEachCell(function(cell) {
-				var c = cell.nCol;
-				var r = cell.nRow;
-				if (curRow !== r) {
-					curRow = r;
-					hiddenRow = 0 === t.rows[r].height;
-					rowCache = t._getRowCache(r);
-				}
-				if(!hiddenRow && 0 < t.cols[c].width){
-					var style = cell.getStyle();
-					if (style && ((style.fill && style.fill.notEmpty()) || (style.border && style.border.notEmpty()))) {
-						maxCol = Math.max(maxCol, c);
-						maxRow = Math.max(maxRow, r);
-					}
-					if (rowCache && rowCache.columnsWithText[c]) {
-						rightSide = 0;
-						var ct = t._getCellTextCache(c, r);
-						if (ct !== undefined) {
-							if (!ct.flags.isMerged() && !ct.flags.wrapText) {
-								rightSide = ct.sideR;
-							}
-
-							maxCol = Math.max(maxCol, c + rightSide);
-							maxRow = Math.max(maxRow, r);
-						}
-					}
-				}
-			});
-			var maxCell = this.model.autoFilters.getMaxColRow();
+			maxCell = this.model.autoFilters.getMaxColRow();
 			maxCol = Math.max(maxCol, maxCell.col);
 			maxRow = Math.max(maxRow, maxCell.row);
 
@@ -1827,6 +1842,7 @@
 			maxCell = this.objectRender.getMaxColRow();
 			maxCol = Math.max(maxCol, maxCell.col);
 			maxRow = Math.max(maxRow, maxCell.row);
+
 			range = new asc_Range(0, 0, maxCol, maxRow);
 			this._calcPagesPrint(range, pageOptions, indexWorksheet, arrPages);
 		}
