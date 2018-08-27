@@ -2170,7 +2170,7 @@
                         // Мы уже нарисовали border для невидимой границы
                         return;
                     }
-                } else if (0 < index && this._getRowHeight(index - 1)) {
+                } else if (0 < index && 0 === this._getRowHeight(index - 1)) {
                     // Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
                     h -= 1;
                     y += 1;
