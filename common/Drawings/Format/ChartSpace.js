@@ -1910,10 +1910,17 @@ CChartSpace.prototype.changeFill = function (unifill)
     }
     var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush, this.getEditorType());
     unifill2.convertToPPTXMods();
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
+    }
     this.spPr.setFill(unifill2);
 };
 CChartSpace.prototype.setFill = function (fill) {
-
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
+    }
     this.spPr.setFill(fill);
 };
 
@@ -1932,6 +1939,10 @@ CChartSpace.prototype.changeLine = function (line)
     if(stroke.Fill)
     {
         stroke.Fill.convertToPPTXMods();
+    }
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
     }
     this.spPr.setLn(stroke);
 };
