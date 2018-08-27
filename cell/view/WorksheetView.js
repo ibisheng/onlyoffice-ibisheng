@@ -1555,7 +1555,7 @@
     };
 
     // ----- Drawing for print -----
-    WorksheetView.prototype._calcPagesPrint = function(range, pageOptions, printOnlySelection, indexWorksheet, arrPages) {
+    WorksheetView.prototype._calcPagesPrint = function(range, pageOptions, indexWorksheet, arrPages) {
         if (0 === range.r2 || 0 === range.c2) {
 			// Ничего нет
             return;
@@ -1786,7 +1786,7 @@
 				range = this.model.selectionRange.ranges[i];
 				range = new asc_Range(range.c1, range.r1, range.c2 + 1, range.r2 + 1);
 				this._prepareCellTextMetricsCache(range);
-				this._calcPagesPrint(range, pageOptions, printOnlySelection, indexWorksheet, arrPages);
+				this._calcPagesPrint(range, pageOptions, indexWorksheet, arrPages);
 			}
         } else {
 			var t = this;
@@ -1837,7 +1837,7 @@
 			maxCols = Math.max(maxCols, maxCell.col);
 			maxRows = Math.max(maxRows, maxCell.row);
 			range = new asc_Range(0, 0, maxCols, maxRows);
-			this._calcPagesPrint(range, pageOptions, printOnlySelection, indexWorksheet, arrPages);
+			this._calcPagesPrint(range, pageOptions, indexWorksheet, arrPages);
 		}
 	};
 
