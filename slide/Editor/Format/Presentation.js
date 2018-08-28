@@ -7436,12 +7436,12 @@ CPresentation.prototype =
             }
             else
             {
-                //this.Slides[this.CurPage].graphicObjects.clearTrackObjects();
-                //this.Slides[this.CurPage].graphicObjects.clearPreTrackObjects();
-                //this.Slides[this.CurPage].graphicObjects.resetSelectionState();
-                //this.DrawingDocument.m_oWordControl.OnUpdateOverlay();
+                this.Slides[this.CurPage].graphicObjects.clearTrackObjects();
+                this.Slides[this.CurPage].graphicObjects.clearPreTrackObjects();
+                // this.Slides[this.CurPage].graphicObjects.resetSelectionState();
 
                 this.Slides[this.CurPage].graphicObjects.changeCurrentState(new AscFormat.NullState(this.Slides[this.CurPage].graphicObjects));
+                this.DrawingDocument.m_oWordControl.OnUpdateOverlay();
                 editor.sync_EndAddShape();
             }
         }
