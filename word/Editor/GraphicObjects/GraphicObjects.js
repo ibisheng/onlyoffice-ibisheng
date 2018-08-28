@@ -989,10 +989,18 @@ CGraphicObjects.prototype =
         }
     },
 
+    getCompatibilityMode: function(){
+        var ret = 0xFF;
+        if(this.document && this.document.GetCompatibilityMode){
+            ret = this.document.GetCompatibilityMode();
+        }
+        return ret;
+    },
 
 
     mergeDrawings: function(pageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables)
     {
+        var nCompatibilityMode = this.getCompatibilityMode();
         if(!this.graphicPages[pageIndex])
         {
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
@@ -1048,7 +1056,7 @@ CGraphicObjects.prototype =
                 if(cur_drawing.Is_Inline()){
                     drawing_array = hdr_ftr_page.inlineObjects;
                 }
-                else if(cur_drawing.behindDoc === true){
+                else if(cur_drawing.behindDoc === true && (cur_drawing.wrappingType === WRAPPING_TYPE_NONE ||  nCompatibilityMode < document_compatibility_mode_Word15)){
                     drawing_array = hdr_ftr_page.behindDocObjects;
                 }
                 else{
@@ -3137,15 +3145,16 @@ CGraphicObjects.prototype =
     {
         if(this.canChangeWrapPolygon())
         {
+            var bNeedBehindDoc = this.getCompatibilityMode() < document_compatibility_mode_Word15;
             if(this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_THROUGH
                 || this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_TIGHT
-            || this.selectedObjects[0].parent.behindDoc !== true)
+            || this.selectedObjects[0].parent.behindDoc !== bNeedBehindDoc)
             {
                 if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : AscCommon.changestype_2_Element_and_Type , Element : this.selectedObjects[0].parent.Get_ParentParagraph(), CheckType : AscCommon.changestype_Paragraph_Content} ))
                 {
                     History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsChangeWrapPolygon);
                     this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);
-                    this.selectedObjects[0].parent.Set_BehindDoc(true);
+                    this.selectedObjects[0].parent.Set_BehindDoc(bNeedBehindDoc);
                     this.selectedObjects[0].parent.Check_WrapPolygon();
                     this.document.Recalculate();
                     this.document.Document_UpdateInterfaceState();

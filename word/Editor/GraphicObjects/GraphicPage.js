@@ -66,6 +66,9 @@ function CGraphicPage(pageIndex, graphicObjects)
 
 CGraphicPage.prototype =
 {
+    getCompatibilityMode: function () {
+        return editor.WordControl.m_oLogicDocument.GetCompatibilityMode();
+    },
     addFloatTable: function(table)
     {
         for(var i = 0; i < this.flowTables.length; ++i)
@@ -78,12 +81,13 @@ CGraphicPage.prototype =
 
     addObject: function(object)
     {
+
         var drawing_array, need_sort = true;
         if(object.parent.Is_Inline()){
             drawing_array = this.inlineObjects;
             need_sort = false;
         }
-        else if(object.parent.behindDoc == true){
+        else if(object.parent.behindDoc == true && (this.getCompatibilityMode() < document_compatibility_mode_Word15 || object.parent.wrappingType === WRAPPING_TYPE_NONE)){
             drawing_array  = this.behindDocObjects;
         }
         else{
@@ -188,7 +192,7 @@ CGraphicPage.prototype =
             if(oDrawing.Is_Inline()){
                 drawing_array = this.inlineObjects;
             }
-            else if(oDrawing.behindDoc === true){
+            else if(oDrawing.behindDoc === true  && (this.getCompatibilityMode() < document_compatibility_mode_Word15 || oDrawing.wrappingType === WRAPPING_TYPE_NONE)){
                 drawing_array = this.behindDocObjects;
             }
             else{
@@ -311,7 +315,7 @@ CGraphicPage.prototype =
         if(graphicObject.Is_Inline()){
             this.inlineObjects.push(graphicObject);
         }
-        else if(graphicObject.behindDoc === true){
+        else if(graphicObject.behindDoc === true && (this.getCompatibilityMode() < document_compatibility_mode_Word15 || graphicObject.wrappingType === WRAPPING_TYPE_NONE)){
             this.behindDocObjects.push(graphicObject);
             this.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
         }
