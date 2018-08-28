@@ -3481,46 +3481,53 @@ function DrawingObjects() {
 
     _this.updateSizeDrawingObjects = function(target, bNoChangeCoords) {
 
+        var oGraphicObject;
+        var bCheck, bRecalculate;
         if(!History.Is_On() || true === bNoChangeCoords){
             if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
-                    if (drawingObject.from.row >= target.row) {
-                        if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.handleUpdateExtents)
-                            {
-                                drawingObject.graphicObject.handleUpdateExtents();
-                                drawingObject.graphicObject.recalculate();
-                            }
-                            else
-                            {
-                                if(drawingObject.graphicObject.recalculateTransform){
-                                    drawingObject.graphicObject.recalculateTransform();
-                                }
-                                if(drawingObject.graphicObject.recalculateBounds){
-                                    drawingObject.graphicObject.recalculateBounds();
-                                }
-                            }
+                    bCheck = false;
+                    if(target.target === AscCommonExcel.c_oTargetType.RowResize){
+                        if(drawingObject.from.row >= target.row){
+                            bCheck = true;
                         }
                     }
-                }
-            } else {
-                for (i = 0; i < aObjects.length; i++) {
-                    drawingObject = aObjects[i];
-                    if (drawingObject.from.col >= target.col) {
-                        if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.handleUpdateExtents)
-                            {
-                                drawingObject.graphicObject.handleUpdateExtents();
-                                drawingObject.graphicObject.recalculate();
-                            }
-                            else
-                            {
-                                if(drawingObject.graphicObject.recalculateTransform){
-                                    drawingObject.graphicObject.recalculateTransform();
+                    else{
+                        if(drawingObject.from.col >= target.col){
+                            bCheck = true;
+                        }
+                    }
+                    if (bCheck) {
+                        oGraphicObject = drawingObject.graphicObject;
+                        if(oGraphicObject){
+                            if(oGraphicObject.handleUpdateExtents) {
+
+                                bRecalculate = true;
+                                if(oGraphicObject.recalculateTransform){
+                                    var oldX = oGraphicObject.x;
+                                    var oldY = oGraphicObject.y;
+                                    var oldExtX = oGraphicObject.extX;
+                                    var oldExtY = oGraphicObject.extY;
+                                    oGraphicObject.recalculateTransform();
+                                    var fDelta = 0.01;
+                                    bRecalculate = false;
+                                    if(!AscFormat.fApproxEqual(oldX, oGraphicObject.x, fDelta) || !AscFormat.fApproxEqual(oldY, oGraphicObject.y, fDelta)
+                                        || !AscFormat.fApproxEqual(oldExtX, oGraphicObject.extX, fDelta) || !AscFormat.fApproxEqual(oldExtY, oGraphicObject.extY, fDelta)){
+                                        bRecalculate = true;
+                                    }
                                 }
-                                if(drawingObject.graphicObject.recalculateBounds){
-                                    drawingObject.graphicObject.recalculateBounds();
+                                if(bRecalculate){
+                                    oGraphicObject.handleUpdateExtents();
+                                    oGraphicObject.recalculate();
+                                }
+                            }
+                            else {
+                                if(oGraphicObject.recalculateTransform){
+                                    oGraphicObject.recalculateTransform();
+                                }
+                                if(oGraphicObject.recalculateBounds){
+                                    oGraphicObject.recalculateBounds();
                                 }
                             }
                         }
