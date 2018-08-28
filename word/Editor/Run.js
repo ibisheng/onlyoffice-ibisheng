@@ -7689,7 +7689,11 @@ ParaRun.prototype.Reject_PrChange = function()
 {
     if (true === this.Have_PrChange())
     {
+		if (this.GetParaEnd())
+			this.Paragraph.TextPr.SetPr(this.Pr.PrChange);
+
         this.Set_Pr(this.Pr.PrChange);
+
         this.Remove_PrChange();
     }
 };

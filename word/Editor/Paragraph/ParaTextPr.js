@@ -539,6 +539,17 @@ ParaTextPr.prototype.Set_TextFill = function(Value)
 	History.Add(new CChangesParaTextPrTextFill(this, this.Value.TextFill, Value));
 	this.Value.TextFill = Value;
 };
+/**
+ * Выставляем настройки (если какая-либо undefined, то такая настройка удаляется)
+ * @param {CTextPr} oTextPr
+ */
+ParaTextPr.prototype.SetPr = function(oTextPr)
+{
+	if (!oTextPr)
+		oTextPr = new CTextPr();
+
+	this.Set_Value(oTextPr);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
