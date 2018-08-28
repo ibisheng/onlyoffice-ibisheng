@@ -566,10 +566,10 @@
     };
 
 	WorksheetView.prototype._getRowTop = function (i) {
-		// ToDo check hidden all rows
 		var l = this.rows.length;
 		return (i < l) ? this.rows[i].top :
-			this.rows[l - 1].top + this.rows[l - 1].height + Asc.round(this.defaultRowHeightPx * this.getZoom()) * (i - l);
+			this.rows[l - 1].top + this.rows[l - 1].height + (!this.model.isDefaultHeightHidden()) *
+			Asc.round(this.defaultRowHeightPx * this.getZoom()) * (i - l);
 	};
     WorksheetView.prototype.getCellTop = function (row, units) {
 		var u = units >= 0 && units <= 3 ? units : 0;
@@ -653,8 +653,8 @@
     };
 
 	WorksheetView.prototype._getRowHeight = function (i) {
-		// ToDo check hidden all rows
-		return (i < this.rows.length) ? this.rows[i].height : Asc.round(this.defaultRowHeightPx * this.getZoom());
+		return (i < this.rows.length) ? this.rows[i].height :
+			(!this.model.isDefaultHeightHidden()) * Asc.round(this.defaultRowHeightPx * this.getZoom());
 	};
     WorksheetView.prototype.getRowHeight = function (index, units) {
 		var u = units >= 0 && units <= 3 ? units : 0;
