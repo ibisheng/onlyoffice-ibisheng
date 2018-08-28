@@ -7934,60 +7934,104 @@ background-repeat: no-repeat;\
 		}
 		return false;
 	};
-	asc_docs_api.prototype.asc_SetContentControlProperties = function(oContentControlPr, Id)
+	asc_docs_api.prototype.asc_SetContentControlProperties = function(oContentControlPr, Id, isApplyToAll)
 	{
-		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		var oLogicDocument = this.private_GetLogicDocument();
 		if (!oLogicDocument)
 			return;
 
-		var isLocked        = true;
-		var oContentControl = null;
-		if (undefined === Id)
+		if (true === isApplyToAll)
 		{
-			var oInfo          = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
-			var oInlineControl = oInfo.GetInlineLevelSdt();
-			var oBlockControl  = oInfo.GetBlockLevelSdt();
+			var arrContentControls = oLogicDocument.GetAllContentControls();
 
-			if (oInlineControl)
-				oContentControl = oInlineControl;
-			else if (oBlockControl)
-				oContentControl = oBlockControl;
+			var arrCheckElements = [], arrCheckTypes = [];
+			for (var nIndex = 0, nCount = arrContentControls.length; nIndex < nCount; ++nIndex)
+			{
+				var oContentControl = arrContentControls[nIndex];
+				if (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType())
+				{
+					arrCheckElements.push(oContentControl);
+					arrCheckTypes.push(AscCommon.changestype_ContentControl_Properties);
+				}
+				else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
+				{
+					var oParagraph = oContentControl.GetParagraph();
+					if (oParagraph)
+					{
+						arrCheckElements.push(oParagraph);
+						arrCheckTypes.push(AscCommon.changestype_Paragraph_Properties);
+					}
+				}
+			}
+
+			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+				Type       : AscCommon.changestype_2_Element_and_Type_Array,
+				Elements   : arrCheckElements,
+				CheckTypes : arrCheckTypes
+			}))
+			{
+				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeContentControlProperties);
+
+				for (var nIndex = 0, nCount = arrContentControls.length; nIndex < nCount; ++nIndex)
+				{
+					arrContentControls[nIndex].SetContentControlPr(oContentControlPr);
+				}
+
+				oLogicDocument.Document_UpdateInterfaceState();
+				oLogicDocument.Document_UpdateSelectionState();
+			}
 		}
 		else
 		{
-			oContentControl = AscCommon.g_oTableId.Get_ById(Id);
-		}
+			var isLocked        = true;
+			var oContentControl = null;
+			if (undefined === Id)
+			{
+				var oInfo          = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
+				var oInlineControl = oInfo.GetInlineLevelSdt();
+				var oBlockControl  = oInfo.GetBlockLevelSdt();
 
-		if (oContentControl && oContentControl.GetContentControlType)
-		{
-			if (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType())
-			{
-				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
-					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
-					Elements  : [oContentControl],
-					CheckType : AscCommon.changestype_ContentControl_Properties
-				});
+				if (oInlineControl)
+					oContentControl = oInlineControl;
+				else if (oBlockControl)
+					oContentControl = oBlockControl;
 			}
-			else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
+			else
 			{
-				var oParagraph = oContentControl.GetParagraph();
-				if (oParagraph)
+				oContentControl = AscCommon.g_oTableId.Get_ById(Id);
+			}
+
+			if (oContentControl && oContentControl.GetContentControlType)
+			{
+				if (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType())
 				{
 					isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 						Type      : AscCommon.changestype_2_ElementsArray_and_Type,
-						Elements  : [oParagraph],
-						CheckType : AscCommon.changestype_Paragraph_Properties
+						Elements  : [oContentControl],
+						CheckType : AscCommon.changestype_ContentControl_Properties
 					});
 				}
+				else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
+				{
+					var oParagraph = oContentControl.GetParagraph();
+					if (oParagraph)
+					{
+						isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+							Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+							Elements  : [oParagraph],
+							CheckType : AscCommon.changestype_Paragraph_Properties
+						});
+					}
+				}
 			}
-		}
 
-		if (false === isLocked)
-		{
-			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeContentControlProperties);
-			oContentControl.SetContentControlPr(oContentControlPr);
-			oLogicDocument.Document_UpdateInterfaceState();
-			oLogicDocument.Document_UpdateSelectionState();
+			if (false === isLocked)
+			{
+				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeContentControlProperties);
+				oContentControl.SetContentControlPr(oContentControlPr);
+				oLogicDocument.Document_UpdateInterfaceState();
+				oLogicDocument.Document_UpdateSelectionState();
+			}
 		}
 	};
 	asc_docs_api.prototype.asc_IsContentControl = function()
