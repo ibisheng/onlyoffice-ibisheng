@@ -739,13 +739,31 @@ function checkPointInMap(map, worksheet, row, col)
         this.axis = oAxis;
 
         var oStyle = null, oLbl, fMinW;
+        var oFirstTextPr = null;
         for(var i = 0; i < aStrings.length; ++i){
             if(typeof aStrings[i] === "string"){
                 oLbl = fCreateLabel(aStrings[i], i, oAxis, oChartSpace, oAxis.txPr, oAxis.spPr, oChartSpace.getDrawingDocument());
                 if(oStyle){
                     oLbl.lastStyleObject = oStyle;
                 }
+                if(oFirstTextPr){
+                    var aRuns = oLbl.tx.rich.content.Content[0] && oLbl.tx.rich.content.Content[0].Content;
+                    if(aRuns){
+                        for(var j = 0; j < aRuns.length; ++j){
+                            var oRun = aRuns[j];
+                            if(oRun.RecalcInfo && true === oRun.RecalcInfo.TextPr){
+                                oRun.RecalcInfo.TextPr = false;
+                                oRun.CompiledPr = oFirstTextPr;
+                            }
+                        }
+                    }
+                }
                 fMinW = oLbl.tx.rich.content.RecalculateMinMaxContentWidth().Min;
+                if(!oFirstTextPr){
+                    if(oLbl.tx.rich.content.Content[0]){
+                        oFirstTextPr = oLbl.tx.rich.content.Content[0].Get_FirstTextPr2();
+                    }
+                }
                 if(fMinW > this.maxMinWidth){
                     this.maxMinWidth = fMinW;
                 }
