@@ -1417,7 +1417,8 @@ DrawingObjectsController.prototype =
         var content, invert_transform_text, tx, ty, hit_paragraph, par, check_hyperlink;
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-            if(e.CtrlKey && !this.document)
+            var bNotes = (this.drawingObjects && this.drawingObjects.getObjectType && this.drawingObjects.getObjectType() === AscDFH.historyitem_type_Notes);
+            if(e.CtrlKey && !this.document && !bNotes)
             {
                 content = object.getDocContent();
                 invert_transform_text = object.invertTransformText;
