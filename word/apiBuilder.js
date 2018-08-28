@@ -4186,13 +4186,13 @@
 			{
 				this.Drawing.Set_DrawingType(drawing_Anchor);
 				this.Drawing.Set_WrappingType(WRAPPING_TYPE_TIGHT);
-				this.Drawing.Set_BehindDoc(false);
+				this.Drawing.Set_BehindDoc(true);
 			}
 			else if ("through" === sType)
 			{
 				this.Drawing.Set_DrawingType(drawing_Anchor);
 				this.Drawing.Set_WrappingType(WRAPPING_TYPE_THROUGH);
-				this.Drawing.Set_BehindDoc(false);
+				this.Drawing.Set_BehindDoc(true);
 			}
 			else if ("topAndBottom" === sType)
 			{

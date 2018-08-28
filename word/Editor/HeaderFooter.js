@@ -1649,7 +1649,6 @@ CHeaderFooterController.prototype =
         }
 
         this.LogicDocument.DrawingObjects.drawBehindDocHdrFtr(nPageIndex, pGraphics);
-        this.LogicDocument.DrawingObjects.drawWrappingObjectsHdrFtr(nPageIndex, pGraphics);
 
         if (oHeader)
             oHeader.Draw(nPageIndex, pGraphics);
