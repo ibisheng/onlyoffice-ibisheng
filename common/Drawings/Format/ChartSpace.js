@@ -739,13 +739,31 @@ function checkPointInMap(map, worksheet, row, col)
         this.axis = oAxis;
 
         var oStyle = null, oLbl, fMinW;
+        var oFirstTextPr = null;
         for(var i = 0; i < aStrings.length; ++i){
             if(typeof aStrings[i] === "string"){
                 oLbl = fCreateLabel(aStrings[i], i, oAxis, oChartSpace, oAxis.txPr, oAxis.spPr, oChartSpace.getDrawingDocument());
                 if(oStyle){
                     oLbl.lastStyleObject = oStyle;
                 }
+                if(oFirstTextPr){
+                    var aRuns = oLbl.tx.rich.content.Content[0] && oLbl.tx.rich.content.Content[0].Content;
+                    if(aRuns){
+                        for(var j = 0; j < aRuns.length; ++j){
+                            var oRun = aRuns[j];
+                            if(oRun.RecalcInfo && true === oRun.RecalcInfo.TextPr){
+                                oRun.RecalcInfo.TextPr = false;
+                                oRun.CompiledPr = oFirstTextPr;
+                            }
+                        }
+                    }
+                }
                 fMinW = oLbl.tx.rich.content.RecalculateMinMaxContentWidth().Min;
+                if(!oFirstTextPr){
+                    if(oLbl.tx.rich.content.Content[0]){
+                        oFirstTextPr = oLbl.tx.rich.content.Content[0].Get_FirstTextPr2();
+                    }
+                }
                 if(fMinW > this.maxMinWidth){
                     this.maxMinWidth = fMinW;
                 }
@@ -1910,10 +1928,17 @@ CChartSpace.prototype.changeFill = function (unifill)
     }
     var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush, this.getEditorType());
     unifill2.convertToPPTXMods();
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
+    }
     this.spPr.setFill(unifill2);
 };
 CChartSpace.prototype.setFill = function (fill) {
-
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
+    }
     this.spPr.setFill(fill);
 };
 
@@ -1932,6 +1957,10 @@ CChartSpace.prototype.changeLine = function (line)
     if(stroke.Fill)
     {
         stroke.Fill.convertToPPTXMods();
+    }
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
     }
     this.spPr.setLn(stroke);
 };
@@ -9804,7 +9833,7 @@ CChartSpace.prototype.hitInTextRect = function()
                 {
                     calc_entryes[i].calcMarkerUnion.marker.spPr.geometry.Recalculate(marker_size, marker_size);
                 }
-                distance_to_text = marker_size*0.8;
+                distance_to_text = marker_size*0.7;
             }
             var left_inset = marker_size + 3*distance_to_text;
             var legend_pos = c_oAscChartLegendShowSettings.right;

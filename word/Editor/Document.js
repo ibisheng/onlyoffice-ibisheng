@@ -4641,6 +4641,7 @@ CDocument.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelectio
 
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
+	this.Document_UpdateTracks();
 };
 CDocument.prototype.RemoveBeforePaste = function()
 {
@@ -9491,6 +9492,12 @@ CDocument.prototype.UpdateDocumentOutlinePosition = function()
 };
 CDocument.prototype.Document_UpdateTracks = function()
 {
+	if (true === this.TurnOffInterfaceEvents)
+		return;
+
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
+		return;
+
 	this.private_UpdateTracks(this.IsSelectionUse(), this.IsSelectionEmpty());
 };
 CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
@@ -12638,6 +12645,14 @@ CDocument.prototype.SetSdtGlobalShowHighlight = function(isShow)
 CDocument.prototype.OnChangeSdtGlobalSettings = function()
 {
 	this.GetApi().sync_OnChangeSdtGlobalSettings();
+};
+/**
+ * Проверяем все ли параметры SdtSettings выставлены по умолчанию
+ * @returns {boolean}
+ */
+CDocument.prototype.IsSdtGlobalSettingsDefault = function()
+{
+	return this.Settings.SdtSettings.IsDefault();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Math
@@ -16352,6 +16367,28 @@ CDocument.prototype.ClearContentControl = function(Id)
 	}
 
 	return oContentControl;
+};
+/**
+ * Выделяем содержимое внутри заданного контейнера
+ * @param {string} sId
+ */
+CDocument.prototype.SelectContentControl = function(sId)
+{
+	var oContentControl = this.TableId.Get_ById(sId);
+	if (!oContentControl)
+		return;
+
+	this.RemoveSelection();
+
+	if (oContentControl.GetContentControlType
+		&& (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType()
+		|| c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType()))
+	{
+		oContentControl.SelectContentControl();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateTracks();
+	}
 };
 CDocument.prototype.GetAllSignatures = function()
 {

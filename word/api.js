@@ -9083,6 +9083,46 @@ background-repeat: no-repeat;\
 	{
 		return this.asc_GetCurrentContentControl();
 	};
+	window["asc_docs_api"].prototype["pluginMethod_SelectContentControl"] = function(id)
+	{
+		var oLogicDocument = this.private_GetLogicDocument();
+		if (!oLogicDocument)
+			return;
+
+		oLogicDocument.SelectContentControl(id);
+	};
+	window["asc_docs_api"].prototype["pluginMethod_GetSelectedText"] = function()
+	{
+		var oLogicDocument = this.private_GetLogicDocument();
+		if (!oLogicDocument)
+			return;
+
+		return oLogicDocument.GetSelectedText(false, {NewLine : true, NewLineParagraph : true});
+	};
+	window["asc_docs_api"].prototype["pluginMethod_RemoveSelectedContent"] = function()
+	{
+		var oLogicDocument = this.private_GetLogicDocument();
+		if (!oLogicDocument || !oLogicDocument.IsSelectionUse())
+			return;
+
+		if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true, oLogicDocument.IsFormFieldEditing()))
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_BackSpaceButton);
+			oLogicDocument.Remove(-1, true);
+		}
+	};
+	window["asc_docs_api"].prototype["pluginMethod_AddComment"] = function(sMessage, sAuthorName)
+	{
+		var oData = new asc_CCommentDataWord();
+
+		if (sMessage)
+			oData.asc_putText(sMessage);
+
+		if (sAuthorName)
+			oData.asc_putUserName(sAuthorName);
+
+		this.asc_addComment(oData);
+	};
 	/**
 	 * Find and replace text.
 	 * @param {Object} oProperties The properties for find and replace.
