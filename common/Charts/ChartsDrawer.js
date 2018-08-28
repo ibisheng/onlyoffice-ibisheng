@@ -8166,7 +8166,7 @@ drawPieChart.prototype = {
 		var point = this.chart.series[0].val.numRef ? this.chart.series[0].val.numRef.numCache.pts[val] :
 			this.chart.series[0].val.numLit.pts[val];
 
-		if (!point) {
+		if (!point || !point.compiledDlb) {
 			return;
 		}
 
