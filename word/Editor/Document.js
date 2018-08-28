@@ -9497,6 +9497,12 @@ CDocument.prototype.UpdateDocumentOutlinePosition = function()
 };
 CDocument.prototype.Document_UpdateTracks = function()
 {
+	if (true === this.TurnOffInterfaceEvents)
+		return;
+
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
+		return;
+
 	this.private_UpdateTracks(this.IsSelectionUse(), this.IsSelectionEmpty());
 };
 CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
