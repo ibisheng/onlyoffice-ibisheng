@@ -3258,7 +3258,7 @@
 			objMCRow = isFirstRowTmp ? objectMergedCells[row] : objMCNextRow;
 			objMCNextRow = objectMergedCells[nextRow];
 
-			var rowCache = t._fetchRowCache(row);
+			var rowCache = t._getRowCache(row);
 			var y1 = this._getRowTop(row) - offsetY;
 			var y2 = y1 + h - gridlineSize;
 
@@ -4913,10 +4913,10 @@
     };
 
     WorksheetView.prototype._isLeftBorderErased = function (col, rowCache) {
-        return rowCache.erased[col - 1] === true;
+        return rowCache && rowCache.erased[col - 1] === true;
     };
     WorksheetView.prototype._isRightBorderErased = function (col, rowCache) {
-        return rowCache.erased[col] === true;
+        return rowCache && rowCache.erased[col] === true;
     };
 
     WorksheetView.prototype._calcMaxBorderWidth = function (b1, b2) {
