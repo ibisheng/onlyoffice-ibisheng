@@ -8105,10 +8105,10 @@ background-repeat: no-repeat;\
 	{
 		var oLogicDocument = this.private_GetLogicDocument();
 		if (!oLogicDocument)
-			return {r : 0, g : 0, b : 0};
+			return new Asc.asc_CColor(0, 0, 0);
 
 		var oColor = oLogicDocument.GetSdtGlobalColor();
-		return {r : oColor.r, g : oColor.g, b : oColor.b};
+		return new Asc.asc_CColor(oColor.r, oColor.g, oColor.b);
 	};
 	asc_docs_api.prototype.asc_SetGlobalContentControlShowHighlight = function(isShow)
 	{
