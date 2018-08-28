@@ -2327,9 +2327,15 @@ function CEditorPage(api)
 
 				if (oThis.m_oApi.isMobileVersion)
 				{
-					oThis.MobileTouchManager = new AscCommon.CMobileTouchManager();
+					oThis.MobileTouchManager = new AscCommon.CMobileTouchManager({ eventsElement : "word_mobile_element" });
 					oThis.MobileTouchManager.Init(oThis.m_oApi);
+
+                    if (AscCommon.g_inputContext && AscCommon.g_inputContext.HtmlArea)
+                        oThis.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
+
 					oThis.MobileTouchManager.Resize();
+
+                    oThis.MobileTouchManager.scrollTo(oThis.m_dScrollX, oThis.m_dScrollY);
 				}
 
 				return;
