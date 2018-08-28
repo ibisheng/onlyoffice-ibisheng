@@ -4846,11 +4846,15 @@ function CDrawingDocument()
 						}
 					}
 
+					var _yCell = _y;
+					if (!AscCommon.AscBrowser.isRetina)
+						_yCell = 1 + (_y >> 0);
+
 					for (var nIndexB = 0; nIndexB < _object.Buttons.length; nIndexB++)
 					{
 						var image = g_oContentControlButtonIcons.getImage(_object.Buttons[nIndexB], nIndexB == _object.ActiveButtonIndex);
 						if (image)
-							ctx.drawImage(image, nAdvancedLB, _y, 20, 20);
+							ctx.drawImage(image, nAdvancedLB >> 0, _yCell, 20, 20);
 						nAdvancedLB += 20;
 					}
 
