@@ -2037,6 +2037,25 @@ CUniColor.prototype =
             return _ret;
         }
 
+        if(this.Mods && unicolor.Mods)
+        {
+            var aMods = this.Mods.Mods;
+            var aMods2 = unicolor.Mods.Mods;
+            if(aMods.length === aMods2.length)
+            {
+                for (var i = 0; i < aMods.length; ++i)
+                {
+                    if(aMods2[i].name !== aMods[i].name || aMods2[i].val !== aMods[i].val)
+                    {
+                        break;
+                    }
+                }
+                if(i === aMods.length)
+                {
+                    _ret.Mods = this.Mods.createDuplicate();
+                }
+            }
+        }
         switch(this.color.type)
         {
             case c_oAscColor.COLOR_TYPE_NONE:
