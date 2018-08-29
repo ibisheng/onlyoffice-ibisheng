@@ -163,9 +163,6 @@
 	}
 
     function CacheElement() {
-        if (!(this instanceof CacheElement)) {
-            return new CacheElement();
-        }
         this.columnsWithText = {};							// Колонки, в которых есть текст
         this.columns = {};
         this.erased = {};
@@ -173,10 +170,6 @@
     }
 
     function Cache() {
-        if (!(this instanceof Cache)) {
-            return new Cache();
-        }
-
         this.rows = {};
         this.sectors = [];
 
