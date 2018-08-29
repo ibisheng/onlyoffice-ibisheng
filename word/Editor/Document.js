@@ -16260,19 +16260,6 @@ CDocument.prototype.MoveToFillingForm = function(isNext)
 		}
 	}
 };
-CDocument.prototype.SelectContentControl = function(Id)
-{
-	var oBlockLevelSdt = this.TableId.Get_ById(Id);
-	if (oBlockLevelSdt)
-	{
-		this.RemoveSelection();
-		oBlockLevelSdt.SelectContentControl();
-
-		this.Document_UpdateInterfaceState();
-		this.Document_UpdateRulersState();
-		this.Document_UpdateSelectionState();
-	}
-};
 CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 {
 	return this.OnEndTextDrag(NearestPos, isCopy);
@@ -16378,16 +16365,19 @@ CDocument.prototype.SelectContentControl = function(sId)
 	if (!oContentControl)
 		return;
 
-	this.RemoveSelection();
-
 	if (oContentControl.GetContentControlType
 		&& (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType()
 		|| c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType()))
 	{
+		this.RemoveSelection();
+
 		oContentControl.SelectContentControl();
 		this.Document_UpdateSelectionState();
+		this.Document_UpdateRulersState();
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateTracks();
+
+		this.private_UpdateCursorXY(true, true);
 	}
 };
 CDocument.prototype.GetAllSignatures = function()
