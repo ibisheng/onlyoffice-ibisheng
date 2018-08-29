@@ -595,7 +595,8 @@ var c_oSer_SettingsType = {
 	FootnotePr: 4,
 	EndnotePr: 5,
 	SdtGlobalColor: 6,
-	SdtGlobalShowHighlight: 7
+	SdtGlobalShowHighlight: 7,
+	Compat: 8
 };
 var c_oSer_MathPrType = {
 	BrkBin: 0,
@@ -933,7 +934,13 @@ var c_oSerFFData = {
 	TIDefault: 21,
 	TIFormat: 22,
 	TIMaxLength: 23,
-	TIType: 24,
+	TIType: 24
+};
+var c_oSerCompat = {
+	CompatSetting: 0,
+	CompatName: 1,
+	CompatUri: 2,
+	CompatValue: 3
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -6903,12 +6910,8 @@ function BinaryFileReader(doc, openParams)
 			table.ReIndexing(0);
 			table.Correct_BadTable();
 		}
-		if ("Microsoft Office Word" === this.oReadResult.Application && this.oReadResult.AppVersion) {
-			if (this.oReadResult.AppVersion.startsWith("14.")) {
-				this.Document.Settings.CompatibilityMode = document_compatibility_mode_Word14;
-			} else if (this.oReadResult.AppVersion.startsWith("15.")) {
-				this.Document.Settings.CompatibilityMode = document_compatibility_mode_Word15;
-			}
+		if (null !== this.oReadResult.compatibilityMode) {
+			this.Document.Settings.CompatibilityMode = this.oReadResult.compatibilityMode;
 		}
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
@@ -14142,6 +14145,12 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 		{
 			this.Document.SetSdtGlobalShowHighlight(this.stream.GetBool());
 		}
+		else if ( c_oSer_SettingsType.Compat === type )
+		{
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.ReadCompat(t,l);
+			});
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -14527,6 +14536,42 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 		}
 		
 		this.Document.clrSchemeMap.color_map[nScriptType] = nScriptVal;
+	};
+	this.ReadCompat = function(type, length)
+	{
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerCompat.CompatSetting === type)
+		{
+			var compat = {name: null, url: null, value: null};
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.ReadCompatSetting(t,l,compat);
+			});
+			if ("compatibilityMode" === compat.name) {
+				if ("14" === compat.value) {
+					this.oReadResult.compatibilityMode = document_compatibility_mode_Word14;
+				} else if ("15" === compat.value) {
+					this.oReadResult.compatibilityMode = document_compatibility_mode_Word15;
+				}
+			}
+		}
+		else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadCompatSetting = function(type, length, compat)
+	{
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerCompat.CompatName === type) {
+			compat.name = this.stream.GetString2LE(length);
+		} else if (c_oSerCompat.CompatUri === type) {
+			compat.url = this.stream.GetString2LE(length);
+		} else if (c_oSerCompat.CompatValue === type) {
+			compat.value = this.stream.GetString2LE(length);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
 	};
 };
 function Binary_NotesTableReader(doc, oReadResult, openParams, stream)
@@ -14925,6 +14970,7 @@ function DocReadResult(doc) {
 	this.bookmarksStarted = {};
 	this.Application;
 	this.AppVersion;
+	this.compatibilityMode = null;
 };
 //---------------------------------------------------------export---------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
