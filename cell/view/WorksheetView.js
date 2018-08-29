@@ -4475,16 +4475,11 @@
             range = new Asc.Range(0, 0, colsLength - 1, this.rows.length - 1);
         }
         var t = this;
-        var curRow = -1, hiddenRow = false;
+		this.model.bExcludeHiddenRows = true;
 		this.model.getRange3(range.r1, 0, range.r2, range.c2)._foreachNoEmpty(function(cell, row, col) {
-            if (curRow !== row) {
-                curRow = row;
-				hiddenRow = 0 === t.rows[row].height;
-            }
-            if(!hiddenRow && !(colsLength <= col || 0 === t.cols[col].width)) {
-                t._addCellTextToCache(col, row);
-            }
+			t._addCellTextToCache(col, row);
 		});
+		this.model.bExcludeHiddenRows = false;
         this.isChanged = false;
     };
 
