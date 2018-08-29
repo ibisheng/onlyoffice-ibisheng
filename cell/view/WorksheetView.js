@@ -4484,7 +4484,7 @@
 
     WorksheetView.prototype._fetchCellCacheText = function (col, row) {
         var r = this._fetchRowCache(row);
-        return (r.columnsWithText[col] = ( r.columnsWithText[col] || {} ));
+        return (r.columnsWithText[col] = ( r.columnsWithText[col] || true ));
     };
 
     WorksheetView.prototype._getRowCache = function (row) {
@@ -4752,7 +4752,7 @@
             textBound: textBound
         };
 
-        this._fetchCellCacheText(col, row).hasText = true;
+        this._fetchCellCacheText(col, row);
 
         if (!angle && (cto.leftSide !== 0 || cto.rightSide !== 0)) {
             this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
