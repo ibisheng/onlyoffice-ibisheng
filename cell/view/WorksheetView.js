@@ -4493,13 +4493,13 @@
 
     WorksheetView.prototype._getCellCache = function (col, row) {
         var r = this.cache.rows[row];
-        return r ? r.columns[col] : undefined;
+        return r && r.columns[col];
     };
 
     WorksheetView.prototype._getCellTextCache = function (col, row, dontLookupMergedCells) {
-        var r = this.cache.rows[row], c = r ? r.columns[col] : undefined;
-        if (c && c.text) {
-            return c.text;
+        var c = this._getCellCache(col, row);
+        if (c) {
+            return c;
         } else if (!dontLookupMergedCells) {
             // ToDo проверить это условие, возможно оно избыточно
             var range = this.model.getMergedByCell(row, col);
@@ -4737,7 +4737,7 @@
 //                    }
         }
 
-        this._fetchCellCache(col, row).text = {
+        this._fetchCellCache(col, row) = {
             state: this.stringRender.getInternalState(),
             flags: fl,
             metrics: tm,
@@ -4800,7 +4800,7 @@
 							this.stringRender.getTransformBound(angle, colWidth, rowInfo.height, tm.width, ha, va,
 								maxW);
 
-                      this._fetchCellCache(col, row).text.textBound = textBound;
+                      this._fetchCellCache(col, row).textBound = textBound;
                   }
 
                   this.isChanged = true;
@@ -4875,7 +4875,7 @@
                 if (!r.columns[i] || 0 === this.cols[i].width) {
                     continue;
                 }
-                var ct = r.columns[i].text;
+                var ct = r.columns[i];
                 if (!ct) {
                     continue;
                 }
