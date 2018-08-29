@@ -169,6 +169,21 @@
         return this;
     }
 
+	function CacheElementText() {
+		this.state = null;
+		this.flags = null;
+		this.metrics = null;
+		this.cellW = null;
+		this.cellHA = null;
+		this.cellVA = null;
+		this.sideL = null;
+		this.sideR = null;
+		this.cellType = null;
+		this.isFormula = false;
+		this.angle = null;
+		this.textBound = null;
+	}
+
     function Cache() {
         this.rows = {};
         this.sectors = [];
@@ -4474,18 +4489,18 @@
     };
 
     WorksheetView.prototype._fetchRowCache = function (row) {
-        return (this.cache.rows[row] = ( this.cache.rows[row] || new CacheElement() ));
-    };
+		return (this.cache.rows[row] = (this.cache.rows[row] || new CacheElement()));
+	};
 
     WorksheetView.prototype._fetchCellCache = function (col, row) {
-        var r = this._fetchRowCache(row);
-        return (r.columns[col] = ( r.columns[col] || {} ));
-    };
+		var r = this._fetchRowCache(row);
+		return (r.columns[col] = (r.columns[col] || new CacheElementText()));
+	};
 
     WorksheetView.prototype._fetchCellCacheText = function (col, row) {
-        var r = this._fetchRowCache(row);
-        return (r.columnsWithText[col] = ( r.columnsWithText[col] || true ));
-    };
+		var r = this._fetchRowCache(row);
+		return (r.columnsWithText[col] = (r.columnsWithText[col] || true));
+	};
 
     WorksheetView.prototype._getRowCache = function (row) {
         return this.cache.rows[row];
@@ -4596,6 +4611,7 @@
                         strCopy.text = 'A';
                         tm = this._roundTextMetrics(this.stringRender.measureString([strCopy], fl));
                         AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy.format, tm);
+						this._fetchCellCache(col, row).metrics = tm;
                     }
                     this._updateRowHeight(tm, col, row, fl, isMerged, fMergedRows, va);
                 }
@@ -4737,20 +4753,19 @@
 //                    }
         }
 
-        this._fetchCellCache(col, row) = {
-            state: this.stringRender.getInternalState(),
-            flags: fl,
-            metrics: tm,
-            cellW: cto.maxWidth,
-            cellHA: ha,
-            cellVA: va,
-            sideL: cto.leftSide,
-            sideR: cto.rightSide,
-            cellType: cellType,
-            isFormula: c.isFormula(),
-            angle: angle,
-            textBound: textBound
-        };
+        var cache = this._fetchCellCache(col, row);
+		cache.state = this.stringRender.getInternalState();
+		cache.flags = fl;
+		cache.metrics = tm;
+		cache.cellW = cto.maxWidth;
+		cache.cellHA = ha;
+		cache.cellVA = va;
+		cache.sideL = cto.leftSide;
+		cache.sideR = cto.rightSide;
+		cache.cellType = cellType;
+		cache.isFormula = c.isFormula();
+		cache.angle = angle;
+		cache.textBound = textBound;
 
         this._fetchCellCacheText(col, row);
 
