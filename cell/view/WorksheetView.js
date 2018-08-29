@@ -82,6 +82,7 @@
 
     var c_oTargetType = AscCommonExcel.c_oTargetType;
     var c_oAscCanChangeColWidth = AscCommonExcel.c_oAscCanChangeColWidth;
+	var c_oAscMergeType = AscCommonExcel.c_oAscMergeType;
     var c_oAscLockTypeElemSubType = AscCommonExcel.c_oAscLockTypeElemSubType;
     var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
     var c_oAscGraphicOption = AscCommonExcel.c_oAscGraphicOption;
@@ -244,6 +245,18 @@
     CellFlags.prototype.isMerged = function () {
         return null !== this.merged;
     };
+	CellFlags.prototype.getMergeType = function () {
+	    var res = c_oAscMergeType.none;
+	    if (null !== this.merged) {
+			if (this.merged.c1 !== this.merged.c2) {
+				res |= c_oAscMergeType.columns;
+			}
+			if (this.merged.r1 !== this.merged.r2) {
+				res |= c_oAscMergeType.rows;
+			}
+        }
+        return res;
+	};
 
     function CellBorderObject(borders, mergeInfo, col, row) {
         this.borders = borders;
@@ -4568,29 +4581,22 @@
             this.handlers.trigger("reinitializeScrollY");
         }
 
-        var str, tm, isMerged = false, strCopy;
+        var str, tm, strCopy;
 
         // Range для замерженной ячейки
         var fl = this._getCellFlags(c);
         var mc = fl.merged;
-        var fMergedColumns = false;	// Замержены ли колонки (если да, то автоподбор ширины не должен работать)
-        var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
         if (null !== mc) {
             if (col !== mc.c1 || row !== mc.r1) {
                 // Проверим внесена ли первая ячейка в cache (иначе если была скрыта первая строка или первый столбец, то мы не внесем)
                 if (undefined === this._getCellTextCache(mc.c1, mc.r1, true)) {
                     return this._addCellTextToCache(mc.c1, mc.r1, canChangeColWidth);
                 }
+				// skip other merged cell from range
                 return mc.c2;
-            } // skip other merged cell from range
-            if (mc.c1 !== mc.c2) {
-                fMergedColumns = true;
             }
-            if (mc.r1 !== mc.r2) {
-                fMergedRows = true;
-            }
-            isMerged = true;
         }
+		var mergeType = fl.getMergeType();
         var align = c.getAlign();
         var angle = align.getAngle();
         var va = align.getAlignVertical();
@@ -4606,9 +4612,10 @@
                         strCopy.text = 'A';
                         tm = this._roundTextMetrics(this.stringRender.measureString([strCopy], fl));
                         AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy.format, tm);
-						this._fetchCellCache(col, row).metrics = tm;
+						cache = this._fetchCellCache(col, row);
+						cache.metrics = tm;
                     }
-                    this._updateRowHeight(tm, col, row, fl, isMerged, fMergedRows, va);
+                    this._updateRowHeight(col, row);
                 }
             }
 
@@ -4623,7 +4630,7 @@
         var pad = this.settings.cells.padding * 2 + 1;
         var sstr, sfl, stm;
 
-        if (!this.cols[col].isCustomWidth && fl.isNumberFormat && !fMergedColumns &&
+        if (!this.cols[col].isCustomWidth && fl.isNumberFormat && !(mergeType & c_oAscMergeType.cols) &&
           (c_oAscCanChangeColWidth.numbers === canChangeColWidth ||
           c_oAscCanChangeColWidth.all === canChangeColWidth)) {
             colWidth = this.cols[col].innerWidth;
@@ -4654,7 +4661,7 @@
             dDigitsCount = this.getColumnWidthInSymbols(col);
             colWidth = this.cols[col].innerWidth;
             // подбираем ширину
-            if (!this.cols[col].isCustomWidth && !fMergedColumns && !fl.wrapText &&
+            if (!this.cols[col].isCustomWidth && !(mergeType & c_oAscMergeType.cols) && !fl.wrapText &&
               c_oAscCanChangeColWidth.all === canChangeColWidth) {
                 sstr = c.getValue2(gc_nMaxDigCountView, function () {
                     return true;
@@ -4681,15 +4688,15 @@
         // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
         str = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
         var ha = c.getAlignHorizontalByValue(align.getAlignHorizontal());
-        var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ?
+        var maxW = fl.wrapText || fl.shrinkToFit || mergeType || asc.isFixedWidthCell(str) ?
           this._calcMaxWidth(col, row, mc) : undefined;
         tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
-        var cto = (isMerged || fl.wrapText || fl.shrinkToFit) ? {
+        var cto = (mergeType || fl.wrapText || fl.shrinkToFit) ? {
             maxWidth: maxW - this.cols[col].innerWidth + this.cols[col].width, leftSide: 0, rightSide: 0
         } : this._calcCellTextOffset(col, row, ha, tm.width);
 
         // check right side of cell text and append columns if it exceeds existing cells borders
-        if (!isMerged) {
+        if (!mergeType) {
             var rside = this.cols[col - cto.leftSide].left + tm.width;
             var lc = this.cols[this.cols.length - 1];
             if (rside > lc.left + lc.width) {
@@ -4701,7 +4708,7 @@
 
         if (angle) {
             //  повернутый текст учитывает мерж ячеек по строкам
-            if (fMergedRows) {
+            if (mergeType & c_oAscMergeType.rows) {
                 rowHeight = 0;
 
                 for (var j = mc.r1; j <= mc.r2 && j < this.nRowsCount; ++j) {
@@ -4718,7 +4725,7 @@
                       this.stringRender.getTransformBound(angle, colWidth, rowHeight, tm.width, ha, va, rowHeight);
                 } else {
 
-                    if (!fMergedRows) {
+                    if (!(mergeType & c_oAscMergeType.rows)) {
                         rowHeight = tm.height;
                     }
                     tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, rowHeight));
@@ -4768,55 +4775,54 @@
             this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
         }
 
-        fMergedRows = fMergedRows || (isMerged && fl.wrapText);
-        this._updateRowHeight(tm, col, row, fl, isMerged, fMergedRows, va, ha, angle, maxW,
-          colWidth, textBound);
+        this._updateRowHeight(col, row, maxW, colWidth);
 
         return mc ? mc.c2 : col;
     };
 
-    WorksheetView.prototype._updateRowHeight =
-      function (tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound) {
-			var rowInfo = this.rows[row];
-			// update row's descender
-			if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged && !angle) {
-			    rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline - 1);
+	WorksheetView.prototype._updateRowHeight = function (col, row, maxW, colWidth) {
+		var cache = this._getCellTextCache(col, row);
+		var mergeType = cache.flags.getMergeType();
+		var isMergedRows = (mergeType & c_oAscMergeType.rows) || (mergeType && fl.wrapText);
+		var tm = cache.metrics;
+		var va = cache.cellVA;
+		var textBound = cache.textBound;
+		var rowInfo = this.rows[row];
+		// update row's descender
+		if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !mergeType && !cache.angle) {
+			rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline - 1);
+		}
+
+		// update row's height
+		// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
+		if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) && !isMergedRows) {
+			var newHeight = tm.height;
+			var oldHeight = AscCommonExcel.convertPtToPx(rowInfo.heightReal);
+			if (cache.angle && textBound) {
+				newHeight = Math.max(oldHeight, textBound.height);
 			}
 
-			// update row's height
-			// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
-			if (!rowInfo.isCustomHeight && !(window["NATIVE_EDITOR_ENJINE"] && this.notUpdateRowHeight) &&
-				!fMergedRows) {
-				var newHeight = tm.height;
-				var oldHeight = AscCommonExcel.convertPtToPx(rowInfo.heightReal);
-				if (angle && textBound) {
-				    newHeight = Math.max(oldHeight, textBound.height);
+			newHeight = Math.min(this.maxRowHeightPx, Math.max(oldHeight, newHeight));
+			if (newHeight !== oldHeight) {
+				rowInfo.heightReal = AscCommonExcel.convertPxToPt(newHeight);
+				rowInfo.height = Asc.round(newHeight * this.getZoom());
+				History.TurnOff();
+				this.model.setRowHeight(rowInfo.heightReal, row, row, false);
+				History.TurnOn();
+
+				if (cache.angle) {
+					if (cache.flags.wrapText && !rowInfo.isCustomHeight) {
+						maxW = tm.width;
+					}
+
+					cache.textBound = this.stringRender.getTransformBound(cache.angle, colWidth, rowInfo.height, tm.width,
+						cache.cellHA, va, maxW);
 				}
 
-				newHeight = Math.min(this.maxRowHeightPx, Math.max(oldHeight, newHeight));
-				if (newHeight !== oldHeight) {
-					rowInfo.heightReal = AscCommonExcel.convertPxToPt(newHeight);
-					rowInfo.height = Asc.round(newHeight * this.getZoom());
-					History.TurnOff();
-                  this.model.setRowHeight(rowInfo.heightReal, row, row, false);
-					History.TurnOn();
-
-                  if (angle) {
-                      if (flags.wrapText && !rowInfo.isCustomHeight) {
-                          maxW = tm.width;
-                      }
-
-                      textBound =
-							this.stringRender.getTransformBound(angle, colWidth, rowInfo.height, tm.width, ha, va,
-								maxW);
-
-                      this._fetchCellCache(col, row).textBound = textBound;
-                  }
-
-                  this.isChanged = true;
-              }
-          }
-      };
+				this.isChanged = true;
+			}
+		}
+	};
 
     WorksheetView.prototype._calcMaxWidth = function (col, row, mc) {
         if (null === mc) {

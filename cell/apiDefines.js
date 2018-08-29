@@ -258,6 +258,13 @@ var c_oAscCanChangeColWidth = {
   all: 2	// numbers + text
 };
 
+// Merge cell type
+var c_oAscMergeType = {
+  none: 0,
+  columns: 1, // Замержены ли колонки (если да, то автоподбор ширины не должен работать)
+  rows: 2     // Замержены ли строки (если да, то автоподбор высоты не должен работать)
+};
+
 var c_oAscPaneState = {
   Frozen: "frozen",
   FrozenSplit: "frozenSplit",
@@ -385,6 +392,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscRecalcIndexTypes = c_oAscRecalcIndexTypes;
   window['AscCommonExcel'].c_oAscCellEditorSelectState = c_oAscCellEditorSelectState;
   window['AscCommonExcel'].c_oAscCanChangeColWidth = c_oAscCanChangeColWidth;
+  window['AscCommonExcel'].c_oAscMergeType = c_oAscMergeType;
   window['AscCommonExcel'].c_oAscPaneState = c_oAscPaneState;
   window['AscCommonExcel'].c_oTargetType = c_oTargetType;
   window['AscCommonExcel'].c_oAscCoAuthoringMeBorderColor = c_oAscCoAuthoringMeBorderColor;
