@@ -59,11 +59,13 @@ CSdtPr.prototype.Copy = function()
 {
 	var oPr = new CSdtPr();
 
-	oPr.Alias = this.Alias;
-	oPr.Id    = this.Id;
-	oPr.Tag   = this.Tag;
-	oPr.Label = this.Label;
-	oPr.Lock  = this.Lock;
+	oPr.Alias      = this.Alias;
+	oPr.Id         = this.Id;
+	oPr.Tag        = this.Tag;
+	oPr.Label      = this.Label;
+	oPr.Lock       = this.Lock;
+	oPr.Appearance = this.Appearance;
+	oPr.Color      = (this.Color ? this.Color.Copy() : undefined);
 
 	return oPr;
 };
