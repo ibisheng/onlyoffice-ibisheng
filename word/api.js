@@ -8258,6 +8258,8 @@ background-repeat: no-repeat;\
 				oPr.InitFromSdtTOC(oTOC);
 				return oPr;
 			}
+
+			oTOC = oInnerTOC;
 		}
 
 		if (oTOC instanceof AscCommonWord.CComplexField)
