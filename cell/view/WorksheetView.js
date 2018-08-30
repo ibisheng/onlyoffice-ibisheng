@@ -11948,7 +11948,6 @@
     /**
      *
      * @param {Object} ranges
-     * @param canChangeColWidth
      * @param lockDraw
      * @param updateHeight
      */
