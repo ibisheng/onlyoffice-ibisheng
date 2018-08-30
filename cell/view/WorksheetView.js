@@ -11748,12 +11748,14 @@
 			}
 		}
 
-		this._updateCellsRange(bbox, isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers,
-			lockDraw);
-
 		if (!isNotHistory) {
 			History.EndTransaction();
 		}
+
+		this.canChangeColWidth = isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers;
+		this._updateCellsRange2(bbox);
+		this.canChangeColWidth = c_oAscCanChangeColWidth.none;
+		this.draw(lockDraw);
 
 		if (oAutoExpansionTable) {
 			var callback = function () {
