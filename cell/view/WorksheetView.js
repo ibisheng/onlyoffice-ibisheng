@@ -12001,10 +12001,6 @@
             }
         }
     };
-    WorksheetView.prototype.updateRange = function (range, canChangeColWidth, lockDraw) {
-        this._checkUpdateRange(range);
-        this._updateCellsRange(range, canChangeColWidth, lockDraw);
-    };
 
     WorksheetView.prototype._updateCellsRange2 = function (range, skipHeight) {
 		this._cleanCache(range);
