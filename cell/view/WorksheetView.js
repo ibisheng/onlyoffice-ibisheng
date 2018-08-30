@@ -8660,7 +8660,7 @@
                 return;
             }
             var bIsUpdate = true;
-            var oUpdateRanges = [], hasUpdates = false;
+            var hasUpdates = false;
 
             var callTrigger = false;
             var res;
@@ -8933,15 +8933,18 @@
 				t.model.excludeHiddenRows(false);
 
                 if (bIsUpdate) {
+
+					t.canChangeColWidth = canChangeColWidth;
+					t._updateCellsRange2(item);
+					t.canChangeColWidth = c_oAscCanChangeColWidth.none;
+
                     hasUpdates = true;
-					item.canChangeColWidth = canChangeColWidth;
-                    oUpdateRanges.push(item);
                     bIsUpdate = false;
                 }
             });
 
             if (hasUpdates) {
-                t.updateRanges(oUpdateRanges, false, true);
+				t._recalculateAfterUpdate2();
             }
             if (callTrigger) {
                 t.handlers.trigger("slowOperation", false);
