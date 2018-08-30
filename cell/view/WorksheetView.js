@@ -11954,23 +11954,12 @@
         return this.arrActiveFormulaRanges;
     };
 
-    /**
-     *
-     * @param {Object} ranges
-     * @param lockDraw
-     * @param updateHeight
-     */
-    WorksheetView.prototype.updateRanges = function (ranges, lockDraw, updateHeight) {
+    WorksheetView.prototype.updateRanges = function (ranges, skipHeight) {
         if (0 < ranges.length) {
 			for (var i = 0; i < ranges.length; ++i) {
-				this.updateRange(ranges[i], ranges[i].canChangeColWidth || c_oAscCanChangeColWidth.none, true);
+				this._checkUpdateRange(ranges[i]);
+				this._updateCellsRange2(ranges[i], skipHeight);
 			}
-
-            if (updateHeight) {
-                this.isChanged = true;
-            }
-
-            this._recalculateAfterUpdate(ranges, lockDraw);
         }
     };
     // ToDo избавиться от этой функции!!!!Заглушка для принятия изменений

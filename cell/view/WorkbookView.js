@@ -731,10 +731,10 @@
 		  }
 	  });
 
-    this.model.handlers.add("cleanCellCache", function(wsId, oRanges, bLockDraw, updateHeight) {
+    this.model.handlers.add("cleanCellCache", function(wsId, oRanges, skipHeight) {
       var ws = self.getWorksheetById(wsId, true);
       if (ws) {
-        ws.updateRanges(oRanges, bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(), updateHeight);
+        ws.updateRanges(oRanges, skipHeight);
       }
     });
     this.model.handlers.add("changeWorksheetUpdate", function(wsId, val) {
