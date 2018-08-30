@@ -8518,6 +8518,8 @@
                     return;
                 }
 
+				var hasMerged = t.model.getRange3(arnFrom.r1, arnFrom.c1, arnFrom.r2, arnFrom.c2).hasMerged();
+
                 // Очищаем выделение
                 t.cleanSelection();
 
@@ -8552,19 +8554,15 @@
                 // Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
                 t._updateSelectionNameAndInfo();
 
-                if (null !== t.model.getRange3(arnTo.r1, arnTo.c1, arnTo.r2, arnTo.c2).hasMerged() &&
-                  false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo)) {
-                    t.model.autoFilters.unmergeTablesAfterMove(arnTo);
-                    t._updateCellsRange(arnTo, false, true);
-                    t._recalculateAfterUpdate([arnFrom, arnTo]);
-                    //не делаем действий в asc_onConfirmAction, потому что во время диалога может выполниться autosave и новые измения добавятся в точку, которую уже отправили
-                    //тем более результат диалога ни на что не влияет
-                    t.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmPutMergeRange,
-                      function () {
-                      });
-                }
-
                 History.EndTransaction();
+
+				if (hasMerged && false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo)) {
+					//не делаем действий в asc_onConfirmAction, потому что во время диалога может выполниться autosave и новые измения добавятся в точку, которую уже отправили
+					//тем более результат диалога ни на что не влияет
+					t.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmPutMergeRange,
+						function () {
+						});
+				}
             };
 
             if (t.model.autoFilters._searchFiltersInRange(arnFrom, true)) {
