@@ -525,10 +525,6 @@
         return this.visibleRange;
     };
 
-    WorksheetView.prototype.updateVisibleRange = function () {
-        return this._updateCellsRange(this.getVisibleRange());
-    };
-
     WorksheetView.prototype.getFirstVisibleCol = function (allowPane) {
         var tmp = 0;
         if (allowPane && this.topLeftFrozenCell) {
