@@ -405,6 +405,9 @@
         this.cellCommentator = new AscCommonExcel.CCellCommentator(this);
         this.objectRender = null;
 
+        this.arrUpdateHeight = [];
+        this.skipUpdateRowHeight = false;
+
         this._init();
 
         return this;
@@ -2597,13 +2600,13 @@
 	/** Рисует текст ячейки */
 	WorksheetView.prototype._drawCellText =
 		function (drawingCtx, col, row, colStart, colEnd, offsetX, offsetY, drawMergedCells) {
+			var r = this._getRowCache(row);
+	        if (!(r && r.columnsWithText[col])) {
+				return null;
+            }
 			var c = this._getVisibleCell(col, row);
 			var color = c.getFont().getColor();
 			var ct = this._getCellTextCache(col, row);
-			if (!ct) {
-				return null;
-			}
-
 			var isMerged = ct.flags.isMerged(), range = undefined, isWrapped = ct.flags.wrapText;
 			var ctx = drawingCtx || this.drawingCtx;
 
@@ -4612,10 +4615,10 @@
                         strCopy.text = 'A';
                         tm = this._roundTextMetrics(this.stringRender.measureString([strCopy], fl));
                         AscCommonExcel.g_oCacheMeasureEmpty.add(strCopy.format, tm);
-						cache = this._fetchCellCache(col, row);
-						cache.metrics = tm;
                     }
-                    this._updateRowHeight(col, row);
+					cache = this._fetchCellCache(col, row);
+					cache.metrics = tm;
+                    this._updateRowHeight(cache, row);
                 }
             }
 
@@ -4775,14 +4778,16 @@
             this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
         }
 
-        this._updateRowHeight(col, row, maxW, colWidth);
+        this._updateRowHeight(cache, row, maxW, colWidth);
 
         return mc ? mc.c2 : col;
     };
 
-	WorksheetView.prototype._updateRowHeight = function (col, row, maxW, colWidth) {
-		var cache = this._getCellTextCache(col, row);
-		var mergeType = cache.flags.getMergeType();
+	WorksheetView.prototype._updateRowHeight = function (cache, row, maxW, colWidth) {
+	    if (this.skipUpdateRowHeight) {
+	        return;
+        }
+		var mergeType = cache.flags && cache.flags.getMergeType();
 		var isMergedRows = (mergeType & c_oAscMergeType.rows) || (mergeType && fl.wrapText);
 		var tm = cache.metrics;
 		var va = cache.cellVA;
@@ -4822,6 +4827,45 @@
 				this.isChanged = true;
 			}
 		}
+	};
+
+	WorksheetView.prototype._updateRowsHeight = function () {
+		var range, cache, row;
+		for (var j = 0; j < this.arrUpdateHeight.length; ++j) {
+		    range = this.arrUpdateHeight[j];
+			for (var r = range.r1; r <= range.r2 && r < this.rows.length; ++r) {
+				if (this.rows[r].isCustomHeight) {
+					continue;
+				}
+
+				row = this.rows[r];
+				row.heightReal = AscCommonExcel.oDefaultMetrics.RowHeight;
+				row.height = Asc.round(AscCommonExcel.convertPtToPx(row.heightReal) * this.getZoom());
+				row.descender = this.defaultRowDescender;
+
+				cache = this._getRowCache(r);
+				if (cache) {
+					cache = cache.columns;
+					for (var i in cache) {
+						this._updateRowHeight(cache[i], r);
+					}
+				}
+
+				History.TurnOff();
+				this.model.setRowHeight(row.heightReal, r, r, false);
+				History.TurnOn();
+			}
+        }
+		this.arrUpdateHeight = [];
+
+		this._updateRowPositions();
+		this._calcVisibleRows();
+
+		if (this.objectRender) {
+			this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: range.r1}, true);
+		}
+
+		this.handlers.trigger("reinitializeScroll");
 	};
 
     WorksheetView.prototype._calcMaxWidth = function (col, row, mc) {
@@ -7649,12 +7693,12 @@
             t.expandRowsOnScroll(false, true, to.r2 + 1);
 
             // Сбрасываем параметры
-            t._updateCellsRange(to, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
+			t._updateCellsRange2(to);
             if (c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter) {
                 t.handlers.trigger('onStopFormatPainter');
             }
             // Перерисовываем
-            t._recalculateAfterUpdate([to]);
+            t._recalculateAfterUpdate2([to]);
         };
 
         var result = AscCommonExcel.preparePromoteFromTo(from, to);
@@ -8542,19 +8586,20 @@
 
                 t.model.autoFilters.afterMoveAutoFilters(arnFrom, arnTo);
 
-                t._updateCellsRange(arnTo, false, true);
-                t.model.selectionRange.assign2(arnTo);
-                // Сбрасываем параметры
-                t.activeMoveRange = null;
-                t.startCellMoveRange = null;
-                t._updateCellsRange(arnFrom, false, true);
-                // Тут будет отрисовка select-а
-                t._recalculateAfterUpdate([arnFrom, arnTo]);
+                t._updateCellsRange2(arnTo);
+				t._updateCellsRange2(arnFrom);
 
-                // Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
-                t._updateSelectionNameAndInfo();
+				t.model.selectionRange.assign2(arnTo);
+				// Сбрасываем параметры
+				t.activeMoveRange = null;
+				t.startCellMoveRange = null;
 
-                History.EndTransaction();
+				// Тут будет отрисовка select-а
+				t._recalculateAfterUpdate2([arnFrom, arnTo]);
+				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
+				t._updateSelectionNameAndInfo();
+
+				History.EndTransaction();
 
 				if (hasMerged && false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo)) {
 					//не делаем действий в asc_onConfirmAction, потому что во время диалога может выполниться autosave и новые измения добавятся в точку, которую уже отправили
@@ -11960,6 +12005,13 @@
         this._updateCellsRange(range, canChangeColWidth, lockDraw);
     };
 
+    WorksheetView.prototype._updateCellsRange2 = function (range) {
+		this._cleanCache(range);
+		this.skipUpdateRowHeight = true;
+		this._calcCellsTextMetrics(range);
+		this.skipUpdateRowHeight = false;
+		this.arrUpdateHeight.push(range);
+    };
     WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {
         var r, c, h, d, ct, isMerged;
         var mergedRange, bUpdateRowHeight, oldHeight;
@@ -12071,10 +12123,23 @@
         this.model.onUpdateRanges(arrChanged);
         this.objectRender.rebuildChartGraphicObjects(arrChanged);
         this.cellCommentator.updateActiveComment();
-        //this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
     };
+    WorksheetView.prototype._recalculateAfterUpdate2 = function (arrChanged, lockDraw) {
+		this._updateRowsHeight();
+		if (!lockDraw) {
+			this._updateSelectionNameAndInfo();
+		}
+
+		arrChanged = arrChanged.concat(this.model.hiddenManager.getRecalcHidden());
+
+		this.model.onUpdateRanges(arrChanged);
+		this.objectRender.rebuildChartGraphicObjects(arrChanged);
+		this.cellCommentator.updateActiveComment();
+		this.handlers.trigger("onDocumentPlaceChanged");
+		this.draw(lockDraw);
+	};
 
     WorksheetView.prototype.setChartRange = function (range) {
         this.isChartAreaEditMode = true;
