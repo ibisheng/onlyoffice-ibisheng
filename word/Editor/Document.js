@@ -13298,6 +13298,9 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				Item.Split(NewParagraph);
 			}
 
+			NewParagraph.Correct_Content();
+			NewParagraph.MoveCursorToStartPos();
+
 			this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
 			this.CurPos.ContentPos++;
 
