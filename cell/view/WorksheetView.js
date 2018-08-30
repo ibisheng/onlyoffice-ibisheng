@@ -1926,6 +1926,7 @@
         if (lockDraw || this.model.workbook.bCollaborativeChanges || window['IS_NATIVE_EDITOR']) {
             return this;
         }
+        this._recalculateAfterUpdate2();
 		this.handlers.trigger("checkLastWork");
         this._clean();
         this._drawCorner();
@@ -7701,7 +7702,7 @@
 
 			t._updateCellsRange2(to);
             // Перерисовываем
-            t._recalculateAfterUpdate2();
+			t.draw();
         };
 
         var result = AscCommonExcel.preparePromoteFromTo(from, to);
@@ -8189,7 +8190,7 @@
 
 						// Обновляем выделенные ячейки
 						t._updateCellsRange2(arn);
-						t._recalculateAfterUpdate2();
+						t.draw();
                     } else {
                         t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange,
                           c_oAscError.Level.NoCritical);
@@ -8601,7 +8602,7 @@
 				t.startCellMoveRange = null;
 
 				// Тут будет отрисовка select-а
-				t._recalculateAfterUpdate2();
+				t.draw();
 				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
 				t._updateSelectionNameAndInfo();
 
@@ -8944,7 +8945,7 @@
             });
 
             if (hasUpdates) {
-				t._recalculateAfterUpdate2();
+				t.draw();
             }
             if (callTrigger) {
                 t.handlers.trigger("slowOperation", false);
@@ -12131,18 +12132,17 @@
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
     };
-    WorksheetView.prototype._recalculateAfterUpdate2 = function (lockDraw) {
-        var arrChanged = this.arrUpdateHeight.concat(this.model.hiddenManager.getRecalcHidden());
-		this._updateRowsHeight();
-		if (!lockDraw) {
+    WorksheetView.prototype._recalculateAfterUpdate2 = function () {
+		var arrChanged = this.arrUpdateHeight.concat(this.model.hiddenManager.getRecalcHidden());
+		if (0 < arrChanged.length) {
+			this._updateRowsHeight();
 			this._updateSelectionNameAndInfo();
-		}
 
-		this.model.onUpdateRanges(arrChanged);
-		this.objectRender.rebuildChartGraphicObjects(arrChanged);
-		this.cellCommentator.updateActiveComment();
-		this.handlers.trigger("onDocumentPlaceChanged");
-		this.draw(lockDraw);
+			this.model.onUpdateRanges(arrChanged);
+			this.objectRender.rebuildChartGraphicObjects(arrChanged);
+			this.cellCommentator.updateActiveComment();
+			this.handlers.trigger("onDocumentPlaceChanged");
+		}
 	};
 
     WorksheetView.prototype.setChartRange = function (range) {
