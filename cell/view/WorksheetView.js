@@ -8181,12 +8181,13 @@
                         t.activeFillHandle = null;
                         t.fillHandleDirection = -1;
 
-                        // Обновляем выделенные ячейки
-                        t.isChanged = true;
-                        t._updateCellsRange(arn);
                         History.SetSelection(range.bbox.clone());
                         History.SetSelectionRedo(oCanPromote.to.clone());
                         History.EndTransaction();
+
+						// Обновляем выделенные ячейки
+						t._updateCellsRange2(arn);
+						t._recalculateAfterUpdate2([arn]);
                     } else {
                         t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange,
                           c_oAscError.Level.NoCritical);
