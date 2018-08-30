@@ -221,7 +221,7 @@
                 case "onEvent":
                 {
                     if (window.Asc.plugin["event_" + pluginData.eventName])
-                        window.Asc.plugin["event_" + pluginData.eventName](pluginData.data);
+                        window.Asc.plugin["event_" + pluginData.eventName](pluginData.eventData);
                 }
                 default:
                     break;
