@@ -7949,6 +7949,11 @@ drawPieChart.prototype = {
 		var angle;
 		for (var i = numCache.length - 1; i >= 0; i--) {
 			angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
+			//правка связана с реализацией arcTo, где swAng зануляется и приравнивается к значению
+			if(angle < 10e-16) {
+				angle = 0;
+			}
+
 			if (!this.paths.series) {
 				this.paths.series = [];
 			}
