@@ -4846,10 +4846,13 @@ PasteProcessor.prototype =
 
 		var getNewParagraph = function(){
 			var paragraph = new Paragraph(t.oDocument.DrawingDocument, Parent, bPresentation);
+			var copyParaPr;
 			if(getStyleCurSelection){
 				if(pasteIntoParagraphPr)
 				{
-					paragraph.Set_Pr(pasteIntoParagraphPr.Copy());
+					copyParaPr = pasteIntoParagraphPr.Copy();
+					copyParaPr.NumPr = null;
+					paragraph.Set_Pr(copyParaPr);
 
 					if(paragraph.TextPr && pasteIntoParaRunPr)
 					{
