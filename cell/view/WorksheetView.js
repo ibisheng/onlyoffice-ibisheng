@@ -4788,7 +4788,7 @@
 	        return;
         }
 		var mergeType = cache.flags && cache.flags.getMergeType();
-		var isMergedRows = (mergeType & c_oAscMergeType.rows) || (mergeType && fl.wrapText);
+		var isMergedRows = (mergeType & c_oAscMergeType.rows) || (mergeType && cache.flags.wrapText);
 		var tm = cache.metrics;
 		var va = cache.cellVA;
 		var textBound = cache.textBound;
