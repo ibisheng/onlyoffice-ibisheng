@@ -7699,7 +7699,7 @@
 
 			t._updateCellsRange2(to);
             // Перерисовываем
-            t._recalculateAfterUpdate2([to]);
+            t._recalculateAfterUpdate2();
         };
 
         var result = AscCommonExcel.preparePromoteFromTo(from, to);
@@ -8187,7 +8187,7 @@
 
 						// Обновляем выделенные ячейки
 						t._updateCellsRange2(arn);
-						t._recalculateAfterUpdate2([arn]);
+						t._recalculateAfterUpdate2();
                     } else {
                         t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange,
                           c_oAscError.Level.NoCritical);
@@ -8599,7 +8599,7 @@
 				t.startCellMoveRange = null;
 
 				// Тут будет отрисовка select-а
-				t._recalculateAfterUpdate2([arnFrom, arnTo]);
+				t._recalculateAfterUpdate2();
 				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
 				t._updateSelectionNameAndInfo();
 
@@ -12126,13 +12126,12 @@
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
     };
-    WorksheetView.prototype._recalculateAfterUpdate2 = function (arrChanged, lockDraw) {
+    WorksheetView.prototype._recalculateAfterUpdate2 = function (lockDraw) {
+        var arrChanged = this.arrUpdateHeight.concat(this.model.hiddenManager.getRecalcHidden());
 		this._updateRowsHeight();
 		if (!lockDraw) {
 			this._updateSelectionNameAndInfo();
 		}
-
-		arrChanged = arrChanged.concat(this.model.hiddenManager.getRecalcHidden());
 
 		this.model.onUpdateRanges(arrChanged);
 		this.objectRender.rebuildChartGraphicObjects(arrChanged);
