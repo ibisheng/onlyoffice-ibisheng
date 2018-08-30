@@ -234,19 +234,19 @@ CChartSpace.prototype.setStartPage = function(pageIndex)
     }
     if(this.chart && this.chart.plotArea)
     {
-        var hor_axis = this.chart.plotArea.getHorizontalAxis();
-        if(hor_axis && hor_axis.title)
+        var aAxes = this.chart.plotArea.axId;
+        if(aAxes)
         {
-            title = hor_axis.title;
-            content = title.getDocContent();
-            content && content.Set_StartPage(pageIndex);
-        }
-        var vert_axis = this.chart.plotArea.getVerticalAxis();
-        if(vert_axis && vert_axis.title)
-        {
-            title = vert_axis.title;
-            content = title.getDocContent();
-            content && content.Set_StartPage(pageIndex);
+            for(var i = 0; i < aAxes.length; ++i)
+            {
+                var axis = aAxes[i];
+                if(axis && axis.title)
+                {
+                    title = axis.title;
+                    content = title.getDocContent();
+                    content && content.Set_StartPage(pageIndex);
+                }
+            }
         }
     }
 };

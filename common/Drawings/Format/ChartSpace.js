@@ -1289,7 +1289,8 @@ CChartSpace.prototype.checkTypeCorrect = function(){
     if(this.chart.plotArea.charts.length === 0){
         return false;
     }
-    if(this.chart.plotArea.charts[0].series.length === 0){
+    var allSeries = this.getAllSeries();
+    if(allSeries.length === 0){
         return false;
     }
     return true;
@@ -2811,19 +2812,19 @@ CChartSpace.prototype.recalcTitles = function()
     }
     if(this.chart && this.chart.plotArea)
     {
-        var hor_axis = this.chart.plotArea.getHorizontalAxis();
-        if(hor_axis && hor_axis.title)
+        var aAxes = this.chart.plotArea.axId;
+        if(aAxes)
         {
-            hor_axis.title.recalcInfo.recalculateContent = true;
-            hor_axis.title.recalcInfo.recalcTransform = true;
-            hor_axis.title.recalcInfo.recalcTransformText = true;
-        }
-        var vert_axis = this.chart.plotArea.getVerticalAxis();
-        if(vert_axis && vert_axis.title)
-        {
-            vert_axis.title.recalcInfo.recalculateContent = true;
-            vert_axis.title.recalcInfo.recalcTransform = true;
-            vert_axis.title.recalcInfo.recalcTransformText = true;
+            for(var i = 0; i < aAxes.length; ++i)
+            {
+                var axis = aAxes[i];
+                if(axis && axis.title)
+                {
+                    axis.title.recalcInfo.recalculateContent = true;
+                    axis.title.recalcInfo.recalcTransform = true;
+                    axis.title.recalcInfo.recalcTransformText = true;
+                }
+            }
         }
     }
 };
@@ -2838,21 +2839,20 @@ CChartSpace.prototype.recalcTitles2 = function()
     }
     if(this.chart && this.chart.plotArea)
     {
-        var hor_axis = this.chart.plotArea.getHorizontalAxis();
-        if(hor_axis && hor_axis.title)
+        var aAxes = this.chart.plotArea.axId;
+        if(aAxes)
         {
-            hor_axis.title.recalcInfo.recalculateContent = true;
-            hor_axis.title.recalcInfo.recalcTransform = true;
-            hor_axis.title.recalcInfo.recalcTransformText = true;
-            hor_axis.title.recalcInfo.recalculateTxBody = true;
-        }
-        var vert_axis = this.chart.plotArea.getVerticalAxis();
-        if(vert_axis && vert_axis.title)
-        {
-            vert_axis.title.recalcInfo.recalculateContent = true;
-            vert_axis.title.recalcInfo.recalcTransform = true;
-            vert_axis.title.recalcInfo.recalcTransformText = true;
-            vert_axis.title.recalcInfo.recalculateTxBody = true;
+            for(var i = 0; i < aAxes.length; ++i)
+            {
+                var axis = aAxes[i];
+                if(axis && axis.title)
+                {
+                    axis.title.recalcInfo.recalculateContent = true;
+                    axis.title.recalcInfo.recalcTransform = true;
+                    axis.title.recalcInfo.recalcTransformText = true;
+                    axis.title.recalcInfo.recalculateTxBody = true;
+                }
+            }
         }
     }
 };
@@ -10937,149 +10937,132 @@ CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
         if(this.chart.plotArea)
         {
             fSaveChartObjectSourceFormatting(this.chart.plotArea, oCopy.chart.plotArea, oTheme, oColorMap);
-            if(oCopy.chart.plotArea.valAx)
+            var aAxes = oCopy.chart.plotArea.axId;
+            if(aAxes)
             {
-                fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx, oCopy.chart.plotArea.valAx, oTheme, oColorMap);
-                if(this.chart.plotArea.valAx.compiledLn)
+                for(var i = 0; i < aAxes.length; ++i)
                 {
-                    if(!oCopy.chart.plotArea.valAx.spPr){
-                        oCopy.chart.plotArea.valAx.setSpPr(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.valAx.spPr.setLn(this.chart.plotArea.valAx.compiledLn.createDuplicate(true));
-                }
-                if(this.chart.plotArea.valAx.compiledMajorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.valAx.majorGridlines){
-                        oCopyi.chart.plotArea.valAx.setMajorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.valAx.majorGridlines.setLn(this.chart.plotArea.valAx.compiledMajorGridLines.createDuplicate(true));
-                }
-                if(this.chart.plotArea.valAx.compiledMinorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.valAx.minorGridlines){
-                        oCopy.chart.plotArea.valAx.setMinorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.valAx.minorGridlines.setLn(this.chart.plotArea.valAx.compiledMinorGridLines.createDuplicate(true));
-                }
-                if(oCopy.chart.plotArea.valAx.title)
-                {
-                    fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx.title, oCopy.chart.plotArea.valAx.title, oTheme, oColorMap);
-                }
-            }
-            if(oCopy.chart.plotArea.catAx)
-            {
-                fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx, oCopy.chart.plotArea.catAx, oTheme, oColorMap);
-                if(this.chart.plotArea.catAx.compiledLn)
-                {
-                    if(!oCopy.chart.plotArea.catAx.spPr){
-                        oCopy.chart.plotArea.catAx.setSpPr(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.catAx.spPr.setLn(this.chart.plotArea.catAx.compiledLn.createDuplicate(true));
-                }
-                if(this.chart.plotArea.catAx.compiledMajorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.catAx.majorGridlines){
-                        oCopy.chart.plotArea.catAx.setMajorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.catAx.majorGridlines.setLn(this.chart.plotArea.catAx.compiledMajorGridLines.createDuplicate(true));
-                }
-                if(this.chart.plotArea.catAx.compiledMinorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.catAx.minorGridlines){
-                        oCopy.chart.plotArea.catAx.setMinorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.catAx.minorGridlines.setLn(this.chart.plotArea.catAx.compiledMinorGridLines.createDuplicate(true));
-                }
-                if(oCopy.chart.plotArea.catAx.title)
-                {
-                    fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx.title, oCopy.chart.plotArea.catAx.title, oTheme, oColorMap);
-                }
-            }
-
-            if(this.chart.plotArea.charts[0])
-            {
-                var series = this.chart.plotArea.charts[0].series;
-                var seriesCopy = oCopy.chart.plotArea.charts[0].series;
-
-                var oDataPoint;
-                for(var i = 0; i < series.length; ++i)
-                {
-                    series[i].brush = series[i].compiledSeriesBrush;
-                    series[i].pen = series[i].compiledSeriesPen;
-                    fSaveChartObjectSourceFormatting(series[i], seriesCopy[i], oTheme, oColorMap);
-                    var pts = AscFormat.getPtsFromSeries(series[i]);
-                    var ptsCopy = AscFormat.getPtsFromSeries(seriesCopy[i]);
-                    for(var j = 0; j < pts.length; ++j)
+                    if(aAxes[i] && this.chart.plotArea.axId[i])
                     {
-                        var pt = pts[j];
-                        oDataPoint = null;
-                        if(Array.isArray(seriesCopy[i].dPt))
+                        fSaveChartObjectSourceFormatting(this.chart.plotArea.axId[i], aAxes[i], oTheme, oColorMap);
+                        if(this.chart.plotArea.axId[i].compiledLn)
                         {
-                            for(var k = 0; k < seriesCopy[i].dPt.length; ++k)
+                            if(!aAxes[i].spPr){
+                                aAxes[i].setSpPr(new AscFormat.CSpPr());
+                            }
+                            aAxes[i].spPr.setLn(this.chart.plotArea.axId[i].compiledLn.createDuplicate(true));
+                        }
+                        if(this.chart.plotArea.axId[i].compiledMajorGridLines)
+                        {
+                            if(!aAxes[i].majorGridlines){
+                                aAxes[i].setMajorGridlines(new AscFormat.CSpPr());
+                            }
+                            aAxes[i].majorGridlines.setLn(this.chart.plotArea.axId[i].compiledMajorGridLines.createDuplicate(true));
+                        }
+                        if(this.chart.plotArea.axId[i].compiledMinorGridLines)
+                        {
+                            if(!aAxes[i].minorGridlines){
+                                aAxes[i].setMinorGridlines(new AscFormat.CSpPr());
+                            }
+                            aAxes[i].minorGridlines.setLn(this.chart.plotArea.axId[i].compiledMinorGridLines.createDuplicate(true));
+                        }
+                        if(aAxes[i].title)
+                        {
+                            fSaveChartObjectSourceFormatting(this.chart.plotArea.axId[i].title, aAxes[i].title, oTheme, oColorMap);
+                        }
+                    }
+                }
+            }
+
+            for(var t = 0; t < this.chart.plotArea.charts.length; ++t)
+            {
+                if(this.chart.plotArea.charts[t])
+                {
+                    var oChartOrig = this.chart.plotArea.charts[t];
+                    var oChartCopy = oCopy.chart.plotArea.charts[t];
+                    var series = oChartOrig.series;
+                    var seriesCopy = oChartCopy.series;
+
+                    var oDataPoint;
+                    for(var i = 0; i < series.length; ++i)
+                    {
+                        series[i].brush = series[i].compiledSeriesBrush;
+                        series[i].pen = series[i].compiledSeriesPen;
+                        fSaveChartObjectSourceFormatting(series[i], seriesCopy[i], oTheme, oColorMap);
+                        var pts = AscFormat.getPtsFromSeries(series[i]);
+                        var ptsCopy = AscFormat.getPtsFromSeries(seriesCopy[i]);
+                        for(var j = 0; j < pts.length; ++j)
+                        {
+                            var pt = pts[j];
+                            oDataPoint = null;
+                            if(Array.isArray(seriesCopy[i].dPt))
                             {
-                                if(seriesCopy[i].dPt[k].idx === pts[j].idx)
+                                for(var k = 0; k < seriesCopy[i].dPt.length; ++k)
                                 {
-                                    oDataPoint = seriesCopy[i].dPt[k];
-                                    break;
+                                    if(seriesCopy[i].dPt[k].idx === pts[j].idx)
+                                    {
+                                        oDataPoint = seriesCopy[i].dPt[k];
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if(!oDataPoint)
-                        {
-                            oDataPoint = new AscFormat.CDPt();
-                            oDataPoint.setIdx(pt.idx);
-                            seriesCopy[i].addDPt(oDataPoint);
-                        }
-                        fSaveChartObjectSourceFormatting(pt, oDataPoint, oTheme, oColorMap);
-                        if(pt.compiledMarker)
-                        {
-                            var oMarker = pt.compiledMarker.createDuplicate();
-                            oDataPoint.setMarker(oMarker);
-                            fSaveChartObjectSourceFormatting(pt.compiledMarker, oMarker, oTheme, oColorMap);
+                            if(!oDataPoint)
+                            {
+                                oDataPoint = new AscFormat.CDPt();
+                                oDataPoint.setIdx(pt.idx);
+                                seriesCopy[i].addDPt(oDataPoint);
+                            }
+                            fSaveChartObjectSourceFormatting(pt, oDataPoint, oTheme, oColorMap);
+                            if(pt.compiledMarker)
+                            {
+                                var oMarker = pt.compiledMarker.createDuplicate();
+                                oDataPoint.setMarker(oMarker);
+                                fSaveChartObjectSourceFormatting(pt.compiledMarker, oMarker, oTheme, oColorMap);
+                            }
                         }
                     }
-                }
-                if(oCopy.chart.plotArea.charts[0].calculatedHiLowLines)
-                {
-                    if(!oCopy.chart.plotArea.charts[0].hiLowLines)
+                    if(oChartOrig.calculatedHiLowLines)
                     {
-                        oCopy.chart.plotArea.charts[0].setHiLowLines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.charts[0].hiLowLines.setLn(this.chart.plotArea.charts[0].calculatedHiLowLines.createDuplicate(true));
-                }
-                if( oCopy.chart.plotArea.charts[0].upDownBars)
-                {
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.upBarsBrush)
-                    {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.upBars)
+                        if(!oChartCopy.hiLowLines)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setUpBars(new AscFormat.CSpPr());
+                            oChartCopy.setHiLowLines(new AscFormat.CSpPr());
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.upBars.setFill(this.chart.plotArea.charts[0].upDownBars.upBarsBrush.saveSourceFormatting());
+                        oChartCopy.hiLowLines.setLn(oChartOrig.calculatedHiLowLines.createDuplicate(true));
                     }
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.upBarsPen)
+                    if( oChartOrig.upDownBars)
                     {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.upBars)
+                        if(oChartOrig.upDownBars.upBarsBrush)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setUpBars(new AscFormat.CSpPr());
+                            if(!oChartCopy.upDownBars.upBars)
+                            {
+                                oChartCopy.upDownBars.setUpBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.upBars.setFill(oChartOrig.upDownBars.upBarsBrush.saveSourceFormatting());
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.upBars.setLn(this.chart.plotArea.charts[0].upDownBars.upBarsPen.createDuplicate(true));
-                    }
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.downBarsBrush)
-                    {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.downBars)
+                        if(oChartOrig.upDownBars.upBarsPen)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setDownBars(new AscFormat.CSpPr());
+                            if(!oChartCopy.upDownBars.upBars)
+                            {
+                                oChartCopy.upDownBars.setUpBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.upBars.setLn(oChartOrig.upDownBars.upBarsPen.createDuplicate(true));
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.downBars.setFill(this.chart.plotArea.charts[0].upDownBars.downBarsBrush.saveSourceFormatting());
-                    }
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.downBarsPen)
-                    {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.downBars)
+                        if(oChartOrig.upDownBars.downBarsBrush)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setDownBars(new AscFormat.CSpPr());
+                            if(!oChartCopy.upDownBars.downBars)
+                            {
+                                oChartCopy.upDownBars.setDownBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.downBars.setFill(oChartOrig.upDownBars.downBarsBrush.saveSourceFormatting());
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.downBars.setLn(this.chart.plotArea.charts[0].upDownBars.downBarsPen.createDuplicate(true));
+                        if(oChartOrig.upDownBars.downBarsPen)
+                        {
+                            if(!oChartCopy.upDownBars.downBars)
+                            {
+                                oChartCopy.upDownBars.setDownBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.downBars.setLn(oChartOrig.upDownBars.downBarsPen.createDuplicate(true));
+                        }
                     }
                 }
             }
@@ -11388,9 +11371,9 @@ CChartSpace.prototype.recalculateDLbls = function()
                     }
                     var compiled_dlb = new AscFormat.CDLbl();
                     compiled_dlb.merge(default_lbl);
-                    compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls);
-                    if(this.chart.plotArea.charts[0].dLbls)
-                        compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls.findDLblByIdx(pt.idx), false);
+                    compiled_dlb.merge(aCharts[t].dLbls);
+                    if(aCharts[t].dLbls)
+                        compiled_dlb.merge(aCharts[t].dLbls.findDLblByIdx(pt.idx), false);
                     compiled_dlb.merge(ser.dLbls);
                     if(ser.dLbls)
                         compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx));

@@ -2817,7 +2817,7 @@ function DrawingObjects() {
                 {
                     var max_r = 0, max_c = 0;
 
-                    var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
+                    var series = oNewChartSpace.getAllSeries(), ser;
 					
 					function fFillCell(oCell, sNumFormat, value)
 					{
