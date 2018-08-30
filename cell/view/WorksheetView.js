@@ -7693,10 +7693,11 @@
             t.expandRowsOnScroll(false, true, to.r2 + 1);
 
             // Сбрасываем параметры
-			t._updateCellsRange2(to);
             if (c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter) {
                 t.handlers.trigger('onStopFormatPainter');
             }
+
+			t._updateCellsRange2(to);
             // Перерисовываем
             t._recalculateAfterUpdate2([to]);
         };
@@ -8586,7 +8587,9 @@
 
                 t.model.autoFilters.afterMoveAutoFilters(arnFrom, arnTo);
 
-                t._updateCellsRange2(arnTo);
+				History.EndTransaction();
+
+				t._updateCellsRange2(arnTo);
 				t._updateCellsRange2(arnFrom);
 
 				t.model.selectionRange.assign2(arnTo);
@@ -8598,8 +8601,6 @@
 				t._recalculateAfterUpdate2([arnFrom, arnTo]);
 				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
 				t._updateSelectionNameAndInfo();
-
-				History.EndTransaction();
 
 				if (hasMerged && false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo)) {
 					//не делаем действий в asc_onConfirmAction, потому что во время диалога может выполниться autosave и новые измения добавятся в точку, которую уже отправили
