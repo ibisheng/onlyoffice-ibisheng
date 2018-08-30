@@ -407,6 +407,9 @@
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
 				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY + this.TargetOffsetY);
 			}
+
+            if (window.g_asc_plugins)
+                window.g_asc_plugins.onPluginEvent("onTargetPositionChanged");
 		},
 
 		emulateKeyDownApi : function(code)

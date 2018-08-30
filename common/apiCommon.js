@@ -3777,6 +3777,9 @@
 
 		this.size = undefined;
 		this.initOnSelectionChanged = undefined;
+
+		this.events = [];
+		this.eventsMap = {};
 	}
 
 	CPluginVariation.prototype["get_Description"] = function()
@@ -3905,6 +3908,20 @@
 	{
 		this.initOnSelectionChanged = value;
 	};
+    CPluginVariation.prototype["get_Events"]           = function()
+    {
+        return this.events;
+    };
+    CPluginVariation.prototype["set_Events"]           = function(value)
+    {
+    	if (!value)
+    		return;
+
+        this.events = value.slice(0, value.length);
+        this.eventsMap = {};
+        for (var i = 0; i < this.events.length; i++)
+        	this.eventsMap[this.events[i]] = true;
+    };
 
 	CPluginVariation.prototype["serialize"]   = function()
 	{
