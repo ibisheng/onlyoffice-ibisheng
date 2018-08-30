@@ -12865,7 +12865,7 @@
             }
         }
         History.TurnOn();
-        this._updateCellsRange(oAllRange.bbox); // ToDo Стоит обновить nRowsCount и nColsCount
+        this._updateCellsRange2(oAllRange.bbox); // ToDo Стоит обновить nRowsCount и nColsCount
     };
     WorksheetView.prototype.getData = function () {
         var arrResult, arrCells = [], c, r, row, lastC = -1, lastR = -1, val;
