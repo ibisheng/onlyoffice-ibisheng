@@ -407,6 +407,7 @@
 
         this.arrUpdateHeight = [];
         this.skipUpdateRowHeight = false;
+        this.canChangeColWidth = c_oAscCanChangeColWidth.none;
 
         this._init();
 
@@ -4554,6 +4555,7 @@
 
     WorksheetView.prototype._addCellTextToCache = function (col, row, canChangeColWidth) {
         var self = this;
+        canChangeColWidth = canChangeColWidth || this.canChangeColWidth;
 
         function makeFnIsGoodNumFormat(flags, width) {
             return function (str) {
