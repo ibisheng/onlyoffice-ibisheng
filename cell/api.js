@@ -1399,7 +1399,7 @@ var editor;
       AscCommon.CollaborativeEditing.Load_Images();
       this.wb._onWSSelectionChanged();
       History.TurnOff();
-      this.wb.getWorksheet().updateVisibleRange();
+      this.wb.drawWorksheet();
       History.TurnOn();
     }
   };
