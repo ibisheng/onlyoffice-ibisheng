@@ -405,7 +405,8 @@
         this.cellCommentator = new AscCommonExcel.CCellCommentator(this);
         this.objectRender = null;
 
-        this.arrUpdateHeight = [];
+        this.arrRecalcRanges = [];
+		this.arrRecalcRangesWithHeight = [];
         this.skipUpdateRowHeight = false;
         this.canChangeColWidth = c_oAscCanChangeColWidth.none;
 
@@ -4833,9 +4834,12 @@
 	};
 
 	WorksheetView.prototype._updateRowsHeight = function () {
+	    if (0 === this.arrRecalcRangesWithHeight.length) {
+	        return;
+        }
 		var range, cache, row;
-		for (var j = 0; j < this.arrUpdateHeight.length; ++j) {
-		    range = this.arrUpdateHeight[j];
+		for (var j = 0; j < this.arrRecalcRangesWithHeight.length; ++j) {
+		    range = this.arrRecalcRangesWithHeight[j];
 			for (var r = range.r1; r <= range.r2 && r < this.rows.length; ++r) {
 				if (this.rows[r].isCustomHeight) {
 					continue;
@@ -4859,7 +4863,7 @@
 				History.TurnOn();
 			}
         }
-		this.arrUpdateHeight = [];
+		this.arrRecalcRangesWithHeight = [];
 
 		this._updateRowPositions();
 		this._calcVisibleRows();
@@ -12011,12 +12015,16 @@
         this._updateCellsRange(range, canChangeColWidth, lockDraw);
     };
 
-    WorksheetView.prototype._updateCellsRange2 = function (range) {
+    WorksheetView.prototype._updateCellsRange2 = function (range, skipHeight) {
 		this._cleanCache(range);
 		this.skipUpdateRowHeight = true;
 		this._calcCellsTextMetrics(range);
 		this.skipUpdateRowHeight = false;
-		this.arrUpdateHeight.push(range);
+		if (skipHeight) {
+			this.arrRecalcRanges.push(range);
+        } else {
+			this.arrRecalcRangesWithHeight.push(range);
+        }
     };
     WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {
         var r, c, h, d, ct, isMerged;
@@ -12133,13 +12141,15 @@
         this.draw(lockDraw);
     };
     WorksheetView.prototype._recalculateAfterUpdate2 = function () {
-		var arrChanged = this.arrUpdateHeight.concat(this.model.hiddenManager.getRecalcHidden());
-		if (0 < arrChanged.length) {
+		var ranges = this.arrRecalcRangesWithHeight.concat(this.arrRecalcRanges,
+			this.model.hiddenManager.getRecalcHidden());
+
+		if (0 < ranges.length) {
 			this._updateRowsHeight();
 			this._updateSelectionNameAndInfo();
 
-			this.model.onUpdateRanges(arrChanged);
-			this.objectRender.rebuildChartGraphicObjects(arrChanged);
+			this.model.onUpdateRanges(ranges);
+			this.objectRender.rebuildChartGraphicObjects(ranges);
 			this.cellCommentator.updateActiveComment();
 			this.handlers.trigger("onDocumentPlaceChanged");
 		}
