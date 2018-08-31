@@ -7699,7 +7699,7 @@
                 t.handlers.trigger('onStopFormatPainter');
             }
 
-			t._updateCellsRange2(to);
+			t._updateRange(to);
             // Перерисовываем
 			t.draw();
         };
@@ -8188,7 +8188,7 @@
                         History.EndTransaction();
 
 						// Обновляем выделенные ячейки
-						t._updateCellsRange2(arn);
+						t._updateRange(arn);
 						t.draw();
                     } else {
                         t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange,
@@ -8592,8 +8592,8 @@
 
 				History.EndTransaction();
 
-				t._updateCellsRange2(arnTo);
-				t._updateCellsRange2(arnFrom);
+				t._updateRange(arnTo);
+				t._updateRange(arnFrom);
 
 				t.model.selectionRange.assign2(arnTo);
 				// Сбрасываем параметры
@@ -8935,7 +8935,7 @@
                 if (bIsUpdate) {
 
 					t.canChangeColWidth = canChangeColWidth;
-					t._updateCellsRange2(item);
+					t._updateRange(item);
 					t.canChangeColWidth = c_oAscCanChangeColWidth.none;
 
                     hasUpdates = true;
@@ -11750,7 +11750,7 @@
 		}
 
 		this.canChangeColWidth = isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers;
-		this._updateCellsRange2(bbox);
+		this._updateRange(bbox);
 		this.canChangeColWidth = c_oAscCanChangeColWidth.none;
 		this.draw(lockDraw);
 
@@ -11957,7 +11957,7 @@
         if (0 < ranges.length) {
 			for (var i = 0; i < ranges.length; ++i) {
 				this._checkUpdateRange(ranges[i]);
-				this._updateCellsRange2(ranges[i], skipHeight);
+				this._updateRange(ranges[i], skipHeight);
 			}
         }
     };
@@ -11999,7 +11999,7 @@
         }
     };
 
-    WorksheetView.prototype._updateCellsRange2 = function (range, skipHeight) {
+    WorksheetView.prototype._updateRange = function (range, skipHeight) {
 		this._cleanCache(range);
 		this.skipUpdateRowHeight = true;
 		this._calcCellsTextMetrics(range);
@@ -12755,7 +12755,7 @@
             }
         }
         History.TurnOn();
-        this._updateCellsRange2(oAllRange.bbox); // ToDo Стоит обновить nRowsCount и nColsCount
+        this._updateRange(oAllRange.bbox); // ToDo Стоит обновить nRowsCount и nColsCount
     };
     WorksheetView.prototype.getData = function () {
         var arrResult, arrCells = [], c, r, row, lastC = -1, lastR = -1, val;

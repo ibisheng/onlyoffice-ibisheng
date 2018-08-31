@@ -1045,7 +1045,7 @@
         if (false === ct.hyperlink.hyperlinkModel.getVisited() && !isSelectOnShape) {
           ct.hyperlink.hyperlinkModel.setVisited(true);
           if (ct.hyperlink.hyperlinkModel.Ref) {
-          	ws._updateCellsRange2(ct.hyperlink.hyperlinkModel.Ref.getBBox0());
+          	ws._updateRange(ct.hyperlink.hyperlinkModel.Ref.getBBox0());
           	ws.draw();
           }
         }

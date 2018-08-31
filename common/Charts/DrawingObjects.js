@@ -3013,7 +3013,7 @@ function DrawingObjects() {
 					oAllRange = oAllRange.bbox;
 					oAllRange.r2 = Math.max(oAllRange.r2, max_r);
 					oAllRange.c2 = Math.max(oAllRange.c2, max_c);
-					worksheet._updateCellsRange2(oAllRange);
+					worksheet._updateRange(oAllRange);
 					worksheet.draw();
                     aImagesSync.length = 0;
                     oNewChartSpace.getAllRasterImages(aImagesSync);
