@@ -12853,7 +12853,7 @@
     WorksheetView.prototype.setData = function (oData) {
         History.Clear();
         History.TurnOff();
-        var oAllRange = new AscCommonExcel.Range(this.model, 0, 0, this.nRowsCount - 1, this.nColsCount - 1);
+		var oAllRange = this.model.getRange3(0, 0, this.model.getRowsCount(), this.model.getColsCount());
         oAllRange.cleanAll();
 
         var row, oCell;
