@@ -1925,6 +1925,15 @@
     for (i = 0, length = this.fmgrGraphics.length; i < length; ++i)
       this.fmgrGraphics[i].ClearFontsRasterCache();
 
+    if (AscCommon.g_fontManager) {
+        AscCommon.g_fontManager.ClearFontsRasterCache();
+        AscCommon.g_fontManager.m_pFont = null;
+    }
+    if (AscCommon.g_fontManager2) {
+        AscCommon.g_fontManager2.ClearFontsRasterCache();
+        AscCommon.g_fontManager2.m_pFont = null;
+    }
+
     var item;
     var activeIndex = this.model.getActive();
     for (i in this.wsViews) {
