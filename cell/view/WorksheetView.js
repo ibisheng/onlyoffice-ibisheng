@@ -1923,7 +1923,7 @@
         if (lockDraw || this.model.workbook.bCollaborativeChanges || window['IS_NATIVE_EDITOR']) {
             return this;
         }
-        this._recalculateAfterUpdate2();
+        this._recalculate();
 		this.handlers.trigger("checkLastWork");
         this._clean();
         this._drawCorner();
@@ -12011,7 +12011,7 @@
         }
     };
 
-    WorksheetView.prototype._recalculateAfterUpdate2 = function () {
+    WorksheetView.prototype._recalculate = function () {
 		var ranges = this.arrRecalcRangesWithHeight.concat(this.arrRecalcRanges,
 			this.model.hiddenManager.getRecalcHidden());
 
