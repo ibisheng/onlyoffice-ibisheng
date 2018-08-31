@@ -4451,14 +4451,14 @@ CChartSpace.prototype.getValAxisCrossType = function()
                                             sPt = oPtFormat.formatToChart(oPt.val);
                                         }
                                         else{
-                                            sPt = oPt.val;
+                                            sPt = oPt.val + "";
                                         }
                                     }
                                     else if(oLitFormat){
                                         sPt = oLitFormat.formatToChart(oPt.val);
                                     }
                                     else{
-                                        sPt = oPt.val;
+                                        sPt = oPt.val + "";
                                     }
                                     aStrings.push(sPt);
                                 }
@@ -4794,6 +4794,23 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     if(bTickSkip && !AscFormat.isRealNumber(fForceContentWidth)){
                         fForceContentWidth = Math.abs(fHorInterval) +  fHorInterval/nTickLblSkip;
                     }
+
+
+                    if(AscFormat.isRealNumber(oCurAxis.lblOffset)){
+                        var fStakeOffset = oCurAxis.lblOffset/100.0;
+                        var oFirstTextPr = null;
+                        for(var tt = 0; tt < oLabelsBox.aLabels.length; ++tt){
+                            var oLbl = oLabelsBox.aLabels[tt];
+                            if(oLbl && oLbl.tx && oLbl.tx.rich && oLbl.tx.rich.content && oLbl.tx.rich.content.Content[0]){
+                                oFirstTextPr = oLbl.tx.rich.content.Content[0].Get_FirstTextPr2();
+                                break;
+                            }
+                        }
+                        if(oFirstTextPr && AscFormat.isRealNumber(oFirstTextPr.FontSize)){
+                            fDistance = fStakeOffset*oFirstTextPr.FontSize*fDistance/10.0;
+                        }
+                    }
+
 
                     fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers, fForceContentWidth);
 
