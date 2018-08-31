@@ -3306,6 +3306,7 @@
 		}
 	};
 	Worksheet.prototype.initColumns = function () {
+		this.initColumn(this.oAllCol);
 		this.aCols.forEach(this.initColumn, this);
 	};
 	Worksheet.prototype.initPostOpen = function (handlers) {
