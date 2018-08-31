@@ -3819,7 +3819,7 @@ function OfflineEditor () {
 
                     if (1 === type) { // cells or chart
                         if (addl > 0)
-                            left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                            left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                         else
                             left = this.cols[Math.max(0,arrRanges[i].c1,0)].left - offsetX;
 
@@ -3829,7 +3829,7 @@ function OfflineEditor () {
                             top = this.rows[Math.max(0,arrRanges[i].r1,0)].top - offsetY;
 
                         if (addr > 0)
-                            right = this.cols[colsCount - 1].left + this.defaultColWidth * addr - offsetX;
+                            right = this.cols[colsCount - 1].left + this.defaultColWidthPx * addr - offsetX;
                         else
                             right = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
 
@@ -3840,7 +3840,7 @@ function OfflineEditor () {
                     }
                     else if (2 === type) {       // column range
                         if (addl > 0)
-                            left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                            left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                         else
                             left = this.cols[Math.max(0,arrRanges[i].c1)].left - offsetX;
 
@@ -3850,7 +3850,7 @@ function OfflineEditor () {
                             top = this.rows[Math.max(0,arrRanges[i].r1)].top - offsetY;
 
                         if (addr > 0)
-                            right = this.cols[colsCount - 1].left + this.defaultColWidth * addr - offsetX;
+                            right = this.cols[colsCount - 1].left + this.defaultColWidthPx * addr - offsetX;
                         else
                             right = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
 
@@ -3858,7 +3858,7 @@ function OfflineEditor () {
                     }
                     else if (3 === type) {       // row range
                         if (addl > 0)
-                            left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                            left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                         else
                             left = this.cols[arrRanges[i].c1].left - offsetX;
 
@@ -3876,7 +3876,7 @@ function OfflineEditor () {
                     }
                     else if (4 === type) {       // max
                         if (addl > 0)
-                            left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                            left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                         else
                             left = this.cols[arrRanges[i].c1].left - offsetX;
 
@@ -3889,7 +3889,7 @@ function OfflineEditor () {
                         bottom = 0;
                     } else {
                         if (addl > 0)
-                            left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                            left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                         else
                             left = this.cols[Math.max(0,arrRanges[i].c1)].left - offsetX;
 
@@ -3899,7 +3899,7 @@ function OfflineEditor () {
                             top = this.rows[Math.max(0,arrRanges[i].r1)].top - offsetY;
 
                         if (addr > 0)
-                            right = this.cols[colsCount - 1].left + this.defaultColWidth * addr - offsetX;
+                            right = this.cols[colsCount - 1].left + this.defaultColWidthPx * addr - offsetX;
                         else
                             right = this.cols[Math.max(0,arrRanges[i].c2)].left + this.cols[Math.max(0,arrRanges[i].c2)].width - offsetX;
 
@@ -3947,7 +3947,7 @@ function OfflineEditor () {
 
                 if (1 === type) { // cells or chart
                     if (addl > 0)
-                        left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                        left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                     else
                         left = this.cols[Math.max(0,arrRanges[i].c1,0)].left - offsetX;
 
@@ -3957,7 +3957,7 @@ function OfflineEditor () {
                         top = this.rows[Math.max(0,arrRanges[i].r1,0)].top - offsetY;
 
                     if (addr > 0)
-                        right = this.cols[colsCount - 1].left + this.defaultColWidth * addr - offsetX;
+                        right = this.cols[colsCount - 1].left + this.defaultColWidthPx * addr - offsetX;
                     else
                         right = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
 
@@ -3968,7 +3968,7 @@ function OfflineEditor () {
                 }
                 else if (2 === type) {       // column range
                     if (addl > 0)
-                        left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                        left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                     else
                         left = this.cols[Math.max(0,arrRanges[i].c1)].left - offsetX;
 
@@ -3978,7 +3978,7 @@ function OfflineEditor () {
                         top = this.rows[Math.max(0,arrRanges[i].r1)].top - offsetY;
 
                     if (addr > 0)
-                        right = this.cols[colsCount - 1].left + this.defaultColWidth * addr - offsetX;
+                        right = this.cols[colsCount - 1].left + this.defaultColWidthPx * addr - offsetX;
                     else
                         right = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
 
@@ -3986,7 +3986,7 @@ function OfflineEditor () {
                 }
                 else if (3 === type) {       // row range
                     if (addl > 0)
-                        left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                        left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                     else
                         left = this.cols[arrRanges[i].c1].left - offsetX;
 
@@ -4004,7 +4004,7 @@ function OfflineEditor () {
                 }
                 else if (4 === type) {       // max
                     if (addl > 0)
-                        left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                        left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                     else
                         left = this.cols[arrRanges[i].c1].left - offsetX;
 
@@ -4017,7 +4017,7 @@ function OfflineEditor () {
                     bottom = 0;
                 } else {
                     if (addl > 0)
-                        left = this.cols[colsCount - 1].left + this.defaultColWidth * addl - offsetX;
+                        left = this.cols[colsCount - 1].left + this.defaultColWidthPx * addl - offsetX;
                     else
                         left = this.cols[Math.max(0,arrRanges[i].c1)].left - offsetX;
 
@@ -4027,7 +4027,7 @@ function OfflineEditor () {
                         top = this.rows[Math.max(0,arrRanges[i].r1)].top - offsetY;
 
                     if (addr > 0)
-                        right = this.cols[colsCount - 1].left + this.defaultColWidth * addr - offsetX;
+                        right = this.cols[colsCount - 1].left + this.defaultColWidthPx * addr - offsetX;
                     else
                         right = this.cols[Math.max(0,arrRanges[i].c2)].left + this.cols[Math.max(0,arrRanges[i].c2)].width - offsetX;
 
@@ -4364,11 +4364,12 @@ function OfflineEditor () {
 
     this.getMaxBounds = function () {
         var worksheet = _api.wb.getWorksheet();
+
         var left = worksheet.cols[worksheet.cols.length - 1].left;
         var top =  worksheet.rows[worksheet.rows.length - 1].top;
 
-        left += (AscCommon.gc_nMaxCol - worksheet.cols.length) * worksheet.defaultColWidth;
-        top += (AscCommon.gc_nMaxRow - worksheet.rows.length) * worksheet.defaultRowHeight;
+        left += (AscCommon.gc_nMaxCol - worksheet.cols.length) * worksheet.defaultColWidthPx;
+        top += (AscCommon.gc_nMaxRow - worksheet.rows.length) * AscCommonExcel.oDefaultMetrics.RowHeight;
 
         return [left, top];
     };
