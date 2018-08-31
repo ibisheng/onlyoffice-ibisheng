@@ -4247,14 +4247,14 @@ function DrawingObjects() {
             settings.putShowHorAxis(true);
             settings.putShowVerAxis(true);
             var series = AscFormat.getChartSeries(worksheet.model, settings);
-            if(series && series.series.length > 1)
-            {
-                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
-            }
-            else
-            {
-                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
-            }
+            // if(series && series.series.length > 1)
+            // {
+            //     settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
+            // }
+            // else
+            // {
+            //     settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
+            // }
             settings.putHorAxisLabel(Asc.c_oAscChartHorAxisLabelShowSettings.none);
             settings.putVertAxisLabel(Asc.c_oAscChartVertAxisLabelShowSettings.none);
             settings.putDataLabelsPos(Asc.c_oAscChartDataLabelsPos.none);
