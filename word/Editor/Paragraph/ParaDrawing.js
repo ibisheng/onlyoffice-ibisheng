@@ -874,25 +874,55 @@ ParaDrawing.prototype.CheckWH = function()
 	}
 	this.setExtent(extX, extY);
 
-	var xc          = this.GraphicObj.localTransform.TransformPointX(this.GraphicObj.extX / 2, this.GraphicObj.extY / 2);
-	var yc          = this.GraphicObj.localTransform.TransformPointY(this.GraphicObj.extX / 2, this.GraphicObj.extY / 2);
-	var oBounds     = this.GraphicObj.bounds;
-	var LineCorrect = 0;
-	if (this.GraphicObj.pen && this.GraphicObj.pen.Fill && this.GraphicObj.pen.Fill.fill)
-	{
-		LineCorrect = (this.GraphicObj.pen.w == null) ? 12700 : parseInt(this.GraphicObj.pen.w);
-		LineCorrect /= 72000.0;
-	}
-    if(!AscFormat.checkNormalRotate(rot)){
-		var t = extX;
-        extX = extY;
-        extY = t;
-	}
 
-	var EEL = (xc - extX / 2) - oBounds.l + LineCorrect;
-	var EET = (yc - extY / 2) - oBounds.t + LineCorrect;
-	var EER = oBounds.r + LineCorrect - (xc + extX / 2);
-	var EEB = oBounds.b + LineCorrect - (yc + extY / 2);
+	var EEL = 0.0, EET = 0.0, EER = 0.0, EEB = 0.0;
+	//if(this.Is_Inline())
+	{
+		var xc          = this.GraphicObj.localTransform.TransformPointX(this.GraphicObj.extX / 2, this.GraphicObj.extY / 2);
+		var yc          = this.GraphicObj.localTransform.TransformPointY(this.GraphicObj.extX / 2, this.GraphicObj.extY / 2);
+		var oBounds     = this.GraphicObj.bounds;
+		var LineCorrect = 0;
+		if (this.GraphicObj.pen && this.GraphicObj.pen.Fill && this.GraphicObj.pen.Fill.fill)
+		{
+			LineCorrect = (this.GraphicObj.pen.w == null) ? 12700 : parseInt(this.GraphicObj.pen.w);
+			LineCorrect /= 72000.0;
+		}
+
+
+		var l = oBounds.l;
+		var r = oBounds.r;
+		var t = oBounds.t;
+		var b = oBounds.b;
+
+		var startX, startY;
+		if(!AscFormat.checkNormalRotate(rot)){
+			var t = extX;
+			extX = extY;
+			extY = t;
+		}
+
+
+		startX = xc - extX/2.0;
+		startY = yc - extY/2.0;
+
+		if(l > startX){
+			l = startX;
+		}
+		if(r < startX + extX){
+			r = startX + extX;
+		}
+		if(t > startY){
+			t = startY;
+		}
+		if(b < startY + extY){
+			b = startY + extY;
+		}
+
+		EEL = (xc - extX / 2) - l + LineCorrect;
+		EET = (yc - extY / 2) - t + LineCorrect;
+		EER = r + LineCorrect - (xc + extX / 2);
+		EEB = b + LineCorrect - (yc + extY / 2);
+	}
 	this.setEffectExtent(EEL, EET, EER, EEB);
 	this.Check_WrapPolygon();
 };
