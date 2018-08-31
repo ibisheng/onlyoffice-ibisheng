@@ -4551,9 +4551,8 @@
         }
     };
 
-    WorksheetView.prototype._addCellTextToCache = function (col, row, canChangeColWidth) {
+    WorksheetView.prototype._addCellTextToCache = function (col, row) {
         var self = this;
-        canChangeColWidth = canChangeColWidth || this.canChangeColWidth;
 
         function makeFnIsGoodNumFormat(flags, width) {
             return function (str) {
@@ -4593,7 +4592,7 @@
             if (col !== mc.c1 || row !== mc.r1) {
                 // Проверим внесена ли первая ячейка в cache (иначе если была скрыта первая строка или первый столбец, то мы не внесем)
                 if (undefined === this._getCellTextCache(mc.c1, mc.r1, true)) {
-                    return this._addCellTextToCache(mc.c1, mc.r1, canChangeColWidth);
+                    return this._addCellTextToCache(mc.c1, mc.r1);
                 }
 				// skip other merged cell from range
                 return mc.c2;
@@ -4634,14 +4633,14 @@
         var sstr, sfl, stm;
 
         if (!this.cols[col].isCustomWidth && fl.isNumberFormat && !(mergeType & c_oAscMergeType.cols) &&
-          (c_oAscCanChangeColWidth.numbers === canChangeColWidth ||
-          c_oAscCanChangeColWidth.all === canChangeColWidth)) {
+          (c_oAscCanChangeColWidth.numbers === this.canChangeColWidth ||
+          c_oAscCanChangeColWidth.all === this.canChangeColWidth)) {
             colWidth = this.cols[col].innerWidth;
             // Измеряем целую часть числа
             sstr = c.getValue2(gc_nMaxDigCountView, function () {
                 return true;
             });
-            if ("General" === numFormatStr && c_oAscCanChangeColWidth.all !== canChangeColWidth) {
+            if ("General" === numFormatStr && c_oAscCanChangeColWidth.all !== this.canChangeColWidth) {
                 // asc.truncFracPart изменяет исходный массив, поэтому клонируем
                 var fragmentsTmp = [];
                 for (var k = 0; k < sstr.length; ++k) {
@@ -4665,7 +4664,7 @@
             colWidth = this.cols[col].innerWidth;
             // подбираем ширину
             if (!this.cols[col].isCustomWidth && !(mergeType & c_oAscMergeType.cols) && !fl.wrapText &&
-              c_oAscCanChangeColWidth.all === canChangeColWidth) {
+              c_oAscCanChangeColWidth.all === this.canChangeColWidth) {
                 sstr = c.getValue2(gc_nMaxDigCountView, function () {
                     return true;
                 });
@@ -9037,7 +9036,7 @@
 		}
 	};
 
-    WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
+    WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate) {
         var t = this;
 		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
 		var specialPasteProps = specialPasteHelper.specialPasteProps;
@@ -9202,7 +9201,7 @@
 		return selectData;
     };
 
-    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, val, pasteContent, bIsUpdate, canChangeColWidth ) {
+    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, val, pasteContent, bIsUpdate ) {
         var t = this;
 		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
 		var specialPasteProps = specialPasteHelper.specialPasteProps;
@@ -9238,7 +9237,7 @@
 		//paste from excel binary
 		if(fromBinaryExcel)
 		{
-			selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+			selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate);
 		}
 		else
 		{
@@ -9271,22 +9270,22 @@
 						}
 					}
 
-					selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+					selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate);
 					AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
 				} else {
 					oImageMap = pasteContent.props.oImageMap;
 					if (window["NATIVE_EDITOR_ENJINE"]) {
 						//TODO для мобильных приложений  - не рабочий код!
 						AscCommon.ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
-						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate);
 						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
 					} else {
-						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate);
 						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
 					}
 				}
 			} else {
-				selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+				selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate);
 			}
 
             History.EndTransaction();
@@ -11050,10 +11049,11 @@
 
         oldColWidth = this.getColumnWidthInSymbols(col);
 
+        this.canChangeColWidth = c_oAscCanChangeColWidth.all;
         this.cols[col].isCustomWidth = false;
         for (row = r1; row <= r2; ++row) {
             // пересчет метрик текста
-            this._addCellTextToCache(col, row, /*canChangeColWidth*/c_oAscCanChangeColWidth.all);
+            this._addCellTextToCache(col, row);
             ct = this._getCellTextCache(col, row);
             if (ct === undefined) {
                 continue;
@@ -11102,6 +11102,7 @@
                 }
             }
         }
+        this.canChangeColWidth = c_oAscCanChangeColWidth.none;
 
         var pad, cc, cw;
         if (width > 0) {
