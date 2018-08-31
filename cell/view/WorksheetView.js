@@ -12782,20 +12782,25 @@
      * @private
      */
     WorksheetView.prototype._onUpdateFormatTable = function (range, recalc, changeRowsOrMerge) {
+		var arrChanged;
         //ToDo заглушка, чтобы не падало. Нужно полностью переделывать этот код!!!! (Перенес выше из-за бага http://bugzilla.onlyoffice.com/show_bug.cgi?id=26705)
         this._checkUpdateRange(range);
 
         if (!recalc) {
-            // При скрытии/открытии строк стоит делать update всему
-            if (changeRowsOrMerge) {
-                this.isChanged = true;
-            }
-            // Пока вызовем updateRange, но стоит делать просто draw
-            this._updateCellsRange(range);
-            // ToDo убрать совсем reinitRanges
-            if (this.objectRender && this.objectRender.drawingArea) {
-                this.objectRender.drawingArea.reinitRanges();
-            }
+            // ToDo сделать правильное обновление при скрытии/раскрытии строк/столбцов
+			this._initCellsArea(AscCommonExcel.recalcType.full);
+			this.cache.reset();
+			this._cleanCellsTextMetricsCache();
+			this._prepareCellTextMetricsCache();
+			if (this.objectRender && this.objectRender.drawingArea) {
+				this.objectRender.drawingArea.reinitRanges();
+			}
+			arrChanged = [new asc_Range(range.c1, 0, range.c2, gc_nMaxRow0)];
+			this.model.onUpdateRanges(arrChanged);
+			this.objectRender.rebuildChartGraphicObjects(arrChanged);
+			this.draw();
+			this.handlers.trigger("reinitializeScroll");
+			this._updateSelectionNameAndInfo();
             return;
         }
 
@@ -12804,6 +12809,7 @@
         }
 
         var i, r = range.r1, bIsUpdate = false, w;
+        // AutoFit column with by headers of table
         for (i = range.c1; i <= range.c2; ++i) {
             w = this.onChangeWidthCallback(i, r, r, /*onlyIfMore*/true);
             if (-1 !== w) {
@@ -12826,7 +12832,7 @@
             if (this.objectRender && this.objectRender.drawingArea) {
                 this.objectRender.drawingArea.reinitRanges();
             }
-            var arrChanged = [new asc_Range(range.c1, 0, range.c2, gc_nMaxRow0)];
+            arrChanged = [new asc_Range(range.c1, 0, range.c2, gc_nMaxRow0)];
 			this.model.onUpdateRanges(arrChanged);
             this.objectRender.rebuildChartGraphicObjects(arrChanged);
             this.draw();
