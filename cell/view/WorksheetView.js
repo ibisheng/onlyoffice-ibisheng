@@ -4858,6 +4858,7 @@
 				History.TurnOn();
 			}
         }
+		this.arrRecalcRanges = [];
 		this.arrRecalcRangesWithHeight = [];
 
 		this._updateRowPositions();
