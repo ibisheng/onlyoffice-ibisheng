@@ -3625,7 +3625,7 @@ CParagraphContentWithParagraphLikeContent.prototype.GetDirectTextPr = function()
 	}
 	else
 	{
-		return this.Content[this.CurPos.ContentPos].GetDirectTextPr();
+		return this.Content[this.State.ContentPos].GetDirectTextPr();
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
