@@ -9637,6 +9637,11 @@ drawDoughnutChart.prototype = {
 				curVal = idxPoint ? idxPoint.val : 0;
 				angle = Math.abs((parseFloat(curVal / sumData)) * (Math.PI * 2));
 
+				//правка связана с реализацией arcTo, где swAng зануляется и приравнивается к значению
+				if(angle < 10e-16) {
+					angle = 0;
+				}
+
 				if (!this.paths.series) {
 					this.paths.series = [];
 				}
