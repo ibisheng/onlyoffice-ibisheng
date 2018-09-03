@@ -930,6 +930,16 @@ CDocumentContentElementBase.prototype.GetSimilarNumbering = function(oContinueEn
 {
 	return null;
 };
+/**
+ * Переходим к следующей ссылке на сноску
+ * @param isNext {boolean} - направление поиска
+ * @param isCurrent {boolean} - ищем начиная с текущей позиции или с края элемента
+ * @returns {boolean}
+ */
+CDocumentContentElementBase.prototype.GotoFootnoteRef = function(isNext, isCurrent)
+{
+	return false;
+};
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
