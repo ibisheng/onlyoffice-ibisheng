@@ -596,12 +596,22 @@ function RotateTrackGroup(originalObject)
         }
     };
 
-    this.trackEnd = function()
+    this.trackEnd = function(bWord)
     {
         if(!this.bIsTracked){
             return;
         }
+        var x = this.originalObject.x;
+        var y = this.originalObject.y;
+        if(bWord){
+            this.originalObject.x = 0;
+            this.originalObject.y = 0;
+        }
         AscFormat.CheckSpPrXfrm3(this.originalObject);
+        if(bWord){
+            this.originalObject.x = x;
+            this.originalObject.y = y;
+        }
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }
