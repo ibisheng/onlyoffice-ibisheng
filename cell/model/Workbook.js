@@ -2917,20 +2917,36 @@
 		if (start < this.count) {
 			this.checkSize(this.count - 1 + insertCount);
 			var startOffset = start * this.structSize;
-			var endOffset = (start + insertCount) * this.structSize;
-			var endData = (this.count - insertCount) * this.structSize;
-			this.data.set(this.data.subarray(startOffset, endData), endOffset);
-			this.data.fill(0, startOffset, endOffset);
+			if (start + insertCount < this.count) {
+				var endOffset = (start + insertCount) * this.structSize;
+				var endData = (this.count - insertCount) * this.structSize;
+				this.data.set(this.data.subarray(startOffset, endData), endOffset);
+				this.data.fill(0, startOffset, endOffset);
+			} else {
+				this.data.fill(0, startOffset);
+			}
 		}
 	};
 	SheetMemory.prototype.copyRange = function(sheetMemory, startFrom, startTo, count) {
-		sheetMemory.checkSize(startFrom + count);
-		this.checkSize(startTo + count);
-		var startOffsetFrom = startFrom * this.structSize;
-		var endOffsetFrom = (startFrom + count) * this.structSize;
-		var startOffsetTo = startTo * this.structSize;
+		var countCopied = 0;
+		if (startFrom < sheetMemory.count) {
+			countCopied = Math.min(count, sheetMemory.count - startFrom);
+			this.checkSize(startTo + countCopied);
+			countCopied = Math.min(countCopied, this.count - startTo);
+			if (countCopied > 0) {
+				var startOffsetFrom = startFrom * this.structSize;
+				var endOffsetFrom = (startFrom + countCopied) * this.structSize;
+				var startOffsetTo = startTo * this.structSize;
 
-		this.data.set(sheetMemory.data.subarray(startOffsetFrom, endOffsetFrom), startOffsetTo);
+				this.data.set(sheetMemory.data.subarray(startOffsetFrom, endOffsetFrom), startOffsetTo);
+			}
+		}
+		var countErase = Math.min(count - countCopied, this.count - (startTo + countCopied));
+		if (countErase > 0) {
+			var startOffsetErase = (startTo + countCopied) * this.structSize;
+			var endOffsetErase = (startTo + countCopied + countErase) * this.structSize;
+			this.data.fill(0, startOffsetErase, endOffsetErase);
+		}
 	};
 	SheetMemory.prototype.copyRangeByChunk = function(from, fromCount, to, toCount) {
 		if (from < this.count) {
@@ -2938,7 +2954,7 @@
 			var fromStartOffset = from * this.structSize;
 			var fromEndOffset = Math.min((from + fromCount), this.count) * this.structSize;
 			var fromSubArray = this.data.subarray(fromStartOffset, fromEndOffset);
-			for (var i = to; i < to + toCount; i += fromCount) {
+			for (var i = to; i < to + toCount && i < this.count; i += fromCount) {
 				this.data.set(fromSubArray, i * this.structSize);
 			}
 		}
