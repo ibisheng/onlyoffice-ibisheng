@@ -4858,7 +4858,6 @@
 				History.TurnOn();
 			}
         }
-		this.arrRecalcRanges = [];
 		this.arrRecalcRangesWithHeight = [];
 
 		this._updateRowPositions();
@@ -12017,6 +12016,7 @@
 			this.model.hiddenManager.getRecalcHidden());
 
 		if (0 < ranges.length) {
+			this.arrRecalcRanges = [];
 			this._updateRowsHeight();
 			this._updateSelectionNameAndInfo();
 
