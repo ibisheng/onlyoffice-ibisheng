@@ -4638,12 +4638,12 @@ function ObjectLocker(ws) {
     // For array of objects -=Use reset before use=-
     _t.checkObjects = function(callback) {
 
-        function callbackEx(result, sync) {
+        var callbackEx = function(result, sync) {
             //if ( worksheet )
             //	worksheet._drawCollaborativeElements(true);
             if ( callback )
                 callback(result, sync);
-        }
+        };
 
         if(Asc.editor && Asc.editor.collaborativeEditing && Asc.editor.collaborativeEditing.getGlobalLock()){
             callbackEx(false, true);
@@ -4665,7 +4665,7 @@ function ObjectLocker(ws) {
             if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
                 // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
                 asc_applyFunction(callbackEx, true, true);
-                callback = undefined;
+                callbackEx = undefined;
             }
             if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
                 // Редактируем сами, проверяем дальше
