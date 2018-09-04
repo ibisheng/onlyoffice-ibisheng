@@ -228,15 +228,45 @@ Paragraph.prototype.Use_YLimit = function()
 };
 Paragraph.prototype.Set_Pr = function(oNewPr)
 {
-	var Pr_old = this.Pr;
-	var Pr_new = oNewPr;
-	History.Add(new CChangesParagraphPr(this, Pr_old, Pr_new));
+	return this.SetDirectPr(oNewPr);
+};
+/**
+ * Устанавливаем прямые настройки параграфа целиком
+ * @param oParaPr {CParaPr}
+ */
+Paragraph.prototype.SetDirectParaPr = function(oParaPr)
+{
+	History.Add(new CChangesParagraphPr(this, this.Pr, oParaPr));
 
-	this.Pr = oNewPr;
+	this.Pr = oParaPr;
 
 	this.Recalc_CompiledPr();
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 	this.UpdateDocumentOutline();
+};
+/**
+ * Устанавливаем прямые настройки для текста
+ * @param oTextPr {CTextPr}
+ */
+Paragraph.prototype.SetDirectTextPr = function(oTextPr)
+{
+	// TODO: Пока мы пробегаемся только по верхним элементам параграфа (без поиска в глубину), т.к. данная функция используется
+	//       только для новых параграфов
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oRun = this.Content[nIndex];
+		if (oRun.Type === para_Run)
+		{
+			oRun.Set_Pr(oTextPr.Copy());
+
+			// TODO: Передалать ParaEnd
+			if (nIndex === nCount - 1)
+			{
+				this.TextPr.Set_Value(oTextPr.Copy());
+			}
+		}
+	}
 };
 Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 {
@@ -8394,8 +8424,16 @@ Paragraph.prototype.GetDirectTextPr = function()
 
 	return TextPr;
 };
-Paragraph.prototype.GetDirectParaPr = function()
+/**
+ * Получаем прямые настройки параграфа
+ * @param [isCopy=true] копировать ли настройки
+ * @returns {CParaPr}
+ */
+Paragraph.prototype.GetDirectParaPr = function(isCopy)
 {
+	if (false === isCopy)
+		return this.Pr;
+
 	return this.Pr.Copy();
 };
 Paragraph.prototype.PasteFormatting = function(TextPr, oParaPr, ApplyPara)

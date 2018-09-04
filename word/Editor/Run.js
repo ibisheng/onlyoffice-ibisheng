@@ -7061,19 +7061,23 @@ ParaRun.prototype.IsInHyperlinkInTOC = function()
 	return false;
 };
 
-// В данной функции мы жестко меняем настройки на те, которые пришли (т.е. полностью удаляем старые)
 ParaRun.prototype.Set_Pr = function(TextPr)
 {
-    var OldValue = this.Pr;
-    this.Pr = TextPr;
-
-	History.Add(new CChangesRunTextPr(this, OldValue, TextPr, this.private_IsCollPrChangeMine()));
-    this.Recalc_CompiledPr(true);
-
-    this.private_UpdateSpellChecking();
-    this.private_UpdateTrackRevisionOnChangeTextPr(true);
+	return this.SetPr(TextPr);
 };
+/**
+ * Жестко меняем настройки на заданные
+ * @param {CTextPr} oTextPr
+ */
+ParaRun.prototype.SetPr = function(oTextPr)
+{
+	History.Add(new CChangesRunTextPr(this, this.Pr, oTextPr, this.private_IsCollPrChangeMine()));
+	this.Pr = oTextPr;
+	this.Recalc_CompiledPr(true);
 
+	this.private_UpdateSpellChecking();
+	this.private_UpdateTrackRevisionOnChangeTextPr(true);
+};
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     var bReview = false;
