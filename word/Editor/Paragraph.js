@@ -228,7 +228,7 @@ Paragraph.prototype.Use_YLimit = function()
 };
 Paragraph.prototype.Set_Pr = function(oNewPr)
 {
-	return this.SetDirectPr(oNewPr);
+	return this.SetDirectParaPr(oNewPr);
 };
 /**
  * Устанавливаем прямые настройки параграфа целиком
