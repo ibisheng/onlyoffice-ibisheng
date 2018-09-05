@@ -407,16 +407,18 @@ CBookmarksManager.prototype.GetNameForHeadingBookmark = function(oParagraph)
 
 	var sText = oParagraph.GetText();
 
-	var nPos = 0;
-	while (nPos < sText.length)
+	var nStartPos = 0;
+	while (nStartPos < sText.length)
 	{
-		var nChar = sText.charCodeAt(nPos);
+		var nChar = sText.charCodeAt(nStartPos);
 		if (0x0020 !== nChar && 0x0009 !== nChar)
 			break;
+
+		nStartPos++;
 	}
 
 	var sName = "";
-	for (var nIndex = nPos, nLen = Math.min(sText.length, nPos + 10); nIndex < nLen; ++nIndex)
+	for (var nIndex = nStartPos, nLen = Math.min(sText.length, nStartPos + 10); nIndex < nLen; ++nIndex)
 	{
 		var nChar = sText.charCodeAt(nIndex);
 		if (0x0020 === nChar || 0x0009 === nChar)
