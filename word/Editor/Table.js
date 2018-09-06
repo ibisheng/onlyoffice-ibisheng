@@ -3362,7 +3362,9 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 	if (true === this.Selection.Start || table_Selection_Border === this.Selection.Type2 || table_Selection_Border_InnerTable === this.Selection.Type2)
 		return;
 
-	if (true === this.Check_EmptyPages(CurPage - 1) && true !== this.IsEmptyPage(CurPage))
+	if (true !== this.DrawingDocument.IsCursorInTableCur(X, Y, this.GetAbsolutePage(CurPage))
+		&& true === this.Check_EmptyPages(CurPage - 1)
+		&& true !== this.IsEmptyPage(CurPage))
 	{
 		this.private_StartTrackTable(CurPage);
 	}
