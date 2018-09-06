@@ -16828,7 +16828,7 @@ CDocument.prototype.private_RemoveBookmark = function(sName)
 	arrBookmarkChars[1].RemoveBookmark();
 	arrBookmarkChars[0].RemoveBookmark();
 };
-CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
+CDocument.prototype.AddTableOfContents = function(sHeading, oPr, oSdt)
 {
 	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
 	{
@@ -16843,22 +16843,29 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
             }
         }
 
-		this.Remove(1, true, true, true);
-		var oSdt = this.AddContentControl(c_oAscSdtLevelType.Block);
-
-		if (sHeading)
+        if (oSdt instanceof CBlockLevelSdt)
 		{
-			var oParagraph = oSdt.GetCurrentParagraph();
-			oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
-			for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.next())
+			oSdt.ClearContentControl();
+		}
+		else
+		{
+			this.Remove(1, true, true, true);
+			var oSdt = this.AddContentControl(c_oAscSdtLevelType.Block);
+
+			if (sHeading)
 			{
-				var nCharCode = oIterator.value();
-				if (0x0020 === nCharCode)
-					oParagraph.Add(new ParaSpace());
-				else
-					oParagraph.Add(new ParaText(nCharCode));
+				var oParagraph = oSdt.GetCurrentParagraph();
+				oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
+				for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.next())
+				{
+					var nCharCode = oIterator.value();
+					if (0x0020 === nCharCode)
+						oParagraph.Add(new ParaSpace());
+					else
+						oParagraph.Add(new ParaText(nCharCode));
+				}
+				oSdt.AddNewParagraph(false, true);
 			}
-			oSdt.AddNewParagraph(false, true);
 		}
 
 		oSdt.SetThisElementCurrent();

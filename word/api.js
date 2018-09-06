@@ -8290,7 +8290,16 @@ background-repeat: no-repeat;\
 		}
 
 		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
-			oTOC = oTOC.GetInnerTableOfContents();
+		{
+			var oInnerTOC = oTOC.GetInnerTableOfContents();
+			if (!oInnerTOC)
+			{
+				oLogicDocument.AddTableOfContents(null, oPr, oTOC);
+				return;
+			}
+
+			oTOC = oInnerTOC;
+		}
 
 		if (!oTOC)
 			return;
