@@ -12302,8 +12302,9 @@
 						};
 
 						var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar);
+						filterRange = filterInfo.filterRange;
 
-						t._isLockedCells(filterInfo.filterRange, null, addFilterCallBack)
+						t._isLockedCells(filterRange, null, addFilterCallBack)
 					}
 
 					break;
