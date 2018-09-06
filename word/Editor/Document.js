@@ -6522,10 +6522,15 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
 
             if (null != this.Selection.Data && this.Selection.Data.Hyperlink)
             {
-            	var oHyperlink = this.Selection.Data.Hyperlink;
-            	var sBookmarkName = oHyperlink.GetAnchor();
-            	var sValue        = oHyperlink.GetValue();
-            	if (sBookmarkName)
+				var oHyperlink    = this.Selection.Data.Hyperlink;
+				var sBookmarkName = oHyperlink.GetAnchor();
+				var sValue        = oHyperlink.GetValue();
+
+				if (oHyperlink.IsTopOfDocument())
+				{
+					this.MoveCursorToStartPos(false);
+				}
+				else if (sBookmarkName)
 				{
 					var oBookmark = this.BookmarksManager.GetBookmarkByName(sBookmarkName);
 					if (oBookmark)
@@ -7417,7 +7422,12 @@ CDocument.prototype.OnKeyDown = function(e)
         {
 			var sBookmarkName = Hyperlink.GetAnchor();
 			var sValue        = Hyperlink.GetValue();
-			if (sBookmarkName)
+
+			if (Hyperlink.IsTopOfDocument())
+			{
+				this.MoveCursorToStartPos(false);
+			}
+			else if (sBookmarkName)
 			{
 				var oBookmark = this.BookmarksManager.GetBookmarkByName(sBookmarkName);
 				if (oBookmark)
