@@ -782,10 +782,12 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 var Frame_XLimit = FramePr.Get_W();
                 var Frame_YLimit = FramePr.Get_H();
 
-                if (undefined === Frame_XLimit)
+				var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
+
+				if (undefined === Frame_XLimit)
                     Frame_XLimit = Page_Field_R - Page_Field_L;
 
-                if (undefined === Frame_YLimit)
+                if (undefined === Frame_YLimit || Asc.linerule_Auto === FrameHRule)
                     Frame_YLimit = Page_H;
 
                 for (var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++)
@@ -822,7 +824,6 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 else if (-1 === FrameW)
                     FrameW = Frame_XLimit;
 
-                var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
                 switch (FrameHRule)
                 {
                     case Asc.linerule_Auto :
