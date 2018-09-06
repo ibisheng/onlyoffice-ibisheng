@@ -1508,6 +1508,11 @@
 	};
 
 	// plugins
+	baseEditorsApi.prototype._checkLicenseApiFunctions   = function()
+	{
+		return this.licenseResult && Asc.c_oLicenseBranding.ApiFunctions === this.licenseResult['branding'];
+	};
+
 	baseEditorsApi.prototype.asc_pluginsRegister   = function(basePath, plugins)
 	{
 		if (null != this.pluginsManager)

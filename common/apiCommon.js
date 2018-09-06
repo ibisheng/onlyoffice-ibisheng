@@ -139,6 +139,12 @@
 		Developer: 2
 	};
 
+	var c_oLicenseBranding = {
+		None: 0,
+		Custom: 1,
+		ApiFunctions: 2
+	};
+
 	var EPluginDataType = {
 		none: "none",
 		text: "text",
@@ -4086,6 +4092,12 @@
 	prot['None'] = prot.None;
 	prot['Trial'] = prot.Trial;
 	prot['Developer'] = prot.Developer;
+
+	window['Asc']['c_oLicenseBranding'] = window['Asc'].c_oLicenseBranding = c_oLicenseBranding;
+	prot = c_oLicenseBranding;
+	prot['None'] = prot.None;
+	prot['Custom'] = prot.Custom;
+	prot['ApiFunctions'] = prot.ApiFunctions;
 
 	window["Asc"]["EPluginDataType"] = window["Asc"].EPluginDataType = EPluginDataType;
 	prot         = EPluginDataType;
