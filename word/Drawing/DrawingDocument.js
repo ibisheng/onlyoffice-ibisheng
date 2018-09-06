@@ -7368,6 +7368,9 @@ function CDrawingDocument()
 		var isRightTab    = props.get_RightAlignTab();
 		var nTabLeader    = props.get_TabLeader();
 
+		if (undefined === nTabLeader || null === nTabLeader)
+			nTabLeader = Asc.c_oAscTabLeader.Dot;
+
 		var arrLevels         = [];
 		var arrStylesToDelete = [];
 
