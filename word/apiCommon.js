@@ -1616,6 +1616,7 @@
 	CTableOfContentsPr.prototype['get_ShowPageNumbers'] = CTableOfContentsPr.prototype.get_ShowPageNumbers;
 	CTableOfContentsPr.prototype['put_RightAlignTab']   = CTableOfContentsPr.prototype.put_RightAlignTab;
 	CTableOfContentsPr.prototype['get_RightAlignTab']   = CTableOfContentsPr.prototype.get_RightAlignTab;
+	CTableOfContentsPr.prototype['get_TabLeader']       = CTableOfContentsPr.prototype.get_TabLeader;
 	CTableOfContentsPr.prototype['put_TabLeader']       = CTableOfContentsPr.prototype.put_TabLeader;
 	CTableOfContentsPr.prototype['get_StylesType']      = CTableOfContentsPr.prototype.get_StylesType;
 	CTableOfContentsPr.prototype['put_StylesType']      = CTableOfContentsPr.prototype.put_StylesType;
