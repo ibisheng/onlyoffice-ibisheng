@@ -211,16 +211,16 @@ CDocumentContent.prototype.Get_PageContentStartPos2 = function(StartPageIndex, S
 };
 CDocumentContent.prototype.Get_Theme = function()
 {
-	if(this.Parent){
-        return this.Parent.Get_Theme();
-	}
+	if (this.Parent)
+		return this.Parent.Get_Theme();
+
 	return null;
 };
 CDocumentContent.prototype.Get_ColorMap = function()
 {
-	if(this.Parent){
-        return this.Parent.Get_ColorMap();
-	}
+	if (this.Parent)
+		return this.Parent.Get_ColorMap();
+
 	return null;
 };
 CDocumentContent.prototype.Get_PageLimits = function(PageIndex)
@@ -1835,20 +1835,20 @@ CDocumentContent.prototype.Document_UpdateInterfaceState = function()
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 	{
-		var drawin_objects = this.LogicDocument.DrawingObjects;
-		if (drawin_objects.selection.textSelection
-			|| drawin_objects.selection.groupSelection && drawin_objects.selection.groupSelection.selection.textSelection
-			|| drawin_objects.selection.chartSelection && drawin_objects.selection.chartSelection.selection.textSelection)
+		var oDrawingObjects = this.LogicDocument.DrawingObjects;
+		var oTargetTextObject = AscFormat.getTargetTextObject(oDrawingObjects);
+		if (oTargetTextObject)
 		{
 			this.LogicDocument.Interface_Update_DrawingPr();
-			drawin_objects.documentUpdateInterfaceState();
+			oDrawingObjects.documentUpdateInterfaceState();
 		}
 		else
 		{
-			drawin_objects.documentUpdateInterfaceState();
+			oDrawingObjects.resetInterfaceTextPr();
+			oDrawingObjects.updateTextPr();
 			this.LogicDocument.Interface_Update_DrawingPr();
+			oDrawingObjects.updateParentParagraphParaPr();
 		}
-		return;
 	}
 	else //if (docpostype_Content === this.CurPos.Type)
 	{
