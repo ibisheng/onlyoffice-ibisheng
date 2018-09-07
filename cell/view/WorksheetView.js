@@ -4832,14 +4832,16 @@
 	    if (0 === this.arrRecalcRangesWithHeight.length) {
 	        return;
         }
+        var duplicate = {};
 		var range, cache, row;
 		for (var j = 0; j < this.arrRecalcRangesWithHeight.length; ++j) {
 		    range = this.arrRecalcRangesWithHeight[j];
 			for (var r = range.r1; r <= range.r2 && r < this.rows.length; ++r) {
-				if (this.rows[r].isCustomHeight) {
+				if (this.rows[r].isCustomHeight || duplicate[r]) {
 					continue;
 				}
 
+				duplicate[r] = 1;
 				row = this.rows[r];
 				row.heightReal = AscCommonExcel.oDefaultMetrics.RowHeight;
 				row.height = Asc.round(AscCommonExcel.convertPtToPx(row.heightReal) * this.getZoom());
