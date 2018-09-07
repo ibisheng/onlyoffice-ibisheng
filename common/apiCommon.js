@@ -3079,7 +3079,7 @@
 	};
 	CHyperlinkProperty.prototype.is_Heading = function()
 	{
-		return (this.Heading instanceof Paragraph ? true : false)
+		return (this.Heading instanceof AscCommonWord.Paragraph ? true : false)
 	};
 	CHyperlinkProperty.prototype.put_Heading = function(oParagraph)
 	{
