@@ -239,9 +239,11 @@ var c_oAscChangeTableStyleInfo = {
 var c_oAscCellEditorState = {
   editEnd: 0,				// Окончание редактирования
   editStart: 1,				// Начало редактирования
-  editEmptyCell: 2,				// Редактирование пустой ячейки (доступны функции и свойства текста)
+  editEmptyCell: 2,			// Редактирование пустой ячейки (доступны функции и свойства текста)
   editText: 3,				// Редактирование текста, числа, даты и др. формата, кроме формулы
-  editFormula: 4				// Редактирование формулы
+  editFormula: 4,			// Редактирование формулы
+  editInFormulaBar: 5,		// Редактирование в строке формул
+  editInCell: 6				// Редактирование в ячейке
 };
 
 // Состояние select-а
@@ -515,6 +517,8 @@ var c_oAscPopUpSelectorType = {
   prot['editEmptyCell'] = prot.editEmptyCell;
   prot['editText'] = prot.editText;
   prot['editFormula'] = prot.editFormula;
+  prot['editInFormulaBar'] = prot.editInFormulaBar;
+  prot['editInCell'] = prot.editInCell;
   window['Asc']['c_oAscChangeSelectionFormatTable'] = window['Asc'].c_oAscChangeSelectionFormatTable = c_oAscChangeSelectionFormatTable;
   prot = c_oAscChangeSelectionFormatTable;
   prot['all'] = prot.all;

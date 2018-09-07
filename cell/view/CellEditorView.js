@@ -284,7 +284,7 @@
 			window.addEventListener( "mousemove", this.fKeyMouseMove, false );
 		}
 		this._setOptions( options );
-		this.isTopLineActive = true === this.input.isFocused;
+		this._updateTopLineActive(true === this.input.isFocused);
 
 		this._updateFormulaEditMod( /*bIsOpen*/true );
 		this._draw();
@@ -352,7 +352,7 @@
 				window.removeEventListener("mousemove", this.fKeyMouseMove, false);
 			}
 			this.input.blur();
-			this.isTopLineActive = false;
+			this._updateTopLineActive(false);
 			this.input.isFocused = false;
 			this._hideCursor();
 			// hide
@@ -1027,6 +1027,12 @@
 		{index: _s, length: r.oper.value.length, range: range, wsName: wsName};
 	};
 
+	CellEditor.prototype._updateTopLineActive = function (state) {
+		if (state !== this.isTopLineActive) {
+			this.isTopLineActive = state;
+			this.handlers.trigger("updateEditorState", this.isTopLineActive ? c_oAscCellEditorState.editInFormulaBar : c_oAscCellEditorState.editInCell);
+		}
+	};
 	CellEditor.prototype._updateFormulaEditMod = function ( bIsOpen ) {
 		var isFormula = this.isFormula();
 		if ( !bIsOpen ) {
@@ -1575,7 +1581,7 @@
 	};
 
 	CellEditor.prototype._topLineGotFocus = function () {
-		this.isTopLineActive = true;
+		this._updateTopLineActive(true);
 		this.input.isFocused = true;
 		this.setFocus(true);
 		this._hideCursor();
@@ -2616,7 +2622,7 @@
 		this.setFocus(true);
 		this.handlers.trigger('setStrictClose', true);
 
-		this.isTopLineActive = false;
+		this._updateTopLineActive(false);
 		this.input.isFocused = false;
 
 		if (0 === event.button) {
