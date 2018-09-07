@@ -1838,7 +1838,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 
     // Копируем настройки
     NewRun.Set_Pr(this.Pr.Copy(true));
-    NewRun.Set_ReviewType(this.ReviewType);
+    NewRun.Set_ReviewTypeWithInfo(this.ReviewType, this.ReviewInfo ? this.ReviewInfo.Copy() : undefined);
 
     NewRun.CollPrChangeMine  = this.CollPrChangeMine;
     NewRun.CollPrChangeOther = this.CollPrChangeOther;
