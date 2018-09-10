@@ -6285,6 +6285,12 @@ Paragraph.prototype.Selection_SetStart = function(X, Y, CurPage, bTableBorder)
 
 	// Выставляем селект
 	this.Set_SelectionContentPos(SearchPosXY.Pos, SearchPosXY.Pos);
+
+	if (true === SearchPosXY.Numbering && undefined != this.GetNumPr())
+	{
+		this.Set_ParaContentPos(this.Get_StartPos(), true, -1, -1);
+		this.Parent.SelectNumbering(this.GetNumPr(), this);
+	}
 };
 /**
  * Данная функция может использоваться как при движении, так и при окончательном выставлении селекта.
@@ -6347,18 +6353,11 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 
 	if (0 === SelectionStartPos.Compare(SelectionEndPos) && AscCommon.g_mouse_event_type_up === MouseEvent.Type)
 	{
-		var NumPr = this.GetNumPr();
 		var oInfo = new CSelectedElementsInfo();
 		this.GetSelectedElementsInfo(oInfo);
 		var oField = oInfo.Get_Field();
 
-		if (true === SearchPosXY.Numbering && undefined != NumPr)
-		{
-			// Передвигаем курсор в начало параграфа
-			this.Set_ParaContentPos(this.Get_StartPos(), true, -1, -1);
-			this.Parent.SelectNumbering(NumPr, this);
-		}
-		else if (oField && fieldtype_FORMTEXT === oField.Get_FieldType())
+		if (oField && fieldtype_FORMTEXT === oField.Get_FieldType())
 		{
 			// TODO: Пока у нас невложенные поля так будет работать нормально. Со вложенными нужно переделать.
 			oField.SelectAll(1);

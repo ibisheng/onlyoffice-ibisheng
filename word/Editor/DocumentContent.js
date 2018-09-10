@@ -5855,6 +5855,13 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 		{
 			var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
 			Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent);
+
+			if (this.IsNumberingSelection())
+			{
+				// TODO: Можно сделать передвигание нумерации как в Word
+				return;
+			}
+
 			Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
 
 			if (true !== bTableBorder)
