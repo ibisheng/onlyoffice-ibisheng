@@ -1510,7 +1510,7 @@
 	// plugins
 	baseEditorsApi.prototype._checkLicenseApiFunctions   = function()
 	{
-		return this.licenseResult && Asc.c_oLicenseBranding.ApiFunctions === this.licenseResult['branding'];
+		return this.licenseResult && true === this.licenseResult['plugins'];
 	};
 
 	baseEditorsApi.prototype.asc_pluginsRegister   = function(basePath, plugins)
