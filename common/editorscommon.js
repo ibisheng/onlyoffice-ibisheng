@@ -3237,7 +3237,7 @@
 		}
 		else
 		{
-			loadScript('/editor/sdkjs/' + sdkName + '/sdk-all.js', callback);
+			loadScript('/editor/sdkjs/' + sdkName + '/engine.js', callback);
 		}
 	}
 

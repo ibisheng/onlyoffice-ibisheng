@@ -82,8 +82,8 @@ module.exports = function(grunt) {
 	grunt.registerTask('concat_sdk_init', function() {
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
 		var sdkTmp = sdkDstFolder + '/sdk-tmp.js';
-		var sdkAllTmp = sdkDstFolder + '/sdk-all-tmp.js';
-		var sdkAllMinTmp = sdkDstFolder + '/sdk-all-min-tmp.js';
+		var sdkAllTmp = sdkDstFolder + '/engine-tmp.js';
+		var sdkAllMinTmp = sdkDstFolder + '/layout-tmp.js';
 		var srcFilesMin = packageFile['compile']['sdk']['min'];
 		var srcFilesAll = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {};
@@ -158,8 +158,8 @@ module.exports = function(grunt) {
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
 		var sdkTmp = sdkDstFolder + '/sdk-tmp.js';
 		var tmp_sdk_path = sdkDstFolder + '/sdk-js-tmp.js';
-		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
-		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
+		var sdkAllMinDst = sdkDstFolder + '/layout.js';
+		var sdkAllDst = sdkDstFolder + '/engine.js';
 		var sdkAllCache = sdkDstFolder + '/*.cache'
 		var sdkOpt = {
 			jscomp_off: 'checkVars',
@@ -188,7 +188,7 @@ module.exports = function(grunt) {
 				sdk: {
 					options: {
 					  separator: splitLine,
-					  prefix: [ "sdk-all-min", "sdk-all" ]
+					  prefix: [ "layout", "engine" ]
 					},
 					dest: sdkDstFolder,
 					src: tmp_sdk_path
