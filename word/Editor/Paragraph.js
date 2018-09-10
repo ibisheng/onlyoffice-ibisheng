@@ -7452,8 +7452,8 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 	var SelectionUse       = this.IsSelectionUse();
 	var SelectedOneElement = this.Parent.IsSelectedSingleElement();
 
-	// Когда выделено больше 1 параграфа, нумерация не добавляется к пустым параграфам.
-	if (true === SelectionUse && true !== SelectedOneElement && true === this.Is_Empty())
+	// Когда выделено больше 1 параграфа, нумерация не добавляется к пустым параграфам без нумерации
+	if (true === SelectionUse && true !== SelectedOneElement && true === this.Is_Empty() && !this.GetNumPr())
 		return;
 
 	this.RemoveNumPr();
