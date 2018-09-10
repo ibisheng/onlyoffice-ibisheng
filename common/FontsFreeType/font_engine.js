@@ -16627,10 +16627,14 @@ function tt_cmap13_class_rec()
 		if (isSafariAppleDevices)
 			return 0;
 
-        var data = cmap.data;
-        data.pos += 8;
-        cmap_info.language = FT_PEEK_ULONG(data);
-        data.pos -= 8;
+        try {
+            var data = cmap.data;
+            data.pos += 8;
+            cmap_info.language = FT_PEEK_ULONG(data);
+            data.pos -= 8;
+        } catch (e) {
+            console.log("warring:" + e);
+        }
         return 0;
     }
 }
