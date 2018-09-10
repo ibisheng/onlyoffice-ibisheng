@@ -3504,6 +3504,14 @@ CStyle.prototype.IsCustom = function()
 {
 	return this.Custom;
 };
+/**
+ * Проверяем является ли данный стиль, стилем для параграфа
+ * @returns {boolean}
+ */
+CStyle.prototype.IsParagraphStyle = function()
+{
+	return (this.Type === styletype_Paragraph);
+};
 
 function CStyles(bCreateDefault)
 {
@@ -4255,14 +4263,6 @@ CStyles.prototype =
         return "";
     },
 
-    Get : function(StyleId)
-    {
-        if (undefined != this.Style[StyleId])
-            return this.Style[StyleId];
-
-        return null;
-    },
-
     Get_Default_Paragraph : function()
     {
         return this.Default.Paragraph;
@@ -4733,6 +4733,15 @@ CStyles.prototype =
             }
         }
     }
+};
+/**
+ * Получаем стиль по идентификатору
+ * @param sStyleId {string}
+ * @returns {?CStyle}
+ */
+CStyles.prototype.Get = function(sStyleId)
+{
+	return (this.Style[sStyleId] ? this.Style[sStyleId] : null);
 };
 /**
  * Получаем идентификатор стиля по его имени

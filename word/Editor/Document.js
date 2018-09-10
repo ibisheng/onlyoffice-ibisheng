@@ -13271,7 +13271,8 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				{
 					NextId = this.Styles.Get_Next(StyleId);
 
-					if (null === NextId)
+					var oNextStyle = this.Styles.Get(NextId);
+					if (!NextId || !oNextStyle || !oNextStyle.IsParagraphStyle())
 						NextId = StyleId;
 				}
 

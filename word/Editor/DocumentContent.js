@@ -2314,8 +2314,9 @@ CDocumentContent.prototype.AddNewParagraph = function()
                         var Styles = this.Parent.Get_Styles();
                         NextId     = Styles.Get_Next(StyleId);
 
-                        if (null === NextId)
-                            NextId = StyleId;
+						var oNextStyle = Styles.Get(NextId);
+						if (!NextId || !oNextStyle || !oNextStyle.IsParagraphStyle())
+							NextId = StyleId;
                     }
 
 
