@@ -11175,6 +11175,28 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
                         oNewVal.addAxis(cat_ax);
                         oNewVal.addAxis(val_ax);
                     }
+                    else
+                    {
+                        if(oChart.getObjectType() === AscDFH.historyitem_type_BarChart && oChart.barDir === AscFormat.BAR_DIR_BAR)
+                        {
+                            for(var _c = 0; _c < axis_by_types.valAx.length; ++_c)
+                            {
+                                var val_ax = axis_by_types.valAx[_c];
+                                if(val_ax.axPos !== AscFormat.AX_POS_B || val_ax.axPos !== AscFormat.AX_POS_T )
+                                {
+                                    val_ax.setAxPos(AscFormat.AX_POS_B);
+                                }
+                            }
+                            for(var _c = 0; _c < axis_by_types.catAx.length; ++_c)
+                            {
+                                var cat_ax = axis_by_types.catAx[_c];
+                                if(cat_ax.axPos !== AscFormat.AX_POS_L || cat_ax.axPos !== AscFormat.AX_POS_R )
+                                {
+                                    cat_ax.setAxPos(AscFormat.AX_POS_L);
+                                }
+                            }
+                        }
+                    }
                 }
                 if(oChart.setVaryColors && oChart.varyColors === null){
                     oChart.setVaryColors(false);
