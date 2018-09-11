@@ -2683,7 +2683,7 @@ var editor;
       var drawing_area = worksheet.objectRender.drawingArea;
       if (drawing_area) {
         for (var i = 0; i < drawing_area.frozenPlaces.length; ++i) {
-          worksheet.objectRender.showDrawingObjects(false, new AscFormat.GraphicOption(worksheet, AscCommonExcel.c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
+          worksheet.objectRender.showDrawingObjects(true);
             worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
         }
       }
@@ -3080,9 +3080,10 @@ var editor;
 
     if (window['IS_NATIVE_EDITOR'] || !window["NATIVE_EDITOR_ENJINE"]) {
       var wsViews = Asc["editor"].wb.wsViews;
+      History.Get_RecalcData();
       for (var i = 0; i < wsViews.length; ++i) {
         if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
-          wsViews[i].objectRender.controller.startRecalculate();
+          wsViews[i].objectRender.controller.startRecalculate(false);
         }
       }
       this.chartPreviewManager.clearPreviews();

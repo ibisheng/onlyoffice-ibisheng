@@ -151,10 +151,12 @@ DrawingObjectsController.prototype.updateOverlay = function()
 {
     this.drawingObjects.OnUpdateOverlay();
 };
-DrawingObjectsController.prototype.recalculate = function(bAll, Point)
+DrawingObjectsController.prototype.recalculate = function(bAll, Point, bCheckPoint)
 {
-
-    History.Get_RecalcData(Point);//Только для таблиц
+    if(bCheckPoint !== false)
+    {
+        History.Get_RecalcData(Point);//Только для таблиц
+    }
     if(bAll)
     {
         var drawings = this.getDrawingObjects();
@@ -209,9 +211,9 @@ DrawingObjectsController.prototype.getTheme = function()
     return window["Asc"]["editor"].wbModel.theme;
 };
 
-DrawingObjectsController.prototype.startRecalculate = function()
+DrawingObjectsController.prototype.startRecalculate = function(bCheckPoint)
 {
-    this.recalculate();
+    this.recalculate(undefined, undefined, bCheckPoint);
     this.drawingObjects.showDrawingObjects(true);
     //this.updateSelectionState();
 };
