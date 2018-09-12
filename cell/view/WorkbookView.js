@@ -3072,6 +3072,7 @@
 
 	WorkbookView.prototype.savePagePrintOptions = function (arrPagesPrint) {
 		var t = this;
+		var viewMode = !this.Api.canEdit();
 
 		if(!arrPagesPrint) {
 			return;
@@ -3083,7 +3084,7 @@
 			}
 
 			for(var i in arrPagesPrint) {
-				t.getWorksheet(parseInt(i)).savePageOptions(arrPagesPrint[i]);
+				t.getWorksheet(parseInt(i)).savePageOptions(arrPagesPrint[i], viewMode);
 			}
 		};
 
@@ -3094,7 +3095,11 @@
 			lockInfoArr.push(lockInfo);
 		}
 
-		this.collaborativeEditing.lock(lockInfoArr, callback);
+		if(viewMode) {
+			callback();
+		} else {
+			this.collaborativeEditing.lock(lockInfoArr, callback);
+		}
 	};
 
   //------------------------------------------------------------export---------------------------------------------------

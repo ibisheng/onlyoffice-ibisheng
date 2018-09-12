@@ -14456,17 +14456,26 @@
 		return this._isLockedLayoutOptions(onChangeDocSize);
 	};
 
-	WorksheetView.prototype.savePageOptions = function (obj) {
+	WorksheetView.prototype.savePageOptions = function (obj, viewMode) {
 		var t = this;
 		var pageOptions = t.model.PagePrintOptions;
 
-		History.Create_NewPoint();
-		History.StartTransaction();
+		var callback = function() {
+			History.Create_NewPoint();
+			History.StartTransaction();
 
-		pageOptions.asc_setOptions(obj);
-		//window["Asc"]["editor"]._onUpdateLayoutMenu(this.model.nSheetId);
+			pageOptions.asc_setOptions(obj);
+			//window["Asc"]["editor"]._onUpdateLayoutMenu(this.model.nSheetId);
 
-		History.EndTransaction();
+			History.EndTransaction();
+		};
+		if(viewMode) {
+			History.TurnOff();
+		}
+		callback();
+		if(viewMode) {
+			History.TurnOn();
+		}
 	};
 
     //------------------------------------------------------------export---------------------------------------------------
