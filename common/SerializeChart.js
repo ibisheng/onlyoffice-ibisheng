@@ -11125,7 +11125,7 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
 
 
         //check: does category axis exist
-        for(var _i = oNewVal.charts.length; _i > -1; --_i){
+        for(var _i = oNewVal.charts.length - 1; _i > -1; --_i){
             var oChart = oNewVal.charts[_i];
             if(oChart)
             {
@@ -11135,6 +11135,13 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
                     if(axis_by_types.valAx.length === 0 || axis_by_types.catAx.length === 0)
                     {
                         oNewVal.removeCharts(_i, _i);
+                        if(oChart.axId){
+                            oChart.axId.length = 0;
+                            oChart = oChart.createDuplicate();
+                            if(oChart.setParent){
+                                oChart.setParent(oNewVal);
+                            }
+                        }
                         var sDefaultValAxFormatCode = null;
                         if(oChart && oChart.series[0]){
                             var aPoints = AscFormat.getPtsFromSeries(oChart.series[0]);
@@ -11219,13 +11226,6 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
                     oChart.setDLbls(oDlbls);
                 }
                 var aSeries = oChart.series;
-                for(var _j = 0; _j < aSeries.length; ++_j){
-                    var oCurSeries = aSeries[_j];
-                    oDlbls = oCurSeries;
-                    if(oDlbls){
-
-                    }
-                }
             }
         }
 
