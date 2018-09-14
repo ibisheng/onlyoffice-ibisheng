@@ -4256,7 +4256,7 @@ window["asc_IsNeedBuildCryptedFile"] = function()
         }
     }
 
-    window["AscDesktopEditor"]["js_message"]("IsNeedBuildCryptedFile", "" + _returnValue);
+    window["AscDesktopEditor"]["execCommand"]("encrypt:isneedbuild", "" + _returnValue);
     return _returnValue;
 };
 
