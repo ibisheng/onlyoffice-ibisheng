@@ -2403,10 +2403,13 @@
 		var sDataRange = dataRange, sheetModel;
 		if (Asc.c_oAscSelectionDialogType.Chart === dialogType)
 		{
-			dataRange = parserHelp.parse3DRef(dataRange);
-			if (dataRange)
+			if(dataRange)
 			{
-				sheetModel = model.getWorksheetByName(dataRange.sheet);
+				dataRange = parserHelp.parse3DRef(dataRange);
+				if (dataRange)
+				{
+					sheetModel = model.getWorksheetByName(dataRange.sheet);
+				}
 			}
 			if (null === dataRange || !sheetModel)
 				return Asc.c_oAscError.ID.DataRangeError;
