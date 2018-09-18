@@ -2959,11 +2959,11 @@
 			}
 		}
 	};
-	SheetMemory.prototype.fill = function(value, start, end) {
-		this.checkSize(end - 1);
-		var startOffset = start * this.structSize;
-		var endOffset = end * this.structSize;
-		this.data.fill(value, startOffset, endOffset);
+	SheetMemory.prototype.clear = function(start, end) {
+		end = Math.min(end, this.count);
+		if (start < end) {
+			this.data.fill(0, start * this.structSize, end * this.structSize);
+		}
 	};
 	SheetMemory.prototype.getUint8 = function(index, offset) {
 		offset += index * this.structSize;
@@ -4872,16 +4872,8 @@
 		if(!copyRange){
 			this.workbook.dependencyFormulas.move(this.Id, oBBoxFrom, offset);
 		}
-		//modify nRowsCount/nColsCount for correct foreach functions
-		if(oBBoxFrom.r2 >= this.nRowsCount)
-			this.nRowsCount = oBBoxFrom.r2 + 1;
-		if(oBBoxFrom.c2 >= this.nColsCount)
-			this.nColsCount = oBBoxFrom.c2 + 1;
-		if(oBBoxTo.r2 >= this.nRowsCount)
-			this.nRowsCount = oBBoxTo.r2 + 1;
-		if(oBBoxTo.c2 >= this.nColsCount)
-			this.nColsCount = oBBoxTo.c2 + 1;
-		
+		var nRowsCountNew = 0;
+		var nColsCountNew = 0;
 		//todo avoid double getRange3
 		this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2)._foreachNoEmpty(function(cell) {
 			cell.transformSharedFormula();
@@ -4894,20 +4886,24 @@
 				toData.copyRange(fromData, r1From, r1To, count);
 				if(!copyRange|| (copyRange && oThis.workbook.bUndoChanges)){
 					if(from !== to) {
-						fromData.fill(0, r1From, r1From + count);
+						fromData.clear(r1From, r1From + count);
 					} else {
 						if (r1From < r1To) {
-							fromData.fill(0, r1From, Math.min(r1From + count, r1To));
+							fromData.clear(r1From, Math.min(r1From + count, r1To));
 						} else {
-							fromData.fill(0, Math.max(r1From, r1To + count), r1From + count);
+							fromData.clear(Math.max(r1From, r1To + count), r1From + count);
 						}
 					}
 				}
 			} else {
 				toData = oThis.getColDataNoEmpty(to);
 				if(toData) {
-					toData.fill(0, r1To, r1To + count);
+					toData.clear(r1To, r1To + count);
 				}
+			}
+			if (toData) {
+				nRowsCountNew = Math.max(nRowsCountNew, toData.getSize());
+				nColsCountNew = Math.max(nColsCountNew, to + 1);
 			}
 		};
 		if(oBBoxFrom.c1 < oBBoxTo.c1){
@@ -4919,6 +4915,9 @@
 				moveCells(copyRange, oBBoxFrom.c1 + i, oBBoxTo.c1 + i, oBBoxFrom.r1, oBBoxTo.r1, oBBoxFrom.r2 - oBBoxFrom.r1 + 1);
 			}
 		}
+		//modify nRowsCount/nColsCount for correct foreach functions
+		this.nRowsCount = Math.max(this.nRowsCount, nRowsCountNew);
+		this.nColsCount = Math.max(this.nColsCount, nColsCountNew);
 		this.getRange3(oBBoxTo.r1, oBBoxTo.c1, oBBoxTo.r2, oBBoxTo.c2)._foreachNoEmpty(function(cell){
 			var formula = cell.getFormulaParsed();
 			if (formula) {
@@ -5020,7 +5019,7 @@
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
 			if (sheetMemoryFrom) {
 				this.getColData(i + dif).copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
-				sheetMemoryFrom.fill(0, oBBox.r1, oBBox.r2 + 1);
+				sheetMemoryFrom.clear(oBBox.r1, oBBox.r2 + 1);
 			}
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
@@ -5077,7 +5076,7 @@
 				if (i + dif <= gc_nMaxCol0) {
 					this.getColData(i + dif).copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
 				}
-				sheetMemoryFrom.fill(0, oBBox.r1, oBBox.r2 + 1);
+				sheetMemoryFrom.clear(oBBox.r1, oBBox.r2 + 1);
 			}
 		}
 		if (nLeft > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
