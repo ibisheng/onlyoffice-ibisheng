@@ -4242,29 +4242,20 @@
         }
 
         if (null !== this.activeMoveRange) {
-            var activeMoveRangeClone = this.activeMoveRange.clone(true);
+			var arnIntersection = this.activeMoveRange.intersectionSimple(range);
+			if (arnIntersection) {
+				// Координаты для перемещения диапазона
+				_x1 = this.cols[arnIntersection.c1].left - offsetX - 2;
+				_x2 = this.cols[arnIntersection.c2].left + this.cols[arnIntersection.c2].width - offsetX + 1 + 2;
+				_y1 = this.rows[arnIntersection.r1].top - offsetY - 2;
+				_y2 = this.rows[arnIntersection.r2].top + this.rows[arnIntersection.r2].height - offsetY + 1 + 2;
 
-            // Увеличиваем, если выходим за область видимости // Critical Bug 17413
-            while (!this.cols[activeMoveRangeClone.c2]) {
-                this.expandColsOnScroll(true);
-                this.handlers.trigger("reinitializeScrollX");
-            }
-            while (!this.rows[activeMoveRangeClone.r2]) {
-                this.expandRowsOnScroll(true);
-                this.handlers.trigger("reinitializeScrollY");
-            }
-
-            // Координаты для перемещения диапазона
-            _x1 = this.cols[activeMoveRangeClone.c1].left - offsetX - 2;
-            _x2 = this.cols[activeMoveRangeClone.c2].left + this.cols[activeMoveRangeClone.c2].width - offsetX + 1 + 2;
-            _y1 = this.rows[activeMoveRangeClone.r1].top - offsetY - 2;
-            _y2 = this.rows[activeMoveRangeClone.r2].top + this.rows[activeMoveRangeClone.r2].height - offsetY + 1 + 2;
-
-            // Выбираем наибольший range для очистки
-            x1 = Math.min(x1, _x1);
-            x2 = Math.max(x2, _x2);
-            y1 = Math.min(y1, _y1);
-            y2 = Math.max(y2, _y2);
+				// Выбираем наибольший range для очистки
+				x1 = Math.min(x1, _x1);
+				x2 = Math.max(x2, _x2);
+				y1 = Math.min(y1, _y1);
+				y2 = Math.max(y2, _y2);
+			}
         }
 
         if (null !== this.copyActiveRange) {
@@ -8315,16 +8306,6 @@
             this.activeMoveRange.r1 = 0;
         }
         this.activeMoveRange.r2 += rowDelta;
-
-        // Увеличиваем, если выходим за область видимости // Critical Bug 17413
-        while (!this.cols[this.activeMoveRange.c2]) {
-            this.expandColsOnScroll(true);
-            this.handlers.trigger("reinitializeScrollX");
-        }
-        while (!this.rows[this.activeMoveRange.r2]) {
-            this.expandRowsOnScroll(true);
-            this.handlers.trigger("reinitializeScrollY");
-        }
 
         // Перерисовываем
         this._drawSelection();
