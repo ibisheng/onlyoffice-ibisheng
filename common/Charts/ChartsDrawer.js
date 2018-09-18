@@ -10283,6 +10283,10 @@ drawScatterChart.prototype = {
 
 		var x, y, x1, y1, isSplineLine;
 
+		if(!points) {
+			return;
+		}
+
 		for (var i = 0; i < points.length; i++) {
 			isSplineLine = this.chart.series[i].smooth !== false;
 
