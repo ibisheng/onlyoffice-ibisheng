@@ -2247,7 +2247,7 @@
 			((isColHeader || index >= this.rows.length) ? this.defaultRowDescender : this.rows[index].descender) *
 			this.getZoom());
         var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
-        var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
+        var textY = this._calcTextVertPos(y, h, bl, tm, Asc.c_oAscVAlign.Bottom);
 
 		ctx.AddClipRect(x, y, w, h);
 		ctx.setFillStyle(st.color).fillText(text, textX, textY + Asc.round(tm.baseline * this.getZoom()), undefined, sr.charWidths);
@@ -2643,7 +2643,7 @@
 			var x1ct = isMerged ? x1 : this.cols[col].left - offsetX;
 			var x2ct = isMerged ? x2 : x1ct + this.cols[col].width - gridlineSize;
 			var textX = this._calcTextHorizPos(x1ct, x2ct, ct.metrics, ct.cellHA);
-			var textY = this._calcTextVertPos(y1, y2, bl, ct.metrics, ct.cellVA);
+			var textY = this._calcTextVertPos(y1, h, bl, ct.metrics, ct.cellVA);
 			var textW = this._calcTextWidth(x1ct, x2ct, ct.metrics, ct.cellHA);
 
 			var xb1, yb1, wb, hb, colLeft, colRight, i;
@@ -5321,12 +5321,12 @@
         }
     };
 
-    WorksheetView.prototype._calcTextVertPos = function (y1, y2, baseline, tm, align) {
+    WorksheetView.prototype._calcTextVertPos = function (y1, h, baseline, tm, align) {
         switch (align) {
             case Asc.c_oAscVAlign.Center:
-                return Asc.round(0.5 * (y1 + y2 - tm.height) - 1);
+                return y1 + Asc.round(0.5 * (h - tm.height * this.getZoom()));
             case Asc.c_oAscVAlign.Top:
-                return y1 - 1;
+                return y1;
             default:
                 return baseline - Asc.round(tm.baseline * this.getZoom());
         }
