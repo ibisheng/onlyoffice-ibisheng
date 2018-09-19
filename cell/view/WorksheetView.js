@@ -98,7 +98,6 @@
     var c_oAscChangeTableStyleInfo = asc.c_oAscChangeTableStyleInfo;
     var c_oAscChangeSelectionFormatTable = asc.c_oAscChangeSelectionFormatTable;
     var asc_CSelectionMathInfo = AscCommonExcel.asc_CSelectionMathInfo;
-    var vector_koef = AscCommonExcel.vector_koef;
 
     var pageBreakPreviewMode = false;
 
@@ -1583,6 +1582,10 @@
             return;
         }
 
+        var vector_koef = AscCommonExcel.vector_koef / this.getZoom();
+        if (AscCommon.AscBrowser.isRetina)
+            vector_koef /= AscCommon.AscBrowser.retinaPixelRatio;
+
 		var bFitToWidth = false;
 		var bFitToHeight = false;
 		var pageMargins, pageSetup, pageGridLines, pageHeadings;
@@ -2452,7 +2455,7 @@
     /** Рисует спарклайны */
     WorksheetView.prototype._drawSparklines = function(drawingCtx, range, offsetX, offsetY) {
 		this.objectRender.drawSparkLineGroups(drawingCtx || this.drawingCtx, this.model.aSparklineGroups, range,
-			offsetX, offsetY);
+			offsetX * asc_getcvt(0, 3, this._getPPIX()), offsetY * asc_getcvt(0, 3, this._getPPIX()));
     };
 
     /** Рисует ячейки таблицы */

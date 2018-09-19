@@ -2468,7 +2468,7 @@ CPresentation.prototype =
 
     GetSelectedBounds: function(){
         var oController = this.GetCurrentController();
-        if(oController.selectedObjects.length > 0){
+        if(oController && oController.selectedObjects.length > 0){
             return oController.getBoundsForGroup([oController.selectedObjects[0]]);
         }
         return new AscFormat.CGraphicBounds(0, 0, 0, 0);

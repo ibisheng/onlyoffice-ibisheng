@@ -3144,8 +3144,6 @@ function DrawingObjects() {
             graphics.m_oFontManager = AscCommon.g_fontManager;
         }
 
-        var _offX = offsetX* Asc.getCvtRatio(0, 3, oDrawingContext.getPPIX());
-        var _offY = offsetY* Asc.getCvtRatio(0, 3, oDrawingContext.getPPIY());
         for(i = 0; i < aSparklineGroups.length; ++i) {
             var oSparklineGroup = aSparklineGroups[i];
 
@@ -3175,7 +3173,7 @@ function DrawingObjects() {
                     graphics.SetBaseTransform(_baseTransform);
                 }
 
-				sparkline.oCacheView.draw(graphics, _offX, _offY);
+				sparkline.oCacheView.draw(graphics, offsetX, offsetY);
 
                 if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
                 {
