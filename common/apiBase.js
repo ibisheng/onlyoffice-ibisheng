@@ -184,6 +184,8 @@
 
         this.openFileCryptBinary = null;
 
+        this.copyOutEnabled = (config['copyoutenabled'] !== false);
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw =
 			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -339,7 +341,7 @@
 	};
 	baseEditorsApi.prototype.isCopyOutEnabled                = function()
 	{
-		return true;
+		return this.copyOutEnabled;
 	};
 	// target pos
 	baseEditorsApi.prototype.asc_LockTargetUpdate		     = function(isLock)
