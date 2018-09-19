@@ -4324,8 +4324,8 @@
             type      : Asc.c_oAscMouseMoveType.ResizeColumn,
             sizeCCOrPt: this.model.colWidthToCharCount(width),
             sizePx    : width,
-            x         : x1 + this.cols[col].width,
-            y         : this.cellsTop
+            x         : AscCommon.AscBrowser.convertToRetinaValue(x1 + this.cols[col].width),
+            y         : AscCommon.AscBrowser.convertToRetinaValue(this.cellsTop)
         } );
     };
 
@@ -4356,8 +4356,8 @@
             type      : Asc.c_oAscMouseMoveType.ResizeRow,
             sizeCCOrPt: AscCommonExcel.convertPxToPt(height),
             sizePx    : height,
-            x         : this.cellsLeft,
-            y         : y1 + this.rows[row].height
+            x         : AscCommon.AscBrowser.convertToRetinaValue(this.cellsLeft),
+            y         : AscCommon.AscBrowser.convertToRetinaValue(y1 + this.rows[row].height)
         } );
     };
 

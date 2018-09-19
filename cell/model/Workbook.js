@@ -2753,11 +2753,7 @@
 	 * @returns {Number}    Ширина столбца в px
 	 */
 	Workbook.prototype.modelColWidthToColWidth = function (mcw) {
-		var res = Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
-		if (AscBrowser.isRetina) {
-			res = AscBrowser.convertToRetinaValue(res, true);
-		}
-		return res;
+		return Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
 	};
 	/**
 	 * Вычисляет количество символов по ширине столбца
@@ -2767,13 +2763,9 @@
 	Workbook.prototype.colWidthToCharCount = function (w) {
 		var pxInOneCharacter = this.maxDigitWidth + this.paddingPlusBorder;
 		// Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
-		var res = w < pxInOneCharacter ?
+		return w < pxInOneCharacter ?
 			(1 - Asc.floor(100 * (pxInOneCharacter - w) / pxInOneCharacter + 0.49999) / 100) :
 			Asc.floor((w - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
-		if (AscBrowser.isRetina) {
-			res = AscBrowser.convertToRetinaValue(res);
-		}
-		return res;
 	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
 		if (!ascName) {

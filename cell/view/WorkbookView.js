@@ -297,13 +297,13 @@
     var canvasWidth = this.canvasGraphic.width;
     var canvasHeight = this.canvasGraphic.height;
     this.buffers.shapeCtx = new AscCommon.CGraphics();
-    this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, canvasWidth * vector_koef, canvasHeight * vector_koef);
+    this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, canvasWidth * 25.4 / this.drawingGraphicCtx.ppiX, canvasHeight * 25.4 / this.drawingGraphicCtx.ppiY);
     this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
 
     var overlayWidth = this.canvasGraphicOverlay.width;
     var overlayHeight = this.canvasGraphicOverlay.height;
     this.buffers.shapeOverlayCtx = new AscCommon.CGraphics();
-    this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, overlayWidth, overlayHeight, overlayWidth * vector_koef, overlayHeight * vector_koef);
+    this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, overlayWidth, overlayHeight, overlayWidth * 25.4 / this.overlayGraphicCtx.ppiX, overlayHeight * 25.4 / this.overlayGraphicCtx.ppiY);
     this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
 
     this.stringRender = new AscCommonExcel.StringRender(this.buffers.main);
