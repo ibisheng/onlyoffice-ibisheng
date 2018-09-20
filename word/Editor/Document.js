@@ -528,7 +528,7 @@ CSelectedContent.prototype.ConvertToMath = function()
 		for (var nInParaPos = 0; nInParaPos < oParagraph.GetElementsCount(); ++nInParaPos)
 		{
 			var oElement = oParagraph.Content[nInParaPos];
-			if (para_Run === oElement.Get_Type())
+			if (para_Run === oElement.GetType())
 			{
 				var oRun = new ParaRun(oParagraph, true);
 				oParaMath.Root.Add_ToContent(nRunPos++, oRun);

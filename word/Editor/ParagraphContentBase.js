@@ -33,6 +33,7 @@
 "use strict";
 function CParagraphContentBase()
 {
+	this.Type      = para_Unknown;
 	this.Paragraph = null;
 
 	this.StartLine  = -1;
@@ -41,6 +42,14 @@ function CParagraphContentBase()
 	this.Lines       = [];
 	this.LinesLength = 0;
 }
+CParagraphContentBase.prototype.GetType = function()
+{
+	return this.Type;
+};
+CParagraphContentBase.prototype.Get_Type = function()
+{
+	return this.Type;
+};
 CParagraphContentBase.prototype.CanSplit = function()
 {
 	return false;
