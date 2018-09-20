@@ -293,7 +293,6 @@
     this._canResize();
 
     // Shapes
-    var vector_koef = AscCommonExcel.vector_koef;
     var canvasWidth = this.canvasGraphic.width;
     var canvasHeight = this.canvasGraphic.height;
     this.buffers.shapeCtx = new AscCommon.CGraphics();

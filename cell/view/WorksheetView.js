@@ -1583,8 +1583,9 @@
         }
 
         var vector_koef = AscCommonExcel.vector_koef / this.getZoom();
-        if (AscCommon.AscBrowser.isRetina)
-            vector_koef /= AscCommon.AscBrowser.retinaPixelRatio;
+        if (AscCommon.AscBrowser.isRetina) {
+			vector_koef /= AscCommon.AscBrowser.retinaPixelRatio;
+		}
 
 		var bFitToWidth = false;
 		var bFitToHeight = false;
@@ -1902,6 +1903,10 @@
 
             // Рисуем сетку
             if (printPagesData.pageGridLines) {
+                var vector_koef = AscCommonExcel.vector_koef / this.getZoom();
+				if (AscCommon.AscBrowser.isRetina) {
+					vector_koef /= AscCommon.AscBrowser.retinaPixelRatio;
+				}
                 this._drawGrid(drawingCtx, range, offsetX, offsetY, printPagesData.pageWidth / vector_koef,
                   printPagesData.pageHeight / vector_koef);
             }
