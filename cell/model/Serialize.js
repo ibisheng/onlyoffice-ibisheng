@@ -6789,7 +6789,10 @@
                     tmp.prevCol++;
                     tmp.cell.setRowCol(tmp.prevRow, tmp.prevCol);
                 }
-				this.setFormulaOpen(tmp);
+				//use only excel
+				if(!(this.copyPasteObj && this.copyPasteObj.isCopyPaste && typeof editor != "undefined" && editor)) {
+					this.setFormulaOpen(tmp);
+				}
 				tmp.cell.saveContent();
                 if (tmp.cell.nCol >= tmp.ws.nColsCount) {
                     tmp.ws.nColsCount = tmp.cell.nCol + 1;
