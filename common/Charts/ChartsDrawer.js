@@ -4162,7 +4162,7 @@ drawBarChart.prototype = {
 
 				//стартовая позиция колонки X
 				if (this.catAx.scaling.orientation === ORIENTATION_MIN_MAX) {
-					if (xPoints[1] && xPoints[1].pos) {
+					if (xPoints[1] && xPoints[1].pos && xPoints[idx]) {
 						startXPosition = xPoints[idx].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					} else if(xPoints[idx]){
 						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.valAx.posX);
@@ -4170,7 +4170,7 @@ drawBarChart.prototype = {
 						startXPosition = xPoints[0].pos - Math.abs(xPoints[0].pos - this.valAx.posX);
 					}
 				} else {
-					if (xPoints[1] && xPoints[1].pos) {
+					if (xPoints[1] && xPoints[1].pos && xPoints[idx]) {
 						startXPosition = xPoints[idx].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					} else if(xPoints[idx]){
 						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.valAx.posX);
