@@ -870,7 +870,6 @@ CNum.prototype.FillToAscNum = function(oAscNum)
 	{
 		var oLvl = this.GetLvl(nLvl);
 		oLvl.FillToAscNumberingLvl(oAscNum.get_Lvl(nLvl));
-		this.SetLvl(oLvl, nLvl);
 	}
 };
 /**
