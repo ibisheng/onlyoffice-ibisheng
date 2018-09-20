@@ -1116,6 +1116,9 @@
 	 */
 	ApiRange.prototype.SetValue = function (value) {
 		this.range.setValue(checkFormat(value).getValue());
+		// ToDo update range in setValue
+		var worksheet = this.range.worksheet;
+		worksheet.workbook.handlers.trigger("cleanCellCache", worksheet.getId(), [this.range.bbox], true);
 	};
 	Object.defineProperty(ApiRange.prototype, "Value", {
 		get: function () {
