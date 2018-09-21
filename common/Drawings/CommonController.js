@@ -859,7 +859,7 @@ DrawingObjectsController.prototype =
                         else {
                             sLink2 = _link;
                         }
-                        var oHyperlink = new ParaHyperlink();
+                        var oHyperlink = AscFormat.ExecuteNoHistory(function(){return new ParaHyperlink();}, this, []);
                         oHyperlink.Value = sLink2;
                         oHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
                         if(hit_in_text_rect){
