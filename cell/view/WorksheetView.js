@@ -8899,17 +8899,18 @@
                                     break;
                                 }
                             }
+							if (null !== val.asc_getText()) {
+								// Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
+								mc = t.model.getMergedByCell(activeCell.row, activeCell.col);
+								c = mc ? mc.c1 : activeCell.col;
+								r = mc ? mc.r1 : activeCell.row;
+								t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
+								// Вызываем функцию пересчета для заголовков форматированной таблицы
+								t.model.autoFilters.renameTableColumn(arn);
+							}
+
                             val.hyperlinkModel.Ref = range;
                             range.setHyperlink(val.hyperlinkModel);
-                            // Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
-                            mc = t.model.getMergedByCell(activeCell.row, activeCell.col);
-                            c = mc ? mc.c1 : activeCell.col;
-                            r = mc ? mc.r1 : activeCell.row;
-                            if (null !== val.asc_getText()) {
-                                t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
-                                // Вызываем функцию пересчета для заголовков форматированной таблицы
-                                t.model.autoFilters.renameTableColumn(arn);
-                            }
                             break;
                         } else {
                             bIsUpdate = false;
