@@ -442,6 +442,22 @@ window["DesktopSaveQuestionReturn"] = function(isNeedSaved)
 	}
 };
 
+window["NativeFileOpen_error"] = function(error)
+{
+    var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+    if ("password" == error)
+    {
+        window.isNativeOpenPassword = error;
+        _api._onNeedParams(undefined, true);
+    }
+    else if ("error" == error)
+    {
+        _api.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
+        return;
+    }
+};
+
 window["OnNativeReturnCallback"] = function(name, obj)
 {
 	var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
