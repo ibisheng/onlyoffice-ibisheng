@@ -390,7 +390,7 @@
 		this.value = function(param)
 		{
 			var _map = this.map;
-			if (window["AscDesktopEditor"] && AscCommon.AscBrowser.isRetina)
+			if ((window["AscDesktopEditor"] && !AscCommon.AscBrowser.isMacOs) && AscCommon.AscBrowser.isRetina)
 				_map = this.mapRetina;
 
 			return _map[param] ? _map[param] : param;
