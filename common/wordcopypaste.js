@@ -5412,6 +5412,7 @@ PasteProcessor.prototype =
                     }
                 }
             }
+            table.SetTableLayout(tbllayout_Fixed);
             return table;
         }, this, []);
         return oTable;
