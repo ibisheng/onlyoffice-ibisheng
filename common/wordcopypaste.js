@@ -5412,7 +5412,6 @@ PasteProcessor.prototype =
                     }
                 }
             }
-            table.SetTableLayout(tbllayout_AutoFit);
             return table;
         }, this, []);
         return oTable;
@@ -5473,6 +5472,7 @@ PasteProcessor.prototype =
 		var presentation = editor.WordControl.m_oLogicDocument;
 		var graphicFrame = new CGraphicFrame(presentation.Slides[presentation.CurPage]);
 		var table = new CTable(this.oDocument.DrawingDocument, graphicFrame, true, 0, 0, grid, true);
+        table.SetTableLayout(tbllayout_Fixed);
 		graphicFrame.setGraphicObject(table);
 		graphicFrame.setNvSpPr(new AscFormat.UniNvPr());
 
