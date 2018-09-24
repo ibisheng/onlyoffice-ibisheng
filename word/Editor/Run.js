@@ -1336,20 +1336,35 @@ ParaRun.prototype.ConcatToContent = function(arrNewItems)
 ParaRun.prototype.AddText = function(sString, nPos)
 {
 	var nCharPos = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
-	for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
-	{
-		var nCharCode = oIterator.value();
 
-		if (9 === nCharCode) // \t
-			this.AddToContent(nCharPos++, new ParaTab());
-		else if (10 === nCharCode) // \n
-			this.AddToContent(nCharPos++, new ParaNewLine(break_Line));
-		else if (13 === nCharCode) // \r
-			continue;
-		else if (32 === nCharCode) // space
-			this.AddToContent(nCharPos++, new ParaSpace());
-		else
-			this.AddToContent(nCharPos++, new ParaText(nCharCode));
+	if (this.IsMathRun())
+	{
+		for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
+		{
+			var nCharCode = oIterator.value();
+
+			var oMathText = new CMathText();
+			oMathText.add(nCharCode);
+			this.AddToContent(nCharPos++, oMathText);
+		}
+	}
+	else
+	{
+		for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
+		{
+			var nCharCode = oIterator.value();
+
+			if (9 === nCharCode) // \t
+				this.AddToContent(nCharPos++, new ParaTab());
+			else if (10 === nCharCode) // \n
+				this.AddToContent(nCharPos++, new ParaNewLine(break_Line));
+			else if (13 === nCharCode) // \r
+				continue;
+			else if (32 === nCharCode) // space
+				this.AddToContent(nCharPos++, new ParaSpace());
+			else
+				this.AddToContent(nCharPos++, new ParaText(nCharCode));
+		}
 	}
 };
 /**
@@ -9228,7 +9243,7 @@ ParaRun.prototype.UpdLastElementForGaps = function(_CurLine, _CurRange, GapsInfo
 };
 ParaRun.prototype.IsPlaceholder = function()
 {
-    return this.Content.length == 1 && this.Content[0].IsPlaceholder();
+    return this.Content.length == 1 && this.Content[0].IsPlaceHolder && this.Content[0].IsPlaceholder();
 };
 ParaRun.prototype.AddMathPlaceholder = function()
 {
