@@ -360,10 +360,14 @@ CDocumentContent.prototype.GetNumbering = function()
 };
 CDocumentContent.prototype.Get_Styles = function(lvl)
 {
-	if (this.Content[0] && this.Content[0].bFromDocument)
+	if(!this.bPresentation)
+	{
 		return this.Styles;
+	}
 	else
+	{
 		return this.Parent.Get_Styles(lvl);
+	}
 };
 CDocumentContent.prototype.Get_TableStyleForPara = function()
 {
