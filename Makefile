@@ -13,7 +13,11 @@ BUILD_NUMBER ?= 0
 GRUNT_ENV += PRODUCT_VERSION=$(PRODUCT_VERSION)
 GRUNT_ENV += BUILD_NUMBER=$(BUILD_NUMBER)
 
+WEBAPPS_DIR = web-apps
+
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
 WEBAPPS_DIR = web-apps-pro
+endif
 
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
 NODE_MODULES = build/node_modules ../$(WEBAPPS_DIR)/build/node_modules
