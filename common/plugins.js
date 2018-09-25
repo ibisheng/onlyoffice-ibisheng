@@ -875,7 +875,10 @@
 										oApi.wbModel.reassignImageUrls(window.g_asc_plugins.images_rename);
 										delete window.g_asc_plugins.images_rename;
 										window.g_asc_plugins.api.asc_Recalculate();
-
+										var wsView = oApi.wb && oApi.wb.getWorksheet();
+										if (wsView && wsView.objectRender && wsView.objectRender.controller) {
+											wsView.objectRender.controller.recalculate2(true);
+										}
 										var pluginData = new CPluginData();
 										pluginData.setAttribute("guid", guid);
 										pluginData.setAttribute("type", "onCommandCallback");
