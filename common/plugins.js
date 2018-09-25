@@ -877,7 +877,7 @@
 										window.g_asc_plugins.api.asc_Recalculate();
 										var wsView = oApi.wb && oApi.wb.getWorksheet();
 										if (wsView && wsView.objectRender && wsView.objectRender.controller) {
-											wsView.objectRender.controller.recalculate2(true);
+											wsView.objectRender.controller.recalculate2(undefined);
 										}
 										var pluginData = new CPluginData();
 										pluginData.setAttribute("guid", guid);
