@@ -297,7 +297,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 {
 	return AscFormat.ExecuteNoHistory(function()
 	{
-		var settings = new AscCommon.asc_ChartSettings();
+		var settings = new Asc.asc_ChartSettings();
 		settings.type = type;
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
 		var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);

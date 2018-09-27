@@ -51,7 +51,6 @@
 	var c_oAscCellEditorState = asc.c_oAscCellEditorState;
 	var Fragment = AscCommonExcel.Fragment;
 
-	var asc_calcnpt = asc.calcNearestPt;
 	var asc_getcvt = asc.getCvtRatio;
 	var asc_round = asc.round;
 	var asc_search = asc.search;
@@ -172,6 +171,7 @@
 		};
 
 		this._formula = null;
+		this._parseResult = null;
 
 		// Обработчик кликов
 		this.clickCounter = new AscFormat.ClickCounter();
@@ -209,10 +209,10 @@
 
 		// create text render
 		t.drawingCtx = new asc.DrawingContext({
-			canvas: t.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+			canvas: t.canvas, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
 		});
 		t.overlayCtx = new asc.DrawingContext({
-			canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+			canvas: t.canvasOverlay, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
 		});
 		t.textRender = new AscCommonExcel.CellTextRender(t.drawingCtx);
 		t.textRender.setDefaultFont(settings.font.clone());
@@ -284,7 +284,7 @@
 			window.addEventListener( "mousemove", this.fKeyMouseMove, false );
 		}
 		this._setOptions( options );
-		this.isTopLineActive = true === this.input.isFocused;
+		this._updateTopLineActive(true === this.input.isFocused);
 
 		this._updateFormulaEditMod( /*bIsOpen*/true );
 		this._draw();
@@ -344,6 +344,7 @@
 		this.isOpened = false;
 
 		this._formula = null;
+		this._parseResult = null;
 
 		if (!window['IS_NATIVE_EDITOR']) {
 			if (window.removeEventListener) {
@@ -351,7 +352,7 @@
 				window.removeEventListener("mousemove", this.fKeyMouseMove, false);
 			}
 			this.input.blur();
-			this.isTopLineActive = false;
+			this._updateTopLineActive(false);
 			this.input.isFocused = false;
 			this._hideCursor();
 			// hide
@@ -592,9 +593,7 @@
 		var wrap = -1 !== text.indexOf(kNewLine);
 		if (this.selectionBegin !== this.selectionEnd) {
 			this._removeChars();
-		} else {
-			this.undoList.push({fn: "fake", args: []});
-		}//фейковый undo(потому что у нас делает undo по 2 действия)
+		}
 
 		// save info to undo/redo
 		this.undoList.push({fn: this._removeChars, args: [this.cursorPos, length]});
@@ -677,8 +676,8 @@
 	CellEditor.prototype.formulaIsOperator = function () {
 		var elem;
 		return this.isFormula() &&
-			(null !== (elem = this._formula.getElementByPos(this.cursorPos - 1)) && elem.type === cElementType.operator ||
-			null === elem || this._formula.operand_expected);
+			(null !== (elem = this._parseResult.getElementByPos(this.cursorPos - 1)) && elem.type === cElementType.operator ||
+			null === elem || this._parseResult.operand_expected);
 	};
 
 	CellEditor.prototype.insertFormula = function ( functionName, isDefName ) {
@@ -806,17 +805,17 @@
 //             console.log("e-s "+ (__e__ - __s__));
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._parseResult = new AscCommonExcel.ParseResult([], []);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		var refPos = [];
-		this._formula.parse(true, true, refPos);
+		this._formula.parse(true, true, this._parseResult);
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
 
-		if (refPos && refPos.length > 0) {
-			for (var index = 0; index < refPos.length; index++) {
+		if (this._parseResult.refPos && this._parseResult.refPos.length > 0) {
+			for (var index = 0; index < this._parseResult.refPos.length; index++) {
 				wsName = null;
 				isName = false;
-				r = refPos[index];
+				r = this._parseResult.refPos[index];
 
 				offset = r.end;
 				_e = r.end;
@@ -834,7 +833,7 @@
 					}
 					case cElementType.cell3D        : {
 						ret = true;
-						wsName = r.oper.ws.getName();
+						wsName = r.oper.getWS().getName();
 						_s = _e - r.oper.value.length;
 						_sColorPos = _e - r.oper.toString().length;
 						refStr = r.oper.value;
@@ -933,14 +932,14 @@
 			"getCellFormulaEnterWSOpen"), ws = wsOPEN ? wsOPEN.model : this.handlers.trigger("getActiveWS");
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._parseResult = new AscCommonExcel.ParseResult([], []);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		var refPos = [];
-		this._formula.parse(true, true, refPos);
+		this._formula.parse(true, true, this._parseResult);
 
-		if (refPos && refPos.length > 0) {
-			for (var index = 0; index < refPos.length; index++) {
+		if (this._parseResult.refPos && this._parseResult.refPos.length > 0) {
+			for (var index = 0; index < this._parseResult.refPos.length; index++) {
 				wsName = null;
-				r = refPos[index];
+				r = this._parseResult.refPos[index];
 
 				offset = r.end;
 				_e = r.end;
@@ -958,7 +957,7 @@
 					case cElementType.cell3D        : {
 						refStr = r.oper.value;
 						ret = true;
-						wsName = r.oper.ws.getName();
+						wsName = r.oper.getWS().getName();
 						_s = _e - r.oper.value.length + 1;
 						_sColorPos = _e - r.oper.toString().length;
 						break;
@@ -1028,6 +1027,12 @@
 		{index: _s, length: r.oper.value.length, range: range, wsName: wsName};
 	};
 
+	CellEditor.prototype._updateTopLineActive = function (state) {
+		if (state !== this.isTopLineActive) {
+			this.isTopLineActive = state;
+			this.handlers.trigger("updateEditorState", this.isTopLineActive ? c_oAscCellEditorState.editInFormulaBar : c_oAscCellEditorState.editInCell);
+		}
+	};
 	CellEditor.prototype._updateFormulaEditMod = function ( bIsOpen ) {
 		var isFormula = this.isFormula();
 		if ( !bIsOpen ) {
@@ -1333,45 +1338,46 @@
 	};
 
 	CellEditor.prototype._drawSelection = function () {
-		var ctx = this.overlayCtx, ppix = ctx.getPPIX(), ppiy = ctx.getPPIY();
-		var begPos, endPos, top, top1, top2, begInfo, endInfo, line1, line2, i, selection = [];
+		var ctx = this.overlayCtx;
+		var zoom = this.getZoom();
+		var begPos, endPos, top, topLine, begInfo, endInfo, line, i, y, h, selection = [];
 
-		function drawRect( x, y, w, h ) {
-			if ( window['IS_NATIVE_EDITOR'] ) {
-				selection.push( [asc_calcnpt( x, ppix ), asc_calcnpt( y, ppiy ), asc_calcnpt( w, ppix ), asc_calcnpt( h, ppiy )] );
-			}
-			else {
-				ctx.fillRect( asc_calcnpt( x, ppix ), asc_calcnpt( y, ppiy ), asc_calcnpt( w, ppix ), asc_calcnpt( h, ppiy ) );
+		function drawRect(x, y, w, h) {
+			if (window['IS_NATIVE_EDITOR']) {
+				selection.push([x, y, w, h]);
+			} else {
+				ctx.fillRect(x, y, w, h);
 			}
 		}
 
 		begPos = this.selectionBegin;
 		endPos = this.selectionEnd;
 
-		if ( !window['IS_NATIVE_EDITOR'] ) {
-			ctx.setFillStyle( this.defaults.selectColor ).clear();
+		if (!window['IS_NATIVE_EDITOR']) {
+			ctx.setFillStyle(this.defaults.selectColor).clear();
 		}
 
-		if ( begPos !== endPos && !this.isTopLineActive ) {
-			top = this.textRender.calcLineOffset( this.topLineIndex );
-			begInfo = this.textRender.calcCharOffset( Math.min( begPos, endPos ) );
-			line1 = this.textRender.getLineInfo( begInfo.lineIndex );
-			top1 = this.textRender.calcLineOffset( begInfo.lineIndex );
-			endInfo = this.textRender.calcCharOffset( Math.max( begPos, endPos ) );
-			if ( begInfo.lineIndex === endInfo.lineIndex ) {
-				drawRect( begInfo.left, top1 - top, endInfo.left - begInfo.left, line1.th );
-			}
-			else {
-				line2 = this.textRender.getLineInfo( endInfo.lineIndex );
-				top2 = this.textRender.calcLineOffset( endInfo.lineIndex );
-				drawRect( begInfo.left, top1 - top, line1.tw - begInfo.left + line1.startX, line1.th );
-				if ( line2 ) {
-					drawRect( line2.startX, top2 - top, endInfo.left - line2.startX, line2.th );
+		if (begPos !== endPos && !this.isTopLineActive) {
+			top = this.textRender.calcLineOffset(this.topLineIndex);
+			begInfo = this.textRender.calcCharOffset(Math.min(begPos, endPos));
+			line = this.textRender.getLineInfo(begInfo.lineIndex);
+			topLine = this.textRender.calcLineOffset(begInfo.lineIndex);
+			endInfo = this.textRender.calcCharOffset(Math.max(begPos, endPos));
+			h = asc_round(line.th * zoom);
+			y = topLine - top;
+			if (begInfo.lineIndex === endInfo.lineIndex) {
+				drawRect(begInfo.left, y, endInfo.left - begInfo.left, h);
+			} else {
+				drawRect(begInfo.left, y, line.tw - begInfo.left + line.startX, h);
+				for (i = begInfo.lineIndex + 1, y += h; i < endInfo.lineIndex; ++i, y += h) {
+					line = this.textRender.getLineInfo(i);
+					h = asc_round(line.th * zoom);
+					drawRect(line.startX, y, line.tw, h);
 				}
-				top = top1 - top + line1.th;
-				for ( i = begInfo.lineIndex + 1; i < endInfo.lineIndex; ++i, top += line1.th ) {
-					line1 = this.textRender.getLineInfo( i );
-					drawRect( line1.startX, top, line1.tw, line1.th );
+				line = this.textRender.getLineInfo(endInfo.lineIndex);
+				topLine = this.textRender.calcLineOffset(endInfo.lineIndex);
+				if (line) {
+					drawRect(line.startX, topLine - top, endInfo.left - line.startX, asc_round(line.th * zoom));
 				}
 			}
 		}
@@ -1430,6 +1436,7 @@
 		var curTop = asc_round(((cur !== null ? cur.top : 0) + y) * this.ky);
 		var curHeight = asc_round((cur !== null ? cur.height : this._getContentHeight()) * this.ky);
 		var i, dy, nCount = this.textRender.getLinesCount();
+		var zoom = this.getZoom();
 
 		while (1 < nCount) {
 			if (curTop + curHeight - 1 > h) {
@@ -1437,7 +1444,7 @@
 				if (i === nCount) {
 					break;
 				}
-				dy = this.textRender.getLineInfo(i).th;
+				dy = asc_round(this.textRender.getLineInfo(i).th * zoom);
 				y -= dy;
 				curTop -= asc_round(dy * this.ky);
 				++this.topLineIndex;
@@ -1445,7 +1452,7 @@
 			}
 			if (curTop < 0) {
 				--this.topLineIndex;
-				dy = this.textRender.getLineInfo(this.topLineIndex).th;
+				dy = asc_round(this.textRender.getLineInfo(this.topLineIndex).th * zoom);
 				y += dy;
 				curTop += asc_round(dy * this.ky);
 				continue;
@@ -1543,9 +1550,10 @@
 		var t = this;
 		var lc = t.textRender.getLinesCount();
 		var i, h, w, li, chw;
+		var zoom = this.getZoom();
 		for ( h = 0, i = Math.max( t.topLineIndex, 0 ); i < lc; ++i ) {
 			li = t.textRender.getLineInfo( i );
-			h += li.th;
+			h += asc_round(li.th * zoom);
 			if ( coord.y <= h ) {
 				for ( w = li.startX, i = li.beg; i <= li.end; ++i ) {
 					chw = t.textRender.getCharWidth( i );
@@ -1573,7 +1581,7 @@
 	};
 
 	CellEditor.prototype._topLineGotFocus = function () {
-		this.isTopLineActive = true;
+		this._updateTopLineActive(true);
 		this.input.isFocused = true;
 		this.setFocus(true);
 		this._hideCursor();
@@ -1628,11 +1636,11 @@
 	// Content
 
 	CellEditor.prototype._getContentLeft = function () {
-		return asc_calcnpt( 0, this.drawingCtx.getPPIX(), this.defaults.padding/*px*/ );
+		return this.defaults.padding;
 	};
 
 	CellEditor.prototype._getContentWidth = function () {
-		return this.right - this.left - asc_calcnpt( 0, this.drawingCtx.getPPIX(), this.defaults.padding + this.defaults.padding + 1/*px*/ );
+		return this.right - this.left - 2 * this.defaults.padding + 1/*px*/;
 	};
 
 	CellEditor.prototype._getContentHeight = function () {
@@ -1641,15 +1649,13 @@
 	};
 
 	CellEditor.prototype._getContentPosition = function () {
-		var ppix = this.drawingCtx.getPPIX();
-
-		switch ( this.textFlags.textAlign ) {
+		switch (this.textFlags.textAlign) {
 			case AscCommon.align_Right:
-				return asc_calcnpt( this.right - this.left, ppix, -this.defaults.padding - 1 );
+				return this.right - this.left - this.defaults.padding - 1;
 			case AscCommon.align_Center:
-				return asc_calcnpt( 0.5 * (this.right - this.left), ppix, 0 );
+				return 0.5 * (this.right - this.left);
 		}
-		return asc_calcnpt( 0, ppix, this.defaults.padding );
+		return this.defaults.padding;
 	};
 
 	CellEditor.prototype._wrapText = function () {
@@ -1678,30 +1684,32 @@
 			this._removeChars(undefined, undefined, isRange);
 		}
 
-		if (pos === undefined) {
-			pos = this.cursorPos;
-		}
-
-		if (!this.undoMode) {
-			// save info to undo/redo
-			this.undoList.push({fn: this._removeChars, args: [pos, length], isRange: isRange});
-			this.redoList = [];
-		}
-
-		if (this.newTextFormat) {
-			var oNewObj = new Fragment({format: this.newTextFormat, text: str});
-			this._addFragments([oNewObj], pos);
-			this.newTextFormat = null;
-		} else {
-			f = this._findFragmentToInsertInto(pos);
-			if (f) {
-				l = pos - f.begin;
-				s = opt.fragments[f.index].text;
-				opt.fragments[f.index].text = s.slice(0, l) + str + s.slice(l);
+		if (0 !== length) {
+			if (pos === undefined) {
+				pos = this.cursorPos;
 			}
-		}
 
-		this.cursorPos = pos + str.length;
+			if (!this.undoMode) {
+				// save info to undo/redo
+				this.undoList.push({fn: this._removeChars, args: [pos, length], isRange: isRange});
+				this.redoList = [];
+			}
+
+			if (this.newTextFormat) {
+				var oNewObj = new Fragment({format: this.newTextFormat, text: str});
+				this._addFragments([oNewObj], pos);
+				this.newTextFormat = null;
+			} else {
+				f = this._findFragmentToInsertInto(pos);
+				if (f) {
+					l = pos - f.begin;
+					s = opt.fragments[f.index].text;
+					opt.fragments[f.index].text = s.slice(0, l) + str + s.slice(l);
+				}
+			}
+
+			this.cursorPos = pos + str.length;
+		}
 
 		this.noUpdateMode = noUpdateMode;
 		if (!this.noUpdateMode) {
@@ -2235,17 +2243,15 @@
 					break;
 				}
 
-				if (window['IS_NATIVE_EDITOR']) {
-					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
-				} else {
+				if (!window['IS_NATIVE_EDITOR']) {
 					// Отключим стандартную обработку браузера нажатия backspace
 					event.stopPropagation();
 					event.preventDefault();
 					if (hieroglyph) {
 						t._syncEditors();
 					}
-					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 				}
+				t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 				return false;
 
 			case 46:  // "del"
@@ -2616,7 +2622,7 @@
 		this.setFocus(true);
 		this.handlers.trigger('setStrictClose', true);
 
-		this.isTopLineActive = false;
+		this._updateTopLineActive(false);
 		this.input.isFocused = false;
 
 		if (0 === event.button) {
@@ -2678,7 +2684,7 @@
 	/** @param event {jQuery.Event} */
 	CellEditor.prototype._onInputTextArea = function (event) {
 		var t = this;
-		if (this.handlers.trigger("isViewerMode") || this.loadFonts) {
+		if (!this.handlers.trigger("canEdit") || this.loadFonts) {
 			return true;
 		}
 		this.loadFonts = true;

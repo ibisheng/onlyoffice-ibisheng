@@ -4989,7 +4989,7 @@ function CThumbnailsManager()
 			case 46:    // delete
 			case 8:     // backspace
 			{
-				if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+				if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 				{
 					var _delete_array = this.GetSelectedArray();
 
@@ -5014,7 +5014,7 @@ function CThumbnailsManager()
 			{
 				if (global_keyboardEvent.CtrlKey && global_keyboardEvent.ShiftKey)
 				{
-					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+					if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 					{
 						var _presentation = this.m_oWordControl.m_oLogicDocument;
 						History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveSlidesToEnd);
@@ -5027,7 +5027,7 @@ function CThumbnailsManager()
 				}
 				else if (global_keyboardEvent.CtrlKey)
 				{
-					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+					if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 					{
 						_presentation       = this.m_oWordControl.m_oLogicDocument;
 						var _selected_array = this.GetSelectedArray();
@@ -5210,12 +5210,12 @@ function CThumbnailsManager()
 			{
 				if (global_keyboardEvent.CtrlKey)
 				{
-					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+					if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 					{
 						editor.DublicateSlide();
-						e.preventDefault();
-						return false;
 					}
+					e.preventDefault();
+					return false;
 				}
 				break;
 			}
@@ -5226,7 +5226,7 @@ function CThumbnailsManager()
 				if (global_keyboardEvent.CtrlKey && global_keyboardEvent.ShiftKey)
 				{
 
-					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+					if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 					{
 						var _presentation = this.m_oWordControl.m_oLogicDocument;
 						History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveSlidesToStart);
@@ -5239,7 +5239,7 @@ function CThumbnailsManager()
 				}
 				else if (global_keyboardEvent.CtrlKey)
 				{
-					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+					if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 					{
 						_presentation       = this.m_oWordControl.m_oLogicDocument;
 						var _selected_array = this.GetSelectedArray();

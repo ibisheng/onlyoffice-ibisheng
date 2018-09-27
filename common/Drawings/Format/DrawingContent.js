@@ -73,6 +73,21 @@
         }
         return fSummHeight;
     };
+
+    CDrawingDocContent.prototype.GetSummaryHeight_ =function () {
+        var dHeight = 0.0;
+        for(var i = 0; i < this.Content.length; ++i){
+            var oElement = this.Content[i];
+            if(oElement.GetType() === type_Paragraph){
+                for(var j = 0; j < oElement.Lines.length; ++j){
+                    var oLine = oElement.Lines[j];
+                    dHeight += (oLine.Bottom - oLine.Top - oLine.Metrics.Descent);
+                }
+            }
+        }
+        return dHeight;
+    };
+
     CDrawingDocContent.prototype.Get_ColumnsCount = function(){
         var nColumnCount = 1;
         if(this.Parent.getBodyPr){
@@ -649,7 +664,7 @@
     };
 
 
-    CDrawingDocContent.prototype.ClearParagraphFormatting = function()
+    CDrawingDocContent.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
     {
         if (true === this.ApplyToAll)
         {
@@ -657,7 +672,7 @@
             {
                 var Item = this.Content[Index];
                 Item.Set_ApplyToAll(true);
-                Item.Clear_TextFormatting();
+                Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
                 Item.Set_ApplyToAll(false);
             }
 
@@ -666,7 +681,7 @@
 
         if (docpostype_DrawingObjects == this.CurPos.Type)
         {
-            return this.LogicDocument.DrawingObjects.paragraphClearFormatting();
+            return this.LogicDocument.DrawingObjects.paragraphClearFormatting(isClearParaPr, isClearTextPr);
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
@@ -686,14 +701,14 @@
                     for (var Index = StartPos; Index <= EndPos; Index++)
                     {
                         var Item = this.Content[Index];
-                        Item.Clear_TextFormatting();
+                        Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
                     }
                 }
             }
             else
             {
                 var Item = this.Content[this.CurPos.ContentPos];
-                Item.Clear_TextFormatting();
+                Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
             }
         }
     };

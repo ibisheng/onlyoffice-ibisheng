@@ -1727,7 +1727,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 14:
                     {
-                        _imagePr.ChangeLevel = _params[_current.pos++];
+                        _imagePr.put_ChangeLevel(parseInt(_params[_current.pos++]));
                         break;
                     }
                     case 15:
@@ -1764,47 +1764,59 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     {
                         var bIsNeed = _params[_current.pos++];
 
-                        if (bIsNeed)
-                        {
-                            var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
-                            if (currImage && currImage.length) {
+                        if (bIsNeed) {
+                            var properties = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
+                            if (properties) {
+                                for (var i = 0; i < properties.length; i++) {
+                                    if (undefined !== properties[i].ImageUrl && null != properties[i].ImageUrl) {                                
+                                        var section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+                                        var page_width = AscCommon.Page_Width;
+                                        var page_height = AscCommon.Page_Height;
+                                        var page_x_left_margin = AscCommon.X_Left_Margin;
+                                        var page_y_top_margin = AscCommon.Y_Top_Margin;
+                                        var page_x_right_margin = AscCommon.X_Right_Margin;
+                                        var page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
 
-                                var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
+                                        if (section_select) {
+                                            if (section_select.W) {
+                                                page_width = section_select.W;
+                                            }
 
-                                var _w = _originSize[0];
-                                var _h = _originSize[1];
+                                            if (section_select.H) {
+                                                page_height = section_select.H;
+                                            }
+                                        }
+                 
+                                        var boundingWidth  = Math.max(1, page_width  - (page_x_left_margin + page_x_right_margin));
+                                        var boundingHeight = Math.max(1, page_height - (page_y_top_margin  + page_y_bottom_margin));
 
-                                // сбрасываем урл
-                                _imagePr.ImageUrl = undefined;
+                                        var size = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](properties[i].ImageUrl);
 
-                                var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-                                var _page_width = AscCommon.Page_Width;
-                                var _page_height = AscCommon.Page_Height;
-                                var _page_x_left_margin = AscCommon.X_Left_Margin;
-                                var _page_y_top_margin = AscCommon.Y_Top_Margin;
-                                var _page_x_right_margin = AscCommon.X_Right_Margin;
-                                var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
+                                        var w = (undefined !== size[0]) ? Math.max(size[0] * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                        var h = (undefined !== size[1]) ? Math.max(size[1] * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                        
+                                        var mW = boundingWidth  / w;
+                                        var mH = boundingHeight / h;
 
-                                if (_section_select)
-                                {
-                                    if (_section_select.W)
-                                        _page_width = _section_select.W;
+                                        if (mH < mW) {
+                                            boundingWidth  = boundingHeight / h * w;
+                                        } else if (mW < mH) {
+                                            boundingHeight = boundingWidth  / w * h;
+                                        }
 
-                                    if (_section_select.H)
-                                        _page_height = _section_select.H;
+                                        //var __w = Math.max(1, page_width  - (page_x_left_margin + page_x_right_margin));
+                                        //var __h = Math.max(1, page_height - (page_y_top_margin  + page_y_bottom_margin));
+
+                                        //w = Math.max(5, boundingWidth);
+                                        //h = Math.max(5, boundingHeight);
+
+                                        _imagePr.Width  = Math.max(5, boundingWidth);
+                                        _imagePr.Height = Math.max(5, boundingHeight);
+                                        _imagePr.ImageUrl = undefined;
+
+                                        break;
+                                    }
                                 }
-
-                                var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
-                                var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-
-                                var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                                var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-
-                                wI = Math.max(5, Math.min(wI, __w));
-                                hI = Math.max(5, Math.min(hI, __h));
-
-                                _imagePr.Width = wI;
-                                _imagePr.Height = hI;
                             }
                         }
 
@@ -2281,6 +2293,20 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
           _api.asc_setDocumentPassword(_params[0]);
           break;
         }
+
+        case 22000: // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
+        {
+            var obj = JSON.parse(_params);
+            var type = parseInt(obj["type"]);
+            var encoding = parseInt(obj["encoding"]);
+
+            _api.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
+            _api.documentFormat = "txt";
+           
+            _api.asc_setAdvancedOptions(type, new Asc.asc_CTXTAdvancedOptions(encoding));
+            
+            break;
+        } 
 
         default:
             break;
@@ -3279,7 +3305,7 @@ function asc_menu_WriteAscValAxisSettings(_type, _settings, _stream)
 
 function asc_menu_ReadChartPr(_params, _cursor)
 {
-    var _settings = new AscCommon.asc_ChartSettings();
+    var _settings = new Asc.asc_ChartSettings();
 
     var _continue = true;
     while (_continue)
@@ -4490,15 +4516,15 @@ Asc['asc_docs_api'].prototype.UpdateParagraphProp = function(ParaPr)
     var NumSubType = -1;
     if ( !(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId) )
     {
-        var Numb = this.WordControl.m_oLogicDocument.Numbering.Get_AbstractNum( ParaPr.NumPr.NumId );
+        var oNum = this.WordControl.m_oLogicDocument.GetNumbering().GetNum(ParaPr.NumPr.NumId);
 
-        if ( undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl] )
+        if (oNum && oNum.GetLvl(ParaPr.NumPr.Lvl))
         {
-            var Lvl = Numb.Lvl[ParaPr.NumPr.Lvl];
-            var NumFormat = Lvl.Format;
-            var NumText   = Lvl.LvlText;
+            var Lvl = oNum.GetLvl(ParaPr.NumPr.Lvl);
+            var NumFormat = Lvl.GetFormat();
+            var NumText   = Lvl.GetLvlText();
 
-            if ( numbering_numfmt_Bullet === NumFormat )
+            if ( Asc.c_oAscNumberingFormat.Bullet === NumFormat )
             {
                 NumType    = 0;
                 NumSubType = 0;
@@ -4534,31 +4560,31 @@ Asc['asc_docs_api'].prototype.UpdateParagraphProp = function(ParaPr)
                 {
                     var NumVal2 = NumText[1].Value;
 
-                    if ( numbering_numfmt_Decimal === NumFormat )
+                    if ( Asc.c_oAscNumberingFormat.Decimal === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 1;
                         else if ( ")" === NumVal2 )
                             NumSubType = 2;
                     }
-                    else if ( numbering_numfmt_UpperRoman === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.UpperRoman === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 3;
                     }
-                    else if ( numbering_numfmt_UpperLetter === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.UpperLetter === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 4;
                     }
-                    else if ( numbering_numfmt_LowerLetter === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.LowerLetter === NumFormat )
                     {
                         if ( ")" === NumVal2 )
                             NumSubType = 5;
                         else if ( "." === NumVal2 )
                             NumSubType = 6;
                     }
-                    else if ( numbering_numfmt_LowerRoman === NumFormat )
+                    else if ( Asc.c_oAscNumberingFormat.LowerRoman === NumFormat )
                     {
                         if ( "." === NumVal2 )
                             NumSubType = 7;
@@ -4674,6 +4700,34 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
                 }
             }
         }
+    }
+
+        /* change z-index */
+    if (AscFormat.isRealNumber(ImagePr.ChangeLevel))
+    {
+        switch (ImagePr.ChangeLevel)
+        {
+            case 0:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringToFront();
+                break;
+            }
+            case 1:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringForward();
+                break;
+            }
+            case 2:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.sendToBack();
+                break;
+            }
+            case 3:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringBackward();
+            }
+        }
+        return;
     }
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Image_Properties, AdditionalData) )
@@ -5793,7 +5847,7 @@ function NativeOpenFile3(_params, documentInfo)
         _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
-                                  stream["WriteLong"](options.asc_getOptionId());
+                                  stream["WriteString2"](JSON.stringify(options));
                                   window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
                                   });
 
@@ -5811,6 +5865,7 @@ function NativeOpenFile3(_params, documentInfo)
             _api.asc_setAutoSaveGap(1);
             _api._coAuthoringInit();
             _api.asc_SetFastCollaborative(true);
+            _api.SetCollaborativeMarksShowType(Asc.c_oAscCollaborativeMarksShowType.None);
            
             window["native"]["onTokenJWT"](_api.CoAuthoringApi.get_jwt());
 

@@ -45,7 +45,6 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var asc = window["Asc"];
-		var asc_calcnpt = asc.calcNearestPt;
 		var asc_debug   = asc.outputDebugStr;
 		var asc_typeof  = asc.typeOf;
 		var asc_round   = asc.round;
@@ -197,17 +196,20 @@
 
 		/**
 		 * Setups one or more strings to process on
-		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
+		 * @param {String|Array} fragments  A simple string or array of formatted strings AscCommonExcel.Fragment
 		 * @param {AscCommonExcel.CellFlags} flags  Optional.
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
-		StringRender.prototype.setString = function(str, flags) {
+		StringRender.prototype.setString = function(fragments, flags) {
 			this.fragments = [];
-			if ( asc_typeof(str) === "string" ) {
-				this.fragments.push({text: str, format: new AscCommonExcel.Font()});
+			if ( asc_typeof(fragments) === "string" ) {
+				var newFragment = new AscCommonExcel.Fragment();
+				newFragment.text = fragments;
+				newFragment.format = new AscCommonExcel.Font();
+				this.fragments.push(newFragment);
 			} else {
-				for (var i = 0; i < str.length; ++i) {
-					this.fragments.push({text: str[i].text, format: str[i].format});
+				for (var i = 0; i < fragments.length; ++i) {
+					this.fragments.push(fragments[i].clone());
 				}
 			}
 			this.flags = flags;
@@ -316,8 +318,8 @@
                         offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
-                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        dx = w  - posv + 1 + 1 - tm.height * angleSin;
+                        offsetX = - w  - posv + 1 + 1 - tm.height * angleSin;
                     }
                 }
 
@@ -357,8 +359,8 @@
                         offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
-                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        dx = w  - posv + 1 + 1 - tm.height * angleSin;
+                        offsetX = - w  - posv + 1 + 1 - tm.height * angleSin;
                     }
                 }
 
@@ -399,8 +401,8 @@
                         offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
-                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        dx = w  - posv + 1 + 1 - tm.height * angleSin;
+                        offsetX = - w  - posv + 1 + 1 - tm.height * angleSin;
                     }
 
                     dy = Math.min(h + tm.height * angleCos, posh);
@@ -415,9 +417,6 @@
             } else {
                 bound.height = Math.abs(angleSin * textW) + Math.abs(angleCos * tm.height);
                 bound.width  = Math.abs(angleCos * textW) + Math.abs(angleSin * tm.height);
-
-                // Делаем кратным 1pt
-                bound.height = asc_calcnpt(bound.height, 96);
             }
 
             return bound;
@@ -448,38 +447,16 @@
 
 		/**
 		 * Measures string
-		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
+		 * @param {String|Array} fragments  A simple string or array of formatted strings AscCommonExcel.Fragment
 		 * @param {AscCommonExcel.CellFlags} [flags]      Optional.
 		 * @param {Number} [maxWidth]   Optional. Text width restriction
 		 * @return {Asc.TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
 		 */
-		StringRender.prototype.measureString = function(str, flags, maxWidth) {
-			if (str !== undefined) {
-				this.setString(str, flags);
+		StringRender.prototype.measureString = function(fragments, flags, maxWidth) {
+			if (fragments) {
+				this.setString(fragments, flags);
 			}
 			return this._doMeasure(maxWidth);
-		};
-
-		/**
-		 * Draw string
-		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
-		 * @param {AscCommonExcel.CellFlags} flags  Optional.
-		 * @param {Number} x  Left of the text rect
-		 * @param {Number} y  Top of the text rect
-		 * @param {Number} maxWidth  Text width restriction
-		 * @param {String} textColor  Default text color for formatless string
-		 * @return {StringRender}  Returns 'this' to allow chaining
-		 */
-		StringRender.prototype.renderString = function(str, flags, x, y, maxWidth, textColor) {
-			if (str !== undefined) {
-				this.setString(str, flags);
-			}
-			if (this.charWidths.length < 1 && null === this._doMeasure(maxWidth)) {
-				asc_debug("log", "Warning: can not measure '", str, "'");
-				return this;
-			}
-			this._doRender(undefined, x, y, maxWidth, textColor);
-			return this;
 		};
 
 		/**
@@ -566,58 +543,52 @@
 		StringRender.prototype._calcLineMetrics = function (f, va, fm) {
 			var l = new lineMetrics();
 
-			var ppi = 96;
-			var hpt = f * 1.275;
-			var fpx = f * ppi / 72;
-			var topt = 72 / ppi;
+			if (!va) {
+				var _a = Math.max(0, asc.ceil(fm.nat_y1 * f / fm.nat_scale));
+				var _d = Math.max(0, asc.ceil(-fm.nat_y2 * f / fm.nat_scale));
 
-			var h;
-			var a = asc_round(fpx) * topt;
-			var d;
-
-			var a_2 = asc_round(fpx / 2) * topt;
-
-			var h_2_3;
-			var a_2_3 = asc_round(fpx * 2/3) * topt;
-			var d_2_3;
-
-			var x = a_2 + a_2_3;
-
-			if (va === AscCommon.vertalign_SuperScript) {
-				h = asc_calcnpt(hpt, ppi);
-				d = h - a;
-
-				l.th = x + d;
-				l.bl = x;
-				l.bl2 = a_2_3;
-				l.a = fm.ascender + a_2;         // >0
-				l.d = fm.descender - a_2;        // <0
-			} else if (va === AscCommon.vertalign_SubScript) {
-				h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
-				d_2_3 = h_2_3 - a_2_3;
-				l.th = x + d_2_3;
-				l.bl = a;
-				l.bl2 = x;
-				l.a = fm.ascender + a - x;       // >0
-				l.d = fm.descender + x - a;      // >0
+				l.th = _a + _d;
+				l.bl = _a;
+				l.a = _a;
+				l.d = _d;
 			} else {
-				/* Было раньше
-				l.th = a + d;
-				l.bl = a;
-				l.a = fm.ascender;
-				l.d = fm.descender;*/
+				var ppi = 96;
+				var hpt = f * 1.275;
+				var fpx = f * ppi / 72;
+				var topt = 72 / ppi;
 
-				var _a = Math.max(0, fm.nat_y1 * f / fm.nat_scale);
-				var _d = Math.max(0, (-fm.nat_y2) * f / fm.nat_scale);
-				
-				var _aa = asc_calcnpt(_a, ppi);
-				var _dd = asc_calcnpt(_d, ppi);
-				
-				l.th = _aa + _dd;
-				l.bl = _aa;
-				l.a = _aa;
-				l.d = _dd;
+				var h;
+				var a = asc_round(fpx) * topt;
+				var d;
+
+				var a_2 = asc_round(fpx / 2) * topt;
+
+				var h_2_3;
+				var a_2_3 = asc_round(fpx * 2/3) * topt;
+				var d_2_3;
+
+				var x = a_2 + a_2_3;
+
+				if (va === AscCommon.vertalign_SuperScript) {
+					h = hpt;
+					d = h - a;
+
+					l.th = x + d;
+					l.bl = x;
+					l.bl2 = a_2_3;
+					l.a = fm.ascender + a_2;         // >0
+					l.d = fm.descender - a_2;        // <0
+				} else if (va === AscCommon.vertalign_SubScript) {
+					h_2_3 = hpt * 2/3;
+					d_2_3 = h_2_3 - a_2_3;
+					l.th = x + d_2_3;
+					l.bl = a;
+					l.bl2 = x;
+					l.a = fm.ascender + a - x;       // >0
+					l.d = fm.descender + x - a;      // >0
+				}
 			}
+
 			return l;
 		};
 
@@ -631,7 +602,7 @@
 		 */
 		StringRender.prototype._calcTextMetrics = function (dontCalcRepeatChars) {
 			var self = this, i = 0, p, p_, lm, beg = 0;
-			var l = new LineInfo(), TW = 0, TH = 0, BL = 0, CL = 0;
+			var l = new LineInfo(), TW = 0, TH = 0, BL = 0;
 
 			function addLine(b, e) {
 				if (-1 !== b)
@@ -641,7 +612,7 @@
 				self.lines.push(l);
 				if (TW < l.tw) {TW = l.tw;}
 				BL = TH + l.bl;
-				TH += l.th;
+				TH += l.th + 1;
 			}
 
 			if (0 >= this.chars.length) {
@@ -689,11 +660,7 @@
 					addLine(beg, i - 1);
 				}
 			}
-
-			if (this.lines.length > 0) {
-				CL = (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2;
-			}
-			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, CL);
+			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0);
 		};
 
 		StringRender.prototype._getRepeatCharPos = function () {
@@ -807,7 +774,7 @@
 
 				for (chPos = self.chars.length, j = 0; j < s.length; ++j, ++chPos) {
 					ch  = s.charAt(j);
-					tm = ctx.measureChar(ch, 1/*pt units*/);
+					tm = ctx.measureChar(ch, 0/*px units*/);
 					chw = tm.width;
 
 					isNL = self.reHypNL.test(ch);
@@ -969,7 +936,7 @@
 				canReduce = false;
 				ratio = maxWidth / tm.width;
 				for (var i = 0; i < this.fragments.length; ++i) {
-					format = this.fragments[i].format = this.fragments[i].format.clone();
+					format = this.fragments[i].format;
 					size = Math.max(minSize, Math.floor(format.getSize() * ratio * 2) / 2);
 					format.setSize(size);
 					if (minSize < size) {
@@ -991,7 +958,7 @@
 		StringRender.prototype._doRender = function(drawingCtx, x, y, maxWidth, textColor) {
 			var self = this;
 			var ctx = drawingCtx || this.drawingCtx;
-			var ppix = ctx.getPPIX();
+			var zoom = ctx.getZoom();
 			var ppiy = ctx.getPPIY();
 			var align  = this.flags ? this.flags.textAlign : null;
 			var i, j, p, p_, f, f_, strBeg;
@@ -1000,9 +967,9 @@
 			function initX(startPos) {
 				var x_ = x;
 				if (align === AscCommon.align_Right) {
-					x_ = asc_calcnpt(x + maxWidth - self._calcLineWidth(startPos), ppix, -1/*px*/);
+					x_ = x + maxWidth - self._calcLineWidth(startPos) - 1/*px*/;
 				} else if (align === AscCommon.align_Center) {
-					x_ = asc_calcnpt(x + 0.5 * (maxWidth - asc_calcnpt(self._calcLineWidth(startPos), ppix)), ppix, 0/*px*/);
+					x_ = x + 0.5 * (maxWidth - self._calcLineWidth(startPos));
 				}
 				l.startX = x_;
 				return x_;
@@ -1023,43 +990,43 @@
 				var so = prop.font.Strikeout;
 				var ul = Asc.EUnderline.underlineNone !== prop.font.Underline;
 				var isSO = so === true;
-				var fsz, x2, y, lw, dy, i, b, x_, cp, w_1px, h_1px;
+				var fsz, x2, y, lw, dy, i, b, x_, cp;
+				var bl = asc_round(l.bl * zoom);
 
+				y = y1 + bl + dh;
 				if (align !== AscCommon.align_Justify || dx < 0.000001) {
-					ctx.fillText(self.chars.slice(begin, end), x1, y1 + l.bl + dh, undefined, self.charWidths.slice(begin, end), angle);
+					ctx.fillText(self.chars.slice(begin, end), x1, y, undefined, self.charWidths.slice(begin, end), angle);
 				} else {
 					for (i = b = begin, x_ = x1; i < end; ++i) {
 						cp = self.charProps[i];
 						if (cp && cp.wrd && i > b) {
-							ctx.fillText(self.chars.slice(b, i), x_, y1 + l.bl + dh, undefined, self.charWidths.slice(b, i), angle);
+							ctx.fillText(self.chars.slice(b, i), x_, y, undefined, self.charWidths.slice(b, i), angle);
 							x_ += self._calcCharsWidth(b, i - 1) + dx;
 							dw += dx;
 							b = i;
 						}
 					}
 					if (i > b) { // draw remainder of text
-						ctx.fillText(self.chars.slice(b, i), x_, y1 + l.bl + dh, undefined, self.charWidths.slice(b, i), angle);
+						ctx.fillText(self.chars.slice(b, i), x_, y, undefined, self.charWidths.slice(b, i), angle);
 					}
 				}
 
 				if (isSO || ul) {
-					x2 = asc_calcnpt(x1 + dw, ppix);
+					x2 = x1 + dw;
 					fsz = prop.font.FontSize;
 					lw = asc_round(fsz * ppiy / 72 / 18) || 1;
 					ctx.setStrokeStyle(prop.c || textColor)
 					   .setLineWidth(lw)
 					   .beginPath();
-					w_1px = asc_calcnpt(0, ppix, 1/*px*/);
-					h_1px = asc_calcnpt(0, ppiy, 1/*px*/);
 					dy = (lw / 2); dy = dy >> 0;
 					if (ul) {
-						y = asc_calcnpt(y1 + l.bl + prop.lm.d * 0.4, ppiy);
-						ctx.lineHor(x1, y + dy * h_1px, x2 + w_1px); // ToDo вопрос тут
+						y = asc_round(y1 + bl + prop.lm.d * 0.4);
+						ctx.lineHor(x1, y + dy, x2 + 1/*px*/); // ToDo вопрос тут
 					}
 					if (isSO) {
 						dy += 1;
-						y = asc_calcnpt(y1 + l.bl - prop.lm.a * 0.275, ppiy);
-						ctx.lineHor(x1, y - dy * h_1px, x2 + w_1px); // ToDo вопрос тут
+						y = asc_round(y1 + bl - prop.lm.a * 0.275);
+						ctx.lineHor(x1, y - dy, x2 + 1/*px*/); // ToDo вопрос тут
 					}
 					ctx.stroke();
 				}
@@ -1102,7 +1069,7 @@
 					}
 					if (p.nl || p.hp) {
 						// begin new line
-						y1 += l.th;
+						y1 += asc_round(l.th * zoom);
 						l = self.lines[++n];
 						x1 = initX(i);
 						dx = computeWordDeltaX();

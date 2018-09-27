@@ -69,9 +69,9 @@ CDrawingsController.prototype.AddInlineTable = function(Cols, Rows)
 {
 	this.DrawingObjects.addInlineTable(Cols, Rows);
 };
-CDrawingsController.prototype.ClearParagraphFormatting = function()
+CDrawingsController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.DrawingObjects.paragraphClearFormatting();
+	this.DrawingObjects.paragraphClearFormatting(isClearParaPr, isClearTextPr);
 };
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
@@ -195,10 +195,6 @@ CDrawingsController.prototype.SetParagraphTabs = function(Tabs)
 CDrawingsController.prototype.SetParagraphIndent = function(Ind)
 {
 	this.DrawingObjects.setParagraphIndent(Ind);
-};
-CDrawingsController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	this.DrawingObjects.setParagraphNumbering(NumInfo);
 };
 CDrawingsController.prototype.SetParagraphShd = function(Shd)
 {
@@ -330,6 +326,14 @@ CDrawingsController.prototype.PasteFormatting = function(TextPr, ParaPr)
 CDrawingsController.prototype.IsSelectionUse = function()
 {
 	return this.DrawingObjects.isSelectionUse();
+};
+CDrawingsController.prototype.IsNumberingSelection = function()
+{
+	var oTargetDocContent = this.DrawingObjects.getTargetDocContent();
+	if (oTargetDocContent && oTargetDocContent.IsNumberingSelection)
+		return  oTargetDocContent.IsNumberingSelection();
+
+	return false;
 };
 CDrawingsController.prototype.IsTextSelectionUse = function()
 {
@@ -536,4 +540,11 @@ CDrawingsController.prototype.AddContentControl = function(nContentControlType)
 CDrawingsController.prototype.GetStyleFromFormatting = function()
 {
 	return this.DrawingObjects.GetStyleFromFormatting();
+};
+CDrawingsController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	var oDocContent = this.DrawingObjects.getTargetDocContent();
+
+	if (oDocContent && oDocContent.GetSimilarNumbering)
+		oDocContent.GetSimilarNumbering(oEngine);
 };

@@ -430,7 +430,7 @@ CDocumentContentElementBase.prototype.Add = function(oParaItem)
 CDocumentContentElementBase.prototype.PreDelete = function()
 {
 };
-CDocumentContentElementBase.prototype.ClearParagraphFormatting = function()
+CDocumentContentElementBase.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 };
 CDocumentContentElementBase.prototype.GetCursorPosXY = function()
@@ -443,6 +443,9 @@ CDocumentContentElementBase.prototype.StartSelectionFromCurPos = function()
 CDocumentContentElementBase.prototype.SetParagraphAlign = function(Align)
 {
 };
+CDocumentContentElementBase.prototype.SetParagraphDefaultTabSize = function(TabSize)
+{
+};
 CDocumentContentElementBase.prototype.SetParagraphSpacing = function(Spacing)
 {
 };
@@ -450,9 +453,6 @@ CDocumentContentElementBase.prototype.SetParagraphTabs = function(Tabs)
 {
 };
 CDocumentContentElementBase.prototype.SetParagraphIndent = function(Ind)
-{
-};
-CDocumentContentElementBase.prototype.SetParagraphNumbering = function(NumInfo)
 {
 };
 CDocumentContentElementBase.prototype.SetParagraphShd = function(Shd)
@@ -765,6 +765,10 @@ CDocumentContentElementBase.prototype.GetAbsolutePage = function(CurPage)
 {
 	return this.private_GetAbsolutePageIndex(CurPage);
 };
+CDocumentContentElementBase.prototype.GetAbsoluteColumn = function(CurPage)
+{
+	return this.Get_AbsoluteColumn(CurPage);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CDocumentContentElementBase.prototype.GetPagesCount = function()
 {
@@ -909,6 +913,34 @@ CDocumentContentElementBase.prototype.GetPrevParagraph = function()
 
 	return null;
 };
+/**
+ * Собираем список заголовков
+ * @param {Paragraph[]} arrOutline
+ * @param {object} oPr
+ */
+CDocumentContentElementBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
+{
+};
+/**
+ * Вплоть до заданного параграфа ищем последнюю похожую нумерацию
+ * @param oContinueEngine {CDocumentNumberingContinueEngine}
+ * @returns {CNumPr | null}
+ */
+CDocumentContentElementBase.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	return null;
+};
+/**
+ * Переходим к следующей ссылке на сноску
+ * @param isNext {boolean} - направление поиска
+ * @param isCurrent {boolean} - ищем начиная с текущей позиции или с края элемента
+ * @returns {boolean}
+ */
+CDocumentContentElementBase.prototype.GotoFootnoteRef = function(isNext, isCurrent)
+{
+	return false;
+};
+
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

@@ -73,9 +73,7 @@ function FrozenPlace(ws, type) {
 		row: _this.worksheet.topLeftFrozenCell ? _this.worksheet.topLeftFrozenCell.getRow0() : 0
 	};
 	_this.isValid = true;
-	
-	var convertMetrics = _this.worksheet.objectRender.convertMetric;
-		
+
 	// Methods	
 	_this.initRange = function() {
 		switch (_this.type) {
@@ -454,14 +452,14 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.Bottom: {
 				//scroll = _this.worksheet.getCellTop(fv.row, 0) - _this.worksheet.getCellTop(_this.frozenCell.row, 0) + headerPx;
-				scroll = -convertMetrics((_this.worksheet.rows[fv.row].top - _this.worksheet.rows[_this.frozenCell.row].top), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.rows[fv.row].top - _this.worksheet.rows[_this.frozenCell.row].top) + headerPx;
 			}
 			break;
 			
 			case FrozenAreaType.Left:
 			case FrozenAreaType.Right: {
 				//scroll = _this.worksheet.getCellTop(fv.row, 0) - headerPx - headerPx;
-				scroll = -convertMetrics((_this.worksheet.rows[fv.row].top - _this.worksheet.cellsTop), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.rows[fv.row].top - _this.worksheet.cellsTop) + headerPx;
 			}
 			break;
 			
@@ -475,14 +473,14 @@ function FrozenPlace(ws, type) {
 			case FrozenAreaType.LeftBottom:
 			case FrozenAreaType.RightBottom: {
 				//scroll = _this.worksheet.getCellTop(fv.row, 0) - _this.worksheet.getCellTop(_this.frozenCell.row, 0) + headerPx;
-				scroll = -convertMetrics((_this.worksheet.rows[fv.row].top - _this.worksheet.rows[_this.frozenCell.row].top), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.rows[fv.row].top - _this.worksheet.rows[_this.frozenCell.row].top) + headerPx;
 			}
 			break;
 			
 			// No frozen areas
 			case FrozenAreaType.Center: {
 				//scroll = _this.worksheet.getCellTop(fv.row, 0);// - headerPx - headerPx;
-				scroll = -convertMetrics((_this.worksheet.rows[fv.row].top - _this.worksheet.cellsTop), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.rows[fv.row].top - _this.worksheet.cellsTop) + headerPx;
 			}
 			break;
 		}
@@ -501,7 +499,7 @@ function FrozenPlace(ws, type) {
 			case FrozenAreaType.Top:
 			case FrozenAreaType.Bottom: {
 				//scroll = _this.worksheet.getCellLeft(fv.col, 0) - headerPx - headerPx;
-				scroll = -convertMetrics((_this.worksheet.cols[fv.col].left - _this.worksheet.cellsLeft), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.cols[fv.col].left - _this.worksheet.cellsLeft) + headerPx;
 			}
 			break;
 			
@@ -512,7 +510,7 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.Right: {
 				//scroll = _this.worksheet.getCellLeft(fv.col, 0) - _this.worksheet.getCellLeft(_this.frozenCell.col, 0) + headerPx;
-				scroll = -convertMetrics((_this.worksheet.cols[fv.col].left - _this.worksheet.cols[_this.frozenCell.col].left), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.cols[fv.col].left - _this.worksheet.cols[_this.frozenCell.col].left) + headerPx;
 			}
 			break;
 			
@@ -526,14 +524,14 @@ function FrozenPlace(ws, type) {
 			case FrozenAreaType.RightTop:
 			case FrozenAreaType.RightBottom: {
 				//scroll = _this.worksheet.getCellLeft(fv.col, 0) - _this.worksheet.getCellLeft(_this.frozenCell.col, 0) + headerPx;
-				scroll = -convertMetrics((_this.worksheet.cols[fv.col].left - _this.worksheet.cols[_this.frozenCell.col].left), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.cols[fv.col].left - _this.worksheet.cols[_this.frozenCell.col].left) + headerPx;
 			}
 			break;			
 			
 			// No frozen areas
 			case FrozenAreaType.Center: {
 				//scroll = _this.worksheet.getCellLeft(fv.col, 0);// - headerPx - headerPx;
-				scroll = -convertMetrics((_this.worksheet.cols[fv.col].left - _this.worksheet.cellsLeft), 1, 0) + headerPx;
+				scroll = -(_this.worksheet.cols[fv.col].left - _this.worksheet.cellsLeft) + headerPx;
 			}
 			break;
 		}

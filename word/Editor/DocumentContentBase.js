@@ -56,6 +56,17 @@ CDocumentContentBase.prototype.GetId = function()
 	return this.Id;
 };
 /**
+ * Получаем ссылку на основной объект документа
+ * @returns {CDocument}
+ */
+CDocumentContentBase.prototype.GetLogicDocument = function()
+{
+	if (this instanceof CDocument)
+		return this;
+
+	return this.LogicDocument;
+};
+/**
  * Получаем тип активной части документа.
  * @returns {(docpostype_Content | docpostype_HdrFtr | docpostype_DrawingObjects | docpostype_Footnotes)}
  */
@@ -316,26 +327,26 @@ CDocumentContentBase.prototype.StopSelection = function()
 	if (this.Content[this.Selection.StartPos])
 		this.Content[this.Selection.StartPos].StopSelection();
 };
-CDocumentContentBase.prototype.GetNumberingInfo = function(NumberingEngine, ParaId, NumPr)
+CDocumentContentBase.prototype.GetNumberingInfo = function(oNumberingEngine, oPara, oNumPr)
 {
-	if (undefined === NumberingEngine || null === NumberingEngine)
-		NumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+	if (undefined === oNumberingEngine || null === oNumberingEngine)
+		oNumberingEngine = new CDocumentNumberingInfoEngine(oPara, oNumPr, this.GetNumbering());
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		this.Content[nIndex].GetNumberingInfo(NumberingEngine);
-		if (true === NumberingEngine.Is_Found())
+		this.Content[nIndex].GetNumberingInfo(oNumberingEngine);
+		if (oNumberingEngine.IsStop())
 			break;
 	}
 
-	return NumberingEngine.Get_NumInfo();
+	return oNumberingEngine.GetNumInfo();
 };
 CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
 	if (this.CurPos.ContentPos < 0)
 		return false;
 
-	this.Remove_NumberingSelection();
+	this.RemoveNumberingSelection();
 
 	var bRetValue = true;
 	if (true === this.Selection.Use)
@@ -620,7 +631,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							}
 							else
 							{
-								if (true === this.Content[this.CurPos.ContentPos - 1].IsEmpty() && undefined === this.Content[this.CurPos.ContentPos - 1].Numbering_Get())
+								if (true === this.Content[this.CurPos.ContentPos - 1].IsEmpty() && undefined === this.Content[this.CurPos.ContentPos - 1].GetNumPr())
 								{
 									// Просто удаляем предыдущий параграф
 									this.Internal_Content_Remove(this.CurPos.ContentPos - 1, 1);
@@ -718,31 +729,42 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 		{
 			if (false === this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText))
 			{
-				if (this.Content[this.CurPos.ContentPos].IsEmpty())
+				var oLogicDocument = this.GetLogicDocument();
+				if (oLogicDocument && true === oLogicDocument.IsFillingFormMode())
 				{
-					this.RemoveFromContent(this.CurPos.ContentPos, 1);
-
-					if ((Count < 0 && this.CurPos.ContentPos > 0) || this.CurPos.ContentPos >= this.Content.length)
-					{
-						this.CurPos.ContentPos--;
-						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
-					}
-					else
-					{
+					if (Count < 0 && this.CurPos.ContentPos > 0)
 						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
-					}
+					else
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
 				}
 				else
 				{
-					if (Count < 0 && this.CurPos.ContentPos > 0)
+					if (this.Content[this.CurPos.ContentPos].IsEmpty())
 					{
-						this.CurPos.ContentPos--;
-						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+						this.RemoveFromContent(this.CurPos.ContentPos, 1);
+
+						if ((Count < 0 && this.CurPos.ContentPos > 0) || this.CurPos.ContentPos >= this.Content.length)
+						{
+							this.CurPos.ContentPos--;
+							this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+						}
+						else
+						{
+							this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+						}
 					}
-					else if (this.CurPos.ContentPos < this.Content.length - 1)
+					else
 					{
-						this.CurPos.ContentPos++;
-						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+						if (Count < 0 && this.CurPos.ContentPos > 0)
+						{
+							this.CurPos.ContentPos--;
+							this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+						}
+						else if (this.CurPos.ContentPos < this.Content.length - 1)
+						{
+							this.CurPos.ContentPos++;
+							this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+						}
 					}
 				}
 			}
@@ -947,8 +969,7 @@ CDocumentContentBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		if (type_Paragraph === this.Content[nIndex].GetType())
-			this.Content[nIndex].GetOutlineParagraphs(arrOutline, oPr);
+		this.Content[nIndex].GetOutlineParagraphs(arrOutline, oPr);
 	}
 
 	return arrOutline;
@@ -1128,6 +1149,30 @@ CDocumentContentBase.prototype.GetPrevParagraph = function()
 	return null;
 };
 /**
+ * Находимся ли мы в колонтитуле
+ * @param {boolean} [bReturnHdrFtr=false]
+ * @returns {?CHeaderFooter | boolean}
+ */
+CDocumentContentBase.prototype.IsHdrFtr = function(bReturnHdrFtr)
+{
+	if (true === bReturnHdrFtr)
+		return null;
+
+	return false;
+};
+/**
+ * Находимся ли мы в сноске
+ * @param {boolean} [bReturnFootnote=false]
+ * @returns {?CFootEndnote | boolean}
+ */
+CDocumentContentBase.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if (bReturnFootnote)
+		return null;
+
+	return false;
+};
+/**
  * Проверяем находимся ли мы в последней ячейке таблицы
  * @param {boolean} isSelection
  * @returns {boolean}
@@ -1136,3 +1181,137 @@ CDocumentContentBase.prototype.IsLastTableCellInRow = function(isSelection)
 {
 	return false;
 };
+/**
+ * Получаем ссылку на главный класс нумерации
+ * @returns {?CNumbering}
+ */
+CDocumentContentBase.prototype.GetNumbering = function()
+{
+	return null;
+};
+/**
+ * Получаем верхний класс CDocumentContent
+ * @returns {CDocumentContentBase}
+ */
+CDocumentContentBase.prototype.GetTopDocumentContent = function()
+{
+	return this;
+};
+/**
+ * Получаем массив параграфов по заданному критерию
+ * @param oProps
+ * @param [arrParagraphs=undefined]
+ * @returns {Paragraph[]}
+ */
+CDocumentContentBase.prototype.GetAllParagraphs = function(oProps, arrParagraphs)
+{
+	if (!arrParagraphs)
+		arrParagraphs = [];
+
+	return arrParagraphs;
+};
+/**
+ * Получаем массив всех параграфов с заданной нумерацией
+ * @param oNumPr {CNumPr | CNumPr[]}
+ * @returns {Paragraph[]}
+ */
+CDocumentContentBase.prototype.GetAllParagraphsByNumbering = function(oNumPr)
+{
+	return this.GetAllParagraphs({Numbering : true, NumPr : oNumPr});
+};
+/**
+ * Получаем массив параграфов из списка заданных стилей
+ * @param arrStylesId {string[]}
+ * @returns {Paragraph[]}
+ */
+CDocumentContentBase.prototype.GetAllParagraphsByStyle = function(arrStylesId)
+{
+	return this.GetAllParagraphs({Style : true, StylesId : arrStylesId});
+};
+/**
+ * Выделяем заданную нумерацию
+ * @param oNumPr {CNumPr}
+ * @param oPara {Paragraph} - текущий парограф
+ */
+CDocumentContentBase.prototype.SelectNumbering = function(oNumPr, oPara)
+{
+	var oTopDocContent = this.GetTopDocumentContent();
+	if (oTopDocContent === this)
+	{
+		this.RemoveSelection();
+
+		oPara.Document_SetThisElementCurrent(false);
+
+		this.Selection.Use      = true;
+		this.Selection.Flag     = selectionflag_Numbering;
+		this.Selection.StartPos = this.CurPos.ContentPos;
+		this.Selection.EndPos   = this.CurPos.ContentPos;
+
+		var arrParagraphs = this.GetAllParagraphsByNumbering(oNumPr);
+
+		this.Selection.Data = {
+			Paragraphs : arrParagraphs,
+			CurPara    : oPara
+		};
+
+		for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+		{
+			arrParagraphs[nIndex].SelectNumbering(arrParagraphs[nIndex] === oPara);
+		}
+
+		this.DrawingDocument.SelectEnabled(true);
+
+		var oLogicDocument = this.GetLogicDocument();
+		oLogicDocument.Document_UpdateSelectionState();
+		oLogicDocument.Document_UpdateInterfaceState();
+	}
+	else
+	{
+		oTopDocContent.SelectNumbering(oNumPr, oPara);
+	}
+};
+/**
+ * Проверяем является ли текущее выделение выделением нумерации
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsNumberingSelection = function()
+{
+	return !!(this.IsSelectionUse() && this.Selection.Flag === selectionflag_Numbering);
+};
+/**
+ * Убираем селект с нумерации
+ */
+CDocumentContentBase.prototype.RemoveNumberingSelection = function()
+{
+	if (this.IsNumberingSelection())
+		this.RemoveSelection();
+};
+/**
+ * Рассчитываем значение нумерованного списка для заданной нумерации
+ * @param oPara {Paragraph}
+ * @param oNumPr {CNumPr}
+ * @returns {number[]}
+ */
+CDocumentContentBase.prototype.CalculateNumberingValues = function(oPara, oNumPr)
+{
+	var oTopDocument = this.GetTopDocumentContent();
+	if (oTopDocument instanceof CFootEndnote)
+		return oTopDocument.Parent.GetNumberingInfo(oPara, oNumPr, oTopDocument);
+
+	return oTopDocument.GetNumberingInfo(null, oPara, oNumPr);
+};
+/**
+ * Вплоть до заданного параграфа ищем последнюю похожую нумерацию
+ * @param oContinueEngine {CDocumentNumberingContinueEngine}
+ */
+CDocumentContentBase.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetSimilarNumbering(oContinueEngine);
+
+		if (oContinueEngine.IsFound())
+			break;
+	}
+};
+

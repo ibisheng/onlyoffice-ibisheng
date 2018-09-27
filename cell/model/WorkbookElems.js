@@ -43,9 +43,13 @@ var parserHelp = AscCommon.parserHelp;
 var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 	var History = AscCommon.History;
+	var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
+
+var UndoRedoData_Layout = AscCommonExcel.UndoRedoData_Layout;
+
 
 var c_oAscCustomAutoFilter = Asc.c_oAscCustomAutoFilter;
 var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
@@ -101,14 +105,14 @@ function shiftSort(a, b, offset)
 	}
 	else
 	{
-	    if (0 != offset.offsetRow) {
-	        if (offset.offsetRow > 0)
+	    if (0 != offset.row) {
+	        if (offset.row > 0)
 	            nRes = b.to.r1 - a.to.r1;
 	        else
 	            nRes = a.to.r1 - b.to.r1;
 	    }
-	    if (0 == nRes && 0 != offset.offsetCol) {
-	        if (offset.offsetCol > 0)
+	    if (0 == nRes && 0 != offset.col) {
+	        if (offset.col > 0)
 	            nRes = b.to.c1 - a.to.c1;
 	        else
 	            nRes = a.to.c1 - b.to.c1;
@@ -389,14 +393,14 @@ function ColorManager()
 }
 ColorManager.prototype =
 {
-	isEqual : function(color1, color2)
+	isEqual : function(color1, color2, byRgb)
 	{
 		var bRes = false;
 		if(null == color1 && null == color2)
 			bRes = true;
 		else if(null != color1 && null != color2)
 		{
-			if((color1 instanceof ThemeColor && color2 instanceof ThemeColor) || (color1 instanceof RgbColor && color2 instanceof RgbColor))
+			if((color1 instanceof ThemeColor && color2 instanceof ThemeColor) || (color1 instanceof RgbColor && color2 instanceof RgbColor) || byRgb)
 				bRes =  color1.getRgb() == color2.getRgb();
 		}
 		return bRes;
@@ -1337,8 +1341,8 @@ var g_oFontProperties = {
 	BorderProp.prototype.isEmpty = function () {
 		return c_oAscBorderStyles.None === this.s;
 	};
-	BorderProp.prototype.isEqual = function (val) {
-		return this.s === val.s && g_oColorManager.isEqual(this.c, val.c);
+	BorderProp.prototype.isEqual = function (val, byRgb) {
+		return this.s === val.s && g_oColorManager.isEqual(this.c, val.c, byRgb);
 	};
 	BorderProp.prototype.clone = function () {
 		var res = new BorderProp();
@@ -1526,6 +1530,34 @@ var g_oBorderProperties = {
 			oRes = null;
 		}
 		return oRes;
+	};
+	Border.prototype.intersect = function (border, def, byRgb) {
+		if (!this.l.isEqual(border.l, byRgb)) {
+			this.l = def.l;
+		}
+		if (!this.t.isEqual(border.t, byRgb)) {
+			this.t = def.t;
+		}
+		if (!this.r.isEqual(border.r, byRgb)) {
+			this.r = def.r;
+		}
+		if (!this.b.isEqual(border.b, byRgb)) {
+			this.b = def.b;
+		}
+		if (!this.d.isEqual(border.d, byRgb)) {
+			this.d = def.d;
+			this.dd = false;
+			this.du = false;
+		}
+		if (!this.ih.isEqual(border.ih, byRgb)) {
+			this.ih = def.ih;
+		}
+		if (!this.iv.isEqual(border.iv, byRgb)) {
+			this.iv = def.iv;
+		}
+		if (this.dd !== border.dd) {
+			this.dd = def.dd;
+		}
 	};
 	Border.prototype.isEqual = function (val) {
 		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) &&
@@ -3106,328 +3138,363 @@ Hyperlink.prototype = {
 	},
 	applyCollaborative : function (nSheetId, collaborativeEditing) {
 		var bbox = this.Ref.getBBox0();
-		var OffsetFirst = {offsetCol:0, offsetRow:0};
-		var OffsetLast = {offsetCol:0, offsetRow:0};
-		OffsetFirst.offsetRow = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r1) - bbox.r1;
-		OffsetFirst.offsetCol = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c1) - bbox.c1;
-		OffsetLast.offsetRow = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r2) - bbox.r2;
-		OffsetLast.offsetCol = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c2) - bbox.c2;
+		var OffsetFirst = new AscCommon.CellBase(0, 0);
+		var OffsetLast = new AscCommon.CellBase(0, 0);
+		OffsetFirst.row = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r1) - bbox.r1;
+		OffsetFirst.col = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c1) - bbox.c1;
+		OffsetLast.row = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r2) - bbox.r2;
+		OffsetLast.col = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c2) - bbox.c2;
 		this.Ref.setOffsetFirst(OffsetFirst);
 		this.Ref.setOffsetLast(OffsetLast);
 	}
 };
-/** @constructor */
-function SheetFormatPr(){
-	this.nBaseColWidth = null;
-	this.dDefaultColWidth = null;
-	this.oAllRow = null;
-}
-SheetFormatPr.prototype = {
-	clone : function(){
+	/** @constructor */
+	function SheetFormatPr() {
+		this.nBaseColWidth = null;
+		this.dDefaultColWidth = null;
+		this.oAllRow = null;
+	}
+	SheetFormatPr.prototype.clone = function () {
 		var oRes = new SheetFormatPr();
 		oRes.nBaseColWidth = this.nBaseColWidth;
 		oRes.dDefaultColWidth = this.dDefaultColWidth;
-		if(null != this.oAllRow)
+		if (null != this.oAllRow) {
 			oRes.oAllRow = this.oAllRow.clone();
+		}
 		return oRes;
+	};
+	SheetFormatPr.prototype.correction = function () {
+		if (null !== this.dDefaultColWidth && 0 > this.dDefaultColWidth) {
+			this.dDefaultColWidth = null;
+		}
+	};
+	/** @constructor */
+	function Col(worksheet, index) {
+		this.ws = worksheet;
+		this.index = index;
+		this.BestFit = null;
+		this.hd = null;
+		this.CustomWidth = null;
+		this.width = null;
+		this.xfs = null;
+
+		this.widthPx = null;
+		this.charCount = null;
 	}
-};
-/** @constructor */
-function Col(worksheet, index)
-{
-	this.ws = worksheet;
-	this.index = index;
-    this.BestFit = null;
-    this.hd = null;
-    this.CustomWidth = null;
-    this.width = null;
-    this.xfs = null;
-}
-Col.prototype =
-{
-	moveHor : function(nDif)
-	{
+
+	Col.prototype.moveHor = function (nDif) {
 		this.index += nDif;
-	},
-	isEqual : function(obj)
-	{
-		var bRes = this.BestFit == obj.BestFit && this.hd == obj.hd && this.width == obj.width && this.CustomWidth == obj.CustomWidth;
-		if(bRes)
-		{
-			if(null != this.xfs && null != obj.xfs)
+	};
+	Col.prototype.isEqual = function (obj) {
+		var bRes = this.BestFit == obj.BestFit && this.hd == obj.hd && this.width == obj.width &&
+			this.CustomWidth == obj.CustomWidth;
+		if (bRes) {
+			if (null != this.xfs && null != obj.xfs) {
 				bRes = this.xfs.isEqual(obj.xfs);
-			else if(null != this.xfs || null != obj.xfs)
+			} else if (null != this.xfs ||
+				null != obj.xfs) {
 				bRes = false;
+			}
 		}
 		return bRes;
-	},
-	isEmpty : function()
-	{
-		return null == this.BestFit && null == this.hd && null == this.width && null == this.xfs && null == this.CustomWidth;
-	},
-	clone : function(oNewWs)
-    {
-        if(!oNewWs)
-            oNewWs = this.ws;
-        var oNewCol = new Col(oNewWs, this.index);
-        if(null != this.BestFit)
-            oNewCol.BestFit = this.BestFit;
-        if(null != this.hd)
-            oNewCol.hd = this.hd;
-        if(null != this.width)
-            oNewCol.width = this.width;
-		if(null != this.CustomWidth)
-            oNewCol.CustomWidth = this.CustomWidth;
-        if(null != this.xfs)
-			oNewCol.xfs = this.xfs;
-        return oNewCol;
-    },
-	getWidthProp : function()
-	{
-		return new AscCommonExcel.UndoRedoData_ColProp(this);
-	},
-	setWidthProp : function(prop)
-	{
-		if(null != prop)
-		{
-			if(null != prop.width)
-				this.width = prop.width;
-			else
-				this.width = null;
-			this.setHidden(prop.hd);
-			if(null != prop.CustomWidth)
-				this.CustomWidth = prop.CustomWidth;
-			else
-				this.CustomWidth = null;
-			if(null != prop.BestFit)
-				this.BestFit = prop.BestFit;
-			else
-				this.BestFit = null;
+	};
+	Col.prototype.isEmpty = function () {
+		return null == this.BestFit && null == this.hd && null == this.width && null == this.xfs &&
+			null == this.CustomWidth;
+	};
+	Col.prototype.clone = function (oNewWs) {
+		if (!oNewWs) {
+			oNewWs = this.ws;
 		}
-	},
-	getStyle : function()
-	{
+		var oNewCol = new Col(oNewWs, this.index);
+		if (null != this.BestFit) {
+			oNewCol.BestFit = this.BestFit;
+		}
+		if (null != this.hd) {
+			oNewCol.hd = this.hd;
+		}
+		if (null != this.width) {
+			oNewCol.width = this.width;
+		}
+		if (null != this.CustomWidth) {
+			oNewCol.CustomWidth = this.CustomWidth;
+		}
+		if (null != this.xfs) {
+			oNewCol.xfs = this.xfs;
+		}
+
+		if (null != this.widthPx) {
+			oNewCol.widthPx = this.widthPx;
+		}
+		if (null != this.charCount) {
+			oNewCol.charCount = this.charCount;
+		}
+		return oNewCol;
+	};
+	Col.prototype.getWidthProp = function () {
+		return new AscCommonExcel.UndoRedoData_ColProp(this);
+	};
+	Col.prototype.setWidthProp = function (prop) {
+		if (null != prop) {
+			if (null != prop.width) {
+				this.width = prop.width;
+			} else {
+				this.width = null;
+			}
+			this.setHidden(prop.hd);
+			if (null != prop.CustomWidth) {
+				this.CustomWidth = prop.CustomWidth;
+			} else {
+				this.CustomWidth = null;
+			}
+			if (null != prop.BestFit) {
+				this.BestFit = prop.BestFit;
+			} else {
+				this.BestFit = null;
+			}
+		}
+	};
+	Col.prototype.getStyle = function () {
 		return this.xfs;
-	},
-	_getUpdateRange: function () {
-	    if (AscCommonExcel.g_nAllColIndex == this.index)
-	        return new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-	    else
-	        return new Asc.Range(this.index, 0, this.index, gc_nMaxRow0);
-	},
-	setStyle : function(xfs)
-	{
+	};
+	Col.prototype._getUpdateRange = function () {
+		if (AscCommonExcel.g_nAllColIndex == this.index) {
+			return new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+		} else {
+			return new Asc.Range(this.index, 0, this.index, gc_nMaxRow0);
+		}
+	};
+	Col.prototype.setStyle = function (xfs) {
 		var oldVal = this.xfs;
 		this.setStyleInternal(xfs);
 		if (History.Is_On() && oldVal !== this.xfs) {
-			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, this.xfs));
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, this.xfs));
 		}
-	},
-	setStyleInternal : function(xfs)
-	{
+	};
+	Col.prototype.setStyleInternal = function (xfs) {
 		this.xfs = g_StyleCache.addXf(xfs);
-	},
-	setCellStyle : function(val)
-	{
+	};
+	Col.prototype.setCellStyle = function (val) {
 		var newVal = this.ws.workbook.CellStyles._prepareCellStyle(val);
 		var oRes = this.ws.workbook.oStyleManager.setCellStyle(this, newVal);
-		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldStyleName = this.ws.workbook.CellStyles.getStyleNameByXfId(oRes.oldVal);
-			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetCellStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldStyleName, val));
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetCellStyle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldStyleName, val));
 
 			// Выставляем стиль
 			var oStyle = this.ws.workbook.CellStyles.getStyleByXfId(oRes.newVal);
-			if (oStyle.ApplyFont)
+			if (oStyle.ApplyFont) {
 				this.setFont(oStyle.getFont());
-			if (oStyle.ApplyFill)
+			}
+			if (oStyle.ApplyFill) {
 				this.setFill(oStyle.getFill());
-			if (oStyle.ApplyBorder)
+			}
+			if (oStyle.ApplyBorder) {
 				this.setBorder(oStyle.getBorder());
-			if (oStyle.ApplyNumberFormat)
+			}
+			if (oStyle.ApplyNumberFormat) {
 				this.setNumFormat(oStyle.getNumFormatStr());
+			}
 		}
-	},
-	setNumFormat : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f:val}));
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setNum : function(val)
-	{
+	};
+	Col.prototype.setNumFormat = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f: val}));
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setNum = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
-		if(History.Is_On() && oRes.oldVal != oRes.newVal)
-			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setFont : function(val)
-    {
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setFont = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setFont(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-		{
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldVal = null;
-			if(null != oRes.oldVal)
+			if (null != oRes.oldVal) {
 				oldVal = oRes.oldVal.clone();
+			}
 			var newVal = null;
-			if(null != oRes.newVal)
+			if (null != oRes.newVal) {
 				newVal = oRes.newVal.clone();
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetFont, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+			}
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetFont, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
-	},
-	setFontname : function(val)
-	{
+	};
+	Col.prototype.setFontname = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setFontname(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fontname, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setFontsize : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFontsize(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fontsize, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setFontcolor : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFontcolor(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fontcolor, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setBold : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setBold(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Bold, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setItalic : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setItalic(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Italic, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setUnderline : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setUnderline(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Underline, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setStrikeout : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setStrikeout(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Strikeout, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setFontAlign : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFontAlign(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_FontAlign, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setAlignVertical : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setAlignVertical(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_AlignVertical, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setAlignHorizontal : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setAlignHorizontal(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_AlignHorizontal, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setFill : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFill(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fill, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setBorder : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setBorder(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-		{
-			var oldVal = null;
-			if(null != oRes.oldVal)
-				oldVal = oRes.oldVal.clone();
-			var newVal = null;
-			if(null != oRes.newVal)
-				newVal = oRes.newVal.clone();
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Border, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fontname, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 		}
-	},
-	setShrinkToFit : function(val)
-	{
+	};
+	Col.prototype.setFontsize = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFontsize(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fontsize, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setFontcolor = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFontcolor(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fontcolor, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setBold = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setBold(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Bold, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setItalic = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setItalic(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Italic, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setUnderline = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setUnderline(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Underline, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setStrikeout = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setStrikeout(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Strikeout, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setFontAlign = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFontAlign(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_FontAlign, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setAlignVertical = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setAlignVertical(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_AlignVertical, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setAlignHorizontal = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setAlignHorizontal(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_AlignHorizontal, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setFill = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFill(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Fill, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setBorder = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setBorder(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			var oldVal = null;
+			if (null != oRes.oldVal) {
+				oldVal = oRes.oldVal.clone();
+			}
+			var newVal = null;
+			if (null != oRes.newVal) {
+				newVal = oRes.newVal.clone();
+			}
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Border, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+		}
+	};
+	Col.prototype.setShrinkToFit = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_ShrinkToFit, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setWrap : function(val)
-	{
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_ShrinkToFit, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setWrap = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setWrap(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-    setAngle : function(val)
-    {
-        var oRes = this.ws.workbook.oStyleManager.setAngle(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-    },
-	setVerticalText : function(val)
-	{
-        var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
-	},
-	setHidden: function(val) {
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Wrap, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setAngle = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setAngle(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Angle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setVerticalText = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Angle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Col.prototype.setHidden = function (val) {
 		if (this.index >= 0 && (!this.hd !== !val)) {
 			this.ws.hiddenManager.addHidden(false, this.index);
 		}
 		this.hd = val;
-	},
-	getHidden: function() {
-		return this.hd;
-	},
-	setIndex: function(val) {
+	};
+	Col.prototype.getHidden = function () {
+		return true === this.hd;
+	};
+	Col.prototype.setIndex = function (val) {
 		this.index = val;
-	},
-	getIndex: function() {
+	};
+	Col.prototype.getIndex = function () {
 		return this.index;
-	}
-};
+	};
 
-var g_nRowOffsetFlag = 0;
-var g_nRowOffsetXf = g_nRowOffsetFlag + 1;
-var g_nRowOffsetHeight = g_nRowOffsetXf + 4;
-var g_nRowStructSize = g_nRowOffsetHeight + 8;
+	var g_nRowOffsetFlag = 0;
+	var g_nRowOffsetXf = g_nRowOffsetFlag + 1;
+	var g_nRowOffsetHeight = g_nRowOffsetXf + 4;
+	var g_nRowStructSize = g_nRowOffsetHeight + 8;
 
-var g_nRowFlag_empty = 0;
-var g_nRowFlag_init = 1;
-var g_nRowFlag_hd = 2;
-var g_nRowFlag_CustomHeight = 4;
-var g_nRowFlag_CalcHeight = 8;
-var g_nRowFlag_NullHeight = 16;
+	var g_nRowFlag_empty = 0;
+	var g_nRowFlag_init = 1;
+	var g_nRowFlag_hd = 2;
+	var g_nRowFlag_CustomHeight = 4;
+	var g_nRowFlag_CalcHeight = 8;
+	var g_nRowFlag_NullHeight = 16;
 
-/**
- * @constructor
- */
-function Row(worksheet)
-{
-	this.ws = worksheet;
-	this.index = null;
-    this.xfs = null;
-    this.h = null;
-	this.flags = g_nRowFlag_init;
-	this._hasChanged = false;
-}
-Row.prototype =
-{
-	clear: function() {
+	/**
+	 * @constructor
+	 */
+	function Row(worksheet) {
+		this.ws = worksheet;
 		this.index = null;
 		this.xfs = null;
 		this.h = null;
 		this.flags = g_nRowFlag_init;
 		this._hasChanged = false;
-	},
-	saveContent: function(opt_inCaseOfChange) {
+	}
+	Row.prototype.clear = function () {
+		this.index = null;
+		this.xfs = null;
+		this.h = null;
+		this.flags = g_nRowFlag_init;
+		this._hasChanged = false;
+	};
+	Row.prototype.saveContent = function (opt_inCaseOfChange) {
 		if (this.index >= 0 && (!opt_inCaseOfChange || this._hasChanged)) {
 			this._hasChanged = false;
 			var sheetMemory = this.ws.rowsData;
@@ -3443,13 +3510,13 @@ Row.prototype =
 			sheetMemory.setUint32(this.index, g_nRowOffsetXf, xfSave);
 			sheetMemory.setFloat64(this.index, g_nRowOffsetHeight, heightToSave);
 		}
-	},
-	loadContent: function(index) {
+	};
+	Row.prototype.loadContent = function (index) {
 		var res = false;
 		this.clear();
 		this.index = index;
 		var sheetMemory = this.ws.rowsData;
-		if(sheetMemory.hasSize(this.index)){
+		if (sheetMemory.hasSize(this.index)) {
 			this.flags = sheetMemory.getUint8(this.index, g_nRowOffsetFlag);
 			if (0 != (g_nRowFlag_init & this.flags)) {
 				this.xfs = g_StyleCache.getXf(sheetMemory.getUint32(this.index, g_nRowOffsetXf));
@@ -3463,239 +3530,259 @@ Row.prototype =
 			}
 		}
 		return res;
-	},
-	setChanged: function(val) {
+	};
+	Row.prototype.setChanged = function (val) {
 		this._hasChanged = val;
-	},
-	isEmpty : function()
-	{
+	};
+	Row.prototype.isEmpty = function () {
 		return this.isEmptyProp();
-	},
-	isEmptyProp : function()
-	{
+	};
+	Row.prototype.isEmptyProp = function () {
 		//todo
 		return null == this.xfs && null == this.h && g_nRowFlag_init == this.flags;
-	},
-	clone : function(oNewWs, renameParams)
-	{
-        if(!oNewWs)
-            oNewWs = this.ws;
-        var oNewRow = new Row(oNewWs);
+	};
+	Row.prototype.clone = function (oNewWs, renameParams) {
+		if (!oNewWs) {
+			oNewWs = this.ws;
+		}
+		var oNewRow = new Row(oNewWs);
 		oNewRow.index = this.index;
 		oNewRow.flags = this.flags;
-		if(null != this.xfs)
+		if (null != this.xfs) {
 			oNewRow.xfs = this.xfs;
-		if(null != this.h)
+		}
+		if (null != this.h) {
 			oNewRow.h = this.h;
+		}
 		return oNewRow;
-	},
-	copyFrom : function(row)
-	{
+	};
+	Row.prototype.copyFrom = function (row) {
 		this.flags = row.flags;
-		if(null != row.xfs)
+		if (null != row.xfs) {
 			this.xfs = row.xfs;
-		if(null != row.h)
+		}
+		if (null != row.h) {
 			this.h = row.h;
+		}
 		this._hasChanged = true;
-	},
-	getDefaultXfs : function()
-	{
+	};
+	Row.prototype.getDefaultXfs = function () {
 		var oRes = null;
-		if(null != this.ws.oAllCol && null != this.ws.oAllCol.xfs)
+		if (null != this.ws.oAllCol && null != this.ws.oAllCol.xfs) {
 			oRes = this.ws.oAllCol.xfs.clone();
+		}
 		return oRes;
-	},
-	getHeightProp : function()
-	{
+	};
+	Row.prototype.getHeightProp = function () {
 		return new AscCommonExcel.UndoRedoData_RowProp(this);
-	},
-	setHeightProp : function(prop)
-	{
-		if(null != prop)
-		{
-			if(null != prop.h)
+	};
+	Row.prototype.setHeightProp = function (prop) {
+		if (null != prop) {
+			if (null != prop.h) {
 				this.h = prop.h;
-			else
+			} else {
 				this.h = null;
+			}
 			this.setHidden(prop.hd);
 			this.setCustomHeight(prop.CustomHeight);
 		}
-	},
-	getStyle : function()
-	{
+	};
+	Row.prototype.getStyle = function () {
 		return this.xfs;
-	},
-	_getUpdateRange: function () {
-	    if (AscCommonExcel.g_nAllRowIndex == this.index)
-	        return new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-	    else
-	        return new Asc.Range(0, this.index, gc_nMaxCol0, this.index);
-	},
-	setStyle : function(xfs)
-	{
+	};
+	Row.prototype._getUpdateRange = function () {
+		if (AscCommonExcel.g_nAllRowIndex == this.index) {
+			return new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+		} else {
+			return new Asc.Range(0, this.index, gc_nMaxCol0, this.index);
+		}
+	};
+	Row.prototype.setStyle = function (xfs) {
 		var oldVal = this.xfs;
 		this.setStyleInternal(xfs);
 		if (History.Is_On() && oldVal !== this.xfs) {
-			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, this.xfs));
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, this.xfs));
 		}
-	},
-	setStyleInternal : function(xfs)
-	{
+	};
+	Row.prototype.setStyleInternal = function (xfs) {
 		this.xfs = g_StyleCache.addXf(xfs);
 		this._hasChanged = true;
-	},
-	setCellStyle : function(val)
-	{
+	};
+	Row.prototype.setCellStyle = function (val) {
 		var newVal = this.ws.workbook.CellStyles._prepareCellStyle(val);
 		var oRes = this.ws.workbook.oStyleManager.setCellStyle(this, newVal);
-		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldStyleName = this.ws.workbook.CellStyles.getStyleNameByXfId(oRes.oldVal);
-			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetCellStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldStyleName, val));
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetCellStyle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldStyleName, val));
 
 			// Выставляем стиль
 			var oStyle = this.ws.workbook.CellStyles.getStyleByXfId(oRes.newVal);
-			if (oStyle.ApplyFont)
+			if (oStyle.ApplyFont) {
 				this.setFont(oStyle.getFont());
-			if (oStyle.ApplyFill)
+			}
+			if (oStyle.ApplyFill) {
 				this.setFill(oStyle.getFill());
-			if (oStyle.ApplyBorder)
+			}
+			if (oStyle.ApplyBorder) {
 				this.setBorder(oStyle.getBorder());
-			if (oStyle.ApplyNumberFormat)
+			}
+			if (oStyle.ApplyNumberFormat) {
 				this.setNumFormat(oStyle.getNumFormatStr());
+			}
 		}
-	},
-	setNumFormat : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f:val}));
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setNum : function(val)
-	{
+	};
+	Row.prototype.setNumFormat = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f: val}));
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setNum = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
-		if(History.Is_On() && oRes.oldVal != oRes.newVal)
-			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setFont : function(val)
-    {
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setFont = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setFont(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-		{
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldVal = null;
-			if(null != oRes.oldVal)
+			if (null != oRes.oldVal) {
 				oldVal = oRes.oldVal.clone();
+			}
 			var newVal = null;
-			if(null != oRes.newVal)
+			if (null != oRes.newVal) {
 				newVal = oRes.newVal.clone();
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetFont, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+			}
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetFont, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
-	},
-	setFontname : function(val)
-	{
+	};
+	Row.prototype.setFontname = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setFontname(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fontname, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setFontsize : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFontsize(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fontsize, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setFontcolor : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFontcolor(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fontcolor, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setBold : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setBold(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Bold, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setItalic : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setItalic(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Italic, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setUnderline : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setUnderline(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Underline, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setStrikeout : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setStrikeout(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Strikeout, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setFontAlign : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFontAlign(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_FontAlign, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setAlignVertical : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setAlignVertical(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_AlignVertical, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setAlignHorizontal : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setAlignHorizontal(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_AlignHorizontal, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setFill : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setFill(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fill, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setBorder : function(val)
-	{
-		var oRes = this.ws.workbook.oStyleManager.setBorder(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-		{
-			var oldVal = null;
-			if(null != oRes.oldVal)
-				oldVal = oRes.oldVal.clone();
-			var newVal = null;
-			if(null != oRes.newVal)
-				newVal = oRes.newVal.clone();
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Border, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fontname, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 		}
-	},
-	setShrinkToFit : function(val)
-	{
+	};
+	Row.prototype.setFontsize = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFontsize(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fontsize, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setFontcolor = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFontcolor(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fontcolor, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setBold = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setBold(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Bold, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setItalic = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setItalic(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Italic, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setUnderline = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setUnderline(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Underline, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setStrikeout = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setStrikeout(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Strikeout, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setFontAlign = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFontAlign(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_FontAlign, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setAlignVertical = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setAlignVertical(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_AlignVertical, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setAlignHorizontal = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setAlignHorizontal(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_AlignHorizontal, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setFill = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setFill(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Fill, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setBorder = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setBorder(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			var oldVal = null;
+			if (null != oRes.oldVal) {
+				oldVal = oRes.oldVal.clone();
+			}
+			var newVal = null;
+			if (null != oRes.newVal) {
+				newVal = oRes.newVal.clone();
+			}
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Border, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+		}
+	};
+	Row.prototype.setShrinkToFit = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_ShrinkToFit, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-	setWrap : function(val)
-	{
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_ShrinkToFit, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setWrap = function (val) {
 		var oRes = this.ws.workbook.oStyleManager.setWrap(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-    setAngle: function(val)
-    {
-        var oRes = this.ws.workbook.oStyleManager.setAngle(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-    },
-	setVerticalText : function(val)
-	{
-        var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
-        if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
-	},
-
-	setHidden: function(val) {
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Wrap, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setAngle = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setAngle(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Angle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setVerticalText = function (val) {
+		var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
+		if (History.Is_On() && oRes.oldVal != oRes.newVal) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Angle, this.ws.getId(),
+				this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+		}
+	};
+	Row.prototype.setHidden = function (val) {
 		if (this.index >= 0 && (!this.getHidden() !== !val)) {
 			this.ws.hiddenManager.addHidden(true, this.index);
 		}
@@ -3705,39 +3792,39 @@ Row.prototype =
 			this.flags &= ~g_nRowFlag_hd;
 		}
 		this._hasChanged = true;
-	},
-	getHidden: function() {
+	};
+	Row.prototype.getHidden = function () {
 		return 0 !== (g_nRowFlag_hd & this.flags);
-	},
-	setCustomHeight: function(val) {
+	};
+	Row.prototype.setCustomHeight = function (val) {
 		if (true === val) {
 			this.flags |= g_nRowFlag_CustomHeight;
 		} else {
 			this.flags &= ~g_nRowFlag_CustomHeight;
 		}
 		this._hasChanged = true;
-	},
-	getCustomHeight: function() {
+	};
+	Row.prototype.getCustomHeight = function () {
 		return 0 != (g_nRowFlag_CustomHeight & this.flags);
-	},
-	setCalcHeight: function(val) {
+	};
+	Row.prototype.setCalcHeight = function (val) {
 		if (true === val) {
 			this.flags |= g_nRowFlag_CalcHeight;
 		} else {
 			this.flags &= ~g_nRowFlag_CalcHeight;
 		}
 		this._hasChanged = true;
-	},
-	getCalcHeight: function() {
+	};
+	Row.prototype.getCalcHeight = function () {
 		return 0 != (g_nRowFlag_CalcHeight & this.flags);
-	},
-	setIndex: function(val) {
+	};
+	Row.prototype.setIndex = function (val) {
 		this.index = val;
-	},
-	getIndex: function() {
+	};
+	Row.prototype.getIndex = function () {
 		return this.index;
-	},
-	setHeight: function(val) {
+	};
+	Row.prototype.setHeight = function (val) {
 		if (val < 0) {
 			val = 0;
 		} else if (val > Asc.c_oAscMaxRowHeight) {
@@ -3745,11 +3832,11 @@ Row.prototype =
 		}
 		this.h = val;
 		this._hasChanged = true;
-	},
-	getHeight: function() {
+	};
+	Row.prototype.getHeight = function () {
 		return this.h;
-	}
-};
+	};
+
 	function getStringFromMultiText(multiText) {
 		var sRes = "";
 		if (multiText) {
@@ -3761,7 +3848,7 @@ Row.prototype =
 			}
 		}
 		return sRes;
-	};
+	}
 	function isEqualMultiText(multiText1, multiText2) {
 		var sRes = "";
 		if (multiText1 && multiText2) {
@@ -3780,7 +3867,7 @@ Row.prototype =
 		} else {
 			return multiText1 === multiText2;
 		}
-	};
+	}
 var g_oCMultiTextElemProperties = {
 		text: 0,
 		format: 1
@@ -4333,7 +4420,6 @@ RangeDataManager.prototype = {
 	},
 	get : function(bbox)
 	{
-		var bboxRange = new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
 		var oRes = {all: [], inner: [], outer: []};
 		var oNodes = this.oIntervalTreeRB.enumerate(bbox.r1, bbox.r2);
 		for(var i = 0, length = oNodes.length; i < length; i++)
@@ -4347,7 +4433,7 @@ RangeDataManager.prototype = {
 					if(elem.bbox.isIntersect(bbox))
 					{
 						oRes.all.push(elem);
-						if(bboxRange.containsRange(elem.bbox))
+						if(bbox.containsRange(elem.bbox))
 							oRes.inner.push(elem);
 						else
 							oRes.outer.push(elem);
@@ -4455,25 +4541,25 @@ RangeDataManager.prototype = {
 	        oGetRes = this.shiftGet(bbox, bHor);
 	    var offset;
 	    if (bHor)
-	        offset = { offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 };
+	        offset = new AscCommon.CellBase(0, bbox.c2 - bbox.c1 + 1);
 	    else
-	        offset = { offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 };
+	        offset = new AscCommon.CellBase(bbox.r2 - bbox.r1 + 1, 0);
 	    if (!bAdd) {
-	        offset.offsetRow = -offset.offsetRow;
-	        offset.offsetCol = -offset.offsetCol;
+	        offset.row *= -1;
+	        offset.col *= -1;
 	    }
 	    this._shiftmove(true, bbox, offset, oGetRes.elems, oChangeParam);
 	},
 	move: function (from, to, oChangeParam)
 	{
-	    var offset = { offsetRow: to.r1 - from.r1, offsetCol: to.c1 - from.c1 };
+	    var offset = new AscCommon.CellBase(to.r1 - from.r1, to.c1 - from.c1);
 	    var oGetRes = this.get(from);
 	    this._shiftmove(false, from, offset, oGetRes, oChangeParam);
 	},
 	_shiftmove: function (bShift, bbox, offset, elems, oChangeParam) {
 	    var aToChange = [];
-	    var bAdd = offset.offsetRow > 0 || offset.offsetCol > 0;
-	    var bHor = 0 != offset.offsetCol ? true : false;
+	    var bAdd = offset.row > 0 || offset.col > 0;
+	    var bHor = 0 != offset.col ? true : false;
 	    //сдвигаем inner
 	    if (elems.inner.length > 0) {
 	        var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
@@ -4490,11 +4576,11 @@ RangeDataManager.prototype = {
 	                    to = from.clone();
 	                    if (bHor) {
 	                        if (to.c1 <= bbox.c2)
-	                            to.setOffsetFirst({ offsetRow: 0, offsetCol: bbox.c2 - to.c1 + 1 });
+	                            to.setOffsetFirst(new AscCommon.CellBase(0,  bbox.c2 - to.c1 + 1));
 	                    }
 	                    else {
 	                        if (to.r1 <= bbox.r2)
-	                            to.setOffsetFirst({ offsetRow: bbox.r2 - to.r1 + 1, offsetCol: 0 });
+	                            to.setOffsetFirst(new AscCommon.CellBase(bbox.r2 - to.r1 + 1, 0));
 	                    }
 	                    to.setOffset(offset);
 	                }
@@ -4517,13 +4603,13 @@ RangeDataManager.prototype = {
 	                    if (from.c1 < bbox.c1 && bbox.r1 <= from.r1 && from.r2 <= bbox.r2) {
 	                        if (bAdd) {
 	                            to = from.clone();
-	                            to.setOffsetLast({ offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 });
+	                            to.setOffsetLast(new AscCommon.CellBase(0, bbox.c2 - bbox.c1 + 1));
 	                        }
 	                        else {
 	                            to = from.clone();
 	                            var nTemp1 = from.c2 - bbox.c1 + 1;
 	                            var nTemp2 = bbox.c2 - bbox.c1 + 1;
-	                            to.setOffsetLast({ offsetRow: 0, offsetCol: -Math.min(nTemp1, nTemp2) });
+	                            to.setOffsetLast(new AscCommon.CellBase(0, -Math.min(nTemp1, nTemp2)));
 	                        }
 	                    }
 	                }
@@ -4531,13 +4617,13 @@ RangeDataManager.prototype = {
 	                    if (from.r1 < bbox.r1 && bbox.c1 <= from.c1 && from.c2 <= bbox.c2) {
 	                        if (bAdd) {
 	                            to = from.clone();
-	                            to.setOffsetLast({ offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 });
+	                            to.setOffsetLast(new AscCommon.CellBase(bbox.r2 - bbox.r1 + 1, 0));
 	                        }
 	                        else {
 	                            to = from.clone();
 	                            var nTemp1 = from.r2 - bbox.r1 + 1;
 	                            var nTemp2 = bbox.r2 - bbox.r1 + 1;
-	                            to.setOffsetLast({ offsetRow: -Math.min(nTemp1, nTemp2), offsetCol: 0 });
+	                            to.setOffsetLast(new AscCommon.CellBase(-Math.min(nTemp1, nTemp2), 0));
 	                        }
 	                    }
 	                }
@@ -5297,7 +5383,7 @@ RangeDataManager.prototype = {
 	};
 	TablePart.prototype.moveRef = function (col, row) {
 		var ref = this.Ref.clone();
-		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 
 		this.Ref = ref;
 		//event
@@ -5312,10 +5398,11 @@ RangeDataManager.prototype = {
 	};
 	TablePart.prototype.changeRef = function (col, row, bIsFirst, bIsNotChangeAutoFilter) {
 		var ref = this.Ref.clone();
+		var offset = new AscCommon.CellBase(row || 0, col || 0);
 		if (bIsFirst) {
-			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetFirst(offset);
 		} else {
-			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetLast(offset);
 		}
 
 		this.Ref = ref;
@@ -5411,11 +5498,11 @@ RangeDataManager.prototype = {
 		}
 
 		var diff = null, startCol;
-		if (activeRange.c1 < this.Ref.c1 && activeRange.c2 > this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
+		if (activeRange.c1 < this.Ref.c1 && activeRange.c2 >= this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
 		{
 			diff = activeRange.c2 - this.Ref.c1 + 1;
 			startCol = 0;
-		} else if (activeRange.c1 < this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
+		} else if (activeRange.c1 <= this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
 		{
 			diff = this.Ref.c2 - activeRange.c1 + 1;
 			startCol = activeRange.c1 - this.Ref.c1;
@@ -5744,7 +5831,7 @@ RangeDataManager.prototype = {
 	};
 	AutoFilter.prototype.moveRef = function (col, row) {
 		var ref = this.Ref.clone();
-		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 
 		if (this.SortState) {
 			this.SortState.moveRef(col, row);
@@ -5754,10 +5841,11 @@ RangeDataManager.prototype = {
 	};
 	AutoFilter.prototype.changeRef = function (col, row, bIsFirst) {
 		var ref = this.Ref.clone();
+		var offset = new AscCommon.CellBase(row || 0, col || 0);
 		if (bIsFirst) {
-			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetFirst(offset);
 		} else {
-			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetLast(offset);
 		}
 
 		this.Ref = ref;
@@ -5943,7 +6031,7 @@ RangeDataManager.prototype = {
 				var colId = filterColumns[j].ColId;
 				if (colId !== cellId) {
 					var cell = worksheet.getCell3(row, colId + col);
-					var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+					var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat() && cell.getType() === window["AscCommon"].CellValueType.Number;
 
 					var isNumberFilter = filterColumns[j].isApplyCustomFilter();
 					var val = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
@@ -5983,7 +6071,7 @@ RangeDataManager.prototype = {
 			} else {
 				if (!isHidden) {
 					var cell = worksheet.getCell3(i, colId + this.Ref.c1);
-					var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+					var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat() && cell.getType() === window["AscCommon"].CellValueType.Number;
 					var isNumberFilter = false;
 					if (newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 || newFilterColumn.DynamicFilter) {
 						isNumberFilter = true;
@@ -6074,7 +6162,7 @@ RangeDataManager.prototype = {
 
 	SortState.prototype.moveRef = function (col, row) {
 		var ref = this.Ref.clone();
-		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 
 		this.Ref = ref;
 
@@ -6087,10 +6175,11 @@ RangeDataManager.prototype = {
 
 	SortState.prototype.changeRef = function (col, row, bIsFirst) {
 		var ref = this.Ref.clone();
+		var offset = new AscCommon.CellBase(row || 0, col || 0);
 		if (bIsFirst) {
-			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetFirst(offset);
 		} else {
-			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetLast(offset);
 		}
 
 		this.Ref = ref;
@@ -6124,11 +6213,6 @@ RangeDataManager.prototype = {
 	}
 
 	TableColumn.prototype.onFormulaEvent = function (type, eventData) {
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			this.TotalsRowFormula.setIsDirty(false);
-		}
 	};
 	TableColumn.prototype.renameSheetCopy = function (ws, renameParams) {
 		if (this.TotalsRowFormula) {
@@ -6160,7 +6244,7 @@ RangeDataManager.prototype = {
 		res.TotalsRowFunction = this.TotalsRowFunction;
 
 		if (this.TotalsRowFormula) {
-			res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+		res.applyTotalRowFormula(this.TotalsRowFormula.getFormula(), this.TotalsRowFormula.ws, false);
 		}
 		if (this.dxf) {
 			res.dxf = this.dxf.clone;
@@ -6873,12 +6957,22 @@ CustomFilter.prototype.isHideValue = function(val) {
 		var trimVal = "string" === typeof(val) ? window["Asc"].trim(val) : val;
 		var trimFilterVal = "string" === typeof(filterVal) ? window["Asc"].trim(filterVal) : filterVal;
 
+
+		var matchingValues = function(val1, val2, op) {
+			var matchingInfo = AscCommonExcel.matchingValue(new AscCommonExcel.cString(val1));
+			if(op) {
+				matchingInfo.op = op;
+			}
+			return AscCommonExcel.matching(new AscCommonExcel.cString(val2), matchingInfo);
+		};
+
 		switch (this.Operator)
 		{
 			case c_oAscCustomAutoFilter.equals://equals
 			{
-				if(trimVal === trimFilterVal)
-				{
+				if(!isDigitValue) {
+					result = matchingValues(trimFilterVal, trimVal);
+				} else if(trimVal === trimFilterVal) {
 					result = true;
 				}
 				
@@ -6886,8 +6980,9 @@ CustomFilter.prototype.isHideValue = function(val) {
 			}
 			case c_oAscCustomAutoFilter.doesNotEqual://doesNotEqual
 			{
-				if(trimVal !== trimFilterVal)
-				{
+				if(!isDigitValue) {
+					result = matchingValues(trimFilterVal, trimVal, "<>");
+				} else if(trimVal !== trimFilterVal) {
 					result = true;
 				}
 					
@@ -7441,7 +7536,7 @@ SortCondition.prototype.clone = function() {
 };
 SortCondition.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
-	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 	
 	this.Ref = ref;
 };
@@ -7471,7 +7566,7 @@ SortCondition.prototype.changeColumns = function(activeRange, isDelete) {
 	
 	if(null !== offsetCol)
 	{
-		ref.setOffset({offsetCol: offsetCol, offsetRow: 0});
+		ref.setOffset(new AscCommon.CellBase(0, offsetCol));
 		this.Ref = ref;
 	}
 	
@@ -7550,7 +7645,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	{
 		case 1://day
 		{
-			date = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day));
+			date = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day));
 			startDate = date.getExcelDateWithTime();
 			date.addDays(1)
 			endDate = date.getExcelDateWithTime();
@@ -7558,19 +7653,19 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 		}
 		case 2://hour
 		{
-			startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 1)).getExcelDateWithTime();
-			endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 59)).getExcelDateWithTime();
+			startDate = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 1)).getExcelDateWithTime();
+			endDate = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, 59)).getExcelDateWithTime();
 			break;
 		}
 		case 3://minute
 		{
-			startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 1)).getExcelDateWithTime();
-			endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 59)).getExcelDateWithTime();
+			startDate = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 1)).getExcelDateWithTime();
+			endDate = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Minute, 59)).getExcelDateWithTime();
 			break;
 		}
 		case 4://month
 		{
-			date = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, 1));
+			date = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, 1));
 			startDate = date.getExcelDateWithTime();
 			date.addMonths(1)
 			endDate = date.getExcelDateWithTime();
@@ -7578,13 +7673,13 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 		}
 		case 5://second
 		{
-			startDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second)).getExcelDateWithTime();
-			endDate = new Date(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second )).getExcelDateWithTime();
+			startDate = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second)).getExcelDateWithTime();
+			endDate = new cDate(Date.UTC( oDateGroupItem.Year, oDateGroupItem.Month - 1, oDateGroupItem.Day, oDateGroupItem.Hour, oDateGroupItem.Second )).getExcelDateWithTime();
 			break;
 		}
 		case 6://year
 		{
-			date = new Date(Date.UTC( oDateGroupItem.Year, 0));
+			date = new cDate(Date.UTC( oDateGroupItem.Year, 0));
 			startDate = date.getExcelDateWithTime();
 			date.addYears(1)
 			endDate = date.getExcelDateWithTime();
@@ -7707,6 +7802,246 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 		return this.all.length;
 	};
 
+
+	/** @constructor */
+	function asc_CPageMargins (ws) {
+		this.left = null;
+		this.right = null;
+		this.top = null;
+		this.bottom = null;
+
+		this.ws = ws;
+
+		return this;
+	}
+	asc_CPageMargins.prototype.init = function () {
+		if (null == this.left)
+			this.left = c_oAscPrintDefaultSettings.PageLeftField;
+		if (null == this.top)
+			this.top = c_oAscPrintDefaultSettings.PageTopField;
+		if (null == this.right)
+			this.right = c_oAscPrintDefaultSettings.PageRightField;
+		if (null == this.bottom)
+			this.bottom = c_oAscPrintDefaultSettings.PageBottomField;
+	};
+	asc_CPageMargins.prototype.asc_getLeft = function () { return this.left; };
+	asc_CPageMargins.prototype.asc_getRight = function () { return this.right; };
+	asc_CPageMargins.prototype.asc_getTop = function () { return this.top; };
+	asc_CPageMargins.prototype.asc_getBottom = function () { return this.bottom; };
+
+	asc_CPageMargins.prototype.asc_setLeft = function (newVal) {
+		var oldVal = this.left;
+		this.left = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.left) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Left, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageMargins.prototype.asc_setRight = function (newVal) {
+		var oldVal = this.right;
+		this.right = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.right) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Right, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageMargins.prototype.asc_setTop = function (newVal) {
+		var oldVal = this.top;
+		this.top = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.top) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Top, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageMargins.prototype.asc_setBottom = function (newVal) {
+		var oldVal = this.bottom;
+		this.bottom = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.bottom) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Bottom, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageMargins.prototype.asc_setOptions = function (obj) {
+		var prop;
+		prop = obj.asc_getLeft();
+		if(prop !== this.asc_getLeft()) {
+			this.asc_setLeft(prop);
+		}
+		prop = obj.asc_getRight();
+		if(prop !== this.asc_getRight()) {
+			this.asc_setRight(prop);
+		}
+		prop = obj.asc_getBottom();
+		if(prop !== this.asc_getBottom()) {
+			this.asc_setBottom(prop);
+		}
+		prop = obj.asc_getTop();
+		if(prop !== this.asc_getTop()) {
+			this.asc_setTop(prop);
+		}
+	};
+
+	/** @constructor */
+	function asc_CPageSetup(ws) {
+		this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
+		this.width = c_oAscPrintDefaultSettings.PageWidth;
+		this.height = c_oAscPrintDefaultSettings.PageHeight;
+
+		this.fitToWidth = false; //ToDo can be a number
+		this.fitToHeight = false; //ToDo can be a number
+
+		// ToDo
+		this.blackAndWhite = false;
+		this.cellComments = 0; // none ST_CellComments
+		this.copies = 1;
+		this.draft = false;
+		this.errors = 0; // displayed ST_PrintError
+		this.firstPageNumber = -1;
+		this.pageOrder = 0; // downThenOver ST_PageOrder
+		this.scale = 100;
+		this.useFirstPageNumber = false;
+		this.usePrinterDefaults = true;
+
+		this.ws = ws;
+
+		return this;
+	}
+	asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
+	asc_CPageSetup.prototype.asc_getWidth = function () { return this.width; };
+	asc_CPageSetup.prototype.asc_getHeight = function () { return this.height; };
+
+	asc_CPageSetup.prototype.asc_setOrientation = function (newVal) {
+		var oldVal = this.orientation;
+		this.orientation = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.orientation) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Orientation, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageSetup.prototype.asc_setWidth = function (newVal) {
+		var oldVal = this.width;
+		this.width = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.width) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Width, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageSetup.prototype.asc_setHeight = function (newVal) {
+		var oldVal = this.height;
+		this.height = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.height) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Height, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+
+	asc_CPageSetup.prototype.asc_getFitToWidth = function () { return this.fitToWidth; };
+	asc_CPageSetup.prototype.asc_getFitToHeight = function () { return this.fitToHeight; };
+
+	asc_CPageSetup.prototype.asc_setFitToWidth = function (newVal) {
+		var oldVal = this.fitToWidth;
+		this.fitToWidth = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.fitToWidth) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_FitToWidth, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageSetup.prototype.asc_setFitToHeight = function (newVal) {
+		var oldVal = this.fitToHeight;
+		this.fitToHeight = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.fitToHeight) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_FitToHeight, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageSetup.prototype.asc_setOptions = function (obj) {
+
+		var prop;
+		prop = obj.asc_getOrientation();
+		if(prop !== this.asc_getOrientation()) {
+			this.asc_setOrientation(prop);
+		}
+		prop = obj.asc_getWidth();
+		if(prop !== this.asc_getWidth()) {
+			this.asc_setWidth(prop);
+		}
+		prop = obj.asc_getHeight();
+		if(prop !== this.asc_getHeight()) {
+			this.asc_setHeight(prop);
+		}
+		prop = obj.asc_getHeight();
+		if(prop !== this.asc_getHeight()) {
+			this.asc_setHeight(prop);
+		}
+		prop = obj.asc_getFitToWidth();
+		if(prop !== this.asc_getFitToWidth()) {
+			this.asc_setFitToWidth(prop);
+		}
+		prop = obj.asc_getFitToHeight();
+		if(prop !== this.asc_getFitToHeight()) {
+			this.asc_setFitToHeight(prop);
+		}
+	};
+
+	/** @constructor */
+	//этот объект используется как в модели, так и в меню для передачи измененных опций page layout
+	//если определена ws - это означает, что этот объект лежит в модели и при изменении его свойств идёт запись в историю
+	//в противном случае запись в историю не происходит
+	function asc_CPageOptions(ws) {
+		this.pageMargins = new asc_CPageMargins(ws);
+		this.pageSetup = new asc_CPageSetup(ws);
+		this.gridLines = null;
+		this.headings = null;
+		this.ws = ws;
+
+		return this;
+	}
+	asc_CPageOptions.prototype.init = function () {
+		this.pageMargins.init();
+
+		if (null == this.gridLines)
+			this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
+		if (null == this.headings)
+			this.headings = c_oAscPrintDefaultSettings.PageHeadings;
+	};
+	asc_CPageOptions.prototype.asc_getPageMargins = function () { return this.pageMargins; };
+	asc_CPageOptions.prototype.asc_getPageSetup = function () { return this.pageSetup; };
+	asc_CPageOptions.prototype.asc_getGridLines = function () { return this.gridLines; };
+	asc_CPageOptions.prototype.asc_getHeadings = function () { return this.headings; };
+	//методы только для меню, без добавляем в историю
+	asc_CPageOptions.prototype.asc_setPageMargins = function (val) { this.pageMargins = val; };
+	asc_CPageOptions.prototype.asc_setPageSetup = function (val) { this.pageSetup = val; };
+
+	asc_CPageOptions.prototype.asc_setGridLines = function (newVal) {
+		var oldVal = this.gridLines;
+		this.gridLines = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.gridLines) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_GridLines, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageOptions.prototype.asc_setHeadings = function (newVal) {
+		var oldVal = this.headings;
+		this.headings = newVal;
+		if (this.ws && History.Is_On() && oldVal !== this.headings) {
+			History.Add(AscCommonExcel.g_oUndoRedoLayout, AscCH.historyitem_Layout_Headings, this.ws.getId(),
+				null, new UndoRedoData_Layout(oldVal, newVal));
+		}
+	};
+	asc_CPageOptions.prototype.asc_setOptions = function (obj) {
+		var gridLines = obj.asc_getGridLines();
+		if(gridLines !== this.asc_getGridLines()) {
+			this.asc_setGridLines(gridLines);
+		}
+		var heading = obj.asc_getHeadings();
+		if(gridLines !== this.asc_getHeadings()) {
+			this.asc_setHeadings(heading);
+		}
+
+		this.asc_getPageMargins().asc_setOptions(obj.asc_getPageMargins());
+		this.asc_getPageSetup().asc_setOptions(obj.asc_getPageSetup());
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	var prot;
 	window['Asc'] = window['Asc'] || {};
@@ -7815,56 +8150,92 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
 
-window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
-prot									= CustomFilters.prototype;
-prot["asc_getAnd"]						= prot.asc_getAnd;
-prot["asc_getCustomFilters"]			= prot.asc_getCustomFilters;
-prot["asc_setAnd"]						= prot.asc_setAnd;
-prot["asc_setCustomFilters"]			= prot.asc_setCustomFilters;
+	window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
+	prot									= CustomFilters.prototype;
+	prot["asc_getAnd"]						= prot.asc_getAnd;
+	prot["asc_getCustomFilters"]			= prot.asc_getCustomFilters;
+	prot["asc_setAnd"]						= prot.asc_setAnd;
+	prot["asc_setCustomFilters"]			= prot.asc_setCustomFilters;
 
-window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
-prot									= CustomFilter.prototype;
-prot["asc_getOperator"]					= prot.asc_getOperator;
-prot["asc_getVal"]						= prot.asc_getVal;
-prot["asc_setOperator"]					= prot.asc_setOperator;
-prot["asc_setVal"]						= prot.asc_setVal;
+	window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
+	prot									= CustomFilter.prototype;
+	prot["asc_getOperator"]					= prot.asc_getOperator;
+	prot["asc_getVal"]						= prot.asc_getVal;
+	prot["asc_setOperator"]					= prot.asc_setOperator;
+	prot["asc_setVal"]						= prot.asc_setVal;
 
-window["Asc"]["DynamicFilter"]			= window["Asc"].DynamicFilter = DynamicFilter;
-prot									= DynamicFilter.prototype;
-prot["asc_getType"]						= prot.asc_getType;
-prot["asc_getVal"]						= prot.asc_getVal;
-prot["asc_getMaxVal"]					= prot.asc_getMaxVal;
-prot["asc_setType"]						= prot.asc_setType;
-prot["asc_setVal"]						= prot.asc_setVal;
-prot["asc_setMaxVal"]					= prot.asc_setMaxVal;
+	window["Asc"]["DynamicFilter"]			= window["Asc"].DynamicFilter = DynamicFilter;
+	prot									= DynamicFilter.prototype;
+	prot["asc_getType"]						= prot.asc_getType;
+	prot["asc_getVal"]						= prot.asc_getVal;
+	prot["asc_getMaxVal"]					= prot.asc_getMaxVal;
+	prot["asc_setType"]						= prot.asc_setType;
+	prot["asc_setVal"]						= prot.asc_setVal;
+	prot["asc_setMaxVal"]					= prot.asc_setMaxVal;
 
-window["Asc"]["ColorFilter"]			= window["Asc"].ColorFilter = ColorFilter;
-prot									= ColorFilter.prototype;
-prot["asc_getCellColor"]				= prot.asc_getCellColor;
-prot["asc_getCColor"]					= prot.asc_getCColor;
-prot["asc_getDxf"]						= prot.asc_getDxf;
-prot["asc_setCellColor"]				= prot.asc_setCellColor;
-prot["asc_setDxf"]						= prot.asc_setDxf;
-prot["asc_setCColor"]					= prot.asc_setCColor;
+	window["Asc"]["ColorFilter"]			= window["Asc"].ColorFilter = ColorFilter;
+	prot									= ColorFilter.prototype;
+	prot["asc_getCellColor"]				= prot.asc_getCellColor;
+	prot["asc_getCColor"]					= prot.asc_getCColor;
+	prot["asc_getDxf"]						= prot.asc_getDxf;
+	prot["asc_setCellColor"]				= prot.asc_setCellColor;
+	prot["asc_setDxf"]						= prot.asc_setDxf;
+	prot["asc_setCColor"]					= prot.asc_setCColor;
 
-window["Asc"]["Top10"]					= window["Asc"].Top10 = Top10;
-prot									= Top10.prototype;
-prot["asc_getFilterVal"]				= prot.asc_getFilterVal;
-prot["asc_getPercent"]					= prot.asc_getPercent;
-prot["asc_getTop"]						= prot.asc_getTop;
-prot["asc_getVal"]						= prot.asc_getVal;
-prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
-prot["asc_setPercent"]					= prot.asc_setPercent;
-prot["asc_setTop"]						= prot.asc_setTop;
-prot["asc_setVal"]						= prot.asc_setVal;
+	window["Asc"]["Top10"]					= window["Asc"].Top10 = Top10;
+	prot									= Top10.prototype;
+	prot["asc_getFilterVal"]				= prot.asc_getFilterVal;
+	prot["asc_getPercent"]					= prot.asc_getPercent;
+	prot["asc_getTop"]						= prot.asc_getTop;
+	prot["asc_getVal"]						= prot.asc_getVal;
+	prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
+	prot["asc_setPercent"]					= prot.asc_setPercent;
+	prot["asc_setTop"]						= prot.asc_setTop;
+	prot["asc_setVal"]						= prot.asc_setVal;
 
-window["Asc"]["TreeRBNode"]			= window["Asc"].TreeRBNode = TreeRBNode;
-window["Asc"]["TreeRB"]			= window["Asc"].TreeRB = TreeRB;
-prot									= TreeRB.prototype;
-prot["insertOrGet"]						= prot.insertOrGet;
-prot["deleteNode"]			= prot.deleteNode;
-prot["enumerate"]						= prot.enumerate;
-prot["getElem"]			= prot.getElem;
-prot["getNodeAll"]			= prot.getNodeAll;
-prot["isEmpty"]			= prot.getNodeAll;
+	window["Asc"]["TreeRBNode"]			= window["Asc"].TreeRBNode = TreeRBNode;
+	window["Asc"]["TreeRB"]			= window["Asc"].TreeRB = TreeRB;
+	prot									= TreeRB.prototype;
+	prot["insertOrGet"]						= prot.insertOrGet;
+	prot["deleteNode"]			= prot.deleteNode;
+	prot["enumerate"]						= prot.enumerate;
+	prot["getElem"]			= prot.getElem;
+	prot["getNodeAll"]			= prot.getNodeAll;
+	prot["isEmpty"]			= prot.getNodeAll;
+
+
+	window["Asc"]["asc_CPageMargins"] = window["Asc"].asc_CPageMargins = asc_CPageMargins;
+	prot = asc_CPageMargins.prototype;
+	prot["asc_getLeft"] = prot.asc_getLeft;
+	prot["asc_getRight"] = prot.asc_getRight;
+	prot["asc_getTop"] = prot.asc_getTop;
+	prot["asc_getBottom"] = prot.asc_getBottom;
+	prot["asc_setLeft"] = prot.asc_setLeft;
+	prot["asc_setRight"] = prot.asc_setRight;
+	prot["asc_setTop"] = prot.asc_setTop;
+	prot["asc_setBottom"] = prot.asc_setBottom;
+
+	window["Asc"]["asc_CPageSetup"] = window["Asc"].asc_CPageSetup = asc_CPageSetup;
+	prot = asc_CPageSetup.prototype;
+	prot["asc_getOrientation"] = prot.asc_getOrientation;
+	prot["asc_getWidth"] = prot.asc_getWidth;
+	prot["asc_getHeight"] = prot.asc_getHeight;
+	prot["asc_setOrientation"] = prot.asc_setOrientation;
+	prot["asc_setWidth"] = prot.asc_setWidth;
+	prot["asc_setHeight"] = prot.asc_setHeight;
+	prot["asc_getFitToWidth"] = prot.asc_getFitToWidth;
+	prot["asc_getFitToHeight"] = prot.asc_getFitToHeight;
+	prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
+	prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
+
+	window["Asc"]["asc_CPageOptions"] = window["Asc"].asc_CPageOptions = asc_CPageOptions;
+	prot = asc_CPageOptions.prototype;
+	prot["asc_getPageMargins"] = prot.asc_getPageMargins;
+	prot["asc_getPageSetup"] = prot.asc_getPageSetup;
+	prot["asc_getGridLines"] = prot.asc_getGridLines;
+	prot["asc_getHeadings"] = prot.asc_getHeadings;
+	prot["asc_setPageMargins"] = prot.asc_setPageMargins;
+	prot["asc_setPageSetup"] = prot.asc_setPageSetup;
+	prot["asc_setGridLines"] = prot.asc_setGridLines;
+	prot["asc_setHeadings"] = prot.asc_setHeadings;
 })(window);

@@ -407,6 +407,9 @@
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
 				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY + this.TargetOffsetY);
 			}
+
+            if (window.g_asc_plugins)
+                window.g_asc_plugins.onPluginEvent("onTargetPositionChanged");
 		},
 
 		emulateKeyDownApi : function(code)
@@ -747,7 +750,20 @@
 					{
 						// китайская точка
 						AscCommon.stopEvent(e);
-						this.clear();
+
+						if (AscCommon.AscBrowser.isIE && !AscCommon.AscBrowser.isIeEdge)
+						{
+							// ie тепряет фокус
+							setTimeout(function(){
+                                window['AscCommon'].g_inputContext.clear();
+                                window['AscCommon'].g_inputContext.HtmlArea.focus();
+							}, 0);
+						}
+						else
+						{
+							this.clear();
+						}
+
 						return false;
 					}
 				}

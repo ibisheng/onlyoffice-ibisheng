@@ -663,6 +663,26 @@
         }
     };
 
+    CGraphicObjectBase.prototype.getPlaceholderType = function()
+    {
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.getPlaceholderIndex = function()
+    {
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.getPhType = function()
+    {
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.getPhIndex = function()
+    {
+        return null;
+    };
+
 
 
     CGraphicObjectBase.prototype.checkDrawingBaseCoords = function()
@@ -916,6 +936,9 @@
         if(this.rectGeometry){
             _geom = this.rectGeometry;
         }
+        else if(this.calcGeometry){
+            _geom = this.calcGeometry;
+        }
         else if(this.spPr && this.spPr.geometry){
             _geom = this.spPr.geometry;
         }
@@ -959,6 +982,9 @@
             return this;
         }
         return null;
+    };
+    CGraphicObjectBase.prototype.getAllDocContents = function(aDrawings){
+
     };
 
 

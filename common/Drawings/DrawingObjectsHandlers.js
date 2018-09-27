@@ -53,6 +53,8 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
 {
     var selected_objects = group ? group.selectedObjects : drawingObjectsController.getSelectedObjects();
     var tx, ty, t;
+    var ret = null;
+    var drawing = null;
     if(selected_objects.length === 1)
     {
         if(bWord && pageIndex !== selected_objects[0].selectStartPage)
@@ -69,67 +71,106 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
         var hit_to_adj = selected_objects[0].hitToAdjustment(tx, ty);
         if(hit_to_adj.hit)
         {
-            return drawingObjectsController.handleAdjustmentHit(hit_to_adj, selected_objects[0], group, pageIndex);
+            ret = drawingObjectsController.handleAdjustmentHit(hit_to_adj, selected_objects[0], group, pageIndex);
+            drawing = selected_objects[0];
         }
     }
 
-    for(var i = selected_objects.length - 1; i > -1; --i)
+    if(!ret)
     {
-        if(bWord && pageIndex !== selected_objects[i].selectStartPage)
+        for(var i = selected_objects.length - 1; i > -1; --i)
         {
-            t = drawingObjectsController.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, selected_objects[i].selectStartPage);
-            tx = t.X;
-            ty = t.Y;
-        }
-        else
-        {
-            tx = x;
-            ty = y;
-        }
-
-        if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
-        {
-            var oRet = handleInternalChart(selected_objects[i], drawingObjectsController, e, x, y, group, pageIndex, bWord);
-            if(oRet){
-                return oRet;
+            if(bWord && pageIndex !== selected_objects[i].selectStartPage)
+            {
+                t = drawingObjectsController.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, selected_objects[i].selectStartPage);
+                tx = t.X;
+                ty = t.Y;
             }
-        }
-        var hit_to_handles = selected_objects[i].hitToHandles(tx, ty);
-        if(hit_to_handles > -1)
-        {
-            return drawingObjectsController.handleHandleHit(hit_to_handles, selected_objects[i], group);
-        }
-    }
-
-    for(i = selected_objects.length - 1; i > -1; --i)
-    {
-        if(bWord && pageIndex !== selected_objects[i].selectStartPage)
-        {
-            t = drawingObjectsController.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, selected_objects[i].selectStartPage);
-            tx = t.X;
-            ty = t.Y;
-        }
-        else
-        {
-            tx = x;
-            ty = y;
-        }
-        if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
-        {
-            var oRet = handleInternalChart(selected_objects[i], drawingObjectsController, e, x, y, group, pageIndex, bWord);
-            if(oRet){
-                return oRet;
-            }
-        }
-        if(selected_objects[i].hitInBoundingRect(tx, ty) /*&& (!selected_objects[i].hitInTextRect || !selected_objects[i].hitInTextRect(tx, ty))*/)
-        {
-            if(bWord && selected_objects[i].parent && selected_objects[i].parent.Is_Inline())
-                return handleInlineHitNoText(selected_objects[i], drawingObjectsController, e, tx, ty, pageIndex, true);
             else
-                return drawingObjectsController.handleMoveHit(selected_objects[i], e, tx, ty, group, true, selected_objects[i].selectStartPage, true);
+            {
+                tx = x;
+                ty = y;
+            }
+
+            if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
+            {
+                ret = handleInternalChart(selected_objects[i], drawingObjectsController, e, tx, ty, group, pageIndex, bWord);
+                if(ret)
+                {
+                    drawing = selected_objects[i];
+                    break;
+                }
+            }
+            if(!ret)
+            {
+                var hit_to_handles = selected_objects[i].hitToHandles(tx, ty);
+                if(hit_to_handles > -1)
+                {
+                    ret = drawingObjectsController.handleHandleHit(hit_to_handles, selected_objects[i], group);
+                    drawing = selected_objects[i];
+                    break;
+                }
+            }
         }
     }
-    return false;
+
+    if(!ret)
+    {
+        for(i = selected_objects.length - 1; i > -1; --i)
+        {
+            if(bWord && pageIndex !== selected_objects[i].selectStartPage)
+            {
+                t = drawingObjectsController.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, selected_objects[i].selectStartPage);
+                tx = t.X;
+                ty = t.Y;
+            }
+            else
+            {
+                tx = x;
+                ty = y;
+            }
+            if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
+            {
+                ret = handleInternalChart(selected_objects[i], drawingObjectsController, e, tx, ty, group, pageIndex, bWord);
+                drawing = selected_objects[i];
+            }
+            if(!ret)
+            {
+                if(selected_objects[i].hitInBoundingRect(tx, ty) /*&& (!selected_objects[i].hitInTextRect || !selected_objects[i].hitInTextRect(tx, ty))*/)
+                {
+                    if(bWord && selected_objects[i].parent && selected_objects[i].parent.Is_Inline())
+                        ret = handleInlineHitNoText(selected_objects[i], drawingObjectsController, e, tx, ty, pageIndex, true);
+                    else
+                        ret = drawingObjectsController.handleMoveHit(selected_objects[i], e, tx, ty, group, true, selected_objects[i].selectStartPage, true);
+
+                }
+            }
+            if(ret)
+            {
+                drawing = selected_objects[i];
+                break;
+            }
+        }
+    }
+    if(ret && drawing)
+    {
+        if(drawingObjectsController.handleEventMode === AscFormat.HANDLE_EVENT_MODE_CURSOR  && drawingObjectsController &&
+            drawingObjectsController.drawingObjects && drawingObjectsController.drawingObjects.cSld)
+        {
+            if(drawing.Lock.Is_Locked())
+            {
+                var MMData              = new AscCommon.CMouseMoveData();
+                var Coords              =  drawingObjectsController.getDrawingDocument().ConvertCoordsToCursorWR(drawing.bounds.x, drawing.bounds.y, pageIndex, null);
+                MMData.X_abs            = Coords.X - 5;
+                MMData.Y_abs            = Coords.Y;
+                MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
+                MMData.UserId           = drawing.Lock.Get_UserId();
+                MMData.HaveChanges      = drawing.Lock.Have_Changes();
+                editor.sync_MouseMoveCallback(MMData);
+            }
+        }
+    }
+    return ret;
 }
 
 
@@ -147,39 +188,43 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
             case AscDFH.historyitem_type_Cnx:
             {
                 ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
-                if(ret)
-                {
-                    return ret;
-                }
                 break;
             }
             case AscDFH.historyitem_type_ChartSpace:
             {
                 ret = handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
-                if(ret)
-                {
-                    return ret;
-                }
                 break;
             }
             case AscDFH.historyitem_type_GroupShape:
             {
                 ret = handleGroup(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
-                if(ret)
-                {
-                    return ret;
-                }
                 break;
             }
             case AscDFH.historyitem_type_GraphicFrame:
             {
                 ret = handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pageIndex);
-                if(ret)
-                {
-                    return ret;
-                }
                 break;
             }
+        }
+
+        if(ret)
+        {
+            if(drawingObjectsController.handleEventMode === AscFormat.HANDLE_EVENT_MODE_CURSOR  && drawingObjectsController &&
+                drawingObjectsController.drawingObjects && drawingObjectsController.drawingObjects.cSld)
+            {
+                if(drawing.Lock.Is_Locked())
+                {
+                    var MMData              = new AscCommon.CMouseMoveData();
+                    var Coords              =  drawingObjectsController.getDrawingDocument().ConvertCoordsToCursorWR(drawing.bounds.x, drawing.bounds.y, pageIndex, null);
+                    MMData.X_abs            = Coords.X - 5;
+                    MMData.Y_abs            = Coords.Y;
+                    MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
+                    MMData.UserId           = drawing.Lock.Get_UserId();
+                    MMData.HaveChanges      = drawing.Lock.Have_Changes();
+                    editor.sync_MouseMoveCallback(MMData);
+                }
+            }
+            return ret;
         }
     }
     return ret;
@@ -432,42 +477,36 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         }
 
         var oLabels;
-        var arrLabels = [];
-        if(drawing.chart.plotArea.catAx && drawing.chart.plotArea.catAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            arrLabels.push(drawing.chart.plotArea.catAx.labels);
-        }
-        if(drawing.chart.plotArea.valAx && drawing.chart.plotArea.valAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            arrLabels.push(drawing.chart.plotArea.valAx.labels);
-        }
-        for(var i = 0; i < arrLabels.length; ++i)
-        {
-            oLabels = arrLabels[i];
-            if(oLabels.hit(x, y))
-            {
-                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        var aAxes = drawing.chart.plotArea.axId;
+        for(var i = 0; i < aAxes.length; ++i){
+            if(aAxes[i].labels){
+                oLabels = aAxes[i].labels;
+                if(oLabels.hit(x, y))
                 {
-                    drawingObjectsController.checkChartTextSelection();
-                    selector.resetSelection();
-                    selector.selectObject(drawing, pageIndex);
-                    selector.selection.chartSelection = drawing;
-                    drawing.selection.axisLbls = oLabels.axis;
-                    drawingObjectsController.updateSelectionState();
-                    drawingObjectsController.updateOverlay();
-                    return true;
-                }
-                else
-                {
-                    return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                    if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                    {
+                        drawingObjectsController.checkChartTextSelection();
+                        selector.resetSelection();
+                        selector.selectObject(drawing, pageIndex);
+                        selector.selection.chartSelection = drawing;
+                        drawing.selection.axisLbls = oLabels.axis;
+                        drawingObjectsController.updateSelectionState();
+                        drawingObjectsController.updateOverlay();
+                        return true;
+                    }
+                    else
+                    {
+                        return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                    }
                 }
             }
         }
 
-        if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            var series = drawing.chart.plotArea.chart.series;
-            var _len = drawing.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
+        if(!window["NATIVE_EDITOR_ENJINE"] && bClickFlag){
+
+            var aCharts = drawing.chart.plotArea.charts;
+            var series = drawing.getAllSeries();
+            var _len = aCharts.length === 1 && aCharts[0].getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
             for(var i = _len - 1; i > -1; --i)
             {
                 var ser = series[i];
@@ -503,6 +542,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
 
                 }
             }
+
         }
 
         var chart_titles = drawing.getAllTitles();
@@ -526,6 +566,18 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                     drawing.selectTitle(title, pageIndex);
                     drawingObjectsController.updateSelectionState();
                     drawingObjectsController.updateOverlay();
+
+                    if(Asc["editor"] && Asc["editor"].wb)
+                    {
+                        var ws = Asc["editor"].wb.getWorksheet();
+                        if(ws){
+                            var ct = ws.getCursorTypeFromXY(ws.objectRender.lastX, ws.objectRender.lastY);
+                            if(ct){
+                                Asc["editor"].wb._onUpdateCursor(ct.cursor);
+                            }
+                        }
+                    }
+
                     return true;
                 }
                 else
@@ -577,7 +629,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
 
         //plotArea
         if(bClickFlag ){
-            var oChartSizes = drawing.getChartSizes();
+            var oChartSizes = drawing.getChartSizes(true);
             var oInvertTransform = drawing.invertTransform;
             var dTx = oInvertTransform.TransformPointX(x, y);
             var dTy = oInvertTransform.TransformPointY(x, y);
@@ -586,7 +638,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D || drawingObjectsController.isViewMode())
+                    if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D || !drawingObjectsController.canEdit())
                     {
                         drawingObjectsController.checkChartTextSelection();
                         selector.resetSelection();
@@ -630,7 +682,6 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                     return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
                 }
             }
-
         }
     }
     return ret;

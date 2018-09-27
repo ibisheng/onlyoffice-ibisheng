@@ -209,7 +209,7 @@ CChartSpace.prototype.recalculateChart = function()
 {
     if(this.chartObj == null)
         this.chartObj =  new AscFormat.CChartsDrawer();
-    this.chartObj.reCalculate(this);
+    this.chartObj.recalculate(this);
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
@@ -234,19 +234,19 @@ CChartSpace.prototype.setStartPage = function(pageIndex)
     }
     if(this.chart && this.chart.plotArea)
     {
-        var hor_axis = this.chart.plotArea.getHorizontalAxis();
-        if(hor_axis && hor_axis.title)
+        var aAxes = this.chart.plotArea.axId;
+        if(aAxes)
         {
-            title = hor_axis.title;
-            content = title.getDocContent();
-            content && content.Set_StartPage(pageIndex);
-        }
-        var vert_axis = this.chart.plotArea.getVerticalAxis();
-        if(vert_axis && vert_axis.title)
-        {
-            title = vert_axis.title;
-            content = title.getDocContent();
-            content && content.Set_StartPage(pageIndex);
+            for(var i = 0; i < aAxes.length; ++i)
+            {
+                var axis = aAxes[i];
+                if(axis && axis.title)
+                {
+                    title = axis.title;
+                    content = title.getDocContent();
+                    content && content.Set_StartPage(pageIndex);
+                }
+            }
         }
     }
 };
@@ -281,10 +281,6 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateChartTitleEditMode(true);
             this.recalcInfo.recalcTitle = null;
             this.recalcInfo.bRecalculatedTitle = true;
-        }
-        else
-        {
-
         }
         if(this.recalcInfo.recalculateTransform)
         {
@@ -352,6 +348,14 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalculateUpDownBars = false;
         }
 
+        var b_recalc_labels = false;
+        if(this.recalcInfo.recalculateAxisLabels)
+        {
+            this.recalculateAxisLabels();
+            this.recalcInfo.recalculateAxisLabels = false;
+            b_recalc_labels = true;
+        }
+        
         var b_recalc_legend = false;
         if(this.recalcInfo.recalculateLegend)
         {
@@ -360,23 +364,20 @@ CChartSpace.prototype.recalculate = function()
             b_recalc_legend = true;
         }
 
-        var b_recalc_labels = false;
-        if(this.recalcInfo.recalculateAxisLabels)
-        {
-            this.recalculateAxisLabels();
-            this.recalcInfo.recalculateAxisLabels = false;
-            b_recalc_labels = true;
-        }
-
 
 
         if(this.recalcInfo.recalculateAxisVal)
         {
-            this.recalculateAxis();
+            if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
+                //old variant
+                this.recalculateAxis();
+            }
+            else{
+                this.recalculateAxes();
+            }
             this.recalcInfo.recalculateAxisVal = false;
             bCheckLabels = true;
         }
-
         if(this.recalcInfo.recalculatePenBrush)
         {
             this.recalculatePenBrush();

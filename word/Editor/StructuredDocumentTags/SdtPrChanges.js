@@ -37,12 +37,14 @@
  * Time: 14:58
  */
 
-AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Alias] = CChangesSdtPrAlias;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Alias]      = CChangesSdtPrAlias;
 AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Id]         = CChangesSdtPrId;
 AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Tag]        = CChangesSdtPrTag;
 AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Label]      = CChangesSdtPrLabel;
 AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Lock]       = CChangesSdtPrLock;
 AscDFH.changesFactory[AscDFH.historyitem_SdtPr_DocPartObj] = CChangesSdtPrDocPartObj;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Appearance] = CChangesSdtPrAppearance;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Color]      = CChangesSdtPrColor;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
@@ -64,6 +66,12 @@ AscDFH.changesRelationMap[AscDFH.historyitem_SdtPr_Lock]  = [
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_SdtPr_DocPartObj] = [
 	AscDFH.historyitem_SdtPr_DocPartObj
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_SdtPr_Appearance] = [
+	AscDFH.historyitem_SdtPr_Appearance
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_SdtPr_Color] = [
+	AscDFH.historyitem_SdtPr_Color
 ];
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -274,4 +282,38 @@ CChangesSdtPrDocPartObj.prototype.ReadFromBinary = function(Reader)
 
 	if (nFlags & 32)
 		this.New.Unique = Reader.GetBool();
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesSdtPrAppearance(Class, Old, New)
+{
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
+}
+CChangesSdtPrAppearance.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesSdtPrAppearance.prototype.constructor = CChangesSdtPrAppearance;
+CChangesSdtPrAppearance.prototype.Type = AscDFH.historyitem_SdtPr_Appearance;
+CChangesSdtPrAppearance.prototype.private_SetValue = function(Value)
+{
+	this.Class.Pr.Appearance = Value;
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseObjectProperty}
+ */
+function CChangesSdtPrColor(Class, Old, New)
+{
+	AscDFH.CChangesBaseObjectProperty.call(this, Class, Old, New);
+}
+CChangesSdtPrColor.prototype = Object.create(AscDFH.CChangesBaseObjectProperty.prototype);
+CChangesSdtPrColor.prototype.constructor = CChangesSdtPrColor;
+CChangesSdtPrColor.prototype.Type = AscDFH.historyitem_SdtPr_Color;
+CChangesSdtPrColor.prototype.private_SetValue = function(Value)
+{
+	this.Class.Pr.Color = Value;
+};
+CChangesSdtPrColor.prototype.private_CreateObject = function()
+{
+	return new CDocumentColor();
 };

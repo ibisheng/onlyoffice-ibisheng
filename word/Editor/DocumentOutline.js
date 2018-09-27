@@ -67,7 +67,7 @@ CDocumentOutline.prototype.UpdateAll = function()
 
 	this.ParagraphsToUpdate = {};
 	this.Elements           = [];
-	this.LogicDocument.GetOutlineParagraphs(this.Elements, {SkipEmptyParagraphs : false});
+	this.LogicDocument.GetOutlineParagraphs(this.Elements, {SkipEmptyParagraphs : false, SkipTables : true, SkipDrawings : true});
 
 	if (this.Elements.length > 0)
 	{
@@ -178,15 +178,49 @@ CDocumentOutline.prototype.private_FindElementByParagraph = function(oParagraph)
 };
 CDocumentOutline.prototype.private_GetParagraphPosition = function(oParagraph)
 {
-	var nParaIndex = oParagraph.GetIndex();
+	var arrParaPos = oParagraph.GetDocumentPositionFromObject();
 	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
 	{
-		if ((this.Elements[nIndex].Paragraph && nParaIndex <= this.Elements[nIndex].Paragraph.GetIndex())
-			|| (!this.Elements[nIndex].Paragraph && nParaIndex <= 0))
+		if ((this.Elements[nIndex].Paragraph && this.private_CompareDocumentPositions(arrParaPos, this.Elements[nIndex].Paragraph.GetDocumentPositionFromObject()) <= 0)
+			|| (!this.Elements[nIndex].Paragraph && this.private_IsStartDocumentPosition(arrParaPos)))
 			return nIndex;
 	}
 
 	return this.Elements.length;
+};
+CDocumentOutline.prototype.private_CompareDocumentPositions = function(arrDocPos1, arrDocPos2)
+{
+	var nLen1 = arrDocPos1.length;
+	var nLen2 = arrDocPos2.length;
+
+	for (var nPos = 0; nPos < nLen1; ++nPos)
+	{
+		if (nLen2 <= nPos)
+			return 1;
+
+		if (arrDocPos1[nPos].Position < arrDocPos2[nPos].Position)
+			return -1;
+		else if (arrDocPos1[nPos].Position > arrDocPos2[nPos].Position)
+			return 1;
+	}
+
+	if (nLen2 > nLen1)
+		return -1;
+
+	return 0;
+};
+CDocumentOutline.prototype.private_IsStartDocumentPosition = function(arrDocPos)
+{
+	if (arrDocPos.length <= 0)
+		return false;
+
+	for (var nIndex = 0, nCount = arrDocPos.length; nIndex < nCount; ++nIndex)
+	{
+		if (0 !== arrDocPos[nIndex].Position)
+			return false;
+	}
+
+	return true;
 };
 CDocumentOutline.prototype.GetElementsCount = function()
 {
@@ -396,9 +430,9 @@ CDocumentOutline.prototype.SelectContent = function(nIndex)
 	this.LogicDocument.RemoveSelection();
 	this.LogicDocument.SelectRange(nStartPos, nEndPos);
 };
-CDocumentOutline.prototype.UpdateCurrentPosition = function(nCurPos)
+CDocumentOutline.prototype.UpdateCurrentPosition = function(arrDocPos)
 {
-	if (null === nCurPos)
+	if (null === arrDocPos)
 	{
 		this.LogicDocument.GetApi().sync_OnDocumentOutlineCurrentPosition(null);
 		return;
@@ -410,9 +444,12 @@ CDocumentOutline.prototype.UpdateCurrentPosition = function(nCurPos)
 	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
 	{
 		var oParagraph = this.Elements[nIndex].Paragraph;
-		var nPos       = oParagraph ? oParagraph.GetIndex() : 0;
 
-		if (nPos > nCurPos)
+		// Такое может случиться только для первого элемента списка
+		if (!oParagraph)
+			continue;
+
+		if (this.private_CompareDocumentPositions(oParagraph.GetDocumentPositionFromObject(), arrDocPos) > 0)
 		{
 			nFindIndex = nIndex - 1;
 			break;

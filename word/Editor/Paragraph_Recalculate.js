@@ -47,7 +47,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
     if (this.Pages.length <= 0)
         return [];
 
-    if (true === this.Parent.Is_HdrFtr(false))
+    if (true === this.Parent.IsHdrFtr(false))
         return [];
 
     //Не запускаемм быстрый пересчет, когда параграф находится в автофигуре с выставленным флагом подбора размера по размеру контента,
@@ -198,7 +198,7 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
     if (this.Pages.length <= 0)
         return -1;
 
-    if (true === this.Parent.Is_HdrFtr(false))
+    if (true === this.Parent.IsHdrFtr(false))
         return -1;
 
     var Run = SimpleChanges[0].Class;
@@ -935,7 +935,9 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
                     isColumnBreakOnPrevLine = true;
             }
 
-            if ((true === isPageBreakOnPrevLine && (0 !== this.private_GetColumnIndex(CurPage) || (0 === CurPage && null !== PrevElement)))
+            // Здесь используем GetAbsoluteColumn, а не у текущего класса, т.к. в данную ветку мы попадаем только, если
+			// верхний DocContent - документ и если не в таблице
+            if ((true === isPageBreakOnPrevLine && (0 !== this.GetAbsoluteColumn(CurPage) || (0 === CurPage && null !== PrevElement)))
                 || (true === isColumnBreakOnPrevLine && 0 === CurPage))
             {
                 this.Pages[CurPage].Set_EndLine(CurLine - 1);
@@ -1356,7 +1358,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
-                Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
+                Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[CurLine].Metrics.Ascent + this.Lines[CurLine].Metrics.Descent;
 
                 if ( true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value )
                 {
@@ -1372,7 +1374,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
             else
             {
                 // Параграф начинается с новой страницы
-                Bottom2 = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
+                Bottom2 = Top + this.Lines[CurLine].Metrics.Ascent + this.Lines[CurLine].Metrics.Descent;
 
                 if ( border_Single === ParaPr.Brd.Top.Value )
                 {
@@ -1498,7 +1500,16 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     else
         Left = false === PRS.UseFirstLine ? this.Pages[CurPage].X + ParaPr.Ind.Left : this.Pages[CurPage].X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 
-    var PageFields = this.Parent.Get_ColumnFields ? this.Parent.Get_ColumnFields(this.Get_Index(), this.Get_AbsoluteColumn(CurPage)) : this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
+	var PageFields = null;
+    if (this.bFromDocument && PRS.GetTopDocument() === this.LogicDocument && !PRS.IsInTable())
+	{
+		// Заглушка для случая, когда параграф лежит в CBlockLevelSdt
+		PageFields = this.LogicDocument.Get_ColumnFields(PRS.GetTopIndex(), this.Get_AbsoluteColumn(CurPage));
+	}
+	else
+	{
+		PageFields = this.Parent.Get_ColumnFields ? this.Parent.Get_ColumnFields(this.Get_Index(), this.Get_AbsoluteColumn(CurPage)) : this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
+	}
 
     var Ranges = PRS.Ranges;
     var Ranges2;
@@ -1817,7 +1828,8 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                             if (1 == RangesCount && !(Line.Info & paralineinfo_End))
                             {
                                 // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
-                                if (RangeWidth - Range.W <= 0.05 * RangeWidth && PRSC.Letters > 1)
+								// либо это набор китайских иероглифов (PRSC.Words > 1)
+                                if ((RangeWidth - Range.W <= 0.05 * RangeWidth || PRSC.Words > 1) && PRSC.Letters > 1)
                                     JustifyWord = (RangeWidth - Range.W) / (PRSC.Letters - 1);
                             }
                             else if (0 == CurRange || Line.Info & paralineinfo_End)
@@ -2101,7 +2113,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     var NewX = 0;
 
     // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
-    var DefTab = ParaPr.DefaultTabSize != null ? ParaPr.DefaultTabSize : AscCommonWord.Default_Tab_Stop;
+    var DefTab = ParaPr.DefaultTab != null ? ParaPr.DefaultTab : AscCommonWord.Default_Tab_Stop;
     if ( null === Tab )
     {
         if ( X < PageStart.X + ParaPr.Ind.Left )
@@ -2704,6 +2716,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.Paragraph       = Para;
     this.Parent          = null;
     this.TopDocument     = null;
+    this.TopIndex        = -1;   // Номер элемента контейнера (содержащего данный параграф), либо номер данного параграфа в самом верхнем документе
     this.PageAbs         = 0;
     this.ColumnAbs       = 0;
 	this.InTable         = false;
@@ -2993,92 +3006,102 @@ CParagraphRecalculateStateWrap.prototype =
         var NumberingType = Para.Numbering.Type;
 
         if ( para_Numbering === NumberingType )
-        {
-            var NumPr = ParaPr.NumPr;
-            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== Para.Get_SectionPr() && true === Para.IsEmpty() ) )
-            {
-                // Так мы обнуляем все рассчитанные ширины данного элемента
-                NumberingItem.Measure( g_oTextMeasurer, undefined );
-            }
-            else
-            {
-                var Numbering = Para.Parent.Get_Numbering();
-                var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-                var NumSuff   = NumLvl.Suff;
-                var NumJc     = NumLvl.Jc;
-                var NumInfo   = Para.Parent.Internal_GetNumInfo( Para.Id, NumPr );
-                var NumTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                NumTextPr.Merge( Para.TextPr.Value );
-                NumTextPr.Merge( NumLvl.TextPr );
+		{
+			var NumPr = ParaPr.NumPr;
+			if (undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== Para.Get_SectionPr() && true === Para.IsEmpty() ))
+			{
+				// Так мы обнуляем все рассчитанные ширины данного элемента
+				NumberingItem.Measure(g_oTextMeasurer, undefined);
+			}
+			else
+			{
+				var oNumbering  = Para.Parent.GetNumbering();
+				var oNumLvl     = oNumbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
+				var nNumSuff    = oNumLvl.GetSuff();
+				var nNumJc      = oNumLvl.GetJc();
+				var oNumInfo    = Para.Parent.CalculateNumberingValues(Para, NumPr);
+				var oNumTextPr  = Para.Get_CompiledPr2(false).TextPr.Copy();
+				oNumTextPr.Merge(Para.TextPr.Value);
+				oNumTextPr.Merge(oNumLvl.GetTextPr());
 
 
-                // Здесь измеряется только ширина символов нумерации, без суффикса
-                NumberingItem.Measure( g_oTextMeasurer, Numbering, NumInfo, NumTextPr, NumPr, Para.Get_Theme() );
+				// Здесь измеряется только ширина символов нумерации, без суффикса
+				NumberingItem.Measure(g_oTextMeasurer, oNumbering, oNumInfo, oNumTextPr, NumPr, Para.Get_Theme());
 
-                // При рассчете высоты строки, если у нас параграф со списком, то размер символа
-                // в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
-                // ниже baseline.
-                if ( LineAscent < NumberingItem.Height )
-                    LineAscent = NumberingItem.Height;
+				// При рассчете высоты строки, если у нас параграф со списком, то размер символа
+				// в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
+				// ниже baseline.
+				if (LineAscent < NumberingItem.Height)
+					LineAscent = NumberingItem.Height;
 
-                switch ( NumJc )
-                {
-                    case AscCommon.align_Right:
-                    {
-                        NumberingItem.WidthVisible = 0;
-                        break;
-                    }
-                    case AscCommon.align_Center:
-                    {
-                        NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
-                        break;
-                    }
-                    case AscCommon.align_Left:
-                    default:
-                    {
-                        NumberingItem.WidthVisible = NumberingItem.WidthNum;
-                        break;
-                    }
-                }
+				switch (nNumJc)
+				{
+					case AscCommon.align_Right:
+					{
+						NumberingItem.WidthVisible = 0;
+						break;
+					}
+					case AscCommon.align_Center:
+					{
+						NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
+						break;
+					}
+					case AscCommon.align_Left:
+					default:
+					{
+						NumberingItem.WidthVisible = NumberingItem.WidthNum;
+						break;
+					}
+				}
 
-                X += NumberingItem.WidthVisible;
+				X += NumberingItem.WidthVisible;
 
-                switch( NumSuff )
-                {
-                    case numbering_suff_Nothing:
-                    {
-                        // Ничего не делаем
-                        break;
-                    }
-                    case numbering_suff_Space:
-                    {
-                        var OldTextPr = g_oTextMeasurer.GetTextPr();
+				if (oNumLvl.IsLegacy())
+				{
+					var nLegacySpace  = AscCommon.TwipsToMM(oNumLvl.GetLegacySpace());
+					var nLegacyIndent = AscCommon.TwipsToMM(oNumLvl.GetLegacyIndent());
+					var nNumWidth     = NumberingItem.WidthNum;
+
+					NumberingItem.WidthSuff = Math.max(nNumWidth, nLegacyIndent, nNumWidth + nLegacySpace) - nNumWidth;
+				}
+				else
+				{
+					switch (nNumSuff)
+					{
+						case Asc.c_oAscNumberingSuff.None:
+						{
+							// Ничего не делаем
+							break;
+						}
+						case Asc.c_oAscNumberingSuff.Space:
+						{
+							var OldTextPr = g_oTextMeasurer.GetTextPr();
 
 
+							var Theme = Para.Get_Theme();
+							g_oTextMeasurer.SetTextPr(oNumTextPr, Theme);
+							g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+							NumberingItem.WidthSuff = g_oTextMeasurer.Measure(" ").Width;
+							g_oTextMeasurer.SetTextPr(OldTextPr, Theme);
+							break;
+						}
+						case Asc.c_oAscNumberingSuff.Tab:
+						{
+							var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
 
-                        var Theme = Para.Get_Theme();
-                        g_oTextMeasurer.SetTextPr( NumTextPr, Theme );
-                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
-                        NumberingItem.WidthSuff = g_oTextMeasurer.Measure( " " ).Width;
-                        g_oTextMeasurer.SetTextPr( OldTextPr, Theme );
-                        break;
-                    }
-                    case numbering_suff_Tab:
-                    {
-                        var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
+							NumberingItem.WidthSuff = NewX - X;
 
-                        NumberingItem.WidthSuff = NewX - X;
+							break;
+						}
+					}
+				}
 
-                        break;
-                    }
-                }
+				NumberingItem.Width = NumberingItem.WidthNum;
+				NumberingItem.WidthVisible += NumberingItem.WidthSuff;
 
-                NumberingItem.Width         = NumberingItem.WidthNum;
-                NumberingItem.WidthVisible += NumberingItem.WidthSuff;
-
-                X += NumberingItem.WidthSuff;
-            }
-        }
+				X += NumberingItem.WidthSuff;
+			}
+		}
         else if ( para_PresentationNumbering === NumberingType )
         {
             var Level = Para.PresentationPr.Level;
@@ -3138,9 +3161,14 @@ CParagraphRecalculateStateWrap.prototype =
         NumberingItem.Line       = CurLine;
         NumberingItem.Range      = CurRange;
         NumberingItem.LineAscent = LineAscent;
+        NumberingItem.Page       = CurPage;
 
         return X;
     }
+};
+CParagraphRecalculateStateWrap.prototype.IsFast = function()
+{
+	return this.Fast;
 };
 CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootnoteReference, oPos)
 {
@@ -3221,6 +3249,17 @@ CParagraphRecalculateStateWrap.prototype.GetSectPr = function()
 CParagraphRecalculateStateWrap.prototype.GetTopDocument = function()
 {
 	return this.TopDocument;
+};
+CParagraphRecalculateStateWrap.prototype.GetTopIndex = function()
+{
+	if (-1 === this.TopIndex)
+	{
+		var arrPos = this.Paragraph.GetDocumentPositionFromObject();
+		if (arrPos.length > 0)
+			this.TopIndex = arrPos[0].Position;
+	}
+
+	return this.TopIndex;
 };
 
 function CParagraphRecalculateStateCounter()

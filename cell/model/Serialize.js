@@ -57,6 +57,7 @@
     
     var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
 	var g_StyleCache = AscCommonExcel.g_StyleCache;
+    var g_cSharedWriteStreak = 64;//like Excel
 
 //dif:
 //Version:2 добавлены свойства колонок и строк CustomWidth, CustomHeight(раньше считались true)
@@ -192,7 +193,8 @@
 		DdeLink: 11,
 		VbaProject: 12,
 		JsaProject: 13,
-		Comments: 14
+		Comments: 14,
+		CalcPr: 15
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -215,7 +217,23 @@
         LocalSheetId: 2,
         Hidden: 3
     };
-    /** @enum */
+	/** @enum */
+	var c_oSerCalcPrTypes = {
+		CalcId: 0,
+		CalcMode: 1,
+		FullCalcOnLoad: 2,
+		RefMode: 3,
+		Iterate: 4,
+		IterateCount: 5,
+		IterateDelta: 6,
+		FullPrecision: 7,
+		CalcCompleted: 8,
+		CalcOnSave: 9,
+		ConcurrentCalc: 10,
+		ConcurrentManualCount: 11,
+		ForceFullCalc: 12
+	};
+	/** @enum */
     var c_oSerWorksheetsTypes =
     {
         Worksheet: 0,
@@ -244,7 +262,12 @@
         SheetView: 23,
         SheetPr: 24,
         SparklineGroups: 25,
-		PivotTable: 26
+		PivotTable: 26,
+        HeaderFooter: 27,
+        LegacyDrawingHF: 28,
+        Picture: 29,
+        RowBreaks: 30,
+        ColBreaks: 31
     };
     /** @enum */
     var c_oSerWorksheetPropTypes =
@@ -752,6 +775,52 @@
 		SheetDataRowCellType: 16,
 		SheetDataRowCellValue: 17
 	};
+    var c_oSer_HeaderFooter = {
+        AlignWithMargins: 0,
+        DifferentFirst: 1,
+        DifferentOddEven: 2,
+        ScaleWithDoc: 3,
+        EvenFooter: 4,
+        EvenHeader: 5,
+        FirstFooter: 6,
+        FirstHeader: 7,
+        OddFooter: 8,
+        OddHeader: 9
+    };
+    var c_oSer_RowColBreaks = {
+        Count: 0,
+        ManualBreakCount: 1,
+        Break: 2,
+        Id: 3,
+        Man: 4,
+        Max: 5,
+        Min: 6,
+        Pt: 7
+    };
+    var c_oSer_LegacyDrawingHF = {
+        Drawings: 0,
+        Drawing: 1,
+        DrawingId: 2,
+        DrawingShape: 3,
+        Cfe: 4,
+        Cff: 5,
+        Cfo: 6,
+        Che: 7,
+        Chf: 8,
+        Cho: 9,
+        Lfe: 10,
+        Lff: 11,
+        Lfo: 12,
+        Lhe: 13,
+        Lhf: 14,
+        Lho: 15,
+        Rfe: 16,
+        Rff: 17,
+        Rfo: 18,
+        Rhe: 19,
+        Rhf: 20,
+        Rho: 21
+    };
 	/** @enum */
     var EBorderStyle =
     {
@@ -1056,17 +1125,17 @@
         this.oSizes = [
             {id:EPageSize.pagesizeLetterPaper, w_mm: 215.9, h_mm: 279.4},
             {id:EPageSize.pagesizeLetterSmall, w_mm: 215.9, h_mm: 279.4},
-            {id:EPageSize.pagesizeTabloidPaper, w_mm: 279.4, h_mm: 431.7},
+            {id:EPageSize.pagesizeTabloidPaper, w_mm: 279.4, h_mm: 431.8},
             {id:EPageSize.pagesizeLedgerPaper, w_mm: 431.8, h_mm: 279.4},
             {id:EPageSize.pagesizeLegalPaper, w_mm: 215.9, h_mm: 355.6},
             {id:EPageSize.pagesizeStatementPaper, w_mm: 495.3, h_mm: 215.9},
             {id:EPageSize.pagesizeExecutivePaper, w_mm: 184.2, h_mm: 266.7},
-            {id:EPageSize.pagesizeA3Paper, w_mm: 297, h_mm: 420.1},
+            {id:EPageSize.pagesizeA3Paper, w_mm: 297, h_mm: 420},
             {id:EPageSize.pagesizeA4Paper, w_mm: 210, h_mm: 297},
             {id:EPageSize.pagesizeA4SmallPaper, w_mm: 210, h_mm: 297},
-            {id:EPageSize.pagesizeA5Paper, w_mm: 148.1, h_mm: 209.9},
+            {id:EPageSize.pagesizeA5Paper, w_mm: 148, h_mm: 210},
             {id:EPageSize.pagesizeB4Paper, w_mm: 250, h_mm: 353},
-            {id:EPageSize.pagesizeB5Paper, w_mm: 176, h_mm: 250.1},
+            {id:EPageSize.pagesizeB5Paper, w_mm: 176, h_mm: 250},
             {id:EPageSize.pagesizeFolioPaper, w_mm: 215.9, h_mm: 330.2},
             {id:EPageSize.pagesizeQuartoPaper, w_mm: 215, h_mm: 275},
             {id:EPageSize.pagesizeStandardPaper1, w_mm: 254, h_mm: 355.6},
@@ -1080,7 +1149,7 @@
             {id:EPageSize.pagesizeCPaper, w_mm: 431.8, h_mm: 558.8},
             {id:EPageSize.pagesizeDPaper, w_mm: 558.8, h_mm: 863.6},
             {id:EPageSize.pagesizeEPaper, w_mm: 863.6, h_mm: 1117.6},
-            {id:EPageSize.pagesizeDLEnvelope, w_mm: 110.1, h_mm: 220.1},
+            {id:EPageSize.pagesizeDLEnvelope, w_mm: 110, h_mm: 220},
             {id:EPageSize.pagesizeC5Envelope, w_mm: 162, h_mm: 229},
             {id:EPageSize.pagesizeC3Envelope, w_mm: 324, h_mm: 458},
             {id:EPageSize.pagesizeC4Envelope, w_mm: 229, h_mm: 324},
@@ -1149,6 +1218,44 @@
           this.theme = null;
           this.tint = null;
       }
+
+	function OpenFormula() {
+		this.aca = null;
+		this.bx = null;
+		this.ca = null;
+		this.del1 = null;
+		this.del2 = null;
+		this.dt2d = null;
+		this.dtr = null;
+		this.r1 = null;
+		this.r2 = null;
+		this.ref = null;
+		this.si = null;
+		this.t = null;
+		this.v = null;
+	}
+	OpenFormula.prototype.clean = function(){
+		this.aca = null;
+		this.bx = null;
+		this.ca = null;
+		this.del1 = null;
+		this.del2 = null;
+		this.dt2d = null;
+		this.dtr = null;
+		this.r1 = null;
+		this.r2 = null;
+		this.ref = null;
+		this.si = null;
+		this.t = null;
+		this.v = null;
+	};
+	function OpenColumnFormula(nRow, formula, parsed, refPos, base) {
+		this.nRow = nRow;
+		this.formula = formula;
+		this.parsed = parsed;
+		this.refPos = refPos;
+		this.base = base;
+	}
 
 	function ReadColorSpreadsheet2(bcr, length) {
 		var output = null;
@@ -1525,7 +1632,7 @@
             if(null != tableColumn.TotalsRowFormula)
             {
                 this.memory.WriteByte(c_oSer_TableColumns.TotalsRowFormula);
-                this.memory.WriteString2(tableColumn.TotalsRowFormula.Formula);
+                this.memory.WriteString2(tableColumn.TotalsRowFormula.getFormula());
             }
             if(null != tableColumn.dxf)
             {
@@ -2318,6 +2425,8 @@
             //DefinedNames
             this.bs.WriteItem(c_oSerWorkbookTypes.DefinedNames, function(){oThis.WriteDefinedNames();});
 
+			this.bs.WriteItem(c_oSerWorkbookTypes.CalcPr, function(){oThis.WriteCalcPr(oThis.wb.calcPr);});
+
 			//PivotCaches
 			var isEmptyCaches = true;
 			var pivotCaches = {};
@@ -2394,15 +2503,30 @@
         this.WriteDefinedNames = function()
         {
             var oThis = this;
-
             var defNameList = this.wb.dependencyFormulas.saveDefName();
+
+            var filterDefName = "_xlnm._FilterDatabase";
 
             if(null != defNameList ){
                 for(var i = 0; i < defNameList.length; i++){
-                    this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(defNameList[i]);});
+                    if(defNameList[i].Name !== filterDefName) {
+						this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(defNameList[i]);});
+                    }
                 }
             }
 
+            //write filters defines name
+            //TODO сделать добавление данных именованных диапазонов при добавлении а/ф
+            var ws, ref, defNameRef, defName;
+            for(var i = 0; i < wb.aWorksheets.length; i++) {
+				ws = wb.aWorksheets[i];
+                if(ws && ws.AutoFilter && ws.AutoFilter.Ref) {
+                    ref = ws.AutoFilter.Ref;
+					defNameRef = AscCommon.parserHelp.get3DRef(ws.getName(), ref.getAbsName());
+					defName = new Asc.asc_CDefName(filterDefName, defNameRef, ws.index, false, true);
+                    this.bs.WriteItem(c_oSerWorkbookTypes.DefinedName, function(){oThis.WriteDefinedName(defName);});
+                }
+            }
         };
         this.WriteDefinedName = function(oDefinedName, LocalSheetId)
         {
@@ -2420,13 +2544,55 @@
             if (null !== oDefinedName.LocalSheetId){
                 this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(oDefinedName.LocalSheetId);});
             }
-            if (null != oDefinedName.Hidden)
-            {
-                this.memory.WriteByte(c_oSerDefinedNameTypes.Hidden);
-                this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(oDefinedName.Hidden);
+            if (null != oDefinedName.Hidden) {
+                this.bs.WriteItem(c_oSerDefinedNameTypes.Hidden, function(){oThis.memory.WriteBool(oDefinedName.Hidden);});
             }
         };
+		this.WriteCalcPr = function(calcPr)
+		{
+			var t = this;
+			//calcId Specifies the version of the calculation engine used to calculate values in the workbook
+			//do not pretend to be other editors
+			// if (null != calcPr.calcId) {
+				// this.bs.WriteItem(c_oSerCalcPrTypes.CalcId, function() {t.memory.WriteLong(calcPr.calcId)});
+			// }
+			if (null != calcPr.calcMode) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.CalcMode, function() {t.memory.WriteByte(calcPr.calcMode)});
+			}
+			if (null != calcPr.fullCalcOnLoad) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.FullCalcOnLoad, function() {t.memory.WriteBool(calcPr.fullCalcOnLoad)});
+			}
+			if (null != calcPr.refMode) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.RefMode, function() {t.memory.WriteByte(calcPr.refMode)});
+			}
+			if (null != calcPr.iterate) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.Iterate, function() {t.memory.WriteBool(calcPr.iterate)});
+			}
+			if (null != calcPr.iterateCount) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.IterateCount, function() {t.memory.WriteLong(calcPr.iterateCount)});
+			}
+			if (null != calcPr.iterateDelta) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.IterateDelta, function() {t.memory.WriteDouble2(calcPr.iterateDelta)});
+			}
+			if (null != calcPr.fullPrecision) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.FullPrecision, function() {t.memory.WriteBool(calcPr.fullPrecision)});
+			}
+			if (null != calcPr.calcCompleted) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.CalcCompleted, function() {t.memory.WriteBool(calcPr.calcCompleted)});
+			}
+			if (null != calcPr.calcOnSave) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.CalcOnSave, function() {t.memory.WriteBool(calcPr.calcOnSave)});
+			}
+			if (null != calcPr.concurrentCalc) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.ConcurrentCalc, function() {t.memory.WriteBool(calcPr.concurrentCalc)});
+			}
+			if (null != calcPr.concurrentManualCount) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.ConcurrentManualCount, function() {t.memory.WriteLong(calcPr.concurrentManualCount)});
+			}
+			if (null != calcPr.forceFullCalc) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.ForceFullCalc, function() {t.memory.WriteBool(calcPr.forceFullCalc)});
+			}
+		};
 		this.WritePivotCaches = function(pivotCaches) {
 			var oThis = this;
 			for (var id in pivotCaches) {
@@ -2600,6 +2766,29 @@
         this.aDxfs = aDxfs;
 		this.stylesForWrite = new StylesForWrite();
         this.isCopyPaste = isCopyPaste;
+        this.sharedFormulas = {};
+		this.sharedFormulasIndex = 0;
+        this._getCrc32FromObjWithProperty = function(val)
+        {
+            return Asc.crc32(this._getStringFromObjWithProperty(val));
+        };
+        this._getStringFromObjWithProperty = function(val)
+        {
+            var sRes = "";
+            if(val.getProperties)
+            {
+                var properties = val.getProperties();
+                for(var i in properties)
+                {
+                    var oCurProp = val.getProperty(properties[i]);
+                    if(null != oCurProp && oCurProp.getProperties)
+                        sRes += this._getStringFromObjWithProperty(oCurProp);
+                    else
+                        sRes += oCurProp;
+                }
+            }
+            return sRes;
+        };
         this._prepeareStyles = function()
         {
 			this.stylesForWrite.init(this.wb.oStyleManager.oDefaultXfs);
@@ -2690,6 +2879,22 @@
 			for (i = 0; i < ws.pivotTables.length; ++i) {
 				this.bs.WriteItem(c_oSerWorksheetsTypes.PivotTable, function(){oThis.WritePivotTable(ws.pivotTables[i])});
 			}
+            if (null !== ws.headerFooter) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.HeaderFooter, function () {oThis.WriteHeaderFooter(ws.headerFooter);});
+            }
+            if (null !== ws.rowBreaks) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.RowBreaks, function () {oThis.WriteRowColBreaks(ws.rowBreaks);});
+            }
+            if (null !== ws.colBreaks) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.ColBreaks, function () {oThis.WriteRowColBreaks(ws.colBreaks);});
+            }
+            if (null !== ws.legacyDrawingHF) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.LegacyDrawingHF, function () {oThis.WriteLegacyDrawingHF(ws.legacyDrawingHF);});
+            }
+            if (null !== ws.picture) {
+                this.memory.WriteByte(c_oSerWorksheetsTypes.Picture);
+                this.memory.WriteString2(ws.picture);
+            }
         };
         this.WriteWorksheetProp = function(ws, index)
         {
@@ -2834,7 +3039,7 @@
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
                 this.memory.WriteBool(oCol.BestFit);
             }
-            if(null != oCol.hd)
+            if(oCol.hd)
             {
                 this.memory.WriteByte(c_oSerWorksheetColTypes.Hidden);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -3383,8 +3588,9 @@
 				{
 					this.bs.WriteItem(c_oSerCellTypes.Style, function(){oThis.memory.WriteLong(nXfsId);});
 				}
-				if(null != cell.formulaParsed)
-					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.formulaParsed);});
+				if (cell.isFormula()) {
+					this.bs.WriteItem(c_oSerCellTypes.Formula, function() {oThis.WriteFormula(cell);});
+				}
 				if(!cell.isNullTextString())
 				{
                     if (null != cell.formulaParsed && cell.isEmptyTextString()) {
@@ -3427,8 +3633,54 @@
 				}
 			}
         };
-        this.WriteFormula = function(formulaParsed)
+        this.WriteFormula = function(cell)
         {
+			var parsed = cell.getFormulaParsed();
+			var formula;
+			var si;
+			var ref;
+			var type;
+			var shared = parsed.getShared();
+            if (shared) {
+                var sharedToWrite = this.sharedFormulas[parsed.getIndexNumber()];
+                if (!sharedToWrite) {
+                    sharedToWrite = {saveShared: !shared.ref.isOneCell() && parsed.canSaveShared(), si: {}};
+                    this.sharedFormulas[parsed.getIndexNumber()] = sharedToWrite;
+                }
+                if (sharedToWrite.saveShared && shared.ref.contains(cell.nCol, cell.nRow)) {
+                    type = ECellFormulaType.cellformulatypeShared;
+                    var rowIndex = Math.floor((cell.nRow - shared.ref.r1) / g_cSharedWriteStreak);
+                    var row = sharedToWrite.si[rowIndex];
+                    if (!row) {
+                        row = {};
+                        sharedToWrite.si[rowIndex] = row;
+                    }
+                    var colIndex = Math.floor((cell.nCol - shared.ref.c1) / g_cSharedWriteStreak);
+                    si = row[colIndex];
+                    if (undefined === si) {
+                        row[colIndex] = si = this.sharedFormulasIndex++;
+                        if (!(cell.nRow === shared.base.nRow && cell.nCol === shared.base.nCol)) {
+                            cell.processFormula(function(parsed) {
+                                formula = parsed.getFormula();
+                            });
+                        } else {
+                            formula = parsed.getFormula();
+                        }
+                        var r1 = shared.ref.r1 + rowIndex * g_cSharedWriteStreak;
+                        var c1 = shared.ref.c1 + colIndex * g_cSharedWriteStreak;
+                        ref = new Asc.Range(c1, r1,
+                            Math.min(c1 + g_cSharedWriteStreak - 1, shared.ref.c2),
+                            Math.min(r1 + g_cSharedWriteStreak - 1, shared.ref.r2));
+                    }
+                } else {
+                    cell.processFormula(function(parsed) {
+                        formula = parsed.getFormula();
+                    });
+                }
+            } else {
+                formula = parsed.getFormula();
+            }
+
             // if(null != oFormula.aca)
             // {
             // this.memory.WriteByte(c_oSerFormulaTypes.Aca);
@@ -3441,11 +3693,11 @@
             // this.memory.WriteByte(c_oSerPropLenType.Byte);
             // this.memory.WriteBool(oFormula.bx);
             // }
-            if(true === formulaParsed.ca)
+            if(true === parsed.ca)
             {
                 this.memory.WriteByte(c_oSerFormulaTypes.Ca);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(formulaParsed.ca);
+                this.memory.WriteBool(parsed.ca);
             }
             // if(null != oFormula.del1)
             // {
@@ -3483,38 +3735,31 @@
             // this.memory.WriteByte(c_oSerPropLenType.Variable);
             // this.memory.WriteString2(oFormula.r2);
             // }
-            // if(null != oFormula.ref)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Ref);
-            // this.memory.WriteByte(c_oSerPropLenType.Variable);
-            // this.memory.WriteString2(oFormula.ref);
-            // }
-            // if(null != oFormula.si)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Si);
-            // this.memory.WriteByte(c_oSerPropLenType.Long);
-            // this.memory.WriteLong(oFormula.si);
-            // }
-            // if(null != oFormula.t)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.T);
-            // this.memory.WriteByte(c_oSerPropLenType.Byte);
-            // this.memory.WriteByte(oFormula.t);
-            // }
-            // if(null != oFormula.v)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Text);
-            // this.memory.WriteByte(c_oSerPropLenType.Variable);
-            // this.memory.WriteString2(oFormula.v);
-            // }
-            this.memory.WriteByte(c_oSerFormulaTypes.Text);
-            this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(formulaParsed.Formula);
+			if (undefined !== ref) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Ref);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(ref.getName());
+			}
+			if (undefined !== si) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Si);
+				this.memory.WriteByte(c_oSerPropLenType.Long);
+				this.memory.WriteLong(si);
+			}
+			if (undefined !== type) {
+				this.memory.WriteByte(c_oSerFormulaTypes.T);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(type);
+			}
+			if (undefined !== formula) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Text);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(formula);
+			}
         };
         this.WriteComments = function(aComments, ws)
         {
             var oThis = this;
-            var i, elem, coord;
+            var i, elem;
             for(i = 0; i < aComments.length; ++i)
             {
                 elem = aComments[i];
@@ -3527,12 +3772,9 @@
 						continue;
 					}
 				}
-                coord = elem.coords;
-                if(null === coord.nLeft || null === coord.nTop || null === coord.nRight || null === coord.nBottom ||
-                    null === coord.nLeftOffset || null === coord.nTopOffset || null === coord.nRightOffset || null === coord.nBottomOffset ||
-                    null === coord.dLeftMM || null === coord.dTopMM || null === coord.dWidthMM || null === coord.dHeightMM)
-                    continue;
-                this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(elem);});
+				if (elem.coords.isValid()) {
+					this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(elem);});
+				}
             }
         };
         this.WriteComment = function(comment)
@@ -3926,6 +4168,154 @@
 			}
 			this.bs.WriteItem(c_oSer_PivotTypes.table, function() {pivotTable.toXml(oThis.memory);});
 		}
+        this.WriteHeaderFooter = function(headerFooter)
+        {
+            var oThis = this;
+            if (null !== headerFooter.alignWithMargins) {
+                this.bs.WriteItem(c_oSer_HeaderFooter.AlignWithMargins, function() {oThis.memory.WriteBool(headerFooter.alignWithMargins);});
+            }
+            if (null !== headerFooter.differentFirst) {
+                this.bs.WriteItem(c_oSer_HeaderFooter.DifferentFirst, function() {oThis.memory.WriteBool(headerFooter.differentFirst);});
+            }
+            if (null !== headerFooter.differentOddEven) {
+                this.bs.WriteItem(c_oSer_HeaderFooter.DifferentOddEven, function() {oThis.memory.WriteBool(headerFooter.differentOddEven);});
+            }
+            if (null !== headerFooter.scaleWithDoc) {
+                this.bs.WriteItem(c_oSer_HeaderFooter.ScaleWithDoc, function() {oThis.memory.WriteBool(headerFooter.scaleWithDoc);});
+            }
+            if (null !== headerFooter.evenFooter) {
+                this.memory.WriteByte(c_oSer_HeaderFooter.EvenFooter);
+                this.memory.WriteString2(headerFooter.evenFooter);
+            }
+            if (null !== headerFooter.evenHeader) {
+                this.memory.WriteByte(c_oSer_HeaderFooter.EvenHeader);
+                this.memory.WriteString2(headerFooter.evenHeader);
+            }
+            if (null !== headerFooter.firstFooter) {
+                this.memory.WriteByte(c_oSer_HeaderFooter.FirstFooter);
+                this.memory.WriteString2(headerFooter.firstFooter);
+            }
+            if (null !== headerFooter.firstHeader) {
+                this.memory.WriteByte(c_oSer_HeaderFooter.FirstHeader);
+                this.memory.WriteString2(headerFooter.firstHeader);
+            }
+            if (null !== headerFooter.oddFooter) {
+                this.memory.WriteByte(c_oSer_HeaderFooter.OddFooter);
+                this.memory.WriteString2(headerFooter.oddFooter);
+            }
+            if (null !== headerFooter.oddHeader) {
+                this.memory.WriteByte(c_oSer_HeaderFooter.OddHeader);
+                this.memory.WriteString2(headerFooter.oddHeader);
+            }
+        }
+        this.WriteRowColBreaks = function(breaks)
+        {
+            var oThis = this;
+            if (null !== breaks.count) {
+                this.bs.WriteItem(c_oSer_RowColBreaks.Count, function() {oThis.memory.WriteLong(breaks.count);});
+            }
+            if (null !== breaks.manualBreakCount) {
+                this.bs.WriteItem(c_oSer_RowColBreaks.ManualBreakCount, function() {oThis.memory.WriteLong(breaks.manualBreakCount);});
+            }
+            for(var i = 0; i < breaks.breaks.length; ++i){
+                this.bs.WriteItem(c_oSer_RowColBreaks.Break, function() {oThis.WriteRowColBreak(breaks.breaks[i]);});
+            }
+        };
+        this.WriteRowColBreak = function(brk)
+        {
+            var oThis = this;
+            if (null !== brk.id) {
+                this.bs.WriteItem(c_oSer_RowColBreaks.Id, function() {oThis.memory.WriteLong(brk.id);});
+            }
+            if (null !== brk.man) {
+                this.bs.WriteItem(c_oSer_RowColBreaks.Man, function() {oThis.memory.WriteBool(brk.man);});
+            }
+            if (null !== brk.max) {
+                this.bs.WriteItem(c_oSer_RowColBreaks.Max, function() {oThis.memory.WriteLong(brk.max);});
+            }
+            if (null !== brk.min) {
+                this.bs.WriteItem(c_oSer_RowColBreaks.Min, function() {oThis.memory.WriteLong(brk.min);});
+            }
+            if (null !== brk.pt) {
+                this.bs.WriteItem(c_oSer_RowColBreaks.Pt, function() {oThis.memory.WriteBool(brk.pt);});
+            }
+        };
+        this.WriteLegacyDrawingHF = function(legacyDrawingHF)
+        {
+            var oThis = this;
+            if (null !== legacyDrawingHF.cfe) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Cfe, function() {oThis.memory.WriteLong(legacyDrawingHF.cfe);});
+            }
+            if (null !== legacyDrawingHF.cff) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Cff, function() {oThis.memory.WriteLong(legacyDrawingHF.cff);});
+            }
+            if (null !== legacyDrawingHF.cfo) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Cfo, function() {oThis.memory.WriteLong(legacyDrawingHF.cfo);});
+            }
+            if (null !== legacyDrawingHF.che) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Che, function() {oThis.memory.WriteLong(legacyDrawingHF.che);});
+            }
+            if (null !== legacyDrawingHF.chf) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Chf, function() {oThis.memory.WriteLong(legacyDrawingHF.chf);});
+            }
+            if (null !== legacyDrawingHF.cho) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Cho, function() {oThis.memory.WriteLong(legacyDrawingHF.cho);});
+            }
+            if (null !== legacyDrawingHF.lfe) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Lfe, function() {oThis.memory.WriteLong(legacyDrawingHF.lfe);});
+            }
+            if (null !== legacyDrawingHF.lff) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Lff, function() {oThis.memory.WriteLong(legacyDrawingHF.lff);});
+            }
+            if (null !== legacyDrawingHF.lfo) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Lfo, function() {oThis.memory.WriteLong(legacyDrawingHF.lfo);});
+            }
+            if (null !== legacyDrawingHF.lhe) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Lhe, function() {oThis.memory.WriteLong(legacyDrawingHF.lhe);});
+            }
+            if (null !== legacyDrawingHF.lhf) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Lhf, function() {oThis.memory.WriteLong(legacyDrawingHF.lhf);});
+            }
+            if (null !== legacyDrawingHF.lho) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Lho, function() {oThis.memory.WriteLong(legacyDrawingHF.lho);});
+            }
+            if (null !== legacyDrawingHF.rfe) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Rfe, function() {oThis.memory.WriteLong(legacyDrawingHF.rfe);});
+            }
+            if (null !== legacyDrawingHF.rff) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Rff, function() {oThis.memory.WriteLong(legacyDrawingHF.rff);});
+            }
+            if (null !== legacyDrawingHF.rfo) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Rfo, function() {oThis.memory.WriteLong(legacyDrawingHF.rfo);});
+            }
+            if (null !== legacyDrawingHF.rhe) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Rhe, function() {oThis.memory.WriteLong(legacyDrawingHF.rhe);});
+            }
+            if (null !== legacyDrawingHF.rhf) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Rhf, function() {oThis.memory.WriteLong(legacyDrawingHF.rhf);});
+            }
+            if (null !== legacyDrawingHF.rho) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Rho, function() {oThis.memory.WriteLong(legacyDrawingHF.rho);});
+            }
+            this.bs.WriteItem(c_oSer_LegacyDrawingHF.Drawings, function() {oThis.WriteLegacyDrawingHFDrawings(legacyDrawingHF.drawings);});
+
+        };
+        this.WriteLegacyDrawingHFDrawings = function(drawings) {
+            var oThis = this;
+            for (var i = 0; i < drawings.length; ++i) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.Drawing, function() {oThis.WriteLegacyDrawingHFDrawing(drawings[i]);});
+            }
+        };
+        this.WriteLegacyDrawingHFDrawing = function(drawing) {
+            var oThis = this;
+            if (null !== drawing.id) {
+                this.memory.WriteByte(c_oSer_LegacyDrawingHF.DrawingId);
+                this.memory.WriteString2(drawing.id);
+            }
+            if (null !== drawing.graphicObject) {
+                this.bs.WriteItem(c_oSer_LegacyDrawingHF.DrawingShape, function(){pptx_content_writer.WriteDrawing(oThis.memory, drawing.graphicObject, null, null, null);});
+            }
+        }
     }
     /** @constructor */
     function BinaryOtherTableWriter(memory, wb)
@@ -4943,8 +5333,8 @@
 			if ((useNumId || this.useNumId) &&
 				((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
 				(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44))) {
-				oRes.id = oNum.id;
-			}
+					oRes.id = oNum.id;
+				}
 			if (null != oNumFmts) {
 				oNumFmts[oNum.id] = oRes;
 			}
@@ -5538,6 +5928,12 @@
                     return oThis.ReadDefinedNames(t,l);
                 });
             }
+			else if (c_oSerWorkbookTypes.CalcPr === type)
+			{
+				res = this.bcr.Read1(length, function(t, l) {
+					return oThis.ReadCalcPr(t, l, oThis.oWorkbook.calcPr);
+				});
+			}
 			else if ( c_oSerWorkbookTypes.ExternalReferences === type )
 			{
 				res = this.bcr.Read1(length, function(t,l){
@@ -5633,6 +6029,39 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
+		this.ReadCalcPr = function(type, length, oCalcPr) {
+			var res = c_oSerConstants.ReadOk;
+			if (c_oSerCalcPrTypes.CalcId == type) {
+				oCalcPr.calcId = this.stream.GetULongLE();
+			} else if (c_oSerCalcPrTypes.CalcMode == type) {
+				oCalcPr.calcMode = this.stream.GetUChar();
+			} else if (c_oSerCalcPrTypes.FullCalcOnLoad == type) {
+				oCalcPr.fullCalcOnLoad = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.RefMode == type) {
+				oCalcPr.refMode = this.stream.GetUChar();
+			} else if (c_oSerCalcPrTypes.Iterate == type) {
+				oCalcPr.iterate = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.IterateCount == type) {
+				oCalcPr.iterateCount = this.stream.GetULongLE();
+			} else if (c_oSerCalcPrTypes.IterateDelta == type) {
+				oCalcPr.iterateDelta = this.stream.GetDoubleLE();
+			} else if (c_oSerCalcPrTypes.FullPrecision == type) {
+				oCalcPr.fullPrecision = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.CalcCompleted == type) {
+				oCalcPr.calcCompleted = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.CalcOnSave == type) {
+				oCalcPr.calcOnSave = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.ConcurrentCalc == type) {
+				oCalcPr.concurrentCalc = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.ConcurrentManualCount == type) {
+				oCalcPr.concurrentManualCount = this.stream.GetULongLE();
+			} else if (c_oSerCalcPrTypes.ForceFullCalc == type) {
+				oCalcPr.forceFullCalc = this.stream.GetBool();
+			} else {
+				res = c_oSerConstants.ReadUnknown;
+			}
+			return res;
+		};
 		this.ReadExternalReferences = function(type, length) {
 			var res = c_oSerConstants.ReadOk;
 			var oThis = this;
@@ -5796,6 +6225,46 @@
                 return oThis.ReadWorksheetsContent(t,l);
             });
         };
+		this.ReadSheetDataExternal = function(bNoBuildDep)
+		{
+			//console.profile('ReadSheetDataExternal');
+			var oThis = this;
+			var res = c_oSerConstants.ReadOk;
+			var oldPos = this.stream.GetCurPos();
+			for (var i = 0; i < this.oReadResult.sheetData.length; ++i) {
+				var sheetDataElem = this.oReadResult.sheetData[i];
+				var ws = sheetDataElem.ws;
+				this.stream.Seek2(sheetDataElem.pos);
+				var tmp = {
+					pos: null, len: null, bNoBuildDep: bNoBuildDep, ws: ws, row: new AscCommonExcel.Row(ws),
+					cell: new AscCommonExcel.Cell(ws), formula: new OpenFormula(), sharedFormulas: {},
+					prevFormulas: {}, siFormulas: {}, prevRow: -1, prevCol: -1
+				};
+				res = this.bcr.Read1(sheetDataElem.len, function(t, l) {
+					return oThis.ReadSheetData(t, l, tmp);
+				});
+				if (!bNoBuildDep) {
+					for (var nCol in tmp.prevFormulas) {
+						if (tmp.prevFormulas.hasOwnProperty(nCol)) {
+							var prevFormula = tmp.prevFormulas[nCol];
+							if (!tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+								prevFormula.parsed.buildDependencies();
+							}
+						}
+					}
+					for (var listenerId in tmp.siFormulas) {
+						if (tmp.siFormulas.hasOwnProperty(listenerId)) {
+							tmp.siFormulas[listenerId].buildDependencies();
+						}
+					}
+				}
+				if(c_oSerConstants.ReadOk !== res)
+					break;
+			}
+			this.stream.Seek2(oldPos);
+			//console.profileEnd();
+			return res;
+		};
         this.ReadWorksheetsContent = function(type, length)
         {
             var res = c_oSerConstants.ReadOk;
@@ -5855,8 +6324,6 @@
             }
             else if ( c_oSerWorksheetsTypes.Cols == type )
             {
-                if(null == oWorksheet.Cols)
-                    oWorksheet.aCols = [];
                 var aTempCols = [];
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheetCols(t,l, aTempCols, oWorksheet);
@@ -5921,28 +6388,18 @@
             }
             else if ( c_oSerWorksheetsTypes.PageMargins == type )
             {
-                var oPageMargins = new Asc.asc_CPageMargins();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadPageMargins(t,l, oPageMargins);
+                    return oThis.ReadPageMargins(t,l, oWorksheet.PagePrintOptions.pageMargins);
                 });
-                if(null == oWorksheet.PagePrintOptions)
-                    oWorksheet.PagePrintOptions = new Asc.asc_CPageOptions();
-                oWorksheet.PagePrintOptions.asc_setPageMargins(oPageMargins);
             }
             else if ( c_oSerWorksheetsTypes.PageSetup == type )
             {
-                var oPageSetup = new Asc.asc_CPageSetup();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadPageSetup(t,l, oPageSetup);
+                    return oThis.ReadPageSetup(t,l, oWorksheet.PagePrintOptions.pageSetup);
                 });
-                if(null == oWorksheet.PagePrintOptions)
-                    oWorksheet.PagePrintOptions = new Asc.asc_CPageOptions();
-                oWorksheet.PagePrintOptions.asc_setPageSetup(oPageSetup);
             }
             else if ( c_oSerWorksheetsTypes.PrintOptions == type )
             {
-                if(null == oWorksheet.PagePrintOptions)
-                    oWorksheet.PagePrintOptions = new Asc.asc_CPageOptions();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadPrintOptions(t,l, oWorksheet.PagePrintOptions);
                 });
@@ -5961,11 +6418,8 @@
             }
             else if ( c_oSerWorksheetsTypes.SheetData == type )
             {
-				var tempRow = new AscCommonExcel.Row(oWorksheet);
-				var tmpData = {pos: null, len: null, prevRow: -1, prevCol: -1};
-                res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadSheetData(t,l, oWorksheet, tempRow, tmpData);
-                });
+				this.oReadResult.sheetData.push({ws: oWorksheet, pos: this.stream.GetCurPos(), len: length});
+				res = c_oSerConstants.ReadUnknown;
             }
             else if ( c_oSerWorksheetsTypes.Drawings == type )
             {
@@ -6013,6 +6467,36 @@
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSparklineGroups(t, l, oWorksheet);
                 });
+            } else if (c_oSerWorksheetsTypes.HeaderFooter === type) {
+                oWorksheet.headerFooter = {
+                    alignWithMargins: null, differentFirst: null, differentOddEven: null, scaleWithDoc: null,
+                    evenFooter: null, evenHeader: null, firstFooter: null, firstHeader: null, oddFooter: null,
+                    oddHeader: null
+                };
+                res = this.bcr.Read1(length, function(t, l) {
+                    return oThis.ReadHeaderFooter(t, l, oWorksheet.headerFooter);
+                });
+            } else if (c_oSerWorksheetsTypes.RowBreaks === type) {
+                oWorksheet.rowBreaks = {count: null, manualBreakCount: null, breaks: []};
+                res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadRowColBreaks(t, l, oWorksheet.rowBreaks);
+                });
+            } else if (c_oSerWorksheetsTypes.ColBreaks === type) {
+                oWorksheet.colBreaks = {count: null, manualBreakCount: null, breaks: []};
+                res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadRowColBreaks(t, l, oWorksheet.colBreaks);
+                });
+            } else if (c_oSerWorksheetsTypes.LegacyDrawingHF === type) {
+                oWorksheet.legacyDrawingHF = {
+                    drawings: [], cfe: null, cff: null, cfo: null, che: null, chf: null, cho: null, lfe: null,
+                    lff: null, lfo: null, lhe: null, lhf: null, lho: null, rfe: null, rff: null, rfo: null, rhe: null,
+                    rhf: null, rho: null
+                };
+                res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadLegacyDrawingHF(t, l, oWorksheet.legacyDrawingHF);
+                });
+            } else if (c_oSerWorksheetsTypes.Picture === type) {
+                oWorksheet.picture = this.stream.GetString2LE(length);
             } else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -6209,124 +6693,192 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadSheetData = function(type, length, ws, tempRow, tmpData)
+        this.ReadSheetData = function(type, length, tmp)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerWorksheetsTypes.Row == type )
+            if ( c_oSerWorksheetsTypes.Row === type )
             {
-				tmpData.pos =  null;
-				tmpData.len = null;
-				tempRow.clear();
+				tmp.pos =  null;
+				tmp.len = null;
+				tmp.row.clear();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadRow(t,l, tempRow, ws, tmpData);
+                    return oThis.ReadRow(t,l, tmp);
                 });
-				if(null === tempRow.index) {
-					tempRow.index = tmpData.prevRow + 1;
+				if(null === tmp.row.index) {
+					tmp.row.index = tmp.prevRow + 1;
 				}
-				tempRow.saveContent();
-				if(tempRow.index >= ws.nRowsCount)
-					ws.nRowsCount = tempRow.index + 1;
-				tmpData.prevRow = tempRow.index;
-				tmpData.prevCol = -1;
+				tmp.row.saveContent();
+				if(tmp.row.index >= tmp.ws.nRowsCount)
+                    tmp.ws.nRowsCount = tmp.row.index + 1;
+				tmp.prevRow = tmp.row.index;
+				tmp.prevCol = -1;
 				//читаем ячейки
-				if (null != tmpData.pos && null != tmpData.len) {
+				if (null !== tmp.pos && null !== tmp.len) {
 					var nOldPos = this.stream.GetCurPos();
-					this.stream.Seek2(tmpData.pos);
-					var tempCell = new AscCommonExcel.Cell(ws);
-					res = this.bcr.Read1(tmpData.len, function(t, l) {
-						return oThis.ReadCells(t, l, ws, tempCell, tmpData);
+					this.stream.Seek2(tmp.pos);
+					res = this.bcr.Read1(tmp.len, function(t,l){
+						return oThis.ReadCells(t,l, tmp, tmp.row.index);
 					});
-					 this.stream.Seek2(nOldPos);
+					this.stream.Seek2(nOldPos);
 				}
-            }
+			}
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadRow = function(type, length, oRow, ws, tmpData)
+        this.ReadRow = function(type, length, tmp)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSerRowTypes.Row == type )
             {
             	var index = this.stream.GetULongLE() - 1;
-                oRow.setIndex(index);
+				tmp.row.setIndex(index);
             }
             else if ( c_oSerRowTypes.Style == type )
             {
                 var xfs = this.aCellXfs[this.stream.GetULongLE()];
                 if(xfs)
-                    oRow.setStyle(xfs);
+					tmp.row.setStyle(xfs);
             }
             else if ( c_oSerRowTypes.Height == type )
             {
             	var h = this.stream.GetDoubleLE();
-                oRow.setHeight(h);
+				tmp.row.setHeight(h);
                 if(AscCommon.CurFileVersion < 2)
-					oRow.setCustomHeight(true);
+					tmp.row.setCustomHeight(true);
             }
             else if ( c_oSerRowTypes.CustomHeight == type )
 			{
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oRow.setCustomHeight(true);
+					tmp.row.setCustomHeight(true);
 			}
             else if ( c_oSerRowTypes.Hidden == type )
 			{
 				var hd = this.stream.GetBool();
 				if(hd)
-					oRow.setHidden(true);
+					tmp.row.setHidden(true);
 			}
             else if ( c_oSerRowTypes.Cells == type )
             {
 				//запоминам место чтобы читать Cells в конце, когда уже зачитан oRow.index
-				tmpData.pos = this.stream.GetCurPos();
-				tmpData.len = length;
+				tmp.pos = this.stream.GetCurPos();
+				tmp.len = length;
 				res = c_oSerConstants.ReadUnknown;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCells = function(type, length, ws, tempCell, tmpData)
+        this.ReadCells = function(type, length, tmp, index)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerRowTypes.Cell == type )
+            if ( c_oSerRowTypes.Cell === type )
             {
-				tempCell.clear();
+				tmp.cell.clear();
+                tmp.formula.clean();
                 res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCell(t,l, ws, tempCell, tmpData.prevRow);
+                    return oThis.ReadCell(t,l, tmp, tmp.cell, tmp.prevRow);
                 });
-                if (tempCell.hasRowCol()) {
-                    tmpData.prevCol = tempCell.nCol;
+                if (tmp.cell.hasRowCol()) {
+                    tmp.prevCol = tmp.cell.nCol;
                 } else {
-                    tmpData.prevCol++;
-                    tempCell.setRowCol(tmpData.prevRow, tmpData.prevCol);
+                    tmp.prevCol++;
+                    tmp.cell.setRowCol(tmp.prevRow, tmp.prevCol);
                 }
-				tempCell.saveContent();
-                if (tempCell.nCol >= ws.nColsCount) {
-                    ws.nColsCount = tempCell.nCol + 1;
+				//use only excel
+				if(!(this.copyPasteObj && this.copyPasteObj.isCopyPaste && typeof editor != "undefined" && editor)) {
+					this.setFormulaOpen(tmp);
+				}
+				tmp.cell.saveContent();
+                if (tmp.cell.nCol >= tmp.ws.nColsCount) {
+                    tmp.ws.nColsCount = tmp.cell.nCol + 1;
                 }
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCell = function(type, length, ws, oCell, nRowIndex)
+		this.setFormulaOpen = function(tmp) {
+			var cell = tmp.cell;
+			var formula = tmp.formula;
+			var curFormula;
+			var prevFormula = tmp.prevFormulas[cell.nCol];
+			if (formula.v && formula.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+				var offsetRow;
+				var shared;
+				var sharedRef;
+				if (prevFormula && (shared = prevFormula.parsed.getShared())) {
+					offsetRow = cell.nRow - shared.ref.r1;
+				} else {
+					offsetRow = 1;
+				}
+				if (prevFormula && prevFormula.nRow + offsetRow === cell.nRow &&
+					AscCommonExcel.compareFormula(prevFormula.formula, prevFormula.refPos, formula.v, offsetRow)) {
+					if (!(shared && shared.ref)) {
+					    sharedRef = new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow);
+						prevFormula.parsed.setShared(sharedRef, prevFormula.base);
+					} else {
+						shared.ref.union3(cell.nCol, cell.nRow);
+					}
+					curFormula = prevFormula;
+				} else {
+					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+						prevFormula.parsed.buildDependencies();
+					}
+					var parseResult = new AscCommonExcel.ParseResult([]);
+					var newFormulaParent = new AscCommonExcel.CCellWithFormula(cell.ws, cell.nRow, cell.nCol);
+					var parsed = new AscCommonExcel.parserFormula(formula.v, newFormulaParent, cell.ws);
+					parsed.ca = formula.ca;
+					parsed.parse(undefined, undefined, parseResult);
+					if (null !== formula.ref) {
+						sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
+						parsed.setShared(sharedRef, newFormulaParent);
+					}
+					curFormula = new OpenColumnFormula(cell.nRow, formula.v, parsed, parseResult.refPos, newFormulaParent);
+					tmp.prevFormulas[cell.nCol] = curFormula;
+				}
+				if (null !== formula.si) {
+					tmp.sharedFormulas[formula.si] = curFormula;
+					tmp.siFormulas[curFormula.parsed.getListenerId()] = curFormula.parsed;
+				}
+			} else if (null !== formula.si) {
+				curFormula = tmp.sharedFormulas[formula.si];
+				if (curFormula) {
+					curFormula.parsed.getShared().ref.union3(cell.nCol, cell.nRow);
+				}
+				if (prevFormula !== curFormula) {
+					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+						prevFormula.parsed.buildDependencies();
+					}
+					tmp.prevFormulas[cell.nCol] = curFormula;
+				}
+			}
+			if (curFormula) {
+				cell.setFormulaInternal(curFormula.parsed);
+				//TODO в версии 5.1.5 при открытии ячейки с формулой и пустым текстом попадали в changedCell по условию !cell.getValueWithoutFormat()
+				//TODO добавляю данное условие для правки бага. до выпуска обязательно пересмотреть!!!
+				if (curFormula.parsed.ca || cell.isNullTextString() || !cell.getValueWithoutFormat()) {
+					tmp.ws.workbook.dependencyFormulas.addToChangedCell(cell);
+				}
+			}
+		};
+        this.ReadCell = function(type, length, tmp, oCell, nRowIndex)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerCellTypes.Ref == type ){
+            if ( c_oSerCellTypes.Ref === type ){
 				var oCellAddress = AscCommon.g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
 				oCell.setRowCol(nRowIndex, oCellAddress.getCol0());
 			}
-            else if ( c_oSerCellTypes.RefRowCol == type ){
+            else if ( c_oSerCellTypes.RefRowCol === type ){
 				var nRow = this.stream.GetULongLE();//todo не используем можно убрать
 				oCell.setRowCol(nRowIndex, this.stream.GetULongLE());
 			}
-            else if( c_oSerCellTypes.Style == type )
+            else if( c_oSerCellTypes.Style === type )
             {
                 var nStyleIndex = this.stream.GetULongLE();
                 if(0 != nStyleIndex)
@@ -6336,7 +6888,7 @@
                         oCell.setStyle(xfs);
                 }
             }
-            else if( c_oSerCellTypes.Type == type )
+            else if( c_oSerCellTypes.Type === type )
             {
                 switch(this.stream.GetUChar())
                 {
@@ -6346,18 +6898,15 @@
                     case ECellTypeType.celltypeSharedString: oCell.setTypeInternal(CellValueType.String);break;
                 }
             }
-            else if( c_oSerCellTypes.Formula == type )
+            else if( c_oSerCellTypes.Formula === type )
             {
-                var cellWithFormula = new AscCommonExcel.CCellWithFormula(ws, oCell.nRow, oCell.nCol);
-				var oFormulaExt = {cell: cellWithFormula, aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, ref: null, si: null, t: null, v: null};
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadFormula(t,l, oFormulaExt);
+                    return oThis.ReadFormula(t,l, tmp.formula);
                 });
-				ws.aFormulaExt.push(oFormulaExt);
             }
-			else if (c_oSerCellTypes.Value == type) {
+			else if (c_oSerCellTypes.Value === type) {
 				var val = this.stream.GetDoubleLE();
-				if (CellValueType.String == oCell.getType() || CellValueType.Error == oCell.getType()) {
+				if (CellValueType.String === oCell.getType() || CellValueType.Error === oCell.getType()) {
 					var ss = this.aSharedStrings[val];
                     if (typeof ss === 'string') {
                         oCell.setValueTextInternal(ss);
@@ -6375,31 +6924,31 @@
         this.ReadFormula = function(type, length, oFormula)
         {
             var res = c_oSerConstants.ReadOk;
-            if ( c_oSerFormulaTypes.Aca == type )
+            if ( c_oSerFormulaTypes.Aca === type )
                 oFormula.aca = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Bx == type )
+            else if ( c_oSerFormulaTypes.Bx === type )
                 oFormula.bx = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Ca == type )
+            else if ( c_oSerFormulaTypes.Ca === type )
                 oFormula.ca = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Del1 == type )
+            else if ( c_oSerFormulaTypes.Del1 === type )
                 oFormula.del1 = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Del2 == type )
+            else if ( c_oSerFormulaTypes.Del2 === type )
                 oFormula.del2 = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Dt2D == type )
+            else if ( c_oSerFormulaTypes.Dt2D === type )
                 oFormula.dt2d = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Dtr == type )
+            else if ( c_oSerFormulaTypes.Dtr === type )
                 oFormula.dtr = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.R1 == type )
+            else if ( c_oSerFormulaTypes.R1 === type )
                 oFormula.r1 = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.R2 == type )
+            else if ( c_oSerFormulaTypes.R2 === type )
                 oFormula.r2 = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.Ref == type )
+            else if ( c_oSerFormulaTypes.Ref === type )
                 oFormula.ref = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.Si == type )
+            else if ( c_oSerFormulaTypes.Si === type )
                 oFormula.si = this.stream.GetULongLE();
-            else if ( c_oSerFormulaTypes.T == type )
+            else if ( c_oSerFormulaTypes.T === type )
                 oFormula.t = this.stream.GetUChar();
-            else if ( c_oSerFormulaTypes.Text == type )
+            else if ( c_oSerFormulaTypes.Text === type )
                 oFormula.v = this.stream.GetString2LE(length);
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -6512,22 +7061,29 @@
             /** proprietary end **/
             else if ( c_oSer_DrawingType.pptxDrawing == type )
             {
-
                // res = c_oSerConstants.ReadUnknown;
-                var oGraphicObject = pptx_content_loader.ReadGraphicObject(this.stream, this.curWorksheet);
-                if(null != oGraphicObject
-                    && !((oGraphicObject.getObjectType() === AscDFH.historyitem_type_Shape || oGraphicObject.getObjectType() === AscDFH.historyitem_type_ImageShape) && !oGraphicObject.spPr)
-                    && !AscCommon.IsHiddenObj(oGraphicObject))
-                {
-                    oDrawing.graphicObject = oGraphicObject;
-					//TODO при copy/paste в word из excel пропадает метод setDrawingBase
-					if(typeof oGraphicObject.setDrawingBase != "undefined")
-						oGraphicObject.setDrawingBase(oDrawing);
+                var graphicObject = this.ReadPptxDrawing();
+                if (graphicObject) {
+                    oDrawing.graphicObject = graphicObject;
+                    //TODO при copy/paste в word из excel пропадает метод setDrawingBase
+                    if(typeof graphicObject.setDrawingBase != "undefined")
+                        graphicObject.setDrawingBase(oDrawing);
                 }
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
+        };
+        this.ReadPptxDrawing = function () {
+            var graphicObject;
+            var oGraphicObject = pptx_content_loader.ReadGraphicObject(this.stream, this.curWorksheet);
+            if(null != oGraphicObject
+                && !((oGraphicObject.getObjectType() === AscDFH.historyitem_type_Shape || oGraphicObject.getObjectType() === AscDFH.historyitem_type_ImageShape) && !oGraphicObject.spPr)
+                && !AscCommon.IsHiddenObj(oGraphicObject))
+            {
+                graphicObject = oGraphicObject;
+            }
+            return graphicObject;
         };
         this.ReadGraphicFrame = function (type, length, oDrawing) {
             var res = c_oSerConstants.ReadOk;
@@ -6615,20 +7171,21 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadComment(t,l, oCommentCoords, aCommentData);
                 });
-                //todo проверка
-                var i;
-                for(i = 0, length = aCommentData.length; i < length; ++i)
-                {
-					aCommentData[i].coords = oCommentCoords;
+                if (oCommentCoords.isValid()) {
+                    var i;
+                    for(i = 0, length = aCommentData.length; i < length; ++i)
+                    {
+                        aCommentData[i].coords = oCommentCoords;
 
-                    var elem = aCommentData[i];
-                    elem.asc_putRow(oCommentCoords.nRow);
-                    elem.asc_putCol(oCommentCoords.nCol);
+                        var elem = aCommentData[i];
+                        elem.asc_putRow(oCommentCoords.nRow);
+                        elem.asc_putCol(oCommentCoords.nCol);
 
-                    if (elem.asc_getDocumentFlag()) {
-                        this.wb.aComments.push(elem);
-                    } else {
-                        oWorksheet.aComments.push(elem);
+                        if (elem.asc_getDocumentFlag()) {
+                            this.wb.aComments.push(elem);
+                        } else {
+                            oWorksheet.aComments.push(elem);
+                        }
                     }
                 }
             }
@@ -7057,6 +7614,141 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
+        this.ReadHeaderFooter = function (type, length, headerFooter) {
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_HeaderFooter.AlignWithMargins === type) {
+                headerFooter.alignWithMargins = this.stream.GetBool();
+            } else if (c_oSer_HeaderFooter.DifferentFirst === type) {
+                headerFooter.differentFirst = this.stream.GetBool();
+            } else if (c_oSer_HeaderFooter.DifferentOddEven === type) {
+                headerFooter.differentOddEven = this.stream.GetBool();
+            } else if (c_oSer_HeaderFooter.ScaleWithDoc === type) {
+                headerFooter.scaleWithDoc = this.stream.GetBool();
+            } else if (c_oSer_HeaderFooter.EvenFooter === type) {
+                headerFooter.evenFooter = this.stream.GetString2LE(length);
+            } else if (c_oSer_HeaderFooter.EvenHeader === type) {
+                headerFooter.evenHeader = this.stream.GetString2LE(length);
+            } else if (c_oSer_HeaderFooter.FirstFooter === type) {
+                headerFooter.firstFooter = this.stream.GetString2LE(length);
+            } else if (c_oSer_HeaderFooter.FirstHeader === type) {
+                headerFooter.firstHeader = this.stream.GetString2LE(length);
+            } else if (c_oSer_HeaderFooter.OddFooter === type) {
+                headerFooter.oddFooter = this.stream.GetString2LE(length);
+            } else if (c_oSer_HeaderFooter.OddHeader === type) {
+                headerFooter.oddHeader = this.stream.GetString2LE(length);
+            } else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+        this.ReadRowColBreaks = function (type, length, breaks) {
+            var oThis = this;
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_RowColBreaks.Count === type) {
+                breaks.count = this.stream.GetLong();
+            } else if (c_oSer_RowColBreaks.ManualBreakCount === type) {
+                breaks.manualBreakCount = this.stream.GetLong();
+            } else if (c_oSer_RowColBreaks.Break === type) {
+                var brk = {id: null, man: null, max: null, min: null, pt: null};
+                res = this.bcr.Read1(length, function(t, l) {
+                    return oThis.ReadRowColBreak(t, l, brk);
+                });
+                breaks.breaks.push(brk);
+            } else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+        this.ReadRowColBreak = function (type, length, brk) {
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_RowColBreaks.Id === type) {
+                brk.id = this.stream.GetLong();
+            } else if (c_oSer_RowColBreaks.Man === type) {
+                brk.man = this.stream.GetBool();
+            } else if (c_oSer_RowColBreaks.Max === type) {
+                brk.max = this.stream.GetLong();
+            } else if (c_oSer_RowColBreaks.Min === type) {
+                brk.min = this.stream.GetLong();
+            } else if (c_oSer_RowColBreaks.Pt === type) {
+                brk.pt = this.stream.GetBool();
+            } else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+        this.ReadLegacyDrawingHF = function (type, length, legacyDrawingHF) {
+            var oThis = this;
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_LegacyDrawingHF.Drawings === type) {
+                res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadLegacyDrawingHFDrawings(t, l, legacyDrawingHF.drawings);
+                });
+            } else if (c_oSer_LegacyDrawingHF.Cfe === type) {
+                legacyDrawingHF.cfe = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Cff === type) {
+                legacyDrawingHF.cff = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Cfo === type) {
+                legacyDrawingHF.cfo = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Che === type) {
+                legacyDrawingHF.che = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Chf === type) {
+                legacyDrawingHF.chf = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Cho === type) {
+                legacyDrawingHF.cho = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Lfe === type) {
+                legacyDrawingHF.lfe = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Lff === type) {
+                legacyDrawingHF.lff = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Lfo === type) {
+                legacyDrawingHF.lfo = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Lhe === type) {
+                legacyDrawingHF.lhe = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Lhf === type) {
+                legacyDrawingHF.lhf = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Lho === type) {
+                legacyDrawingHF.lho = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Rfe === type) {
+                legacyDrawingHF.rfe = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Rff === type) {
+                legacyDrawingHF.rff = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Rfo === type) {
+                legacyDrawingHF.rfo = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Rhe === type) {
+                legacyDrawingHF.rhe = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Rhf === type) {
+                legacyDrawingHF.rhf = this.stream.GetBool();
+            } else if (c_oSer_LegacyDrawingHF.Rho === type) {
+                legacyDrawingHF.rho = this.stream.GetBool();
+            } else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+        this.ReadLegacyDrawingHFDrawings = function (type, length, drawings) {
+            var oThis = this;
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_LegacyDrawingHF.Drawing === type) {
+                var drawing = {id: null, graphicObject: null};
+                res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadLegacyDrawingHFDrawing(t, l, drawing);
+                });
+                if (null !== drawing.id && null !== drawing.graphicObject) {
+                    drawings.push(drawing);
+                }
+            } else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+        this.ReadLegacyDrawingHFDrawing = function (type, length, drawing) {
+            var oThis = this;
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_LegacyDrawingHF.DrawingId === type) {
+                drawing.id = this.stream.GetString2LE(length);
+            } else if (c_oSer_LegacyDrawingHF.DrawingShape === type) {
+                var graphicObject = this.ReadPptxDrawing();
+                if (graphicObject) {
+                    drawing.graphicObject = graphicObject;
+                }
+            } else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
 		this.ReadSparklineGroup = function (type, length, oSparklineGroup) {
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
@@ -7365,7 +8057,8 @@
             activeRange: null
         };
         this.oReadResult = {
-            tableCustomFunc: []
+            tableCustomFunc: [],
+            sheetData: []
         };
         this.getbase64DecodedData = function(szSrc)
         {
@@ -7641,6 +8334,7 @@
                 if(c_oSerConstants.ReadOk == res)
                     res = (new Binary_StylesTableReader(this.stream, wb, aCellXfs, aDxfs, this.copyPasteObj.isCopyPaste)).Read();
             }
+			var bwtr = new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj);
             if(c_oSerConstants.ReadOk == res)
             {
                 for(var i = 0; i < aSeekTable.length; ++i)
@@ -7687,9 +8381,13 @@
                     if(c_oSerConstants.ReadOk == res)
                         res = (new Binary_WorkbookTableReader(this.stream, wb, bwtr)).Read();
                 }
+				bwtr.ReadSheetDataExternal(false);
                 wb.init(this.oReadResult.tableCustomFunc, false, true);
-            } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){
-                wb.init(this.oReadResult.tableCustomFunc, true);
+            } else {
+				bwtr.ReadSheetDataExternal(true);
+				if(window["Asc"] && window["Asc"]["editor"] !== undefined) {
+					wb.init(this.oReadResult.tableCustomFunc, true);
+				}
             }
             return res;
         };

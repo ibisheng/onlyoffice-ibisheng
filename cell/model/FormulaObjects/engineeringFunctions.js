@@ -1052,7 +1052,7 @@ function (window, undefined) {
 				unitConverterArr["g"] = {};//грамм
 
 				unitConverterArr["g"]["sg"] = 0.0000685220500053478;
-				unitConverterArr["g"]["lbm"] = 0.00220462291469134;
+				unitConverterArr["g"]["lbm"] = 0.0022046226218487763;
 				unitConverterArr["g"]["u"] = 6.022137E+023;
 				unitConverterArr["g"]["ozm"] = 0.0352739718003627;
 				unitConverterArr["g"]["grain"] = 15.43236;

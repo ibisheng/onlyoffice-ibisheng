@@ -64,9 +64,9 @@ CLogicDocumentController.prototype.AddInlineTable = function(nCols, nRows)
 {
 	this.LogicDocument.controller_AddInlineTable(nCols, nRows);
 };
-CLogicDocumentController.prototype.ClearParagraphFormatting = function()
+CLogicDocumentController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.LogicDocument.controller_ClearParagraphFormatting();
+	this.LogicDocument.controller_ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 };
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
 {
@@ -135,10 +135,6 @@ CLogicDocumentController.prototype.SetParagraphTabs = function(Tabs)
 CLogicDocumentController.prototype.SetParagraphIndent = function(Ind)
 {
 	this.LogicDocument.controller_SetParagraphIndent(Ind);
-};
-CLogicDocumentController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	this.LogicDocument.controller_SetParagraphNumbering(NumInfo);
 };
 CLogicDocumentController.prototype.SetParagraphShd = function(Shd)
 {
@@ -251,6 +247,10 @@ CLogicDocumentController.prototype.PasteFormatting = function(TextPr, ParaPr)
 CLogicDocumentController.prototype.IsSelectionUse = function()
 {
 	return this.LogicDocument.controller_IsSelectionUse();
+};
+CLogicDocumentController.prototype.IsNumberingSelection = function()
+{
+	return this.LogicDocument.controller_IsNumberingSelection();
 };
 CLogicDocumentController.prototype.IsTextSelectionUse = function()
 {
@@ -399,4 +399,8 @@ CLogicDocumentController.prototype.AddContentControl = function(nContentControlT
 CLogicDocumentController.prototype.GetStyleFromFormatting = function()
 {
 	return this.LogicDocument.controller_GetStyleFromFormatting();
+};
+CLogicDocumentController.prototype.GetSimilarNumbering = function(oContinueEngine)
+{
+	this.LogicDocument.controller_GetSimilarNumbering(oContinueEngine);
 };

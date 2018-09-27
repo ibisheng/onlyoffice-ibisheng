@@ -2416,9 +2416,9 @@ CellFormat.prototype =
 	{
 		return this._formatToText(number, nValType, dDigitsCount, false);
 	},
-	formatToChart : function(number, cultureInfo)
+	formatToChart : function(number, dDigitsCount, cultureInfo)
 	{
-		return this._formatToText(number, CellValueType.Number, gc_nMaxDigCount, true, cultureInfo);
+		return this._formatToText(number, CellValueType.Number, dDigitsCount || gc_nMaxDigCount, true, cultureInfo);
 	},
 	_formatToText : function(number, nValType, dDigitsCount, bChart, cultureInfo)
 	{

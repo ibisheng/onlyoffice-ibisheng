@@ -638,7 +638,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 {
     AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
-        var settings = new AscCommon.asc_ChartSettings();
+        var settings = new Asc.asc_ChartSettings();
         var nSparklineType = oSparklineGroup.asc_getType();
         switch(nSparklineType)
         {
@@ -1247,11 +1247,11 @@ function DrawingObjects() {
     var ScrollOffset = function() {
 
         this.getX = function() {
-            return -ptToPx((worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft)) + worksheet.getCellLeft(0, 0);
+            return 2 * worksheet.getCellLeft(0, 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(true));
         };
 
         this.getY = function() {
-            return -ptToPx((worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop)) + worksheet.getCellTop(0, 0);
+            return 2 * worksheet.getCellTop(0, 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(true));
         }
     };
 
@@ -1281,7 +1281,7 @@ function DrawingObjects() {
     var oStateBeforeLoadChanges = null;
 
     _this.zoom = { last: 1, current: 1 };
-    _this.isViewerMode = null;
+    _this.canEdit = null;
     _this.objectLocker = null;
     _this.drawingArea = null;
     _this.coordsManager = null;
@@ -1290,6 +1290,8 @@ function DrawingObjects() {
     _this.asyncImagesDocumentEndLoaded = null;
     _this.CompositeInput = null;
 
+    _this.lastX = 0;
+    _this.lastY = 0;
 
     _this.nCurPointItemsLength = -1;
     // Task timer
@@ -1452,10 +1454,10 @@ function DrawingObjects() {
             var fromX, fromY, toX, toY;
             if (AscFormat.checkNormalRotate(rot))
             {
-                fromX =  mmToPt(_t.graphicObject.x);
-                fromY =  mmToPt(_t.graphicObject.y);
-                toX = mmToPt(_t.graphicObject.x + _t.graphicObject.extX);
-                toY = mmToPt(_t.graphicObject.y + _t.graphicObject.extY);
+                fromX =  mmToPx(_t.graphicObject.x);
+                fromY =  mmToPx(_t.graphicObject.y);
+                toX = mmToPx(_t.graphicObject.x + _t.graphicObject.extX);
+                toY = mmToPx(_t.graphicObject.y + _t.graphicObject.extY);
                 this.Pos.X = _t.graphicObject.x;
                 this.Pos.Y = _t.graphicObject.y;
                 this.ext.cx = _t.graphicObject.extX;
@@ -1466,19 +1468,16 @@ function DrawingObjects() {
                 var _xc, _yc;
                 _xc = _t.graphicObject.x + _t.graphicObject.extX/2;
                 _yc = _t.graphicObject.y + _t.graphicObject.extY/2;
-                fromX =  mmToPt(_xc - _t.graphicObject.extY/2);
-                fromY =  mmToPt(_yc - _t.graphicObject.extX/2);
-                toX = mmToPt(_xc + _t.graphicObject.extY/2);
-                toY = mmToPt(_yc + _t.graphicObject.extX/2);
+                fromX =  mmToPx(_xc - _t.graphicObject.extY/2);
+                fromY =  mmToPx(_yc - _t.graphicObject.extX/2);
+                toX = mmToPx(_xc + _t.graphicObject.extY/2);
+                toY = mmToPx(_yc + _t.graphicObject.extX/2);
                 this.Pos.X = _xc - _t.graphicObject.extY/2;
                 this.Pos.Y = _yc - _t.graphicObject.extX/2;
                 this.ext.cx = _t.graphicObject.extY;
                 this.ext.cy = _t.graphicObject.extX;
             }
 
-
-           // var fromX =  mmToPt(_t.graphicObject.x), fromY =  mmToPt(_t.graphicObject.y),
-           //     toX = mmToPt(_t.graphicObject.x + _t.graphicObject.extX), toY = mmToPt(_t.graphicObject.y + _t.graphicObject.extY);
             var bReinitHorScroll = false, bReinitVertScroll = false;
 
             var fromColCell = worksheet.findCellByXY(fromX, fromY, true, false, true);
@@ -1531,14 +1530,14 @@ function DrawingObjects() {
             }
 
             _t.from.col = fromColCell.col;
-            _t.from.colOff = ptToMm(fromColCell.colOff);
+            _t.from.colOff = pxToMm(fromColCell.colOff);
             _t.from.row = fromRowCell.row;
-            _t.from.rowOff = ptToMm(fromRowCell.rowOff);
+            _t.from.rowOff = pxToMm(fromRowCell.rowOff);
 
             _t.to.col = toColCell.col;
-            _t.to.colOff = ptToMm(toColCell.colOff);
+            _t.to.colOff = pxToMm(toColCell.colOff);
             _t.to.row = toRowCell.row;
-            _t.to.rowOff = ptToMm(toRowCell.rowOff);
+            _t.to.rowOff = pxToMm(toRowCell.rowOff);
             if(bReinitHorScroll)
             {
                 worksheet.handlers.trigger("reinitializeScrollX");
@@ -1560,8 +1559,8 @@ function DrawingObjects() {
             var bounds = _t.graphicObject.bounds;
 
 
-            var fromX =  mmToPt(bounds.x > 0 ? bounds.x : 0), fromY =  mmToPt(bounds.y > 0 ? bounds.y : 0),
-                toX = mmToPt(bounds.x + bounds.w), toY = mmToPt(bounds.y + bounds.h);
+            var fromX =  mmToPx(bounds.x > 0 ? bounds.x : 0), fromY =  mmToPx(bounds.y > 0 ? bounds.y : 0),
+                toX = mmToPx(bounds.x + bounds.w), toY = mmToPx(bounds.y + bounds.h);
             if(toX < 0)
             {
                 toX = 0;
@@ -1622,14 +1621,14 @@ function DrawingObjects() {
             }
 
             _t.boundsFromTo.from.col = fromColCell.col;
-            _t.boundsFromTo.from.colOff = ptToMm(fromColCell.colOff);
+            _t.boundsFromTo.from.colOff = pxToMm(fromColCell.colOff);
             _t.boundsFromTo.from.row = fromRowCell.row;
-            _t.boundsFromTo.from.rowOff = ptToMm(fromRowCell.rowOff);
+            _t.boundsFromTo.from.rowOff = pxToMm(fromRowCell.rowOff);
 
             _t.boundsFromTo.to.col = toColCell.col;
-            _t.boundsFromTo.to.colOff = ptToMm(toColCell.colOff);
+            _t.boundsFromTo.to.colOff = pxToMm(toColCell.colOff);
             _t.boundsFromTo.to.row = toRowCell.row;
-            _t.boundsFromTo.to.rowOff = ptToMm(toRowCell.rowOff);
+            _t.boundsFromTo.to.rowOff = pxToMm(toRowCell.rowOff);
             if(bReinitHorScroll)
             {
                 worksheet.handlers.trigger("reinitializeScrollX");
@@ -1699,7 +1698,7 @@ function DrawingObjects() {
 
     _this.addShapeOnSheet = function(sType){
         if(this.controller){
-            if (!_this.isViewerMode()) {
+            if (_this.canEdit()) {
 
                 var oVisibleRange = worksheet.getVisibleRange();
 
@@ -1896,7 +1895,7 @@ function DrawingObjects() {
         _this.controller = new AscFormat.DrawingObjectsController(_this);
         _this.lasteForzenPlaseNum = 0;
 
-        _this.isViewerMode = function() { return worksheet.handlers.trigger("getViewerMode"); };
+        _this.canEdit = function() { return worksheet.handlers.trigger('canEdit'); };
 
         aImagesSync = [];
 
@@ -2181,23 +2180,23 @@ function DrawingObjects() {
                     var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
                     var updatedRange = graphicOption.getUpdatedRange();
 
-					var x1 = worksheet.getCellLeft(updatedRange.c1, 1);// - offsetX;
-                    var y1 = worksheet.getCellTop(updatedRange.r1, 1) ;//- offsetY;
-                    var x2 = worksheet.getCellLeft(updatedRange.c2, 1) + worksheet.getColumnWidth(updatedRange.c2, 1);// - offsetX;
-                    var y2 = worksheet.getCellTop(updatedRange.r2, 1) + worksheet.getRowHeight(updatedRange.r2, 1);//- offsetY;
+					var x1 = worksheet.getCellLeft(updatedRange.c1, 0);
+                    var y1 = worksheet.getCellTop(updatedRange.r1, 0);
+                    var x2 = worksheet.getCellLeft(updatedRange.c2, 0) + worksheet.getColumnWidth(updatedRange.c2, 0);
+                    var y2 = worksheet.getCellTop(updatedRange.r2, 0) + worksheet.getRowHeight(updatedRange.r2, 0);
                     var w = x2 - x1;
                     var h = y2 - y1;
-					var offset = worksheet.getCellsOffset(1);
+					var offset = worksheet.getCellsOffset(0);
 
-                    updatedRect.x = ptToMm(x1 - offset.left);//ptToMm(x1);
-                    updatedRect.y = ptToMm(y1 - offset.top);//ptToMm(y1);
-                    updatedRect.w = ptToMm(w);
-                    updatedRect.h = ptToMm(h);
+                    updatedRect.x = pxToMm(x1 - offset.left);
+                    updatedRect.y = pxToMm(y1 - offset.top);
+                    updatedRect.w = pxToMm(w);
+                    updatedRect.h = pxToMm(h);
 
 					var offsetScroll = graphicOption.getOffset();
-					shapeCtx.m_oContext.save();
-					shapeCtx.m_oContext.beginPath();
-					shapeCtx.m_oContext.rect(ptToPx(x1 - offsetScroll.offsetX), ptToPx(y1 - offsetScroll.offsetY), ptToPx(w), ptToPx(h));
+                    shapeCtx.m_oContext.save();
+                    shapeCtx.m_oContext.beginPath();
+                    shapeCtx.m_oContext.rect(x1 - offsetScroll.offsetX, y1 - offsetScroll.offsetY, w, h);
                     shapeCtx.m_oContext.clip();
 
                     shapeCtx.updatedRect = updatedRect;
@@ -2214,16 +2213,16 @@ function DrawingObjects() {
 
                             var range = printOptions.printPagesData.pageRange;
                             var printPagesData = printOptions.printPagesData;
-                            var offsetCols = printPagesData.startOffsetPt;
+                            var offsetCols = printPagesData.startOffsetPx;
 
-                            var left = worksheet.getCellLeft(range.c1, 3) - worksheet.getCellLeft(0, 3) - ptToMm(printPagesData.leftFieldInPt);
-                            var top = worksheet.getCellTop(range.r1, 3) - worksheet.getCellTop(0, 3) - ptToMm(printPagesData.topFieldInPt);
+                            var left = worksheet.getCellLeft(range.c1, 3) - worksheet.getCellLeft(0, 3) - pxToMm(printPagesData.leftFieldInPx);
+                            var top = worksheet.getCellTop(range.r1, 3) - worksheet.getCellTop(0, 3) - pxToMm(printPagesData.topFieldInPx);
 
                             _this.printGraphicObject(drawingObject.graphicObject, printOptions.ctx.DocumentRenderer, top, left);
 
                             if ( printPagesData.pageHeadings ) {
-                                worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
-                                worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPt);
+                                worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPx + offsetCols, printPagesData.topFieldInPx - worksheet.cellsTop);
+                                worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPx - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPx);
                             }
                         }
                         else {
@@ -2371,8 +2370,8 @@ function DrawingObjects() {
     _this.getMaxColRow = function() {
         var r = -1, c = -1;
         aObjects.forEach(function (item) {
-            r = Math.max(r, item.to.row + 1);
-            c = Math.max(c, item.to.col + 1);
+            r = Math.max(r, item.boundsFromTo.to.row);
+            c = Math.max(c, item.boundsFromTo.to.col);
         });
 
         return new AscCommon.CellBase(r, c);
@@ -2386,15 +2385,16 @@ function DrawingObjects() {
             if ( graphicOption ) {
                 var updatedRange = graphicOption.getUpdatedRange();
 
-                var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
-                var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
+                var offset = worksheet.getCellsOffset();
+                var offsetX = worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0) - offset.left;
+                var offsetY = worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0) - offset.top;
 
                 var vr = worksheet.visibleRange;
                 var borderOffsetX = (updatedRange.c1 <= vr.c1) ? 0 : 3;
                 var borderOffsetY = (updatedRange.r1 <= vr.r1) ? 0 : 3;
 
-                x = ptToPx(worksheet.getCellLeft(updatedRange.c1, 1) - offsetX) - borderOffsetX;
-                y = ptToPx(worksheet.getCellTop(updatedRange.r1, 1) - offsetY) - borderOffsetY;
+                x = worksheet.getCellLeft(updatedRange.c1, 0) - offsetX - borderOffsetX;
+                y = worksheet.getCellTop(updatedRange.r1, 0) - offsetY - borderOffsetY;
                 w = worksheet.getCellLeft(updatedRange.c2, 0) - worksheet.getCellLeft(updatedRange.c1, 0) + 3;
                 h = worksheet.getCellTop(updatedRange.r2, 0) - worksheet.getCellTop(updatedRange.r1, 0) + 3;
 
@@ -2458,23 +2458,23 @@ function DrawingObjects() {
             width /= metricCoeff;
         }
 
-        var findVal = pxToPt(realLeftOffset + width);
+        var findVal = realLeftOffset + width;
         var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
         while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
             worksheet.expandColsOnScroll(true);
             toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
         }
         object.to.col = toCell.col;
-        object.to.colOff = ptToMm(toCell.colOff);
+        object.to.colOff = pxToMm(toCell.colOff);
 
-        findVal = pxToPt(realTopOffset + height);
+        findVal = realTopOffset + height;
         toCell = worksheet.findCellByXY(0, findVal, true, true, false);
         while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
             worksheet.expandRowsOnScroll(true);
             toCell = worksheet.findCellByXY(0, findVal, true, true, false);
         }
         object.to.row = toCell.row;
-        object.to.rowOff = ptToMm(toCell.rowOff);
+        object.to.rowOff = pxToMm(toCell.rowOff);
 
         worksheet.handlers.trigger("reinitializeScroll");
     };
@@ -2515,7 +2515,7 @@ function DrawingObjects() {
 
 
     _this.addImageDrawingObject = function(imageUrls, options) {
-        if (imageUrls && !_this.isViewerMode()) {
+        if (imageUrls && _this.canEdit()) {
             api.ImageLoader.LoadImagesWithCallback(imageUrls, function(){
                 // CImage
                 _this.objectLocker.reset();
@@ -2550,7 +2550,7 @@ function DrawingObjects() {
 
     _this.addTextArt = function(nStyle)
     {
-        if (!_this.isViewerMode()) {
+        if (_this.canEdit()) {
 
             var oVisibleRange = worksheet.getVisibleRange();
 
@@ -2594,7 +2594,7 @@ function DrawingObjects() {
     };
 
     _this.addMath = function(Type){
-        if (!_this.isViewerMode() && _this.controller) {
+        if (_this.canEdit() && _this.controller) {
 
             var oTargetContent = _this.controller.getTargetDocContent();
             if(oTargetContent){
@@ -2743,12 +2743,12 @@ function DrawingObjects() {
 
     _this.addChartDrawingObject = function(chart) {
 
-        if ( _this.isViewerMode() )
+        if (!_this.canEdit())
             return;
 
         worksheet.setSelectionShape(true);
 
-        if ( chart instanceof AscCommon.asc_ChartSettings )
+        if ( chart instanceof Asc.asc_ChartSettings )
         {
             if(api.isChartEditor)
             {
@@ -2768,28 +2768,31 @@ function DrawingObjects() {
         }
         else if ( isObject(chart) && chart["binary"] )
         {
+            var model = worksheet.model;
+			History.Clear();
+			History.TurnOff();
+
             for (var i = 0; i < aObjects.length; i++) {
                 aObjects[i].graphicObject.deleteDrawingBase();
             }
-            var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
-            listRange.cleanAll();
-            worksheet._clean();
-            History.Clear();
+			aObjects.length = 0;
 
-            History.TurnOff();
-            aObjects.length = 0;
-            var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
-            listRange.cleanAll();
-            worksheet.endEditChart();
+			var oAllRange = model.getRange3(0, 0, model.getRowsCount(), model.getColsCount());
+			oAllRange.cleanAll();
+
+			worksheet.endEditChart();
+
+			//worksheet._clean();
+
             var asc_chart_binary = new Asc.asc_CChartBinary();
             asc_chart_binary.asc_setBinary(chart["binary"]);
             asc_chart_binary.asc_setThemeBinary(chart["themeBinary"]);
             asc_chart_binary.asc_setColorMapBinary(chart["colorMapBinary"]);
-            var oNewChartSpace = asc_chart_binary.getChartSpace(worksheet.model);
+            var oNewChartSpace = asc_chart_binary.getChartSpace(model);
             var theme = asc_chart_binary.getTheme();
             if(theme)
             {
-                worksheet.model.workbook.theme = theme;
+                model.workbook.theme = theme;
             }
             if(chart["cTitle"] || chart["cDescription"]){
                 if(!oNewChartSpace.nvGraphicFramePr){
@@ -2811,13 +2814,13 @@ function DrawingObjects() {
             }
             var font_map = {};
             oNewChartSpace.documentGetAllFontNames(font_map);
-            AscFormat.checkThemeFonts(font_map, worksheet.model.workbook.theme.themeElements.fontScheme);
+            AscFormat.checkThemeFonts(font_map, model.workbook.theme.themeElements.fontScheme);
             window["Asc"]["editor"]._loadFonts(font_map,
                 function()
                 {
                     var max_r = 0, max_c = 0;
 
-                    var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
+                    var series = oNewChartSpace.getAllSeries(), ser;
 					
 					function fFillCell(oCell, sNumFormat, value)
 					{
@@ -2842,15 +2845,8 @@ function DrawingObjects() {
                         var lit_format_code;
                         if(cache)
                         {
+							lit_format_code = (typeof cache.formatCode === "string" && cache.formatCode.length > 0) ? cache.formatCode : "General";
 
-                            if(typeof cache.formatCode === "string" && cache.formatCode.length > 0)
-                            {
-                                lit_format_code = cache.formatCode;
-                            }
-                            else
-                            {
-                                lit_format_code = "General"
-                            }
                             var sFormula = ref.f + "";
                             if(sFormula[0] === '(')
                                 sFormula = sFormula.slice(1);
@@ -2859,14 +2855,14 @@ function DrawingObjects() {
                             var f1 = sFormula;
 
                             var arr_f = f1.split(",");
-                            var pt_index = 0, i, j, cell, pt, nPtCount, k;
+                            var pt_index = 0, i, j, pt, nPtCount, k;
                             for(i = 0; i < arr_f.length; ++i)
                             {
                                 var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
                                 if(parsed_ref)
                                 {
-                                    var source_worksheet = worksheet.model.workbook.getWorksheetByName(parsed_ref.sheet);
-                                    if(source_worksheet === worksheet.model)
+                                    var source_worksheet = model.workbook.getWorksheetByName(parsed_ref.sheet);
+                                    if(source_worksheet === model)
                                     {
                                         var range1 = source_worksheet.getRange2(parsed_ref.range);
                                         if(range1)
@@ -2979,7 +2975,7 @@ function DrawingObjects() {
                         var resultRef = parserHelp.parse3DRef(first_num_ref.f);
                         if(resultRef)
                         {
-                            worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
+                            model.workbook.aWorksheets[0].sName = resultRef.sheet;
                             if(series[0] && series[0].xVal && series[0].xVal.numRef)
                             {
                                 fillTableFromRef(series[0].xVal.numRef);
@@ -3014,11 +3010,15 @@ function DrawingObjects() {
                             }
                         }
                     }
-                    worksheet._updateCellsRange(new asc_Range(0, 0, Math.max(worksheet.nColsCount - 1, max_c),  Math.max(worksheet.nRowsCount - 1, max_r)));
+					oAllRange = oAllRange.bbox;
+					oAllRange.r2 = Math.max(oAllRange.r2, max_r);
+					oAllRange.c2 = Math.max(oAllRange.c2, max_c);
+					worksheet._updateRange(oAllRange);
+					worksheet.draw();
                     aImagesSync.length = 0;
                     oNewChartSpace.getAllRasterImages(aImagesSync);
                     oNewChartSpace.setBDeleted(false);
-                    oNewChartSpace.setWorksheet(worksheet.model);
+                    oNewChartSpace.setWorksheet(model);
                     oNewChartSpace.addToDrawingObjects();
                     oNewChartSpace.recalcInfo.recalculateReferences = false;
                     oNewChartSpace.recalculate();
@@ -3144,8 +3144,6 @@ function DrawingObjects() {
             graphics.m_oFontManager = AscCommon.g_fontManager;
         }
 
-        var _offX = offsetX* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIX());
-        var _offY = offsetY* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIY());
         for(i = 0; i < aSparklineGroups.length; ++i) {
             var oSparklineGroup = aSparklineGroups[i];
 
@@ -3175,7 +3173,7 @@ function DrawingObjects() {
                     graphics.SetBaseTransform(_baseTransform);
                 }
 
-				sparkline.oCacheView.draw(graphics, _offX, _offY);
+				sparkline.oCacheView.draw(graphics, offsetX, offsetY);
 
                 if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
                 {
@@ -3481,46 +3479,53 @@ function DrawingObjects() {
 
     _this.updateSizeDrawingObjects = function(target, bNoChangeCoords) {
 
+        var oGraphicObject;
+        var bCheck, bRecalculate;
         if(!History.Is_On() || true === bNoChangeCoords){
             if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
-                    if (drawingObject.from.row >= target.row) {
-                        if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.handleUpdateExtents)
-                            {
-                                drawingObject.graphicObject.handleUpdateExtents();
-                                drawingObject.graphicObject.recalculate();
-                            }
-                            else
-                            {
-                                if(drawingObject.graphicObject.recalculateTransform){
-                                    drawingObject.graphicObject.recalculateTransform();
-                                }
-                                if(drawingObject.graphicObject.recalculateBounds){
-                                    drawingObject.graphicObject.recalculateBounds();
-                                }
-                            }
+                    bCheck = false;
+                    if(target.target === AscCommonExcel.c_oTargetType.RowResize){
+                        if(drawingObject.from.row >= target.row){
+                            bCheck = true;
                         }
                     }
-                }
-            } else {
-                for (i = 0; i < aObjects.length; i++) {
-                    drawingObject = aObjects[i];
-                    if (drawingObject.from.col >= target.col) {
-                        if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.handleUpdateExtents)
-                            {
-                                drawingObject.graphicObject.handleUpdateExtents();
-                                drawingObject.graphicObject.recalculate();
-                            }
-                            else
-                            {
-                                if(drawingObject.graphicObject.recalculateTransform){
-                                    drawingObject.graphicObject.recalculateTransform();
+                    else{
+                        if(drawingObject.from.col >= target.col){
+                            bCheck = true;
+                        }
+                    }
+                    if (bCheck) {
+                        oGraphicObject = drawingObject.graphicObject;
+                        if(oGraphicObject){
+                            if(oGraphicObject.handleUpdateExtents) {
+
+                                bRecalculate = true;
+                                if(oGraphicObject.recalculateTransform){
+                                    var oldX = oGraphicObject.x;
+                                    var oldY = oGraphicObject.y;
+                                    var oldExtX = oGraphicObject.extX;
+                                    var oldExtY = oGraphicObject.extY;
+                                    oGraphicObject.recalculateTransform();
+                                    var fDelta = 0.01;
+                                    bRecalculate = false;
+                                    if(!AscFormat.fApproxEqual(oldX, oGraphicObject.x, fDelta) || !AscFormat.fApproxEqual(oldY, oGraphicObject.y, fDelta)
+                                        || !AscFormat.fApproxEqual(oldExtX, oGraphicObject.extX, fDelta) || !AscFormat.fApproxEqual(oldExtY, oGraphicObject.extY, fDelta)){
+                                        bRecalculate = true;
+                                    }
                                 }
-                                if(drawingObject.graphicObject.recalculateBounds){
-                                    drawingObject.graphicObject.recalculateBounds();
+                                if(bRecalculate){
+                                    oGraphicObject.handleUpdateExtents();
+                                    oGraphicObject.recalculate();
+                                }
+                            }
+                            else {
+                                if(oGraphicObject.recalculateTransform){
+                                    oGraphicObject.recalculateTransform();
+                                }
+                                if(oGraphicObject.recalculateBounds){
+                                    oGraphicObject.recalculateBounds();
                                 }
                             }
                         }
@@ -3598,7 +3603,7 @@ function DrawingObjects() {
             {
                 var editChart = function (drawingObject)
                 {
-					var options = new AscCommon.asc_ChartSettings();
+					var options = new Asc.asc_ChartSettings();
 					var catHeadersBBox, serHeadersBBox;
                     var final_bbox = oBBoxTo.clone();
                     var bOneCell = false;
@@ -3888,39 +3893,39 @@ function DrawingObjects() {
         // выход за границу справа
         if ( x + w > right ) {
             var scrollX = scrollOffset.getX();
-            var foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
+            var foundCol = worksheet._findColUnderCursor(mmToPx(x + w) + scrollX, true);
             while ( foundCol == null ) {
                 if ( worksheet.isMaxCol() )
                 {
                     var lastCol = worksheet.cols[worksheet.nColsCount - 1];
-                    if ( mmToPt(x + w) + scrollX > lastCol.left ) {
+                    if ( mmToPx(x + w) + scrollX > lastCol.left ) {
                         response.result = false;
-                        response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
+                        response.x = pxToMm( lastCol.left - (mmToPx(x + w) + scrollX) );
                     }
                     break;
                 }
                 worksheet.expandColsOnScroll(true);
                 worksheet.handlers.trigger("reinitializeScrollX");
-                foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
+                foundCol = worksheet._findColUnderCursor(mmToPx(x + w) + scrollX, true);
             }
         }
         // выход за границу снизу
         if ( y + h > bottom ) {
             var scrollY = scrollOffset.getY();
-            var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
+            var foundRow = worksheet._findRowUnderCursor(mmToPx(y + h) + scrollY, true);
             while ( foundRow == null ) {
                 if ( worksheet.isMaxRow() )
                 {
                     var lastRow = worksheet.rows[worksheet.nRowsCount - 1];
-                    if ( mmToPt(y + h) + scrollY > lastRow.top ) {
+                    if ( mmToPx(y + h) + scrollY > lastRow.top ) {
                         response.result = false;
-                        response.y = ptToMm( lastRow.top - (mmToPt(y + h) + scrollY) );
+                        response.y = pxToMm( lastRow.top - (mmToPx(y + h) + scrollY) );
                     }
                     break;
                 }
                 worksheet.expandRowsOnScroll(true);
                 worksheet.handlers.trigger("reinitializeScrollY");
-                foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
+                foundRow = worksheet._findRowUnderCursor(mmToPx(y + h) + scrollY, true);
             }
         }
 
@@ -4165,6 +4170,8 @@ function DrawingObjects() {
     _this.graphicObjectMouseMove = function(e, x, y) {
         e.IsLocked = e.isLocked;
 
+        _this.lastX = x;
+        _this.lastY = y;
         var offsets = _this.drawingArea.getOffsets(x, y, true);
         if ( offsets )
             _this.controller.onMouseMove( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
@@ -4210,7 +4217,7 @@ function DrawingObjects() {
         return null;
     };
 
-    _this.getAscChartObject = function() {
+    _this.getAscChartObject = function(bNoLock) {
 
         var settings;
         if(api.isChartEditor)
@@ -4220,12 +4227,12 @@ function DrawingObjects() {
         settings = _this.controller.getChartProps();
         if ( !settings )
         {
-            settings = new AscCommon.asc_ChartSettings();
+            settings = new Asc.asc_ChartSettings();
             var selectedRange = worksheet.getSelectedRange();
             if (selectedRange)
             {
                 var box = selectedRange.getBBox0();
-                settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
+                settings.putInColumns((box.r2 - box.r1 > box.c2 - box.c1));
             }
             var oRangeValue = worksheet.getSelectionRangeValue();
             if(oRangeValue){
@@ -4238,14 +4245,14 @@ function DrawingObjects() {
             settings.putShowHorAxis(true);
             settings.putShowVerAxis(true);
             var series = AscFormat.getChartSeries(worksheet.model, settings);
-            if(series && series.series.length > 1)
-            {
-                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
-            }
-            else
-            {
-                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
-            }
+            // if(series && series.series.length > 1)
+            // {
+            //     settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
+            // }
+            // else
+            // {
+            //     settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
+            // }
             settings.putHorAxisLabel(Asc.c_oAscChartHorAxisLabelShowSettings.none);
             settings.putVertAxisLabel(Asc.c_oAscChartVertAxisLabelShowSettings.none);
             settings.putDataLabelsPos(Asc.c_oAscChartDataLabelsPos.none);
@@ -4265,7 +4272,9 @@ function DrawingObjects() {
             hor_axis_settings.setDefault();
         }
         else{
-            this.controller.checkSelectedObjectsAndFireCallback(function(){});
+            if(true !== bNoLock){
+                this.controller.checkSelectedObjectsAndFireCallback(function(){});
+            }
         }
         return settings;
     };
@@ -4361,6 +4370,10 @@ function DrawingObjects() {
         _this.controller.setGraphicObjectLayer(layerType);
     };
 
+    _this.setGraphicObjectAlign = function(alignType) {
+        _this.controller.setGraphicObjectAlign(alignType);
+    };
+
     _this.saveSizeDrawingObjects = function() {
 
         for (var i = 0; i < aObjects.length; i++) {
@@ -4395,12 +4408,12 @@ function DrawingObjects() {
 
         var info = new CCellObjectInfo();
 
-        var tmp = worksheet._findColUnderCursor(pxToPt(x), true);
+        var tmp = worksheet._findColUnderCursor(x, true);
         if (tmp) {
             info.col = tmp.col;
             info.colOff = pxToMm(x - worksheet.getCellLeft(info.col, 0));
         }
-        tmp = worksheet._findRowUnderCursor(pxToPt(y), true);
+        tmp = worksheet._findRowUnderCursor(y, true);
         if (tmp) {
             info.row = tmp.row;
             info.rowOff = pxToMm(y - worksheet.getCellTop(info.row, 0));
@@ -4590,32 +4603,8 @@ function DrawingObjects() {
         return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
     }
 
-    function emuToPx(emu) {
-        return emu * 20 * 96 / 2.54 / 72 / 100 / 1000;
-    }
-
-    function pxToEmu(px) {
-        return px * 2.54 * 72 * 100 * 1000 / 20 / 96;
-    }
-
-    function pxToPt(val) {
-        return val * ascCvtRatio(0, 1);
-    }
-
-    function ptToPx(val) {
-        return val * ascCvtRatio(1, 0);
-    }
-
-    function ptToMm(val) {
-        return val * ascCvtRatio(1, 3);
-    }
-
     function mmToPx(val) {
         return val * ascCvtRatio(3, 0);
-    }
-
-    function mmToPt(val) {
-        return val * ascCvtRatio(3, 1);
     }
 
     function pxToMm(val) {
@@ -4647,12 +4636,12 @@ function ObjectLocker(ws) {
     // For array of objects -=Use reset before use=-
     _t.checkObjects = function(callback) {
 
-        function callbackEx(result, sync) {
+        var callbackEx = function(result, sync) {
             //if ( worksheet )
             //	worksheet._drawCollaborativeElements(true);
             if ( callback )
                 callback(result, sync);
-        }
+        };
 
         if(Asc.editor && Asc.editor.collaborativeEditing && Asc.editor.collaborativeEditing.getGlobalLock()){
             callbackEx(false, true);
@@ -4674,7 +4663,7 @@ function ObjectLocker(ws) {
             if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
                 // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
                 asc_applyFunction(callbackEx, true, true);
-                callback = undefined;
+                callbackEx = undefined;
             }
             if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
                 // Редактируем сами, проверяем дальше
@@ -4767,15 +4756,13 @@ function CoordsManager(ws) {
     _t.calculateCell = function(x, y) {
 
         var cell = new CCellObjectInfo();
+        var offset = worksheet.getCellsOffset(0);
 
-        var _x = x + worksheet.getCellLeft(0, 0);
-        var _y = y + worksheet.getCellTop(0, 0);
+        var _x = x + offset.left;
+        var _y = y + offset.top;
 
-        var xPt = worksheet.objectRender.convertMetric(_x, 0, 1);
-        var yPt = worksheet.objectRender.convertMetric(_y, 0, 1);
-
-        var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
-        var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
+        var offsetX = worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0) - offset.left;
+        var offsetY = worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0) - offset.top;
 
         /* Проверки на максимум в листе */
         function isMaxCol() {
@@ -4794,7 +4781,7 @@ function CoordsManager(ws) {
         //
 
         var delta = 0;
-        var what = roundPlus(xPt - offsetX, 3);
+        var what = _x - offsetX;
         var col = worksheet._findColUnderCursor( what, true );
         while (col == null) {
             if ( isMaxCol() ) {
@@ -4812,7 +4799,7 @@ function CoordsManager(ws) {
         cell.colOff = worksheet.objectRender.convertMetric(cell.colOffPx, 0, 3);
 
         delta = 0;
-        what = roundPlus(yPt - offsetY, 3);
+        what = _y - offsetY;
         var row = worksheet._findRowUnderCursor( what, true );
         while (row == null) {
             if ( isMaxRow() ) {

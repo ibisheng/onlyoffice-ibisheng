@@ -129,11 +129,13 @@
 			this.codePageName = null;
 			this.codePage = null;
 			this.text = null;
+			this.lcid = null;
 		}
 		asc_CCodePage.prototype.init = function (encoding) {
 			this.codePageName = encoding["name"];
 			this.codePage = encoding["codepage"];
 			this.text = encoding["text"];
+			this.lcid = encoding["lcid"];
 		};
 		asc_CCodePage.prototype.asc_getCodePageName = function(){return this.codePageName;};
 		asc_CCodePage.prototype.asc_setCodePageName = function(v){this.codePageName = v;};
@@ -141,6 +143,8 @@
 		asc_CCodePage.prototype.asc_setCodePage = function(v){this.codePage = v;};
 		asc_CCodePage.prototype.asc_getText = function(){return this.text;};
 		asc_CCodePage.prototype.asc_setText = function(v){this.text = v;};
+		asc_CCodePage.prototype.asc_getLcid = function(){return this.lcid;};
+		asc_CCodePage.prototype.asc_setLcid = function(v){this.lcid = v;};
 
 		/** @constructor */
 		function asc_CDelimiter(delimiter){
@@ -214,6 +218,8 @@
 		prot["asc_setCodePage"]			= prot.asc_setCodePage;
 		prot["asc_getText"]				= prot.asc_getText;
 		prot["asc_setText"]				= prot.asc_setText;
+		prot["asc_getLcid"]				= prot.asc_getLcid;
+		prot["asc_setLcid"]				= prot.asc_setLcid;
 
 		prot = asc_CDelimiter.prototype;
 		prot["asc_getDelimiterName"]			= prot.asc_getDelimiterName;

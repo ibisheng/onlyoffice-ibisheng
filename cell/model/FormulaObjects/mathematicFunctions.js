@@ -4245,11 +4245,17 @@
 		var res;
 		if (f) {
 			//вложенные итоги игнорируются, чтобы избежать двойного суммирования
-			f.excludeNestedStAg = true;
+			var oldExcludeHiddenRows = f.excludeHiddenRows;
+			var oldIgnoreNestedStAg = f.excludeNestedStAg;
+			var oldCheckExclude = f.checkExclude;
 
-			f.checkExclude = true;
 			f.excludeHiddenRows = exclude;
+			f.excludeNestedStAg = true;
+			f.checkExclude = true;
 			res = f.Calculate(arg.slice(1));
+			f.excludeHiddenRows = oldExcludeHiddenRows;
+			f.excludeNestedStAg = oldIgnoreNestedStAg;
+			f.checkExclude = oldCheckExclude;
 		}
 
 		return res;
@@ -4401,11 +4407,34 @@
 			}
 		}
 
+		var getRange = function(curArg) {
+			var res = null;
+			if(cElementType.cellsRange === curArg.type) {
+				res = curArg.range && curArg.range.bbox ? curArg.range.bbox : null;
+			} else if(cElementType.cellsRange3D === curArg.type) {
+				res = curArg.bbox ? curArg.bbox : null;
+			}
+			return res;
+		};
+
+		var arg0Range = getRange(arg0);
+		var c_colType = Asc.c_oAscSelectionType.RangeCol;
+
 		var arg0Matrix = arg0.getMatrix();
-		var i, j, arg1, arg2, matchingInfo;
+		var i, j, arg1, arg2, matchingInfo, bSelectRangeCol, arg1Range;
 		for (var k = 1; k < arg.length; k += 2) {
 			arg1 = arg[k];
 			arg2 = arg[k + 1];
+
+			//добавляю флаг bSelectRangeCol - для случая когда нулевой и первый аргумент это area/area3d с диапазоном весь столбец
+			//в этом случае нет ошибки при разных размерах полученных массивов - arg0Matrix/arg1Matrix
+			bSelectRangeCol = false;
+			arg1Range = getRange(arg1);
+			if(arg1Range && arg1Range.getType() === c_colType && arg0Range && arg0Range.getType() === c_colType) {
+				if(arg0Range.c1 === arg0Range.c1 && arg0Range.c2 === arg0Range.c2) {
+					bSelectRangeCol = true;
+				}
+			}
 
 			if (cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type &&
 				cElementType.cellsRange !== arg1.type) {
@@ -4434,10 +4463,13 @@
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
-			if (arg0Matrix.length !== arg1Matrix.length) {
+			if (!bSelectRangeCol && arg0Matrix.length !== arg1Matrix.length) {
 				return new cError(cErrorType.wrong_value_type);
 			}
 			for (i = 0; i < arg1Matrix.length; ++i) {
+				if(bSelectRangeCol && (!arg0Matrix[i] || !arg1Matrix[i])) {
+					continue;
+				}
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
 					return new cError(cErrorType.wrong_value_type);
 				}
@@ -4480,22 +4512,29 @@
 
 		for (i = 0; i < arg.length; i++) {
 
-			if (arg[i] instanceof cArea3D) {
-				return new cError(cErrorType.bad_reference);
-			}
-
 			if (arg[i] instanceof cArea || arg[i] instanceof cArray) {
 				resArr[i] = arg[i].getMatrix();
+			} else if (arg[i] instanceof cArea3D) {
+				if (arg[i].isSingleSheet()) {
+					resArr[i] = arg[i].getMatrix()[0];
+				} else {
+					return new cError(cErrorType.bad_reference);
+				}
 			} else if (arg[i] instanceof cRef || arg[i] instanceof cRef3D) {
-				resArr[i] = [[arg[i].getValue()]];
+				var val = arg[i].getValue();
+				if(val instanceof cEmpty) {
+					return new cError(cErrorType.wrong_value_type);
+				} else {
+					resArr[i] = [[val]];
+				}
 			} else {
 				resArr[i] = [[arg[i]]];
 			}
 
 			row = Math.max(resArr[0].length, row);
-			col = Math.max(resArr[0][0].length, col);
+			col = resArr[0][0] ? Math.max(resArr[0][0].length, col) : 0;
 
-			if (row != resArr[i].length || col != resArr[i][0].length) {
+			if (row != resArr[i].length || (resArr[i][0] && col != resArr[i][0].length)) {
 				return new cError(cErrorType.not_numeric);
 			}
 
@@ -4517,6 +4556,8 @@
 						} else {
 							res *= arg0.tocNumber().getValue();
 						}
+					} else if(arg0 instanceof cBool) {
+						res *= 0;
 					} else {
 						res *= arg0.tocNumber().getValue();
 					}
@@ -4915,14 +4956,13 @@
 	cTRUNC.prototype.Calculate = function (arg) {
 
 		function truncHelper(a, b) {
-			var c = a < 0 ? 1 : 0;
-			if (b == 0) {
-				return new cNumber(a.toString().substr(0, 1 + c));
-			} else if (b > 0) {
-				return new cNumber(a.toString().substr(0, b + 2 + c));
-			} else {
-				return new cNumber(0);
+			//TODO возможно стоит добавить ограничения для коэффициента b(ms не ограничивает; LO - максимальные значения 20/-20)
+			if(b > 20) {
+				b = 20;
 			}
+
+			var numDegree = Math.pow(10, b);
+			return new cNumber(Math.trunc(a*numDegree) / numDegree);
 		}
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(0);

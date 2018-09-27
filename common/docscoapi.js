@@ -835,10 +835,10 @@
   };
 
   DocsCoApi.prototype._reSaveChanges = function() {
-    this.saveChanges(this.arrayChanges, this.currentIndex);
+    this.saveChanges(this.arrayChanges, this.currentIndex, undefined, undefined, true);
   };
 
-  DocsCoApi.prototype.saveChanges = function(arrayChanges, currentIndex, deleteIndex, excelAdditionalInfo) {
+  DocsCoApi.prototype.saveChanges = function(arrayChanges, currentIndex, deleteIndex, excelAdditionalInfo, reSave) {
     if (null === currentIndex) {
       this.deleteIndex = deleteIndex;
       if (null != this.deleteIndex && -1 !== this.deleteIndex) {
@@ -874,7 +874,7 @@
       'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
       'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
       'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null,
-        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks});
+        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks, 'reSave': reSave});
   };
 
   DocsCoApi.prototype.unLockDocument = function(isSave, deleteIndex) {
@@ -1077,14 +1077,14 @@
             if (this._locks[blockTmp] && 1 !== this._locks[blockTmp].state /*asked for it*/) {
               //Exists
               //Check lock state
-              changed = !(this._locks[blockTmp].state === (lock["sessionId"] === this._id ? 2 : 3) && this._locks[blockTmp]["user"] === lock["user"] && this._locks[blockTmp]["time"] === lock["time"] && this._locks[blockTmp]["block"] === blockTmp);
+              changed = !(this._locks[blockTmp].state === (lock["user"] === this._userId ? 2 : 3) && this._locks[blockTmp]["user"] === lock["user"] && this._locks[blockTmp]["time"] === lock["time"] && this._locks[blockTmp]["block"] === blockTmp);
             }
 
             if (changed) {
-              this._locks[blockTmp] = {"state": lock["sessionId"] === this._id ? 2 : 3, "user": lock["user"], "time": lock["time"], "block": blockTmp, "blockValue": blockValue};//2-acquired by me!
+              this._locks[blockTmp] = {"state": lock["user"] === this._userId ? 2 : 3, "user": lock["user"], "time": lock["time"], "block": blockTmp, "blockValue": blockValue};//2-acquired by me!
             }
             if (this._lockCallbacks.hasOwnProperty(blockTmp)) {
-              if (lock["sessionId"] === this._id) {
+              if (lock["user"] === this._userId) {
                 //Do call back
                 this._lockCallbacks[blockTmp]({"lock": this._locks[blockTmp]});
               } else {
@@ -1295,7 +1295,7 @@
           if (lock !== null && lock["block"]) {
             //Find in previous
             for (i = 0; i < previousLocks.length; i++) {
-              if (previousLocks[i] === lock["block"] && lock["sessionId"] === this._id) {
+              if (previousLocks[i] === lock["block"] && lock["user"] === this._userId) {
                 //Lock is ours
                 previousLocks.remove(i);
                 break;

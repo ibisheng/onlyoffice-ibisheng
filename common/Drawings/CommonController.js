@@ -147,13 +147,14 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
 
 	function fSolveQuadraticEquation(a, b, c){
-		var oResult = {x1: null, x2: null, bError: true}
+		var oResult = {x1: null, x2: null, bError: true};
 		var D = b*b - 4*a*c;
         if(D < 0){
             return oResult;
         }
 		oResult.bError = false;
-        oResult.x1 = (-b + Math.sqrt(D))/(2*a), oResult.x2 = (-b - Math.sqrt(D))/(2*a);
+        oResult.x1 = (-b + Math.sqrt(D))/(2*a);
+        oResult.x2 = (-b - Math.sqrt(D))/(2*a);
 		return oResult;
 	}
 
@@ -858,7 +859,7 @@ DrawingObjectsController.prototype =
                         else {
                             sLink2 = _link;
                         }
-                        var oHyperlink = new ParaHyperlink();
+                        var oHyperlink = AscFormat.ExecuteNoHistory(function(){return new ParaHyperlink();}, this, []);
                         oHyperlink.Value = sLink2;
                         oHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
                         if(hit_in_text_rect){
@@ -1341,7 +1342,9 @@ DrawingObjectsController.prototype =
                             }
                         }
                         else if(this.handleDblClickEmptyShape){
-                            this.handleDblClickEmptyShape(object);
+                            if(!object.getDocContent()){
+                                this.handleDblClickEmptyShape(object);
+                            }
                         }
                     }
                     if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleOleObjectDoubleClick){
@@ -1414,7 +1417,8 @@ DrawingObjectsController.prototype =
         var content, invert_transform_text, tx, ty, hit_paragraph, par, check_hyperlink;
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-            if(e.CtrlKey && !this.document)
+            var bNotes = (this.drawingObjects && this.drawingObjects.getObjectType && this.drawingObjects.getObjectType() === AscDFH.historyitem_type_Notes);
+            if(e.CtrlKey && !this.document && !bNotes)
             {
                 content = object.getDocContent();
                 invert_transform_text = object.invertTransformText;
@@ -1943,9 +1947,9 @@ DrawingObjectsController.prototype =
     },
 
 
-    paragraphClearFormatting: function()
+    paragraphClearFormatting: function(isClearParaPr, isClearTextPr)
     {
-        this.applyDocContentFunction(AscFormat.CDrawingDocContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+        this.applyDocContentFunction(AscFormat.CDrawingDocContent.prototype.ClearParagraphFormatting, [isClearParaPr, isClearTextPr], CTable.prototype.ClearParagraphFormatting);
     },
 
     applyDocContentFunction: function(f, args, tableFunction)
@@ -2368,6 +2372,10 @@ DrawingObjectsController.prototype =
     paragraphIncDecIndent: function(bIncrease)
     {
         this.applyDocContentFunction(CDocumentContent.prototype.IncreaseDecreaseIndent, [bIncrease], CTable.prototype.IncreaseDecreaseIndent);
+    },
+    setDefaultTabSize: function(TabSize)
+    {
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphDefaultTabSize, [TabSize], CTable.prototype.SetParagraphDefaultTabSize);
     },
 
     setParagraphAlign: function(align)
@@ -3483,7 +3491,7 @@ DrawingObjectsController.prototype =
         var type = chartSettings.getType();
         if(oPr.getType() === type){
             chartSettings.type = null;
-            var testChartSettings = new AscCommon.asc_ChartSettings();
+            var testChartSettings = new Asc.asc_ChartSettings();
             if(testChartSettings.isEqual(chartSettings)){
                 chartSettings.type = type;
                 return;
@@ -4548,87 +4556,21 @@ DrawingObjectsController.prototype =
         setAxisGridLines(plot_area.getVerticalAxis(), chartSettings.getHorGridLines());
         setAxisGridLines(plot_area.getHorizontalAxis(), chartSettings.getVertGridLines());
 
-        chart_type = plot_area.charts[0];
-
-        var data_labels_pos_setting = chartSettings.getDataLabelsPos();
-        if(AscFormat.isRealNumber(data_labels_pos_setting))
-        {
-            if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none){
-                if(chart_type.dLbls)
-                    chart_type.setDLbls(null);
-                chart_type.removeDataLabels();
-            }
-            else
-            {
-                if(AscFormat.isRealNumber(data_labels_pos_setting)){
+        for(var i = 0; i < plot_area.charts.length; ++i){
+            chart_type = plot_area.charts[i];
+            var data_labels_pos_setting = chartSettings.getDataLabelsPos();
+            if(AscFormat.isRealNumber(data_labels_pos_setting)){
+                if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none){
+                    if(chart_type.dLbls)
+                        chart_type.setDLbls(null);
+                    chart_type.removeDataLabels();
+                }
+                else{
                     var finish_dlbl_pos =  data_labels_pos_setting;
-
-                    switch (chart_type.getObjectType())
-                    {
-                        case AscDFH.historyitem_type_BarChart:
-                        {
-                            if(BAR_GROUPING_CLUSTERED === chart_type.grouping)
-                            {
-                                if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
-                                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
-                                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.inBase
-                                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd))
-                                {
-                                    finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
-                                }
-                            }
-                            else
-                            {
-                                if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
-                                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
-                                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.inBase))
-                                {
-                                    finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
-                                }
-                            }
-                            if(chart.view3D)
-                            {
-                                finish_dlbl_pos = null;
-                            }
-                            break;
-                        }
-                        case AscDFH.historyitem_type_LineChart:
-                        case AscDFH.historyitem_type_ScatterChart:
-                        {
-                            if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.l
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.t
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.r
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.b))
-                            {
-                                finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
-                            }
-                            if(chart.view3D)
-                            {
-                                finish_dlbl_pos = null;
-                            }
-                            break;
-                        }
-                        case AscDFH.historyitem_type_PieChart:
-                        {
-                            if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.bestFit))
-                            {
-                                finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
-                            }
-                            break;
-                        }
-                        case AscDFH.historyitem_type_AreaChart:
-                        case AscDFH.historyitem_type_DoughnutChart:
-                        case AscDFH.historyitem_type_StockChart:
-                        {
-                            finish_dlbl_pos = null;
-                            break;
-                        }
+                    finish_dlbl_pos = this.checkDlblsPosition(chart, chart_type, finish_dlbl_pos);
+                    if(chart_type.dLbls && chart_type.dLbls.dLblPos !== finish_dlbl_pos){
+                        chart_type.dLbls.setDLblPos(finish_dlbl_pos);
                     }
-
                     for(var i = 0; i < chart_type.series.length; ++i){
                         if(chart_type.series[i].setDLbls){
                             if(!chart_type.series[i].dLbls){
@@ -4649,266 +4591,355 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
-        }
-        //подписи данных
-        if(typeof chart_type.setDLbls === "function" && AscFormat.isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
-        {
-            if(AscFormat.isRealBool(chartSettings.showCatName) ||
-                AscFormat.isRealBool(chartSettings.showSerName) ||
-                AscFormat.isRealBool(chartSettings.showVal)){
-                var fCheckLbls = function(oLbl){
-                    if(oLbl.setDelete && oLbl.bDelete){
-                        oLbl.setDelete(false);
-                    }
-                    if(AscFormat.isRealBool(chartSettings.showCatName)){
-                        oLbl.setShowCatName(chartSettings.showCatName);
-                    }
-                    if(AscFormat.isRealBool(chartSettings.showSerName)){
-                        oLbl.setShowSerName(chartSettings.showSerName);
-                    }
-                    if(AscFormat.isRealBool(chartSettings.showVal)){
-                        oLbl.setShowVal(chartSettings.showVal);
-                    }
-                    if(!AscFormat.isRealBool(oLbl.showLegendKey) || oLbl.showLegendKey === true)                {
-                        oLbl.setShowLegendKey(false);
-                    }
-                    if(!AscFormat.isRealBool(oLbl.showPercent) || oLbl.showPercent === true){
-                        oLbl.setShowPercent(false);
-                    }
-                    if(!AscFormat.isRealBool(oLbl.showBubbleSize) || oLbl.showBubbleSize === true){
-                        oLbl.setShowBubbleSize(false);
-                    }
-                    if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
-                        oLbl.setSeparator(chartSettings.separator);
-                };
+            else{
+                if(chart_type.dLbls && AscFormat.isRealNumber(chart_type.dLbls.dLblPos)){
+                    chart_type.dLbls.setDLblPos(this.checkDlblsPosition(chart, chart_type, chart_type.dLbls.dLblPos));
+                }
                 for(var i = 0; i < chart_type.series.length; ++i){
-                    var oSeries = chart_type.series[i];
-                    if(oSeries.setDLbls){
-                        if(!oSeries.dLbls){
-                            oSeries.setDLbls(new AscFormat.CDLbls());
-                            oSeries.dLbls.setParent(oSeries);
+                    if(chart_type.series[i].dLbls){
+                        if(AscFormat.isRealNumber(chart_type.series[i].dLbls.dLblPos)){
+                            chart_type.series[i].dLbls.setDLblPos(this.checkDlblsPosition(chart, chart_type, chart_type.series[i].dLbls.dLblPos));
                         }
-                    }
-                    fCheckLbls(oSeries.dLbls);
-                    for(var j = 0; j < oSeries.dLbls.dLbl.length; ++j){
-                        fCheckLbls(oSeries.dLbls.dLbl[j]);
-                    }
-                }
-            }
-        }
-
-        if(chart_type.getObjectType() === AscDFH.historyitem_type_LineChart )
-        {
-            if(!AscFormat.isRealBool(chartSettings.showMarker) || AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chartSpace))
-            {
-                chartSettings.showMarker = false;
-            }
-            if(!AscFormat.isRealBool(chartSettings.bLine) || AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chartSpace))
-            {
-                chartSettings.bLine = true;
-            }
-
-            if(chartSettings.showMarker)
-            {
-                if(!chart_type.marker)
-                {
-                    chart_type.setMarker(true);
-                }
-                for(var j = 0; j < chart_type.series.length; ++j)
-                {
-                    if(chart_type.series[j].marker && chart_type.series[j].marker.symbol === AscFormat.SYMBOL_NONE)
-                    {
-                        chart_type.series[j].setMarker(null);
-                    }
-                }
-            }
-            else
-            {
-                for(var j = 0; j < chart_type.series.length; ++j)
-                {
-                    if(!chart_type.series[j].marker)
-                    {
-                        chart_type.series[j].setMarker(new AscFormat.CMarker());
-                    }
-                    if(chart_type.series[j].marker.symbol !== AscFormat.SYMBOL_NONE)
-                    {
-                        chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
-                    }
-                }
-            }
-
-            if(!chartSettings.bLine)
-            {
-                for(var j = 0; j < chart_type.series.length; ++j)
-                {
-                    removeDPtsFromSeries(chart_type.series[j]);
-                    if(!chart_type.series[j].spPr)
-                    {
-                        chart_type.series[j].setSpPr(new AscFormat.CSpPr());
-                    }
-
-                    if(AscFormat.isRealBool(chart_type.series[j].smooth))
-                    {
-                        chart_type.series[j].setSmooth(null);
-                    }
-                    chart_type.series[j].spPr.setLn(AscFormat.CreateNoFillLine());
-                }
-            }
-            else
-            {
-                for(var j = 0; j < chart_type.series.length; ++j)
-                {
-                    removeDPtsFromSeries(chart_type.series[j]);
-                    if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
-                    {
-                        chart_type.series[j].setSmooth(chartSettings.smooth === true);
-                    }
-                    if(chart_type.series[j].spPr && chart_type.series[j].spPr.ln)
-                    {
-                        chart_type.series[j].spPr.setLn(null);
-                    }
-                }
-            }
-            if(chart_type.smooth !== (chartSettings.smooth === true))
-            {
-                chart_type.setSmooth(chartSettings.smooth === true);
-            }
-            for(var j = 0; j < chart_type.series.length; ++j)
-            {
-                if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
-                {
-                    chart_type.series[j].setSmooth(chartSettings.smooth === true);
-                }
-            }
-        }
-        if(chart_type.getObjectType() === AscDFH.historyitem_type_ScatterChart)
-        {
-            if(!AscFormat.isRealBool(chartSettings.showMarker))
-            {
-                chartSettings.showMarker = true;
-            }
-            if(!AscFormat.isRealBool(chartSettings.bLine))
-            {
-                chartSettings.bLine = false;
-            }
-
-            for(var i = 0; i < chart_type.series.length; ++i)
-            {
-                if(chart_type.series[i].marker)
-                {
-                    chart_type.series[i].setMarker(null);
-                }
-                if(AscFormat.isRealBool(chart_type.series[i].smooth))
-                {
-                    chart_type.series[i].setSmooth(null);
-                }
-            }
-            var new_scatter_style;
-            if(chartSettings.bLine)
-            {
-                for(var j = 0; j < chart_type.series.length; ++j)
-                {
-                    removeDPtsFromSeries(chart_type.series[j]);
-                    if(chart_type.series[j].spPr && chart_type.series[j].spPr.ln)
-                    {
-                        chart_type.series[j].spPr.setLn(null);
-                    }
-                }
-                if(chartSettings.smooth)
-                {
-                    if(chartSettings.showMarker)
-                    {
-                        new_scatter_style = SCATTER_STYLE_SMOOTH_MARKER;
-                        for(var j = 0; j < chart_type.series.length; ++j)
-                        {
-                            if(chart_type.series[j].marker)
-                            {
-                                chart_type.series[j].setMarker(null);
+                        for(var j = 0; j < chart_type.series[i].dLbls.dLbl.length; ++j){
+                            if(AscFormat.isRealNumber(chart_type.series[i].dLbls.dLbl[j].dLblPos)){
+                                chart_type.series[i].dLbls.dLbl[j].setDLblPos(this.checkDlblsPosition(chart, chart_type, chart_type.series[i].dLbls.dLbl[j].dLblPos));
                             }
-                            chart_type.series[j].setSmooth(true);
-                        }
-                    }
-                    else
-                    {
-                        new_scatter_style = SCATTER_STYLE_SMOOTH;
-                        for(var j = 0; j < chart_type.series.length; ++j)
-                        {
-                            if(!chart_type.series[j].marker)
-                            {
-                                chart_type.series[j].setMarker(new AscFormat.CMarker());
-                            }
-                            chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
-                            chart_type.series[j].setSmooth(true);
-                        }
-                    }
-                }
-                else
-                {
-                    if(chartSettings.showMarker)
-                    {
-                        new_scatter_style = SCATTER_STYLE_LINE_MARKER;
-                        for(var j = 0; j < chart_type.series.length; ++j)
-                        {
-                            if(chart_type.series[j].marker)
-                            {
-                                chart_type.series[j].setMarker(null);
-                            }
-                            chart_type.series[j].setSmooth(false);
-                        }
-                    }
-                    else
-                    {
-                        new_scatter_style = SCATTER_STYLE_LINE;
-                        for(var j = 0; j < chart_type.series.length; ++j)
-                        {
-                            if(!chart_type.series[j].marker)
-                            {
-                                chart_type.series[j].setMarker(new AscFormat.CMarker());
-                            }
-                            chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
-                            chart_type.series[j].setSmooth(false);
                         }
                     }
                 }
             }
-            else
+            //подписи данных
+            if(typeof chart_type.setDLbls === "function" && AscFormat.isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
             {
-                for(var j = 0; j < chart_type.series.length; ++j)
-                {
-                    removeDPtsFromSeries(chart_type.series[j]);
-                    if(!chart_type.series[j].spPr)
-                    {
-                        chart_type.series[j].setSpPr(new AscFormat.CSpPr());
+                if(AscFormat.isRealBool(chartSettings.showCatName) ||
+                    AscFormat.isRealBool(chartSettings.showSerName) ||
+                    AscFormat.isRealBool(chartSettings.showVal)){
+                    var fCheckLbls = function(oLbl){
+                        if(oLbl.setDelete && oLbl.bDelete){
+                            oLbl.setDelete(false);
+                        }
+                        if(AscFormat.isRealBool(chartSettings.showCatName)){
+                            oLbl.setShowCatName(chartSettings.showCatName);
+                        }
+                        if(AscFormat.isRealBool(chartSettings.showSerName)){
+                            oLbl.setShowSerName(chartSettings.showSerName);
+                        }
+                        if(AscFormat.isRealBool(chartSettings.showVal)){
+                            oLbl.setShowVal(chartSettings.showVal);
+                        }
+                        if(!AscFormat.isRealBool(oLbl.showLegendKey) || oLbl.showLegendKey === true)                {
+                            oLbl.setShowLegendKey(false);
+                        }
+                        if(!AscFormat.isRealBool(oLbl.showPercent) || oLbl.showPercent === true){
+                            oLbl.setShowPercent(false);
+                        }
+                        if(!AscFormat.isRealBool(oLbl.showBubbleSize) || oLbl.showBubbleSize === true){
+                            oLbl.setShowBubbleSize(false);
+                        }
+                        if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
+                            oLbl.setSeparator(chartSettings.separator);
+                    };
+                    for(var i = 0; i < chart_type.series.length; ++i){
+                        var oSeries = chart_type.series[i];
+                        if(oSeries.setDLbls){
+                            if(!oSeries.dLbls){
+                                oSeries.setDLbls(new AscFormat.CDLbls());
+                                oSeries.dLbls.setParent(oSeries);
+                            }
+                        }
+                        fCheckLbls(oSeries.dLbls);
+                        for(var j = 0; j < oSeries.dLbls.dLbl.length; ++j){
+                            fCheckLbls(oSeries.dLbls.dLbl[j]);
+                        }
                     }
-                    chart_type.series[j].spPr.setLn(AscFormat.CreateNoFillLine());
                 }
+            }
+
+            if(chart_type.getObjectType() === AscDFH.historyitem_type_LineChart )
+            {
+                if(!AscFormat.isRealBool(chartSettings.showMarker) || AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chartSpace))
+                {
+                    chartSettings.showMarker = false;
+                }
+                if(!AscFormat.isRealBool(chartSettings.bLine) || AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chartSpace))
+                {
+                    chartSettings.bLine = true;
+                }
+
                 if(chartSettings.showMarker)
                 {
-                    new_scatter_style = SCATTER_STYLE_MARKER;
+                    if(!chart_type.marker)
+                    {
+                        chart_type.setMarker(true);
+                    }
                     for(var j = 0; j < chart_type.series.length; ++j)
                     {
-                        if(chart_type.series[j].marker)
+                        if(chart_type.series[j].marker && chart_type.series[j].marker.symbol === AscFormat.SYMBOL_NONE)
                         {
                             chart_type.series[j].setMarker(null);
                         }
-                        chart_type.series[j].setSmooth(false);
                     }
                 }
                 else
                 {
-                    new_scatter_style = SCATTER_STYLE_MARKER;
                     for(var j = 0; j < chart_type.series.length; ++j)
                     {
                         if(!chart_type.series[j].marker)
                         {
                             chart_type.series[j].setMarker(new AscFormat.CMarker());
                         }
-                        chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
+                        if(chart_type.series[j].marker.symbol !== AscFormat.SYMBOL_NONE)
+                        {
+                            chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
+                        }
+                    }
+                }
+
+                if(!chartSettings.bLine)
+                {
+                    for(var j = 0; j < chart_type.series.length; ++j)
+                    {
+                        removeDPtsFromSeries(chart_type.series[j]);
+                        if(!chart_type.series[j].spPr)
+                        {
+                            chart_type.series[j].setSpPr(new AscFormat.CSpPr());
+                        }
+
+                        if(AscFormat.isRealBool(chart_type.series[j].smooth))
+                        {
+                            chart_type.series[j].setSmooth(null);
+                        }
+                        chart_type.series[j].spPr.setLn(AscFormat.CreateNoFillLine());
+                    }
+                }
+                else
+                {
+                    for(var j = 0; j < chart_type.series.length; ++j)
+                    {
+                        removeDPtsFromSeries(chart_type.series[j]);
+                        if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
+                        {
+                            chart_type.series[j].setSmooth(chartSettings.smooth === true);
+                        }
+                        if(chart_type.series[j].spPr && chart_type.series[j].spPr.ln)
+                        {
+                            chart_type.series[j].spPr.setLn(null);
+                        }
+                    }
+                }
+                if(chart_type.smooth !== (chartSettings.smooth === true))
+                {
+                    chart_type.setSmooth(chartSettings.smooth === true);
+                }
+                for(var j = 0; j < chart_type.series.length; ++j)
+                {
+                    if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
+                    {
+                        chart_type.series[j].setSmooth(chartSettings.smooth === true);
                     }
                 }
             }
-            chart_type.setScatterStyle(new_scatter_style);
+            if(chart_type.getObjectType() === AscDFH.historyitem_type_ScatterChart)
+            {
+                if(!AscFormat.isRealBool(chartSettings.showMarker))
+                {
+                    chartSettings.showMarker = true;
+                }
+                if(!AscFormat.isRealBool(chartSettings.bLine))
+                {
+                    chartSettings.bLine = false;
+                }
+
+                for(var i = 0; i < chart_type.series.length; ++i)
+                {
+                    if(chart_type.series[i].marker)
+                    {
+                        chart_type.series[i].setMarker(null);
+                    }
+                    if(AscFormat.isRealBool(chart_type.series[i].smooth))
+                    {
+                        chart_type.series[i].setSmooth(null);
+                    }
+                }
+                var new_scatter_style;
+                if(chartSettings.bLine)
+                {
+                    for(var j = 0; j < chart_type.series.length; ++j)
+                    {
+                        removeDPtsFromSeries(chart_type.series[j]);
+                        if(chart_type.series[j].spPr && chart_type.series[j].spPr.ln)
+                        {
+                            chart_type.series[j].spPr.setLn(null);
+                        }
+                    }
+                    if(chartSettings.smooth)
+                    {
+                        if(chartSettings.showMarker)
+                        {
+                            new_scatter_style = SCATTER_STYLE_SMOOTH_MARKER;
+                            for(var j = 0; j < chart_type.series.length; ++j)
+                            {
+                                if(chart_type.series[j].marker)
+                                {
+                                    chart_type.series[j].setMarker(null);
+                                }
+                                chart_type.series[j].setSmooth(true);
+                            }
+                        }
+                        else
+                        {
+                            new_scatter_style = SCATTER_STYLE_SMOOTH;
+                            for(var j = 0; j < chart_type.series.length; ++j)
+                            {
+                                if(!chart_type.series[j].marker)
+                                {
+                                    chart_type.series[j].setMarker(new AscFormat.CMarker());
+                                }
+                                chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
+                                chart_type.series[j].setSmooth(true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(chartSettings.showMarker)
+                        {
+                            new_scatter_style = SCATTER_STYLE_LINE_MARKER;
+                            for(var j = 0; j < chart_type.series.length; ++j)
+                            {
+                                if(chart_type.series[j].marker)
+                                {
+                                    chart_type.series[j].setMarker(null);
+                                }
+                                chart_type.series[j].setSmooth(false);
+                            }
+                        }
+                        else
+                        {
+                            new_scatter_style = SCATTER_STYLE_LINE;
+                            for(var j = 0; j < chart_type.series.length; ++j)
+                            {
+                                if(!chart_type.series[j].marker)
+                                {
+                                    chart_type.series[j].setMarker(new AscFormat.CMarker());
+                                }
+                                chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
+                                chart_type.series[j].setSmooth(false);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for(var j = 0; j < chart_type.series.length; ++j)
+                    {
+                        removeDPtsFromSeries(chart_type.series[j]);
+                        if(!chart_type.series[j].spPr)
+                        {
+                            chart_type.series[j].setSpPr(new AscFormat.CSpPr());
+                        }
+                        chart_type.series[j].spPr.setLn(AscFormat.CreateNoFillLine());
+                    }
+                    if(chartSettings.showMarker)
+                    {
+                        new_scatter_style = SCATTER_STYLE_MARKER;
+                        for(var j = 0; j < chart_type.series.length; ++j)
+                        {
+                            if(chart_type.series[j].marker)
+                            {
+                                chart_type.series[j].setMarker(null);
+                            }
+                            chart_type.series[j].setSmooth(false);
+                        }
+                    }
+                    else
+                    {
+                        new_scatter_style = SCATTER_STYLE_MARKER;
+                        for(var j = 0; j < chart_type.series.length; ++j)
+                        {
+                            if(!chart_type.series[j].marker)
+                            {
+                                chart_type.series[j].setMarker(new AscFormat.CMarker());
+                            }
+                            chart_type.series[j].marker.setSymbol(AscFormat.SYMBOL_NONE);
+                        }
+                    }
+                }
+                chart_type.setScatterStyle(new_scatter_style);
+            }
         }
+
+    },
+
+    checkDlblsPosition: function(chart, chart_type, position){
+        var finish_dlbl_pos =  position;
+
+        switch (chart_type.getObjectType())
+        {
+            case AscDFH.historyitem_type_BarChart:
+            {
+                if(BAR_GROUPING_CLUSTERED === chart_type.grouping)
+                {
+                    if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
+                        || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
+                        || finish_dlbl_pos === c_oAscChartDataLabelsPos.inBase
+                        || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd))
+                    {
+                        finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
+                    }
+                }
+                else
+                {
+                    if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
+                        || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
+                        || finish_dlbl_pos === c_oAscChartDataLabelsPos.inBase))
+                    {
+                        finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
+                    }
+                }
+                if(chart.view3D)
+                {
+                    finish_dlbl_pos = null;
+                }
+                break;
+            }
+            case AscDFH.historyitem_type_LineChart:
+            case AscDFH.historyitem_type_ScatterChart:
+            {
+                if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
+                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.l
+                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.t
+                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.r
+                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.b))
+                {
+                    finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
+                }
+                if(chart.view3D)
+                {
+                    finish_dlbl_pos = null;
+                }
+                break;
+            }
+            case AscDFH.historyitem_type_PieChart:
+            {
+                if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
+                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
+                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd
+                    || finish_dlbl_pos === c_oAscChartDataLabelsPos.bestFit))
+                {
+                    finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
+                }
+                break;
+            }
+            case AscDFH.historyitem_type_AreaChart:
+            case AscDFH.historyitem_type_DoughnutChart:
+            case AscDFH.historyitem_type_StockChart:
+            {
+                finish_dlbl_pos = null;
+                break;
+            }
+        }
+        return finish_dlbl_pos;
     },
 
     getChartProps: function()
@@ -4925,7 +4956,7 @@ DrawingObjectsController.prototype =
     getPropsFromChart: function(chart_space)
     {
         var chart = chart_space.chart, plot_area = chart_space.chart.plotArea;
-        var ret = new AscCommon.asc_ChartSettings();
+        var ret = new Asc.asc_ChartSettings();
         var range_obj = chart_space.getRangeObjectStr();
         if(range_obj)
         {
@@ -5790,7 +5821,7 @@ DrawingObjectsController.prototype =
                 var selectNext = function (oThis, last_selected_object)
                 {
                     var search_array = oThis.getAllObjectsOnPage(last_selected_object.selectStartPage,
-                        last_selected_object.parent && last_selected_object.parent.DocumentContent && last_selected_object.parent.DocumentContent.Is_HdrFtr(false));
+                        last_selected_object.parent && last_selected_object.parent.DocumentContent && last_selected_object.parent.DocumentContent.IsHdrFtr(false));
 
                     if(search_array.length > 0)
                     {
@@ -5858,7 +5889,7 @@ DrawingObjectsController.prototype =
                 var selectPrev = function (oThis, first_selected_object)
                 {
                     var search_array = oThis.getAllObjectsOnPage(first_selected_object.selectStartPage,
-                        first_selected_object.parent && first_selected_object.parent.DocumentContent && first_selected_object.parent.DocumentContent.Is_HdrFtr(false));
+                        first_selected_object.parent && first_selected_object.parent.DocumentContent && first_selected_object.parent.DocumentContent.IsHdrFtr(false));
 
                     if(search_array.length > 0)
                     {
@@ -5940,9 +5971,10 @@ DrawingObjectsController.prototype =
 
     moveSelectedObjects: function(dx, dy)
     {
-        if(!(this.isViewMode() === false))
+        if(!this.canEdit())
             return;
 
+        var oldCurState = this.curState;
         this.checkSelectedObjectsForMove(this.selection.groupSelection ? this.selection.groupSelection : null);
         this.swapTrackObjects();
         var move_state;
@@ -5955,6 +5987,7 @@ DrawingObjectsController.prototype =
             this.arrTrackObjects[i].track(dx, dy, this.arrTrackObjects[i].originalObject.selectStartPage);
         var nPageIndex  = (this.arrTrackObjects[0] && this.arrTrackObjects[0].originalObject && AscFormat.isRealNumber(this.arrTrackObjects[0].originalObject.selectStartPage)) ? this.arrTrackObjects[0].originalObject.selectStartPage : 0;
         move_state.onMouseUp({}, 0, 0, nPageIndex);
+        this.curState = oldCurState;
     },
 
     cursorMoveToStartPos: function()
@@ -6222,14 +6255,15 @@ DrawingObjectsController.prototype =
         this.updateSelectionState();
     },
 
-    isEditSignatureMode: function(){
-        var oApi = editor || Asc.editor;
-        if(oApi && oApi.restrictions === Asc.c_oAscRestrictionType.OnlySignatures){
-            return true;
+    canEdit: function()
+    {
+        var oApi = this.getEditorApi();
+        var _ret = true;
+        if(oApi){
+            _ret = oApi.canEdit();
         }
-        return false;
+        return _ret;
     },
-
 
     onKeyDown: function(e)
     {
@@ -6237,15 +6271,15 @@ DrawingObjectsController.prototype =
         var drawingObjectsController = this;
         var bRetValue = false;
         var state = drawingObjectsController.curState;
-        var isViewMode = drawingObjectsController.drawingObjects.isViewerMode();
+        var canEdit = drawingObjectsController.canEdit();
         var oApi = window["Asc"]["editor"];
-        if ( e.keyCode == 8 && false === isViewMode ) // BackSpace
+        if ( e.keyCode == 8 && canEdit ) // BackSpace
         {
             var oTargetTextObject = getTargetTextObject(this);
             drawingObjectsController.remove(-1);
             bRetValue = true;
         }
-        else if ( e.keyCode == 9 && false === isViewMode ) // Tab
+        else if ( e.keyCode == 9 && canEdit ) // Tab
         {
             if(this.getTargetDocContent())
             {
@@ -6263,7 +6297,7 @@ DrawingObjectsController.prototype =
             }
             bRetValue = true;
         }
-        else if ( e.keyCode == 13 && false === isViewMode ) // Enter
+        else if ( e.keyCode == 13 && canEdit ) // Enter
         {
             var target_doc_content = this.getTargetDocContent();
             if(target_doc_content)
@@ -6373,7 +6407,7 @@ DrawingObjectsController.prototype =
             }
             bRetValue = true;
         }
-        else if ( e.keyCode == 32 && false === isViewMode ) // Space
+        else if ( e.keyCode == 32 && canEdit ) // Space
         {
             if(!ctrlKey)
             {
@@ -6487,7 +6521,7 @@ DrawingObjectsController.prototype =
         {
             //TODO
         }
-        else if ( e.keyCode == 46 && false === isViewMode ) // Delete
+        else if ( e.keyCode == 46 && canEdit ) // Delete
         {
 			if (!e.shiftKey)
 			{
@@ -6502,7 +6536,7 @@ DrawingObjectsController.prototype =
             this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
-        else if ( e.keyCode == 66 && false === isViewMode && true === ctrlKey ) // Ctrl + B - делаем текст жирным
+        else if ( e.keyCode == 66 && canEdit && true === ctrlKey ) // Ctrl + B - делаем текст жирным
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -6515,7 +6549,7 @@ DrawingObjectsController.prototype =
         {
             //TODO
         }
-        else if ( e.keyCode == 69 && false === isViewMode && true === ctrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
+        else if ( e.keyCode == 69 && canEdit && true === ctrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
         {
 
             var ParaPr = drawingObjectsController.getParagraphParaPr();
@@ -6525,7 +6559,7 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 73 && false === isViewMode && true === ctrlKey ) // Ctrl + I - делаем текст наклонным
+        else if ( e.keyCode == 73 && canEdit && true === ctrlKey ) // Ctrl + I - делаем текст наклонным
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -6534,7 +6568,7 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 74 && false === isViewMode && true === ctrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
+        else if ( e.keyCode == 74 && canEdit && true === ctrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
         {
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
@@ -6543,12 +6577,12 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 75 && false === isViewMode && true === ctrlKey ) // Ctrl + K - добавление гиперссылки
+        else if ( e.keyCode == 75 && canEdit && true === ctrlKey ) // Ctrl + K - добавление гиперссылки
         {
             //TODO
             bRetValue = true;
         }
-        else if ( e.keyCode == 76 && false === isViewMode && true === ctrlKey ) // Ctrl + L + ...
+        else if ( e.keyCode == 76 && canEdit && true === ctrlKey ) // Ctrl + L + ...
         {
 
             var ParaPr = drawingObjectsController.getParagraphParaPr();
@@ -6559,7 +6593,7 @@ DrawingObjectsController.prototype =
             }
 
         }
-        else if ( e.keyCode == 77 && false === isViewMode && true === ctrlKey ) // Ctrl + M + ...
+        else if ( e.keyCode == 77 && canEdit && true === ctrlKey ) // Ctrl + M + ...
         {
             bRetValue = true;
 
@@ -6569,7 +6603,7 @@ DrawingObjectsController.prototype =
             bRetValue = true;
 
         }
-        else if ( e.keyCode == 82 && false === isViewMode && true === ctrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
+        else if ( e.keyCode == 82 && canEdit && true === ctrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
         {
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
@@ -6578,11 +6612,11 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 83 && false === isViewMode && true === ctrlKey ) // Ctrl + S - save
+        else if ( e.keyCode == 83 && canEdit && true === ctrlKey ) // Ctrl + S - save
         {
             bRetValue = false;
         }
-        else if ( e.keyCode == 85 && false === isViewMode && true === ctrlKey ) // Ctrl + U - делаем текст подчеркнутым
+        else if ( e.keyCode == 85 && canEdit && true === ctrlKey ) // Ctrl + U - делаем текст подчеркнутым
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -6591,18 +6625,18 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 86 && false === isViewMode && true === ctrlKey ) // Ctrl + V - paste
+        else if ( e.keyCode == 86 && canEdit && true === ctrlKey ) // Ctrl + V - paste
         {
 
         }
-        else if ( e.keyCode == 88 && false === isViewMode && true === ctrlKey ) // Ctrl + X - cut
+        else if ( e.keyCode == 88 && canEdit && true === ctrlKey ) // Ctrl + X - cut
         {
             //не возвращаем true чтобы не было preventDefault
         }
-        else if ( e.keyCode == 89 && false === isViewMode && true === ctrlKey ) // Ctrl + Y - Redo
+        else if ( e.keyCode == 89 && canEdit && true === ctrlKey ) // Ctrl + Y - Redo
         {
         }
-        else if ( e.keyCode == 90 && false === isViewMode && true === ctrlKey ) // Ctrl + Z - Undo
+        else if ( e.keyCode == 90 && canEdit && true === ctrlKey ) // Ctrl + Z - Undo
         {
         }
         else if ( e.keyCode == 93 || 57351 == e.keyCode /*в Opera такой код*/ ) // контекстное меню
@@ -6618,7 +6652,7 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 145 ) // Scroll Lock
         {
         }
-        else if ( e.keyCode == 187 && false === isViewMode && true === ctrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
+        else if ( e.keyCode == 187 && canEdit && true === ctrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -6639,7 +6673,7 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 189 && false === isViewMode ) // Клавиша Num-
+        else if ( e.keyCode == 189 && canEdit ) // Клавиша Num-
         {
 
             var Item = null;
@@ -6670,12 +6704,12 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 219 && false === isViewMode && true === ctrlKey ) // Ctrl + [
+        else if ( e.keyCode == 219 && canEdit && true === ctrlKey ) // Ctrl + [
         {
             drawingObjectsController.decreaseFontSize();
             bRetValue = true;
         }
-        else if ( e.keyCode == 221 && false === isViewMode && true === ctrlKey ) // Ctrl + ]
+        else if ( e.keyCode == 221 && canEdit && true === ctrlKey ) // Ctrl + ]
         {
             drawingObjectsController.increaseFontSize();
             bRetValue = true;
@@ -6715,6 +6749,13 @@ DrawingObjectsController.prototype =
             if(Asc["editor"])
             {
                 Asc["editor"].asc_endAddShape();
+                var ws = Asc["editor"].wb.getWorksheet();
+                if(ws){
+                    var ct = ws.getCursorTypeFromXY(ws.objectRender.lastX, ws.objectRender.lastY);
+                    if(ct){
+                        Asc["editor"].wb._onUpdateCursor(ct.cursor);
+                    }
+                }
             }
             return true;
         }
@@ -6765,7 +6806,7 @@ DrawingObjectsController.prototype =
         {
             return AscFormat.ExecuteNoHistory(function()
             {
-                var options = new AscCommon.asc_ChartSettings();
+                var options = new Asc.asc_ChartSettings();
                 options.type = type;
                 options.style = 1;
                 options.putTitle(c_oAscChartTitleShowSettings.noOverlay);
@@ -6861,9 +6902,14 @@ DrawingObjectsController.prototype =
         {
             chart_selection = this.selection.groupSelection.selection.chartSelection;
         }
-        if(chart_selection && chart_selection.selection.textSelection)
+        if(chart_selection && (chart_selection.selection.textSelection || chart_selection.selection.title))
         {
-            var content = chart_selection.selection.textSelection.getDocContent(), bDeleteTitle = false;;
+            var oTitle = chart_selection.selection.textSelection;
+            if(!oTitle){
+                oTitle = chart_selection.selection.title;
+                nPageNum2 = this.drawingObjects.num;
+            }
+            var content = oTitle.getDocContent(), bDeleteTitle = false;
             if(content)
             {
                 if(content.Is_Empty())
@@ -8995,8 +9041,8 @@ DrawingObjectsController.prototype =
 
             if ( undefined != Props.DefaultTab )
             {
-                AscCommonWord.Default_Tab_Stop = Props.DefaultTab;
-                //this.setDefaltTabSize( Props.DefaultTab );
+                //AscCommonWord.Default_Tab_Stop = Props.DefaultTab;
+                this.setDefaultTabSize( Props.DefaultTab );
             }
 
 
@@ -9063,6 +9109,10 @@ DrawingObjectsController.prototype =
         //oAscDrawingLayerType
     },
 
+    setGraphicObjectAlign: function(alignType)
+    {
+        this.checkSelectedObjectsAndCallback(this.setGraphicObjectAlignCallBack, [alignType], false, AscDFH.historydescription_Spreadsheet_GraphicObjectLayer);
+    },
 
     setGraphicObjectLayerCallBack: function(layerType)
     {
@@ -9086,6 +9136,43 @@ DrawingObjectsController.prototype =
             case 3:
             {
                 this.bringBackward();
+            }
+        }
+    },
+
+    setGraphicObjectAlignCallBack: function(alignType)
+    {
+        switch (alignType)
+        {
+            case 0:
+            {
+                this.alignLeft(true);
+                break;
+            }
+            case 1:
+            {
+                this.alignRight(true);
+                break;
+            }
+            case 2:
+            {
+                this.alignBottom(true);
+                break;
+            }
+            case 3:
+            {
+                this.alignTop(true);
+                break;
+            }
+            case 4:
+            {
+                this.alignCenter(true);
+                break;
+            }
+            case 5:
+            {
+                this.alignMiddle(true);
+                break;
             }
         }
     },
@@ -11049,10 +11136,10 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     }
     else{
         if(!bCreate && aPreset[5]){
-            if(!oChartSpace.chart.legend){
-                oChartSpace.chart.setLegend(new AscFormat.CLegend());
-            }
-            oChartSpace.chart.legend.setOverlay(false);
+            // if(!oChartSpace.chart.legend){
+            //     oChartSpace.chart.setLegend(new AscFormat.CLegend());
+            // }
+            oChartSpace.chart.legend && oChartSpace.chart.legend.setOverlay(false);
         }
     }
     ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument, bCreate);
