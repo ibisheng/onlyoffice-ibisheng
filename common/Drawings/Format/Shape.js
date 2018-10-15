@@ -5821,6 +5821,7 @@ function getParaDrawing(oDrawing)
 function checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, oTempParent)
 {
     var i, j;
+    var checkSPs = [].concat( oTempParent.cSld.spTree );
     for(i = 0; i < oEndContent.Drawings.length; ++i)
     {
         var shape = oEndContent.Drawings[i].Drawing;
@@ -5852,6 +5853,28 @@ function checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, oTempPar
                 }
             }
             shape.parent = oOldParent;
+        }
+        else if( shape.spPr && shape.spPr.xfrm ){
+            //check paste object position
+            var changed = false;
+            for( var k=0; k< checkSPs.length; k++ ){
+                var oSp = checkSPs[k];
+                var srcSp = shape.spPr
+                if( Math.abs(srcSp.xfrm.offX - oSp.x)<0.01 &&
+                    Math.abs(srcSp.xfrm.offY - oSp.y)<0.01 && 
+                    Math.abs(srcSp.xfrm.extX - oSp.extX )<0.01 &&
+                    Math.abs(srcSp.xfrm.extY - oSp.extY )<0.01
+                ){ 
+                    srcSp.xfrm.offX = shape.x = oSp.x + 10;
+                    srcSp.xfrm.offY = shape.y = oSp.y + 10;
+                    srcSp.xfrm.extX = shape.extX = oSp.extX;
+                    srcSp.xfrm.extY= shape.extY = oSp.extY;
+                    changed = true;
+                }
+            }
+            if( changed ){
+                checkSPs.push( shape );
+            }
         }
     }
 }
