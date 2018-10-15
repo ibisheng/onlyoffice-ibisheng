@@ -77,6 +77,8 @@ CInlineLevelSdt.prototype.Copy = function(Selected, oPr)
 	oContentControl.SetTag(this.GetTag());
 	oContentControl.SetAlias(this.GetAlias());
 	oContentControl.SetContentControlLock(this.GetContentControlLock());
+	oContentControl.SetAppearance(this.GetAppearance());
+	oContentControl.SetColor(this.GetColor());
 
 	return oContentControl;
 };

@@ -3362,7 +3362,11 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 	if (true === this.Selection.Start || table_Selection_Border === this.Selection.Type2 || table_Selection_Border_InnerTable === this.Selection.Type2)
 		return;
 
-	if (true === this.Check_EmptyPages(CurPage - 1) && true !== this.IsEmptyPage(CurPage))
+	// Случай, когда у нас уже есть трэк вложенной таблицы и курсор выходит во внешнюю. Чтобы трэк сразу не пропадал,
+	// пока курсор находится в области табличного трэка для вложенной таблицы.
+	if (true !== this.DrawingDocument.IsCursorInTableCur(X, Y, this.GetAbsolutePage(CurPage))
+		&& true === this.Check_EmptyPages(CurPage - 1)
+		&& true !== this.IsEmptyPage(CurPage))
 	{
 		this.private_StartTrackTable(CurPage);
 	}
@@ -9177,7 +9181,7 @@ CTable.prototype.AddTableRow = function(bBefore)
 	var Cells_info = [];
 	for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 	{
-		var Cell      = Row.Get_Cell(CurCell);
+		var Cell      = Row.GetCell(CurCell);
 		var Cell_info = Row.Get_CellInfo(CurCell);
 
 		var Cell_grid_start = Cell_info.StartGridCol;
@@ -9186,11 +9190,10 @@ CTable.prototype.AddTableRow = function(bBefore)
 		var VMerge_count_before = this.Internal_GetVertMergeCount2(RowId, Cell_grid_start, Cell_grid_span);
 		var VMerge_count_after  = this.Internal_GetVertMergeCount(RowId, Cell_grid_start, Cell_grid_span);
 
-		Cells_info[CurCell] =
-			{
-				VMerge_count_before : VMerge_count_before,
-				VMerge_count_after  : VMerge_count_after
-			};
+		Cells_info[CurCell] = {
+			VMerge_count_before : VMerge_count_before,
+			VMerge_count_after  : VMerge_count_after
+		};
 	}
 
 	// TODO: Пока делаем одинаковый CellSpacing
@@ -9216,20 +9219,19 @@ CTable.prototype.AddTableRow = function(bBefore)
 			New_Cell.Copy_Pr(Old_Cell.Pr);
 
 			// Копируем также текстовые настройки и настройки параграфа
-			var FirstPara = Old_Cell.Content.Get_FirstParagraph();
-			var TextPr    = FirstPara.Get_FirstRunPr();
-			New_Cell.Content.Set_ApplyToAll(true);
-
-			// Добавляем стиль во все параграфы
-			var PStyleId = FirstPara.Style_Get();
-			if (undefined !== PStyleId && null !== this.LogicDocument)
+			var oFirstPara = Old_Cell.GetContent().GetFirstParagraph();
+			if (oFirstPara)
 			{
-				var Styles = this.LogicDocument.Get_Styles();
-				New_Cell.Content.SetParagraphStyle(Styles.Get_Name(PStyleId));
-			}
+				var oNewCellContent = New_Cell.GetContent();
 
-			New_Cell.Content.AddToParagraph(new ParaTextPr(TextPr));
-			New_Cell.Content.Set_ApplyToAll(false);
+				var arrAllParagraphs = oNewCellContent.GetAllParagraphs({All : true});
+				for (var nParaIndex = 0, nParasCount = arrAllParagraphs.length; nParaIndex < nParasCount; ++nParaIndex)
+				{
+					var oTempPara = arrAllParagraphs[nParaIndex];
+					oTempPara.SetDirectParaPr(oFirstPara.GetDirectParaPr(true));
+					oTempPara.SetDirectTextPr(oFirstPara.Get_FirstRunPr(), false);
+				}
+			}
 
 			if (true === bBefore)
 			{

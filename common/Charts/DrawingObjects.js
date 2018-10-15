@@ -2370,8 +2370,8 @@ function DrawingObjects() {
     _this.getMaxColRow = function() {
         var r = -1, c = -1;
         aObjects.forEach(function (item) {
-            r = Math.max(r, item.boundsFromTo.to.row + 1);
-            c = Math.max(c, item.boundsFromTo.to.col + 1);
+            r = Math.max(r, item.boundsFromTo.to.row);
+            c = Math.max(c, item.boundsFromTo.to.col);
         });
 
         return new AscCommon.CellBase(r, c);
@@ -2768,28 +2768,31 @@ function DrawingObjects() {
         }
         else if ( isObject(chart) && chart["binary"] )
         {
+            var model = worksheet.model;
+			History.Clear();
+			History.TurnOff();
+
             for (var i = 0; i < aObjects.length; i++) {
                 aObjects[i].graphicObject.deleteDrawingBase();
             }
-            var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
-            listRange.cleanAll();
-            worksheet._clean();
-            History.Clear();
+			aObjects.length = 0;
 
-            History.TurnOff();
-            aObjects.length = 0;
-            var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
-            listRange.cleanAll();
-            worksheet.endEditChart();
+			var oAllRange = model.getRange3(0, 0, model.getRowsCount(), model.getColsCount());
+			oAllRange.cleanAll();
+
+			worksheet.endEditChart();
+
+			//worksheet._clean();
+
             var asc_chart_binary = new Asc.asc_CChartBinary();
             asc_chart_binary.asc_setBinary(chart["binary"]);
             asc_chart_binary.asc_setThemeBinary(chart["themeBinary"]);
             asc_chart_binary.asc_setColorMapBinary(chart["colorMapBinary"]);
-            var oNewChartSpace = asc_chart_binary.getChartSpace(worksheet.model);
+            var oNewChartSpace = asc_chart_binary.getChartSpace(model);
             var theme = asc_chart_binary.getTheme();
             if(theme)
             {
-                worksheet.model.workbook.theme = theme;
+                model.workbook.theme = theme;
             }
             if(chart["cTitle"] || chart["cDescription"]){
                 if(!oNewChartSpace.nvGraphicFramePr){
@@ -2811,13 +2814,13 @@ function DrawingObjects() {
             }
             var font_map = {};
             oNewChartSpace.documentGetAllFontNames(font_map);
-            AscFormat.checkThemeFonts(font_map, worksheet.model.workbook.theme.themeElements.fontScheme);
+            AscFormat.checkThemeFonts(font_map, model.workbook.theme.themeElements.fontScheme);
             window["Asc"]["editor"]._loadFonts(font_map,
                 function()
                 {
                     var max_r = 0, max_c = 0;
 
-                    var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
+                    var series = oNewChartSpace.getAllSeries(), ser;
 					
 					function fFillCell(oCell, sNumFormat, value)
 					{
@@ -2842,15 +2845,8 @@ function DrawingObjects() {
                         var lit_format_code;
                         if(cache)
                         {
+							lit_format_code = (typeof cache.formatCode === "string" && cache.formatCode.length > 0) ? cache.formatCode : "General";
 
-                            if(typeof cache.formatCode === "string" && cache.formatCode.length > 0)
-                            {
-                                lit_format_code = cache.formatCode;
-                            }
-                            else
-                            {
-                                lit_format_code = "General"
-                            }
                             var sFormula = ref.f + "";
                             if(sFormula[0] === '(')
                                 sFormula = sFormula.slice(1);
@@ -2859,14 +2855,14 @@ function DrawingObjects() {
                             var f1 = sFormula;
 
                             var arr_f = f1.split(",");
-                            var pt_index = 0, i, j, cell, pt, nPtCount, k;
+                            var pt_index = 0, i, j, pt, nPtCount, k;
                             for(i = 0; i < arr_f.length; ++i)
                             {
                                 var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
                                 if(parsed_ref)
                                 {
-                                    var source_worksheet = worksheet.model.workbook.getWorksheetByName(parsed_ref.sheet);
-                                    if(source_worksheet === worksheet.model)
+                                    var source_worksheet = model.workbook.getWorksheetByName(parsed_ref.sheet);
+                                    if(source_worksheet === model)
                                     {
                                         var range1 = source_worksheet.getRange2(parsed_ref.range);
                                         if(range1)
@@ -2979,7 +2975,7 @@ function DrawingObjects() {
                         var resultRef = parserHelp.parse3DRef(first_num_ref.f);
                         if(resultRef)
                         {
-                            worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
+                            model.workbook.aWorksheets[0].sName = resultRef.sheet;
                             if(series[0] && series[0].xVal && series[0].xVal.numRef)
                             {
                                 fillTableFromRef(series[0].xVal.numRef);
@@ -3014,11 +3010,15 @@ function DrawingObjects() {
                             }
                         }
                     }
-                    worksheet._updateCellsRange(new asc_Range(0, 0, Math.max(worksheet.nColsCount - 1, max_c),  Math.max(worksheet.nRowsCount - 1, max_r)));
+					oAllRange = oAllRange.bbox;
+					oAllRange.r2 = Math.max(oAllRange.r2, max_r);
+					oAllRange.c2 = Math.max(oAllRange.c2, max_c);
+					worksheet._updateRange(oAllRange);
+					worksheet.draw();
                     aImagesSync.length = 0;
                     oNewChartSpace.getAllRasterImages(aImagesSync);
                     oNewChartSpace.setBDeleted(false);
-                    oNewChartSpace.setWorksheet(worksheet.model);
+                    oNewChartSpace.setWorksheet(model);
                     oNewChartSpace.addToDrawingObjects();
                     oNewChartSpace.recalcInfo.recalculateReferences = false;
                     oNewChartSpace.recalculate();
@@ -3144,8 +3144,6 @@ function DrawingObjects() {
             graphics.m_oFontManager = AscCommon.g_fontManager;
         }
 
-        var _offX = offsetX* Asc.getCvtRatio(0, 3, oDrawingContext.getPPIX());
-        var _offY = offsetY* Asc.getCvtRatio(0, 3, oDrawingContext.getPPIY());
         for(i = 0; i < aSparklineGroups.length; ++i) {
             var oSparklineGroup = aSparklineGroups[i];
 
@@ -3175,7 +3173,7 @@ function DrawingObjects() {
                     graphics.SetBaseTransform(_baseTransform);
                 }
 
-				sparkline.oCacheView.draw(graphics, _offX, _offY);
+				sparkline.oCacheView.draw(graphics, offsetX, offsetY);
 
                 if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
                 {
@@ -3481,46 +3479,53 @@ function DrawingObjects() {
 
     _this.updateSizeDrawingObjects = function(target, bNoChangeCoords) {
 
+        var oGraphicObject;
+        var bCheck, bRecalculate;
         if(!History.Is_On() || true === bNoChangeCoords){
             if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
-                    if (drawingObject.from.row >= target.row) {
-                        if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.handleUpdateExtents)
-                            {
-                                drawingObject.graphicObject.handleUpdateExtents();
-                                drawingObject.graphicObject.recalculate();
-                            }
-                            else
-                            {
-                                if(drawingObject.graphicObject.recalculateTransform){
-                                    drawingObject.graphicObject.recalculateTransform();
-                                }
-                                if(drawingObject.graphicObject.recalculateBounds){
-                                    drawingObject.graphicObject.recalculateBounds();
-                                }
-                            }
+                    bCheck = false;
+                    if(target.target === AscCommonExcel.c_oTargetType.RowResize){
+                        if(drawingObject.from.row >= target.row){
+                            bCheck = true;
                         }
                     }
-                }
-            } else {
-                for (i = 0; i < aObjects.length; i++) {
-                    drawingObject = aObjects[i];
-                    if (drawingObject.from.col >= target.col) {
-                        if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.handleUpdateExtents)
-                            {
-                                drawingObject.graphicObject.handleUpdateExtents();
-                                drawingObject.graphicObject.recalculate();
-                            }
-                            else
-                            {
-                                if(drawingObject.graphicObject.recalculateTransform){
-                                    drawingObject.graphicObject.recalculateTransform();
+                    else{
+                        if(drawingObject.from.col >= target.col){
+                            bCheck = true;
+                        }
+                    }
+                    if (bCheck) {
+                        oGraphicObject = drawingObject.graphicObject;
+                        if(oGraphicObject){
+                            if(oGraphicObject.handleUpdateExtents) {
+
+                                bRecalculate = true;
+                                if(oGraphicObject.recalculateTransform){
+                                    var oldX = oGraphicObject.x;
+                                    var oldY = oGraphicObject.y;
+                                    var oldExtX = oGraphicObject.extX;
+                                    var oldExtY = oGraphicObject.extY;
+                                    oGraphicObject.recalculateTransform();
+                                    var fDelta = 0.01;
+                                    bRecalculate = false;
+                                    if(!AscFormat.fApproxEqual(oldX, oGraphicObject.x, fDelta) || !AscFormat.fApproxEqual(oldY, oGraphicObject.y, fDelta)
+                                        || !AscFormat.fApproxEqual(oldExtX, oGraphicObject.extX, fDelta) || !AscFormat.fApproxEqual(oldExtY, oGraphicObject.extY, fDelta)){
+                                        bRecalculate = true;
+                                    }
                                 }
-                                if(drawingObject.graphicObject.recalculateBounds){
-                                    drawingObject.graphicObject.recalculateBounds();
+                                if(bRecalculate){
+                                    oGraphicObject.handleUpdateExtents();
+                                    oGraphicObject.recalculate();
+                                }
+                            }
+                            else {
+                                if(oGraphicObject.recalculateTransform){
+                                    oGraphicObject.recalculateTransform();
+                                }
+                                if(oGraphicObject.recalculateBounds){
+                                    oGraphicObject.recalculateBounds();
                                 }
                             }
                         }
@@ -4240,14 +4245,14 @@ function DrawingObjects() {
             settings.putShowHorAxis(true);
             settings.putShowVerAxis(true);
             var series = AscFormat.getChartSeries(worksheet.model, settings);
-            if(series && series.series.length > 1)
-            {
-                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
-            }
-            else
-            {
-                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
-            }
+            // if(series && series.series.length > 1)
+            // {
+            //     settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
+            // }
+            // else
+            // {
+            //     settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
+            // }
             settings.putHorAxisLabel(Asc.c_oAscChartHorAxisLabelShowSettings.none);
             settings.putVertAxisLabel(Asc.c_oAscChartVertAxisLabelShowSettings.none);
             settings.putDataLabelsPos(Asc.c_oAscChartDataLabelsPos.none);
@@ -4631,12 +4636,12 @@ function ObjectLocker(ws) {
     // For array of objects -=Use reset before use=-
     _t.checkObjects = function(callback) {
 
-        function callbackEx(result, sync) {
+        var callbackEx = function(result, sync) {
             //if ( worksheet )
             //	worksheet._drawCollaborativeElements(true);
             if ( callback )
                 callback(result, sync);
-        }
+        };
 
         if(Asc.editor && Asc.editor.collaborativeEditing && Asc.editor.collaborativeEditing.getGlobalLock()){
             callbackEx(false, true);
@@ -4658,7 +4663,7 @@ function ObjectLocker(ws) {
             if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
                 // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
                 asc_applyFunction(callbackEx, true, true);
-                callback = undefined;
+                callbackEx = undefined;
             }
             if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
                 // Редактируем сами, проверяем дальше

@@ -1336,20 +1336,35 @@ ParaRun.prototype.ConcatToContent = function(arrNewItems)
 ParaRun.prototype.AddText = function(sString, nPos)
 {
 	var nCharPos = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
-	for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
-	{
-		var nCharCode = oIterator.value();
 
-		if (9 === nCharCode) // \t
-			this.AddToContent(nCharPos++, new ParaTab());
-		else if (10 === nCharCode) // \n
-			this.AddToContent(nCharPos++, new ParaNewLine(break_Line));
-		else if (13 === nCharCode) // \r
-			continue;
-		else if (32 === nCharCode) // space
-			this.AddToContent(nCharPos++, new ParaSpace());
-		else
-			this.AddToContent(nCharPos++, new ParaText(nCharCode));
+	if (this.IsMathRun())
+	{
+		for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
+		{
+			var nCharCode = oIterator.value();
+
+			var oMathText = new CMathText();
+			oMathText.add(nCharCode);
+			this.AddToContent(nCharPos++, oMathText);
+		}
+	}
+	else
+	{
+		for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
+		{
+			var nCharCode = oIterator.value();
+
+			if (9 === nCharCode) // \t
+				this.AddToContent(nCharPos++, new ParaTab());
+			else if (10 === nCharCode) // \n
+				this.AddToContent(nCharPos++, new ParaNewLine(break_Line));
+			else if (13 === nCharCode) // \r
+				continue;
+			else if (32 === nCharCode) // space
+				this.AddToContent(nCharPos++, new ParaSpace());
+			else
+				this.AddToContent(nCharPos++, new ParaText(nCharCode));
+		}
 	}
 };
 /**
@@ -1838,7 +1853,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 
     // Копируем настройки
     NewRun.Set_Pr(this.Pr.Copy(true));
-    NewRun.Set_ReviewType(this.ReviewType);
+    NewRun.Set_ReviewTypeWithInfo(this.ReviewType, this.ReviewInfo ? this.ReviewInfo.Copy() : undefined);
 
     NewRun.CollPrChangeMine  = this.CollPrChangeMine;
     NewRun.CollPrChangeOther = this.CollPrChangeOther;
@@ -7061,19 +7076,23 @@ ParaRun.prototype.IsInHyperlinkInTOC = function()
 	return false;
 };
 
-// В данной функции мы жестко меняем настройки на те, которые пришли (т.е. полностью удаляем старые)
 ParaRun.prototype.Set_Pr = function(TextPr)
 {
-    var OldValue = this.Pr;
-    this.Pr = TextPr;
-
-	History.Add(new CChangesRunTextPr(this, OldValue, TextPr, this.private_IsCollPrChangeMine()));
-    this.Recalc_CompiledPr(true);
-
-    this.private_UpdateSpellChecking();
-    this.private_UpdateTrackRevisionOnChangeTextPr(true);
+	return this.SetPr(TextPr);
 };
+/**
+ * Жестко меняем настройки на заданные
+ * @param {CTextPr} oTextPr
+ */
+ParaRun.prototype.SetPr = function(oTextPr)
+{
+	History.Add(new CChangesRunTextPr(this, this.Pr, oTextPr, this.private_IsCollPrChangeMine()));
+	this.Pr = oTextPr;
+	this.Recalc_CompiledPr(true);
 
+	this.private_UpdateSpellChecking();
+	this.private_UpdateTrackRevisionOnChangeTextPr(true);
+};
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     var bReview = false;
@@ -7689,7 +7708,11 @@ ParaRun.prototype.Reject_PrChange = function()
 {
     if (true === this.Have_PrChange())
     {
+		if (this.GetParaEnd())
+			this.Paragraph.TextPr.SetPr(this.Pr.PrChange);
+
         this.Set_Pr(this.Pr.PrChange);
+
         this.Remove_PrChange();
     }
 };
@@ -9220,7 +9243,7 @@ ParaRun.prototype.UpdLastElementForGaps = function(_CurLine, _CurRange, GapsInfo
 };
 ParaRun.prototype.IsPlaceholder = function()
 {
-    return this.Content.length == 1 && this.Content[0].IsPlaceholder();
+    return this.Content.length == 1 && this.Content[0].IsPlaceHolder && this.Content[0].IsPlaceholder();
 };
 ParaRun.prototype.AddMathPlaceholder = function()
 {

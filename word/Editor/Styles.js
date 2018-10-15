@@ -3504,6 +3504,14 @@ CStyle.prototype.IsCustom = function()
 {
 	return this.Custom;
 };
+/**
+ * Проверяем является ли данный стиль, стилем для параграфа
+ * @returns {boolean}
+ */
+CStyle.prototype.IsParagraphStyle = function()
+{
+	return (this.Type === styletype_Paragraph);
+};
 
 function CStyles(bCreateDefault)
 {
@@ -4255,14 +4263,6 @@ CStyles.prototype =
         return "";
     },
 
-    Get : function(StyleId)
-    {
-        if (undefined != this.Style[StyleId])
-            return this.Style[StyleId];
-
-        return null;
-    },
-
     Get_Default_Paragraph : function()
     {
         return this.Default.Paragraph;
@@ -4480,28 +4480,32 @@ CStyles.prototype =
 			}
 			case styletype_Table:
 			{
-				Pr.ParaPr.Merge(Style.ParaPr);
-				Pr.TextPr.Merge(Style.TextPr);
-
-				if (undefined != Style.TablePr)
+				// Делаем как в Word: стиль с именем "Normal Table" используется всегда встроенный (баг 37902)
+				if ("Normal Table" !== Style.GetName())
 				{
-					Pr.TablePr.Merge(Style.TablePr);
-					Pr.TableRowPr.Merge(Style.TableRowPr);
-					Pr.TableCellPr.Merge(Style.TableCellPr);
+					Pr.ParaPr.Merge(Style.ParaPr);
+					Pr.TextPr.Merge(Style.TextPr);
 
-					Pr.TableBand1Horz.Merge(Style.TableBand1Horz);
-					Pr.TableBand1Vert.Merge(Style.TableBand1Vert);
-					Pr.TableBand2Horz.Merge(Style.TableBand2Horz);
-					Pr.TableBand2Vert.Merge(Style.TableBand2Vert);
-					Pr.TableFirstCol.Merge(Style.TableFirstCol);
-					Pr.TableFirstRow.Merge(Style.TableFirstRow);
-					Pr.TableLastCol.Merge(Style.TableLastCol);
-					Pr.TableLastRow.Merge(Style.TableLastRow);
-					Pr.TableTLCell.Merge(Style.TableTLCell);
-					Pr.TableTRCell.Merge(Style.TableTRCell);
-					Pr.TableBLCell.Merge(Style.TableBLCell);
-					Pr.TableBRCell.Merge(Style.TableBRCell);
-					Pr.TableWholeTable.Merge(Style.TableWholeTable);
+					if (undefined != Style.TablePr)
+					{
+						Pr.TablePr.Merge(Style.TablePr);
+						Pr.TableRowPr.Merge(Style.TableRowPr);
+						Pr.TableCellPr.Merge(Style.TableCellPr);
+
+						Pr.TableBand1Horz.Merge(Style.TableBand1Horz);
+						Pr.TableBand1Vert.Merge(Style.TableBand1Vert);
+						Pr.TableBand2Horz.Merge(Style.TableBand2Horz);
+						Pr.TableBand2Vert.Merge(Style.TableBand2Vert);
+						Pr.TableFirstCol.Merge(Style.TableFirstCol);
+						Pr.TableFirstRow.Merge(Style.TableFirstRow);
+						Pr.TableLastCol.Merge(Style.TableLastCol);
+						Pr.TableLastRow.Merge(Style.TableLastRow);
+						Pr.TableTLCell.Merge(Style.TableTLCell);
+						Pr.TableTRCell.Merge(Style.TableTRCell);
+						Pr.TableBLCell.Merge(Style.TableBLCell);
+						Pr.TableBRCell.Merge(Style.TableBRCell);
+						Pr.TableWholeTable.Merge(Style.TableWholeTable);
+					}
 				}
 
 				break;
@@ -4729,6 +4733,15 @@ CStyles.prototype =
             }
         }
     }
+};
+/**
+ * Получаем стиль по идентификатору
+ * @param sStyleId {string}
+ * @returns {?CStyle}
+ */
+CStyles.prototype.Get = function(sStyleId)
+{
+	return (this.Style[sStyleId] ? this.Style[sStyleId] : null);
 };
 /**
  * Получаем идентификатор стиля по его имени

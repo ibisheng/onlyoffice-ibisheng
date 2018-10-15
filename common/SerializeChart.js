@@ -11125,7 +11125,7 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
 
 
         //check: does category axis exist
-        for(var _i = oNewVal.charts.length; _i > -1; --_i){
+        for(var _i = oNewVal.charts.length - 1; _i > -1; --_i){
             var oChart = oNewVal.charts[_i];
             if(oChart)
             {
@@ -11135,6 +11135,13 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
                     if(axis_by_types.valAx.length === 0 || axis_by_types.catAx.length === 0)
                     {
                         oNewVal.removeCharts(_i, _i);
+                        if(oChart.axId){
+                            oChart.axId.length = 0;
+                            oChart = oChart.createDuplicate();
+                            if(oChart.setParent){
+                                oChart.setParent(oNewVal);
+                            }
+                        }
                         var sDefaultValAxFormatCode = null;
                         if(oChart && oChart.series[0]){
                             var aPoints = AscFormat.getPtsFromSeries(oChart.series[0]);
@@ -11175,6 +11182,28 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
                         oNewVal.addAxis(cat_ax);
                         oNewVal.addAxis(val_ax);
                     }
+                    else
+                    {
+                        if(oChart.getObjectType() === AscDFH.historyitem_type_BarChart && oChart.barDir === AscFormat.BAR_DIR_BAR)
+                        {
+                            for(var _c = 0; _c < axis_by_types.valAx.length; ++_c)
+                            {
+                                var val_ax = axis_by_types.valAx[_c];
+                                if(val_ax.axPos !== AscFormat.AX_POS_B || val_ax.axPos !== AscFormat.AX_POS_T )
+                                {
+                                    val_ax.setAxPos(AscFormat.AX_POS_B);
+                                }
+                            }
+                            for(var _c = 0; _c < axis_by_types.catAx.length; ++_c)
+                            {
+                                var cat_ax = axis_by_types.catAx[_c];
+                                if(cat_ax.axPos !== AscFormat.AX_POS_L || cat_ax.axPos !== AscFormat.AX_POS_R )
+                                {
+                                    cat_ax.setAxPos(AscFormat.AX_POS_L);
+                                }
+                            }
+                        }
+                    }
                 }
                 if(oChart.setVaryColors && oChart.varyColors === null){
                     oChart.setVaryColors(false);
@@ -11197,13 +11226,6 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
                     oChart.setDLbls(oDlbls);
                 }
                 var aSeries = oChart.series;
-                for(var _j = 0; _j < aSeries.length; ++_j){
-                    var oCurSeries = aSeries[_j];
-                    oDlbls = oCurSeries;
-                    if(oDlbls){
-
-                    }
-                }
             }
         }
 

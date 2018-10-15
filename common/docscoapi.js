@@ -835,10 +835,10 @@
   };
 
   DocsCoApi.prototype._reSaveChanges = function() {
-    this.saveChanges(this.arrayChanges, this.currentIndex);
+    this.saveChanges(this.arrayChanges, this.currentIndex, undefined, undefined, true);
   };
 
-  DocsCoApi.prototype.saveChanges = function(arrayChanges, currentIndex, deleteIndex, excelAdditionalInfo) {
+  DocsCoApi.prototype.saveChanges = function(arrayChanges, currentIndex, deleteIndex, excelAdditionalInfo, reSave) {
     if (null === currentIndex) {
       this.deleteIndex = deleteIndex;
       if (null != this.deleteIndex && -1 !== this.deleteIndex) {
@@ -874,7 +874,7 @@
       'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
       'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
       'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null,
-        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks});
+        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks, 'reSave': reSave});
   };
 
   DocsCoApi.prototype.unLockDocument = function(isSave, deleteIndex) {

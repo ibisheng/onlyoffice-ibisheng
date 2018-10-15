@@ -79,6 +79,14 @@ if(typeof CDocument !== "undefined")
 					AdditionalData.Elements[Index].Document_Is_SelectionLocked(AdditionalData.CheckType, false);
 				}
 			}
+			else if (AscCommon.changestype_2_Element_and_Type_Array === AdditionalData.Type)
+			{
+				var nCount = Math.min(AdditionalData.Elements.length, AdditionalData.CheckTypes.length);
+				for (var nIndex = 0; nIndex < nCount; ++nIndex)
+				{
+					AdditionalData.Elements[nIndex].Document_Is_SelectionLocked(AdditionalData.CheckTypes[nIndex], false);
+				}
+			}
 			else if (AscCommon.changestype_2_AdditionalTypes === AdditionalData.Type)
 			{
 				var Count = AdditionalData.Types.length;

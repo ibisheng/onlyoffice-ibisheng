@@ -1561,10 +1561,13 @@ TextAddState.prototype =
         }
         this.drawingObjects.noNeedUpdateCursorType = false;
         this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
-        if(editor && editor.isPaintFormat)
+        if(editor && AscCommon.c_oAscFormatPainterState.kOff !== editor.isPaintFormat)
         {
             this.drawingObjects.paragraphFormatPaste2();
-            editor.sync_PaintFormatCallback(0);
+            if (AscCommon.c_oAscFormatPainterState.kOn === editor.isPaintFormat)
+            {
+                editor.sync_PaintFormatCallback(c_oAscFormatPainterState.kOff);
+            }
         }
     }
 };

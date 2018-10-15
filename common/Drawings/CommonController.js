@@ -859,7 +859,7 @@ DrawingObjectsController.prototype =
                         else {
                             sLink2 = _link;
                         }
-                        var oHyperlink = new ParaHyperlink();
+                        var oHyperlink = AscFormat.ExecuteNoHistory(function(){return new ParaHyperlink();}, this, []);
                         oHyperlink.Value = sLink2;
                         oHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
                         if(hit_in_text_rect){
@@ -1417,7 +1417,8 @@ DrawingObjectsController.prototype =
         var content, invert_transform_text, tx, ty, hit_paragraph, par, check_hyperlink;
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-            if(e.CtrlKey && !this.document)
+            var bNotes = (this.drawingObjects && this.drawingObjects.getObjectType && this.drawingObjects.getObjectType() === AscDFH.historyitem_type_Notes);
+            if(e.CtrlKey && !this.document && !bNotes)
             {
                 content = object.getDocContent();
                 invert_transform_text = object.invertTransformText;
@@ -11135,10 +11136,10 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     }
     else{
         if(!bCreate && aPreset[5]){
-            if(!oChartSpace.chart.legend){
-                oChartSpace.chart.setLegend(new AscFormat.CLegend());
-            }
-            oChartSpace.chart.legend.setOverlay(false);
+            // if(!oChartSpace.chart.legend){
+            //     oChartSpace.chart.setLegend(new AscFormat.CLegend());
+            // }
+            oChartSpace.chart.legend && oChartSpace.chart.legend.setOverlay(false);
         }
     }
     ApplyLegendProps(aPreset[5], oChartSpace.chart.legend, oDrawingDocument, bCreate);

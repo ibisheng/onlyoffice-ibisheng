@@ -528,7 +528,7 @@ CSelectedContent.prototype.ConvertToMath = function()
 		for (var nInParaPos = 0; nInParaPos < oParagraph.GetElementsCount(); ++nInParaPos)
 		{
 			var oElement = oParagraph.Content[nInParaPos];
-			if (para_Run === oElement.Get_Type())
+			if (para_Run === oElement.GetType())
 			{
 				var oRun = new ParaRun(oParagraph, true);
 				oParaMath.Root.Add_ToContent(nRunPos++, oRun);
@@ -2019,10 +2019,6 @@ CDocument.prototype.Get_ColorMap                   = function()
 {
     return this.clrSchemeMap;
 };
-CDocument.prototype.Get_AllBoundsRectOnPageForMath = function(nPageIndex)
-{
-    return this.DrawingObjects.getAllBoundsRectOnPageForMath(nPageIndex);
-};
 /**
  * Данная функция предназначена для отключения пересчета. Это может быть полезно, т.к. редактор всегда запускает
  * пересчет после каждого действия.
@@ -3338,10 +3334,12 @@ CDocument.prototype.private_RecalculateFlowParagraph         = function(RecalcIn
         var Frame_XLimit = FramePr.Get_W();
         var Frame_YLimit = FramePr.Get_H();
 
+		var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
+
         if (undefined === Frame_XLimit)
             Frame_XLimit = Page_Field_R - Page_Field_L;
 
-        if (undefined === Frame_YLimit)
+        if (undefined === Frame_YLimit || Asc.linerule_Auto === FrameHRule)
             Frame_YLimit = Page_H;
 
         for (var TempIndex = Index; TempIndex < Index + FlowCount; ++TempIndex)
@@ -3389,7 +3387,6 @@ CDocument.prototype.private_RecalculateFlowParagraph         = function(RecalcIn
             FrameW = Frame_XLimit;
         }
 
-        var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
         if ((Asc.linerule_AtLeast === FrameHRule && FrameH < FramePr.H) || Asc.linerule_Exact === FrameHRule)
         {
             FrameH = FramePr.H;
@@ -3999,7 +3996,6 @@ CDocument.prototype.Draw                                     = function(nPageInd
         }
     }
 
-    this.DrawingObjects.drawWrappingObjects(nPageIndex, pGraphics);
     this.DrawingObjects.drawBeforeObjects(nPageIndex, pGraphics);
 
     // Рисуем границы вокруг страницы (если границы надо рисовать перед текстом)
@@ -4646,6 +4642,7 @@ CDocument.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelectio
 
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
+	this.Document_UpdateTracks();
 };
 CDocument.prototype.RemoveBeforePaste = function()
 {
@@ -6295,7 +6292,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     {
         var bOldSelectionIsCommon = true;
 
-        if (docpostype_DrawingObjects === this.CurPos.Type && true != this.IsInDrawing(X, Y, this.CurPage))
+        if (docpostype_DrawingObjects === this.CurPos.Type && (true != this.IsInDrawing(X, Y, this.CurPage) || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText )))
         {
             this.DrawingObjects.resetSelection();
             bOldSelectionIsCommon = false;
@@ -6338,6 +6335,13 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 		{
 			var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
 			Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent, bTableBorder);
+
+			if (this.IsNumberingSelection())
+			{
+				// TODO: Можно сделать передвигание нумерации как в Word
+				return;
+			}
+
 			Item.Selection_SetEnd(X, Y, ElementPageIndex, {
 				Type       : AscCommon.g_mouse_event_type_move,
 				ClickCount : 1
@@ -6525,10 +6529,15 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
 
             if (null != this.Selection.Data && this.Selection.Data.Hyperlink)
             {
-            	var oHyperlink = this.Selection.Data.Hyperlink;
-            	var sBookmarkName = oHyperlink.GetAnchor();
-            	var sValue        = oHyperlink.GetValue();
-            	if (sBookmarkName)
+				var oHyperlink    = this.Selection.Data.Hyperlink;
+				var sBookmarkName = oHyperlink.GetAnchor();
+				var sValue        = oHyperlink.GetValue();
+
+				if (oHyperlink.IsTopOfDocument())
+				{
+					this.MoveCursorToStartPos(false);
+				}
+				else if (sBookmarkName)
 				{
 					var oBookmark = this.BookmarksManager.GetBookmarkByName(sBookmarkName);
 					if (oBookmark)
@@ -7160,13 +7169,6 @@ CDocument.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 
 	this.DrawingDocument.OnDrawContentControl(null, c_oContentControlTrack.Hover);
 
-	if (true === this.DrawingDocument.IsCursorInTableCur(X, Y, PageAbs))
-	{
-		this.DrawingDocument.SetCursorType("text", new AscCommon.CMouseMoveData());
-		this.Api.sync_MouseMoveEndCallback();
-		return;
-	}
-
 	var nDocPosType = this.Get_DocPosType();
 	if (docpostype_HdrFtr === nDocPosType)
 	{
@@ -7427,7 +7429,12 @@ CDocument.prototype.OnKeyDown = function(e)
         {
 			var sBookmarkName = Hyperlink.GetAnchor();
 			var sValue        = Hyperlink.GetValue();
-			if (sBookmarkName)
+
+			if (Hyperlink.IsTopOfDocument())
+			{
+				this.MoveCursorToStartPos(false);
+			}
+			else if (sBookmarkName)
 			{
 				var oBookmark = this.BookmarksManager.GetBookmarkByName(sBookmarkName);
 				if (oBookmark)
@@ -9496,6 +9503,12 @@ CDocument.prototype.UpdateDocumentOutlinePosition = function()
 };
 CDocument.prototype.Document_UpdateTracks = function()
 {
+	if (true === this.TurnOffInterfaceEvents)
+		return;
+
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
+		return;
+
 	this.private_UpdateTracks(this.IsSelectionUse(), this.IsSelectionEmpty());
 };
 CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
@@ -12647,6 +12660,14 @@ CDocument.prototype.OnChangeSdtGlobalSettings = function()
 {
 	this.GetApi().sync_OnChangeSdtGlobalSettings();
 };
+/**
+ * Проверяем все ли параметры SdtSettings выставлены по умолчанию
+ * @returns {boolean}
+ */
+CDocument.prototype.IsSdtGlobalSettingsDefault = function()
+{
+	return this.Settings.SdtSettings.IsDefault();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Math
 //----------------------------------------------------------------------------------------------------------------------
@@ -13253,7 +13274,8 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				{
 					NextId = this.Styles.Get_Next(StyleId);
 
-					if (null === NextId)
+					var oNextStyle = this.Styles.Get(NextId);
+					if (!NextId || !oNextStyle || !oNextStyle.IsParagraphStyle())
 						NextId = StyleId;
 				}
 
@@ -13290,6 +13312,9 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 			{
 				Item.Split(NewParagraph);
 			}
+
+			NewParagraph.Correct_Content();
+			NewParagraph.MoveCursorToStartPos();
 
 			this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
 			this.CurPos.ContentPos++;
@@ -16253,19 +16278,6 @@ CDocument.prototype.MoveToFillingForm = function(isNext)
 		}
 	}
 };
-CDocument.prototype.SelectContentControl = function(Id)
-{
-	var oBlockLevelSdt = this.TableId.Get_ById(Id);
-	if (oBlockLevelSdt)
-	{
-		this.RemoveSelection();
-		oBlockLevelSdt.SelectContentControl();
-
-		this.Document_UpdateInterfaceState();
-		this.Document_UpdateRulersState();
-		this.Document_UpdateSelectionState();
-	}
-};
 CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 {
 	return this.OnEndTextDrag(NearestPos, isCopy);
@@ -16360,6 +16372,31 @@ CDocument.prototype.ClearContentControl = function(Id)
 	}
 
 	return oContentControl;
+};
+/**
+ * Выделяем содержимое внутри заданного контейнера
+ * @param {string} sId
+ */
+CDocument.prototype.SelectContentControl = function(sId)
+{
+	var oContentControl = this.TableId.Get_ById(sId);
+	if (!oContentControl)
+		return;
+
+	if (oContentControl.GetContentControlType
+		&& (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType()
+		|| c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType()))
+	{
+		this.RemoveSelection();
+
+		oContentControl.SelectContentControl();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateTracks();
+
+		this.private_UpdateCursorXY(true, true);
+	}
 };
 CDocument.prototype.GetAllSignatures = function()
 {
@@ -16806,7 +16843,7 @@ CDocument.prototype.private_RemoveBookmark = function(sName)
 	arrBookmarkChars[1].RemoveBookmark();
 	arrBookmarkChars[0].RemoveBookmark();
 };
-CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
+CDocument.prototype.AddTableOfContents = function(sHeading, oPr, oSdt)
 {
 	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
 	{
@@ -16821,22 +16858,29 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
             }
         }
 
-		this.Remove(1, true, true, true);
-		var oSdt = this.AddContentControl(c_oAscSdtLevelType.Block);
-
-		if (sHeading)
+        if (oSdt instanceof CBlockLevelSdt)
 		{
-			var oParagraph = oSdt.GetCurrentParagraph();
-			oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
-			for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.next())
+			oSdt.ClearContentControl();
+		}
+		else
+		{
+			this.Remove(1, true, true, true);
+			var oSdt = this.AddContentControl(c_oAscSdtLevelType.Block);
+
+			if (sHeading)
 			{
-				var nCharCode = oIterator.value();
-				if (0x0020 === nCharCode)
-					oParagraph.Add(new ParaSpace());
-				else
-					oParagraph.Add(new ParaText(nCharCode));
+				var oParagraph = oSdt.GetCurrentParagraph();
+				oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
+				for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.next())
+				{
+					var nCharCode = oIterator.value();
+					if (0x0020 === nCharCode)
+						oParagraph.Add(new ParaSpace());
+					else
+						oParagraph.Add(new ParaText(nCharCode));
+				}
+				oSdt.AddNewParagraph(false, true);
 			}
-			oSdt.AddNewParagraph(false, true);
 		}
 
 		oSdt.SetThisElementCurrent();

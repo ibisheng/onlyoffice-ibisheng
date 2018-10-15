@@ -239,9 +239,11 @@ var c_oAscChangeTableStyleInfo = {
 var c_oAscCellEditorState = {
   editEnd: 0,				// Окончание редактирования
   editStart: 1,				// Начало редактирования
-  editEmptyCell: 2,				// Редактирование пустой ячейки (доступны функции и свойства текста)
+  editEmptyCell: 2,			// Редактирование пустой ячейки (доступны функции и свойства текста)
   editText: 3,				// Редактирование текста, числа, даты и др. формата, кроме формулы
-  editFormula: 4				// Редактирование формулы
+  editFormula: 4,			// Редактирование формулы
+  editInFormulaBar: 5,		// Редактирование в строке формул
+  editInCell: 6				// Редактирование в ячейке
 };
 
 // Состояние select-а
@@ -256,6 +258,13 @@ var c_oAscCanChangeColWidth = {
   none: 0,	// not recalc
   numbers: 1,	// only numbers
   all: 2	// numbers + text
+};
+
+// Merge cell type
+var c_oAscMergeType = {
+  none: 0,
+  columns: 1, // Замержены ли колонки (если да, то автоподбор ширины не должен работать)
+  rows: 2     // Замержены ли строки (если да, то автоподбор высоты не должен работать)
 };
 
 var c_oAscPaneState = {
@@ -385,6 +394,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscRecalcIndexTypes = c_oAscRecalcIndexTypes;
   window['AscCommonExcel'].c_oAscCellEditorSelectState = c_oAscCellEditorSelectState;
   window['AscCommonExcel'].c_oAscCanChangeColWidth = c_oAscCanChangeColWidth;
+  window['AscCommonExcel'].c_oAscMergeType = c_oAscMergeType;
   window['AscCommonExcel'].c_oAscPaneState = c_oAscPaneState;
   window['AscCommonExcel'].c_oTargetType = c_oTargetType;
   window['AscCommonExcel'].c_oAscCoAuthoringMeBorderColor = c_oAscCoAuthoringMeBorderColor;
@@ -507,6 +517,8 @@ var c_oAscPopUpSelectorType = {
   prot['editEmptyCell'] = prot.editEmptyCell;
   prot['editText'] = prot.editText;
   prot['editFormula'] = prot.editFormula;
+  prot['editInFormulaBar'] = prot.editInFormulaBar;
+  prot['editInCell'] = prot.editInCell;
   window['Asc']['c_oAscChangeSelectionFormatTable'] = window['Asc'].c_oAscChangeSelectionFormatTable = c_oAscChangeSelectionFormatTable;
   prot = c_oAscChangeSelectionFormatTable;
   prot['all'] = prot.all;

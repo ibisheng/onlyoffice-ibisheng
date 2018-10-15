@@ -2731,8 +2731,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	parentLeft.prototype.Assemble2 = function (arg, start, count) {
 		return new cString("(" + arg[start + count - 1] + ")");
 	};
-	parentLeft.prototype.Assemble2Locale = function (arg, start, count) {
-		return this.Assemble2(arg, start, count);
+	parentLeft.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
+		return new cString("(" + arg[start + count - 1].toLocaleString(digitDelim) + ")");
 	};
 
 	/** @constructor */

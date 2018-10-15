@@ -281,8 +281,8 @@
 
 			this.m_oCanvas = document.createElement('canvas');
 
-			this.m_oCanvas.width = width;
-			this.m_oCanvas.height = height;
+			this.m_oCanvas.width = (width == 0) ? 1 : width;
+			this.m_oCanvas.height = (height == 0) ? 1 : height;
 
 			this.m_oContext = this.m_oCanvas.getContext('2d');
 			this.m_oContext.globalCompositeOperation = "source-in";
@@ -329,7 +329,8 @@
 
 			if (true)
 			{
-				ctx.putImageData(raster_memory.m_oBuffer, _x, _y, 0, 0, this.nWidth, this.nHeight);
+                if (this.nWidth > 0 && this.nHeight > 0)
+                	ctx.putImageData(raster_memory.m_oBuffer, _x, _y, 0, 0, this.nWidth, this.nHeight);
 			}
 			else
 			{
@@ -348,7 +349,8 @@
 					nIndexDst += nPitch;
 				}
 
-				ctx.putImageData(raster_memory.m_oBuffer, _x, _y, 0, 0, this.nWidth, this.nHeight);
+				if (this.nWidth > 0 && this.nHeight > 0)
+					ctx.putImageData(raster_memory.m_oBuffer, _x, _y, 0, 0, this.nWidth, this.nHeight);
 			}
 
 			if (null != raster_memory.m_oBuffer)

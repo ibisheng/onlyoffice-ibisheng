@@ -229,6 +229,23 @@ CShape.prototype.handleUpdateLn = function()
     this.recalcContent();
     this.recalcTransformText();
     this.addToRecalculate();
+    if(this.recalcInfo && this.recalcInfo.recalculateTransform){
+        if(this.group)
+        {
+            var oMainGroup = this.getMainGroup && this.getMainGroup();
+            if(oMainGroup.parent && oMainGroup.parent.Refresh_RecalcData)
+            {
+                oMainGroup.parent.Refresh_RecalcData({Type: AscDFH.historyitem_Drawing_SetExtent});
+            }
+        }
+        else
+        {
+            if(this.parent && this.parent.Refresh_RecalcData)
+            {
+                this.parent.Refresh_RecalcData({Type: AscDFH.historyitem_Drawing_SetExtent});
+            }
+        }
+    }
 };
 CShape.prototype.handleUpdateGeometry = function()
 {

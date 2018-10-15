@@ -1125,17 +1125,17 @@
         this.oSizes = [
             {id:EPageSize.pagesizeLetterPaper, w_mm: 215.9, h_mm: 279.4},
             {id:EPageSize.pagesizeLetterSmall, w_mm: 215.9, h_mm: 279.4},
-            {id:EPageSize.pagesizeTabloidPaper, w_mm: 279.4, h_mm: 431.7},
+            {id:EPageSize.pagesizeTabloidPaper, w_mm: 279.4, h_mm: 431.8},
             {id:EPageSize.pagesizeLedgerPaper, w_mm: 431.8, h_mm: 279.4},
             {id:EPageSize.pagesizeLegalPaper, w_mm: 215.9, h_mm: 355.6},
             {id:EPageSize.pagesizeStatementPaper, w_mm: 495.3, h_mm: 215.9},
             {id:EPageSize.pagesizeExecutivePaper, w_mm: 184.2, h_mm: 266.7},
-            {id:EPageSize.pagesizeA3Paper, w_mm: 297, h_mm: 420.1},
+            {id:EPageSize.pagesizeA3Paper, w_mm: 297, h_mm: 420},
             {id:EPageSize.pagesizeA4Paper, w_mm: 210, h_mm: 297},
             {id:EPageSize.pagesizeA4SmallPaper, w_mm: 210, h_mm: 297},
-            {id:EPageSize.pagesizeA5Paper, w_mm: 148.1, h_mm: 209.9},
+            {id:EPageSize.pagesizeA5Paper, w_mm: 148, h_mm: 210},
             {id:EPageSize.pagesizeB4Paper, w_mm: 250, h_mm: 353},
-            {id:EPageSize.pagesizeB5Paper, w_mm: 176, h_mm: 250.1},
+            {id:EPageSize.pagesizeB5Paper, w_mm: 176, h_mm: 250},
             {id:EPageSize.pagesizeFolioPaper, w_mm: 215.9, h_mm: 330.2},
             {id:EPageSize.pagesizeQuartoPaper, w_mm: 215, h_mm: 275},
             {id:EPageSize.pagesizeStandardPaper1, w_mm: 254, h_mm: 355.6},
@@ -1149,7 +1149,7 @@
             {id:EPageSize.pagesizeCPaper, w_mm: 431.8, h_mm: 558.8},
             {id:EPageSize.pagesizeDPaper, w_mm: 558.8, h_mm: 863.6},
             {id:EPageSize.pagesizeEPaper, w_mm: 863.6, h_mm: 1117.6},
-            {id:EPageSize.pagesizeDLEnvelope, w_mm: 110.1, h_mm: 220.1},
+            {id:EPageSize.pagesizeDLEnvelope, w_mm: 110, h_mm: 220},
             {id:EPageSize.pagesizeC5Envelope, w_mm: 162, h_mm: 229},
             {id:EPageSize.pagesizeC3Envelope, w_mm: 324, h_mm: 458},
             {id:EPageSize.pagesizeC4Envelope, w_mm: 229, h_mm: 324},
@@ -6789,7 +6789,10 @@
                     tmp.prevCol++;
                     tmp.cell.setRowCol(tmp.prevRow, tmp.prevCol);
                 }
-				this.setFormulaOpen(tmp);
+				//use only excel
+				if(!(this.copyPasteObj && this.copyPasteObj.isCopyPaste && typeof editor != "undefined" && editor)) {
+					this.setFormulaOpen(tmp);
+				}
 				tmp.cell.saveContent();
                 if (tmp.cell.nCol >= tmp.ws.nColsCount) {
                     tmp.ws.nColsCount = tmp.cell.nCol + 1;

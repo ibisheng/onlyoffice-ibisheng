@@ -2468,7 +2468,7 @@ CPresentation.prototype =
 
     GetSelectedBounds: function(){
         var oController = this.GetCurrentController();
-        if(oController.selectedObjects.length > 0){
+        if(oController && oController.selectedObjects.length > 0){
             return oController.getBoundsForGroup([oController.selectedObjects[0]]);
         }
         return new AscFormat.CGraphicBounds(0, 0, 0, 0);
@@ -7436,12 +7436,12 @@ CPresentation.prototype =
             }
             else
             {
-                //this.Slides[this.CurPage].graphicObjects.clearTrackObjects();
-                //this.Slides[this.CurPage].graphicObjects.clearPreTrackObjects();
-                //this.Slides[this.CurPage].graphicObjects.resetSelectionState();
-                //this.DrawingDocument.m_oWordControl.OnUpdateOverlay();
+                this.Slides[this.CurPage].graphicObjects.clearTrackObjects();
+                this.Slides[this.CurPage].graphicObjects.clearPreTrackObjects();
+                // this.Slides[this.CurPage].graphicObjects.resetSelectionState();
 
                 this.Slides[this.CurPage].graphicObjects.changeCurrentState(new AscFormat.NullState(this.Slides[this.CurPage].graphicObjects));
+                this.DrawingDocument.m_oWordControl.OnUpdateOverlay();
                 editor.sync_EndAddShape();
             }
         }

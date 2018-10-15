@@ -1313,15 +1313,9 @@ CHistory.prototype.private_PostProcessingRecalcData = function()
 
 			if (this.RecIndex >= 0)
 				this.RecIndex--;
-
-			if (null !== this.SavedIndex && this.SavedIndex >= 0)
-			{
-				this.SavedIndex--;
-
-				if (this.SavedIndex < 0)
-					this.SavedIndex = null;
-			}
 		}
+
+		this.SavedIndex = null;
 	};
 
 function CRC32()

@@ -211,16 +211,16 @@ CDocumentContent.prototype.Get_PageContentStartPos2 = function(StartPageIndex, S
 };
 CDocumentContent.prototype.Get_Theme = function()
 {
-	if(this.Parent){
-        return this.Parent.Get_Theme();
-	}
+	if (this.Parent)
+		return this.Parent.Get_Theme();
+
 	return null;
 };
 CDocumentContent.prototype.Get_ColorMap = function()
 {
-	if(this.Parent){
-        return this.Parent.Get_ColorMap();
-	}
+	if (this.Parent)
+		return this.Parent.Get_ColorMap();
+
 	return null;
 };
 CDocumentContent.prototype.Get_PageLimits = function(PageIndex)
@@ -360,10 +360,14 @@ CDocumentContent.prototype.GetNumbering = function()
 };
 CDocumentContent.prototype.Get_Styles = function(lvl)
 {
-	if (this.Content[0] && this.Content[0].bFromDocument)
+	if(!this.bPresentation)
+	{
 		return this.Styles;
+	}
 	else
+	{
 		return this.Parent.Get_Styles(lvl);
+	}
 };
 CDocumentContent.prototype.Get_TableStyleForPara = function()
 {
@@ -782,10 +786,12 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 var Frame_XLimit = FramePr.Get_W();
                 var Frame_YLimit = FramePr.Get_H();
 
-                if (undefined === Frame_XLimit)
+				var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
+
+				if (undefined === Frame_XLimit)
                     Frame_XLimit = Page_Field_R - Page_Field_L;
 
-                if (undefined === Frame_YLimit)
+                if (undefined === Frame_YLimit || Asc.linerule_Auto === FrameHRule)
                     Frame_YLimit = Page_H;
 
                 for (var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++)
@@ -822,7 +828,6 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 else if (-1 === FrameW)
                     FrameW = Frame_XLimit;
 
-                var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
                 switch (FrameHRule)
                 {
                     case Asc.linerule_Auto :
@@ -1241,9 +1246,8 @@ CDocumentContent.prototype.Draw                           = function(nPageIndex,
         pGraphics.AddClipRect(ClipInfo.X0, Bounds.Top - Correction, Math.abs(ClipInfo.X1 - ClipInfo.X0), Bounds.Bottom - Bounds.Top + Correction);
     }
 
-
     if (this.LogicDocument)
-        this.LogicDocument.DrawingObjects.drawWrappingObjectsInContent(this.Get_AbsolutePage(CurPage), pGraphics, this);
+        this.LogicDocument.DrawingObjects.drawBehindObjectsByContent(this.Get_AbsolutePage(CurPage), pGraphics, this);
 
     var Page_StartPos = this.Pages[CurPage].Pos;
     var Page_EndPos   = this.Pages[CurPage].EndPos;
@@ -1253,6 +1257,9 @@ CDocumentContent.prototype.Draw                           = function(nPageIndex,
         this.Content[Index].Draw(ElementPageIndex, pGraphics);
     }
 
+
+	if (this.LogicDocument)
+		this.LogicDocument.DrawingObjects.drawBeforeObjectsByContent(this.Get_AbsolutePage(CurPage), pGraphics, this);
 
     if (ClipInfo)
     {
@@ -1832,20 +1839,20 @@ CDocumentContent.prototype.Document_UpdateInterfaceState = function()
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 	{
-		var drawin_objects = this.LogicDocument.DrawingObjects;
-		if (drawin_objects.selection.textSelection
-			|| drawin_objects.selection.groupSelection && drawin_objects.selection.groupSelection.selection.textSelection
-			|| drawin_objects.selection.chartSelection && drawin_objects.selection.chartSelection.selection.textSelection)
+		var oDrawingObjects = this.LogicDocument.DrawingObjects;
+		var oTargetTextObject = AscFormat.getTargetTextObject(oDrawingObjects);
+		if (oTargetTextObject)
 		{
 			this.LogicDocument.Interface_Update_DrawingPr();
-			drawin_objects.documentUpdateInterfaceState();
+			oDrawingObjects.documentUpdateInterfaceState();
 		}
 		else
 		{
-			drawin_objects.documentUpdateInterfaceState();
+			oDrawingObjects.resetInterfaceTextPr();
+			oDrawingObjects.updateTextPr();
 			this.LogicDocument.Interface_Update_DrawingPr();
+			oDrawingObjects.updateParentParagraphParaPr();
 		}
-		return;
 	}
 	else //if (docpostype_Content === this.CurPos.Type)
 	{
@@ -2311,8 +2318,9 @@ CDocumentContent.prototype.AddNewParagraph = function()
                         var Styles = this.Parent.Get_Styles();
                         NextId     = Styles.Get_Next(StyleId);
 
-                        if (null === NextId)
-                            NextId = StyleId;
+						var oNextStyle = Styles.Get(NextId);
+						if (!NextId || !oNextStyle || !oNextStyle.IsParagraphStyle())
+							NextId = StyleId;
                     }
 
 
@@ -2339,7 +2347,12 @@ CDocumentContent.prototype.AddNewParagraph = function()
 					}
                 }
                 else
-                    Item.Split(NewParagraph);
+				{
+					Item.Split(NewParagraph);
+				}
+
+				NewParagraph.Correct_Content();
+                NewParagraph.MoveCursorToStartPos();
 
                 this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
                 this.CurPos.ContentPos++;
@@ -5847,6 +5860,13 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 		{
 			var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
 			Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent);
+
+			if (this.IsNumberingSelection())
+			{
+				// TODO: Можно сделать передвигание нумерации как в Word
+				return;
+			}
+
 			Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
 
 			if (true !== bTableBorder)

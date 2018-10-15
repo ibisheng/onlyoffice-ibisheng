@@ -4162,7 +4162,7 @@ drawBarChart.prototype = {
 
 				//стартовая позиция колонки X
 				if (this.catAx.scaling.orientation === ORIENTATION_MIN_MAX) {
-					if (xPoints[1] && xPoints[1].pos) {
+					if (xPoints[1] && xPoints[1].pos && xPoints[idx]) {
 						startXPosition = xPoints[idx].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					} else if(xPoints[idx]){
 						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.valAx.posX);
@@ -4170,7 +4170,7 @@ drawBarChart.prototype = {
 						startXPosition = xPoints[0].pos - Math.abs(xPoints[0].pos - this.valAx.posX);
 					}
 				} else {
-					if (xPoints[1] && xPoints[1].pos) {
+					if (xPoints[1] && xPoints[1].pos && xPoints[idx]) {
 						startXPosition = xPoints[idx].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					} else if(xPoints[idx]){
 						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.valAx.posX);
@@ -7949,6 +7949,11 @@ drawPieChart.prototype = {
 		var angle;
 		for (var i = numCache.length - 1; i >= 0; i--) {
 			angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
+			//правка связана с реализацией arcTo, где swAng зануляется и приравнивается к значению
+			if(angle < 10e-16) {
+				angle = 0;
+			}
+
 			if (!this.paths.series) {
 				this.paths.series = [];
 			}
@@ -8166,7 +8171,7 @@ drawPieChart.prototype = {
 		var point = this.chart.series[0].val.numRef ? this.chart.series[0].val.numRef.numCache.pts[val] :
 			this.chart.series[0].val.numLit.pts[val];
 
-		if (!point) {
+		if (!point || !point.compiledDlb) {
 			return;
 		}
 
@@ -9632,6 +9637,11 @@ drawDoughnutChart.prototype = {
 				curVal = idxPoint ? idxPoint.val : 0;
 				angle = Math.abs((parseFloat(curVal / sumData)) * (Math.PI * 2));
 
+				//правка связана с реализацией arcTo, где swAng зануляется и приравнивается к значению
+				if(angle < 10e-16) {
+					angle = 0;
+				}
+
 				if (!this.paths.series) {
 					this.paths.series = [];
 				}
@@ -10272,6 +10282,10 @@ drawScatterChart.prototype = {
 		var yPoints = this.valAx.yPoints;
 
 		var x, y, x1, y1, isSplineLine;
+
+		if(!points) {
+			return;
+		}
 
 		for (var i = 0; i < points.length; i++) {
 			isSplineLine = this.chart.series[i].smooth !== false;

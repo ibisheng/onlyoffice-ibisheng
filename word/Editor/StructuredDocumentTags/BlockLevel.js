@@ -1258,6 +1258,10 @@ CBlockLevelSdt.prototype.ClearContentControl = function()
 	this.Content.Remove_FromContent(1, this.Content.GetElementsCount() - 1);
 	this.Content.MoveCursorToStartPos(false);
 };
+CBlockLevelSdt.prototype.GotoFootnoteRef = function(isNext, isCurrent)
+{
+	return this.Content.GotoFootnoteRef(isNext, isCurrent);
+};
 /**
  * Получаем последний элемент содержимого
  * @returns {?CDocumentContentElementBase}

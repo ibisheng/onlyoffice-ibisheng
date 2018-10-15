@@ -1041,8 +1041,7 @@
 			var tmpCellCache = this.cleanCellCache;
 			this.cleanCellCache = {};
 			for (var i in tmpCellCache) {
-				this.wb.handlers.trigger("cleanCellCache", i, [tmpCellCache[i]],
-										 AscCommonExcel.c_oAscCanChangeColWidth.none);
+				this.wb.handlers.trigger("cleanCellCache", i, [tmpCellCache[i]], true);
 			}
 			AscCommonExcel.g_oVLOOKUPCache.clean();
 			AscCommonExcel.g_oHLOOKUPCache.clean();
@@ -2754,11 +2753,7 @@
 	 * @returns {Number}    Ширина столбца в px
 	 */
 	Workbook.prototype.modelColWidthToColWidth = function (mcw) {
-		var res = Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
-		if (AscBrowser.isRetina) {
-			res = AscBrowser.convertToRetinaValue(res, true);
-		}
-		return res;
+		return Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
 	};
 	/**
 	 * Вычисляет количество символов по ширине столбца
@@ -2768,13 +2763,9 @@
 	Workbook.prototype.colWidthToCharCount = function (w) {
 		var pxInOneCharacter = this.maxDigitWidth + this.paddingPlusBorder;
 		// Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
-		var res = w < pxInOneCharacter ?
+		return w < pxInOneCharacter ?
 			(1 - Asc.floor(100 * (pxInOneCharacter - w) / pxInOneCharacter + 0.49999) / 100) :
 			Asc.floor((w - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
-		if (AscBrowser.isRetina) {
-			res = AscBrowser.convertToRetinaValue(res);
-		}
-		return res;
 	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
 		if (!ascName) {
@@ -2918,20 +2909,36 @@
 		if (start < this.count) {
 			this.checkSize(this.count - 1 + insertCount);
 			var startOffset = start * this.structSize;
-			var endOffset = (start + insertCount) * this.structSize;
-			var endData = (this.count - insertCount) * this.structSize;
-			this.data.set(this.data.subarray(startOffset, endData), endOffset);
-			this.data.fill(0, startOffset, endOffset);
+			if (start + insertCount < this.count) {
+				var endOffset = (start + insertCount) * this.structSize;
+				var endData = (this.count - insertCount) * this.structSize;
+				this.data.set(this.data.subarray(startOffset, endData), endOffset);
+				this.data.fill(0, startOffset, endOffset);
+			} else {
+				this.data.fill(0, startOffset);
+			}
 		}
 	};
 	SheetMemory.prototype.copyRange = function(sheetMemory, startFrom, startTo, count) {
-		sheetMemory.checkSize(startFrom + count);
-		this.checkSize(startTo + count);
-		var startOffsetFrom = startFrom * this.structSize;
-		var endOffsetFrom = (startFrom + count) * this.structSize;
-		var startOffsetTo = startTo * this.structSize;
+		var countCopied = 0;
+		if (startFrom < sheetMemory.count) {
+			countCopied = Math.min(count, sheetMemory.count - startFrom);
+			this.checkSize(startTo + countCopied);
+			countCopied = Math.min(countCopied, this.count - startTo);
+			if (countCopied > 0) {
+				var startOffsetFrom = startFrom * this.structSize;
+				var endOffsetFrom = (startFrom + countCopied) * this.structSize;
+				var startOffsetTo = startTo * this.structSize;
 
-		this.data.set(sheetMemory.data.subarray(startOffsetFrom, endOffsetFrom), startOffsetTo);
+				this.data.set(sheetMemory.data.subarray(startOffsetFrom, endOffsetFrom), startOffsetTo);
+			}
+		}
+		var countErase = Math.min(count - countCopied, this.count - (startTo + countCopied));
+		if (countErase > 0) {
+			var startOffsetErase = (startTo + countCopied) * this.structSize;
+			var endOffsetErase = (startTo + countCopied + countErase) * this.structSize;
+			this.data.fill(0, startOffsetErase, endOffsetErase);
+		}
 	};
 	SheetMemory.prototype.copyRangeByChunk = function(from, fromCount, to, toCount) {
 		if (from < this.count) {
@@ -2939,16 +2946,16 @@
 			var fromStartOffset = from * this.structSize;
 			var fromEndOffset = Math.min((from + fromCount), this.count) * this.structSize;
 			var fromSubArray = this.data.subarray(fromStartOffset, fromEndOffset);
-			for (var i = to; i < to + toCount; i += fromCount) {
+			for (var i = to; i < to + toCount && i < this.count; i += fromCount) {
 				this.data.set(fromSubArray, i * this.structSize);
 			}
 		}
 	};
-	SheetMemory.prototype.fill = function(value, start, end) {
-		this.checkSize(end - 1);
-		var startOffset = start * this.structSize;
-		var endOffset = end * this.structSize;
-		this.data.fill(value, startOffset, endOffset);
+	SheetMemory.prototype.clear = function(start, end) {
+		end = Math.min(end, this.count);
+		if (start < end) {
+			this.data.fill(0, start * this.structSize, end * this.structSize);
+		}
 	};
 	SheetMemory.prototype.getUint8 = function(index, offset) {
 		offset += index * this.structSize;
@@ -3307,6 +3314,7 @@
 		}
 	};
 	Worksheet.prototype.initColumns = function () {
+		this.initColumn(this.oAllCol);
 		this.aCols.forEach(this.initColumn, this);
 	};
 	Worksheet.prototype.initPostOpen = function (handlers) {
@@ -4856,16 +4864,8 @@
 		if(!copyRange){
 			this.workbook.dependencyFormulas.move(this.Id, oBBoxFrom, offset);
 		}
-		//modify nRowsCount/nColsCount for correct foreach functions
-		if(oBBoxFrom.r2 >= this.nRowsCount)
-			this.nRowsCount = oBBoxFrom.r2 + 1;
-		if(oBBoxFrom.c2 >= this.nColsCount)
-			this.nColsCount = oBBoxFrom.c2 + 1;
-		if(oBBoxTo.r2 >= this.nRowsCount)
-			this.nRowsCount = oBBoxTo.r2 + 1;
-		if(oBBoxTo.c2 >= this.nColsCount)
-			this.nColsCount = oBBoxTo.c2 + 1;
-		
+		var nRowsCountNew = 0;
+		var nColsCountNew = 0;
 		//todo avoid double getRange3
 		this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2)._foreachNoEmpty(function(cell) {
 			cell.transformSharedFormula();
@@ -4878,20 +4878,24 @@
 				toData.copyRange(fromData, r1From, r1To, count);
 				if(!copyRange|| (copyRange && oThis.workbook.bUndoChanges)){
 					if(from !== to) {
-						fromData.fill(0, r1From, r1From + count);
+						fromData.clear(r1From, r1From + count);
 					} else {
 						if (r1From < r1To) {
-							fromData.fill(0, r1From, Math.min(r1From + count, r1To));
+							fromData.clear(r1From, Math.min(r1From + count, r1To));
 						} else {
-							fromData.fill(0, Math.max(r1From, r1To + count), r1From + count);
+							fromData.clear(Math.max(r1From, r1To + count), r1From + count);
 						}
 					}
 				}
 			} else {
 				toData = oThis.getColDataNoEmpty(to);
 				if(toData) {
-					toData.fill(0, r1To, r1To + count);
+					toData.clear(r1To, r1To + count);
 				}
+			}
+			if (toData) {
+				nRowsCountNew = Math.max(nRowsCountNew, toData.getSize());
+				nColsCountNew = Math.max(nColsCountNew, to + 1);
 			}
 		};
 		if(oBBoxFrom.c1 < oBBoxTo.c1){
@@ -4903,6 +4907,9 @@
 				moveCells(copyRange, oBBoxFrom.c1 + i, oBBoxTo.c1 + i, oBBoxFrom.r1, oBBoxTo.r1, oBBoxFrom.r2 - oBBoxFrom.r1 + 1);
 			}
 		}
+		//modify nRowsCount/nColsCount for correct foreach functions
+		this.nRowsCount = Math.max(this.nRowsCount, nRowsCountNew);
+		this.nColsCount = Math.max(this.nColsCount, nColsCountNew);
 		this.getRange3(oBBoxTo.r1, oBBoxTo.c1, oBBoxTo.r2, oBBoxTo.c2)._foreachNoEmpty(function(cell){
 			var formula = cell.getFormulaParsed();
 			if (formula) {
@@ -5004,7 +5011,7 @@
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
 			if (sheetMemoryFrom) {
 				this.getColData(i + dif).copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
-				sheetMemoryFrom.fill(0, oBBox.r1, oBBox.r2 + 1);
+				sheetMemoryFrom.clear(oBBox.r1, oBBox.r2 + 1);
 			}
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
@@ -5061,7 +5068,7 @@
 				if (i + dif <= gc_nMaxCol0) {
 					this.getColData(i + dif).copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
 				}
-				sheetMemoryFrom.fill(0, oBBox.r1, oBBox.r2 + 1);
+				sheetMemoryFrom.clear(oBBox.r1, oBBox.r2 + 1);
 			}
 		}
 		if (nLeft > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))

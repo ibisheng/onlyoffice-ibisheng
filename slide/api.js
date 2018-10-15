@@ -605,7 +605,7 @@
 		this.bAlignBySelected     = false;
 		this.bSelectedSlidesTheme = false;
 
-		this.isPaintFormat              = false;
+		this.isPaintFormat              = AscCommon.c_oAscFormatPainterState.kOff;
 		this.isShowTableEmptyLine       = false;//true;
 		this.isShowTableEmptyLineAttack = false;//true;
 
@@ -2070,6 +2070,10 @@ background-repeat: no-repeat;\
 		}
 	};
 	asc_docs_api.prototype._autoSaveInner = function () {
+		if (this.WordControl.DemonstrationManager.Mode) {
+			return;
+		}
+
 		var _curTime = new Date();
 		if (null === this.lastSaveTime) {
 			this.lastSaveTime = _curTime;
@@ -2101,7 +2105,7 @@ background-repeat: no-repeat;\
 		}
 	};
 	asc_docs_api.prototype._saveCheck = function() {
-		return !this.isLongAction();
+		return !this.isLongAction() && !this.WordControl.DemonstrationManager.Mode;
 	};
 	asc_docs_api.prototype._haveOtherChanges = function () {
 		return AscCommon.CollaborativeEditing.Have_OtherChanges();

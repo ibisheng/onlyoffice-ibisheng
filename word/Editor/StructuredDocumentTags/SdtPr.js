@@ -59,11 +59,13 @@ CSdtPr.prototype.Copy = function()
 {
 	var oPr = new CSdtPr();
 
-	oPr.Alias = this.Alias;
-	oPr.Id    = this.Id;
-	oPr.Tag   = this.Tag;
-	oPr.Label = this.Label;
-	oPr.Lock  = this.Lock;
+	oPr.Alias      = this.Alias;
+	oPr.Id         = this.Id;
+	oPr.Tag        = this.Tag;
+	oPr.Label      = this.Label;
+	oPr.Lock       = this.Lock;
+	oPr.Appearance = this.Appearance;
+	oPr.Color      = (this.Color ? this.Color.Copy() : undefined);
 
 	return oPr;
 };
@@ -249,7 +251,7 @@ CContentControlPr.prototype.get_Color = function()
 	if (!this.Color)
 		return null;
 
-	return {r : this.Color.r, g : this.Color.g, b : this.Color.b};
+	return new Asc.asc_CColor(this.Color.r, this.Color.g, this.Color.b);
 };
 CContentControlPr.prototype.put_Color = function(r, g, b)
 {
@@ -268,6 +270,21 @@ function CSdtGlobalSettings()
 	this.Color         = new AscCommonWord.CDocumentColor(220, 220, 220);
 	this.ShowHighlight = false;
 }
+/**
+ * Проверяем все ли параметры выставлены по умолчанию
+ * @returns {boolean}
+ */
+CSdtGlobalSettings.prototype.IsDefault = function()
+{
+	if (!this.Color
+		|| 220 !== this.Color.r
+		|| 220 !== this.Color.g
+		|| 220 !== this.Color.b
+		|| false !== this.ShowHighlight)
+		return false;
+
+	return true;
+};
 CSdtGlobalSettings.prototype.Copy = function()
 {
 	var oSettings = new CSdtGlobalSettings();

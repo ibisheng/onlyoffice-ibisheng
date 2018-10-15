@@ -99,6 +99,12 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
+	if (window.isNativeOpenPassword)
+	{
+        window["AscDesktopEditor"]["NativeViewerOpen"](option.asc_getPassword());
+		return;
+	}
+
 	if (window["Asc"].c_oAscAdvancedOptionsID.TXT === idOption) {
 	    var _param = "";
         _param += ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
@@ -188,6 +194,9 @@ Asc['asc_docs_api'].prototype.SetDocumentModified = function(bValue)
 
 Asc['asc_docs_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
+	if (!this.asc_isDocumentCanSave())
+		return;
+
     if (true !== isNoUserSave)
         this.IsUserSave = true;
 	

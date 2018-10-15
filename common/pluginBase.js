@@ -60,7 +60,13 @@
 					window.Asc.plugin.executeMethod = function(name, params, callback)
 					{
 					    if (window.Asc.plugin.isWaitMethod === true)
-					        return false;
+                        {
+                            if (undefined === this.executeMethodStack)
+                                this.executeMethodStack = [];
+
+                            this.executeMethodStack.push({ name : name, params : params, callback : callback });
+                            return false;
+                        }
 
 					    window.Asc.plugin.isWaitMethod = true;
 					    window.Asc.plugin.methodCallback = callback;
@@ -192,6 +198,13 @@
 					{
 						window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
 					}
+
+					if (window.Asc.plugin.executeMethodStack && window.Asc.plugin.executeMethodStack.length > 0)
+                    {
+                        var obj = window.Asc.plugin.executeMethodStack.shift();
+                        window.Asc.plugin.executeMethod(obj.name, obj.params, obj.callback);
+                    }
+
                     break;
                 }
 				case "onCommandCallback":
@@ -204,6 +217,11 @@
                 {
 					if (window.Asc.plugin.onExternalPluginMessage && pluginData.data && pluginData.data.type)
 						window.Asc.plugin.onExternalPluginMessage(pluginData.data);
+                }
+                case "onEvent":
+                {
+                    if (window.Asc.plugin["event_" + pluginData.eventName])
+                        window.Asc.plugin["event_" + pluginData.eventName](pluginData.eventData);
                 }
                 default:
                     break;

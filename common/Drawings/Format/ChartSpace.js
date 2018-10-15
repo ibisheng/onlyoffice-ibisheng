@@ -739,13 +739,31 @@ function checkPointInMap(map, worksheet, row, col)
         this.axis = oAxis;
 
         var oStyle = null, oLbl, fMinW;
+        var oFirstTextPr = null;
         for(var i = 0; i < aStrings.length; ++i){
             if(typeof aStrings[i] === "string"){
                 oLbl = fCreateLabel(aStrings[i], i, oAxis, oChartSpace, oAxis.txPr, oAxis.spPr, oChartSpace.getDrawingDocument());
                 if(oStyle){
                     oLbl.lastStyleObject = oStyle;
                 }
+                if(oFirstTextPr){
+                    var aRuns = oLbl.tx.rich.content.Content[0] && oLbl.tx.rich.content.Content[0].Content;
+                    if(aRuns){
+                        for(var j = 0; j < aRuns.length; ++j){
+                            var oRun = aRuns[j];
+                            if(oRun.RecalcInfo && true === oRun.RecalcInfo.TextPr){
+                                oRun.RecalcInfo.TextPr = false;
+                                oRun.CompiledPr = oFirstTextPr;
+                            }
+                        }
+                    }
+                }
                 fMinW = oLbl.tx.rich.content.RecalculateMinMaxContentWidth().Min;
+                if(!oFirstTextPr){
+                    if(oLbl.tx.rich.content.Content[0]){
+                        oFirstTextPr = oLbl.tx.rich.content.Content[0].Get_FirstTextPr2();
+                    }
+                }
                 if(fMinW > this.maxMinWidth){
                     this.maxMinWidth = fMinW;
                 }
@@ -975,6 +993,7 @@ function checkPointInMap(map, worksheet, row, col)
                 global_MatrixTransformer.TranslateAppend(oTransform, -oSize.w/2.0, -oSize.h/2.0);
                 global_MatrixTransformer.RotateRadAppend(oTransform, fAngle);
                 global_MatrixTransformer.TranslateAppend(oTransform, fXC, fYC);
+                oLabel.transformText = oTransform.CreateDublicate();
                 if(null === fMinLeft || (fXC - fBoxW/2.0) < fMinLeft){
                     fMinLeft = fXC - fBoxW/2.0;
                 }
@@ -1037,6 +1056,7 @@ function checkPointInMap(map, worksheet, row, col)
                 else{
                     global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance - oSize.w, fY);
                 }
+                oLabel.transformText = oTransform.CreateDublicate();
                 if(fY < fMinY){
                     fMinY = fY;
                 }
@@ -1080,6 +1100,7 @@ function checkPointInMap(map, worksheet, row, col)
                         fY = fCurY - fContentHeight/2.0;
                         global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance - fContentWidth, fY);
                     }
+                    oLabel.transformText = oTransform.CreateDublicate();
                     if(fY < fMinY){
                         fMinY = fY;
                     }
@@ -1268,7 +1289,8 @@ CChartSpace.prototype.checkTypeCorrect = function(){
     if(this.chart.plotArea.charts.length === 0){
         return false;
     }
-    if(this.chart.plotArea.charts[0].series.length === 0){
+    var allSeries = this.getAllSeries();
+    if(allSeries.length === 0){
         return false;
     }
     return true;
@@ -1907,10 +1929,17 @@ CChartSpace.prototype.changeFill = function (unifill)
     }
     var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush, this.getEditorType());
     unifill2.convertToPPTXMods();
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
+    }
     this.spPr.setFill(unifill2);
 };
 CChartSpace.prototype.setFill = function (fill) {
-
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
+    }
     this.spPr.setFill(fill);
 };
 
@@ -1929,6 +1958,10 @@ CChartSpace.prototype.changeLine = function (line)
     if(stroke.Fill)
     {
         stroke.Fill.convertToPPTXMods();
+    }
+    if(!this.spPr){
+        this.setSpPr(new AscFormat.CSpPr());
+        this.spPr.setParent(this);
     }
     this.spPr.setLn(stroke);
 };
@@ -2779,19 +2812,19 @@ CChartSpace.prototype.recalcTitles = function()
     }
     if(this.chart && this.chart.plotArea)
     {
-        var hor_axis = this.chart.plotArea.getHorizontalAxis();
-        if(hor_axis && hor_axis.title)
+        var aAxes = this.chart.plotArea.axId;
+        if(aAxes)
         {
-            hor_axis.title.recalcInfo.recalculateContent = true;
-            hor_axis.title.recalcInfo.recalcTransform = true;
-            hor_axis.title.recalcInfo.recalcTransformText = true;
-        }
-        var vert_axis = this.chart.plotArea.getVerticalAxis();
-        if(vert_axis && vert_axis.title)
-        {
-            vert_axis.title.recalcInfo.recalculateContent = true;
-            vert_axis.title.recalcInfo.recalcTransform = true;
-            vert_axis.title.recalcInfo.recalcTransformText = true;
+            for(var i = 0; i < aAxes.length; ++i)
+            {
+                var axis = aAxes[i];
+                if(axis && axis.title)
+                {
+                    axis.title.recalcInfo.recalculateContent = true;
+                    axis.title.recalcInfo.recalcTransform = true;
+                    axis.title.recalcInfo.recalcTransformText = true;
+                }
+            }
         }
     }
 };
@@ -2806,21 +2839,20 @@ CChartSpace.prototype.recalcTitles2 = function()
     }
     if(this.chart && this.chart.plotArea)
     {
-        var hor_axis = this.chart.plotArea.getHorizontalAxis();
-        if(hor_axis && hor_axis.title)
+        var aAxes = this.chart.plotArea.axId;
+        if(aAxes)
         {
-            hor_axis.title.recalcInfo.recalculateContent = true;
-            hor_axis.title.recalcInfo.recalcTransform = true;
-            hor_axis.title.recalcInfo.recalcTransformText = true;
-            hor_axis.title.recalcInfo.recalculateTxBody = true;
-        }
-        var vert_axis = this.chart.plotArea.getVerticalAxis();
-        if(vert_axis && vert_axis.title)
-        {
-            vert_axis.title.recalcInfo.recalculateContent = true;
-            vert_axis.title.recalcInfo.recalcTransform = true;
-            vert_axis.title.recalcInfo.recalcTransformText = true;
-            vert_axis.title.recalcInfo.recalculateTxBody = true;
+            for(var i = 0; i < aAxes.length; ++i)
+            {
+                var axis = aAxes[i];
+                if(axis && axis.title)
+                {
+                    axis.title.recalcInfo.recalculateContent = true;
+                    axis.title.recalcInfo.recalcTransform = true;
+                    axis.title.recalcInfo.recalcTransformText = true;
+                    axis.title.recalcInfo.recalculateTxBody = true;
+                }
+            }
         }
     }
 };
@@ -4500,14 +4532,14 @@ CChartSpace.prototype.getValAxisCrossType = function()
                                             sPt = oPtFormat.formatToChart(oPt.val);
                                         }
                                         else{
-                                            sPt = oPt.val;
+                                            sPt = oPt.val + "";
                                         }
                                     }
                                     else if(oLitFormat){
                                         sPt = oLitFormat.formatToChart(oPt.val);
                                     }
                                     else{
-                                        sPt = oPt.val;
+                                        sPt = oPt.val + "";
                                     }
                                     aStrings.push(sPt);
                                 }
@@ -4844,6 +4876,23 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         fForceContentWidth = Math.abs(fHorInterval) +  fHorInterval/nTickLblSkip;
                     }
 
+
+                    if(AscFormat.isRealNumber(oCurAxis.lblOffset)){
+                        var fStakeOffset = oCurAxis.lblOffset/100.0;
+                        var oFirstTextPr = null;
+                        for(var tt = 0; tt < oLabelsBox.aLabels.length; ++tt){
+                            var oLbl = oLabelsBox.aLabels[tt];
+                            if(oLbl && oLbl.tx && oLbl.tx.rich && oLbl.tx.rich.content && oLbl.tx.rich.content.Content[0]){
+                                oFirstTextPr = oLbl.tx.rich.content.Content[0].Get_FirstTextPr2();
+                                break;
+                            }
+                        }
+                        if(oFirstTextPr && AscFormat.isRealNumber(oFirstTextPr.FontSize)){
+                            fDistance = fStakeOffset*oFirstTextPr.FontSize*fDistance/10.0;
+                        }
+                    }
+
+
                     fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers, fForceContentWidth);
 
 
@@ -4918,7 +4967,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 fDiff = fL;
                 if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.x -= fDiff;
-                    oCorrectedRect.w += fDiff;
+                    //oCorrectedRect.w -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = fR - this.extX;
@@ -4929,7 +4978,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 fDiff = fT;
                 if( fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.y -= fDiff;
-                    oCorrectedRect.h += fDiff;
+                    //oCorrectedRect.h -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = fB - this.extY;
@@ -5164,6 +5213,12 @@ CChartSpace.prototype.getValAxisCrossType = function()
                             }
                         }
                     }
+                }
+                this.plotAreaRect = oRect.copy();
+            }
+            else{
+                if(aRects[0]){
+                    this.plotAreaRect = aRects[0].copy();
                 }
             }
             aAxes = oPlotArea.axId;
@@ -9571,6 +9626,47 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
     }
 };
 
+
+CChartSpace.prototype.layoutLegendEntry = function(oEntry, fX, fY, fDistance){
+    oEntry.localY = fY;
+    var oFirstLine = oEntry.txBody.content.Content[0].Lines[0];
+    var fYFirstLineMiddle = oEntry.localY + oFirstLine.Top + oFirstLine.Metrics.Descent/2.0 + oFirstLine.Metrics.TextAscent - oFirstLine.Metrics.TextAscent2/2.0;// (oFirstLine.Bottom - oFirstLine.Top - oFirstLine.Metrics.Descent - oFirstLine.Metrics.Ascent)/2.0;
+    var fPenWidth;
+    var oUnionMarker = oEntry.calcMarkerUnion;
+    var oLineMarker = oUnionMarker.lineMarker;
+    var oMarker = oUnionMarker.marker;
+    if(oLineMarker){
+        oLineMarker.localX = fX;
+        if(oLineMarker.pen){
+            if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                fPenWidth = oLineMarker.pen.w/36000.0;
+            }
+            else{
+                fPenWidth = 12700.0/36000.0;
+            }
+        }
+        else{
+            fPenWidth = 0.0;
+        }
+        oLineMarker.localY = fYFirstLineMiddle - fPenWidth / 2.0;
+        if(oMarker){
+            oMarker.localX = oLineMarker.localX + oLineMarker.spPr.geometry.gdLst['w']/2.0 - oMarker.spPr.geometry.gdLst['w']/2.0;
+            oMarker.localY = fYFirstLineMiddle - oMarker.spPr.geometry.gdLst['h']/2.0;
+        }
+        oEntry.localX = oLineMarker.localX + oLineMarker.spPr.geometry.gdLst['w'] + fDistance;
+    }
+    else{
+        if(oMarker){
+            oMarker.localX = fX;
+            oMarker.localY = fYFirstLineMiddle - oMarker.spPr.geometry.gdLst['h']/2.0;
+            oEntry.localX = oMarker.localX + oMarker.spPr.geometry.gdLst['w'] + fDistance;
+        }
+        else{
+            oEntry.localX = fX + fDistance;
+        }
+    }
+};
+
 CChartSpace.prototype.hitInTextRect = function()
 {
     return false;
@@ -9835,7 +9931,7 @@ CChartSpace.prototype.hitInTextRect = function()
                 {
                     calc_entryes[i].calcMarkerUnion.marker.spPr.geometry.Recalculate(marker_size, marker_size);
                 }
-                distance_to_text = marker_size*0.8;
+                distance_to_text = marker_size*0.7;
             }
             var left_inset = marker_size + 3*distance_to_text;
             var legend_pos = c_oAscChartLegendShowSettings.right;
@@ -9958,7 +10054,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         else
                         {
                             cut_index = arr_heights.length;
-                            legend_height = height_summ;
+                            legend_height = height_summ2;
                         }
                         legend.x = 0;
                         legend.y = 0;
@@ -9969,20 +10065,21 @@ CChartSpace.prototype.hitInTextRect = function()
                         for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                         {
                             calc_entry = calc_entryes[i];
-                            if(calc_entry.calcMarkerUnion.marker)
-                            {
-                                calc_entry.calcMarkerUnion.marker.localX = distance_to_text + line_marker_width/2 - calc_entry.calcMarkerUnion.marker.extX/2;
-                                calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
-                                calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width + distance_to_text;
-                            }
-
-                            if(calc_entry.calcMarkerUnion.lineMarker)
-                            {
-                                calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
-                                calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
-                                calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
-                            }
-                            calc_entry.localY = summ_h;
+                            this.layoutLegendEntry(calc_entry, distance_to_text, summ_h, distance_to_text);
+                            // if(calc_entry.calcMarkerUnion.marker)
+                            // {
+                            //     calc_entry.calcMarkerUnion.marker.localX = distance_to_text + line_marker_width/2 - calc_entry.calcMarkerUnion.marker.extX/2;
+                            //     calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                            //     calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width + distance_to_text;
+                            // }
+                            //
+                            // if(calc_entry.calcMarkerUnion.lineMarker)
+                            // {
+                            //     calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
+                            //     calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
+                            //     calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
+                            // }
+                            // calc_entry.localY = summ_h;
 
 
 
@@ -10037,9 +10134,11 @@ CChartSpace.prototype.hitInTextRect = function()
                             legend_width = max_legend_width;
                         }
                         var height_summ = 0;
+                        var height_summ2 = 0;
                         for(i = 0;  i < arr_heights.length; ++i)
                         {
                             height_summ+=arr_heights2[i];
+                            height_summ2+= arr_heights[i];
                             if(height_summ > max_legend_height)
                             {
                                 cut_index = i;
@@ -10052,7 +10151,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         {
                             if(cut_index > 0)
                             {
-                                legend_height = height_summ - arr_heights[cut_index];
+                                legend_height = height_summ2 - arr_heights[cut_index];
                             }
                             else
                             {
@@ -10062,7 +10161,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         else
                         {
                             cut_index = arr_heights.length;
-                            legend_height = height_summ;
+                            legend_height = height_summ2;
                         }
                         legend.x = 0;
                         legend.y = 0;
@@ -10095,13 +10194,14 @@ CChartSpace.prototype.hitInTextRect = function()
                             for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
-                                if(calc_entry.calcMarkerUnion.marker)
-                                {
-                                    calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                                    calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
-                                }
-                                calc_entry.localX = 2*distance_to_text + marker_size;
-                                calc_entry.localY = summ_h;
+                                this.layoutLegendEntry(calc_entry, distance_to_text, summ_h, distance_to_text);
+                                // if(calc_entry.calcMarkerUnion.marker)
+                                // {
+                                //     calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                                //     calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                // }
+                                // calc_entry.localX = 2*distance_to_text + marker_size;
+                                // calc_entry.localY = summ_h;
                                 summ_h+=arr_heights[i];
                             }
                         }
@@ -10111,13 +10211,14 @@ CChartSpace.prototype.hitInTextRect = function()
                             for(i = calc_entryes.length-1; i > -1; --i)
                             {
                                 calc_entry = calc_entryes[i];
-                                if(calc_entry.calcMarkerUnion.marker)
-                                {
-                                    calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                                    calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
-                                }
-                                calc_entry.localX = 2*distance_to_text + marker_size;
-                                calc_entry.localY = summ_h;
+                                this.layoutLegendEntry(calc_entry, distance_to_text, summ_h, distance_to_text);
+                                // if(calc_entry.calcMarkerUnion.marker)
+                                // {
+                                //     calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                                //     calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                // }
+                                // calc_entry.localX = 2*distance_to_text + marker_size;
+                                // calc_entry.localY = summ_h;
                                 summ_h+=arr_heights[i];
                             }
                         }
@@ -10195,37 +10296,38 @@ CChartSpace.prototype.hitInTextRect = function()
                         for(i = 0; i < calc_entryes.length; ++i){
                             fCurPosX += fDistanceBetweenLabels;
                             oCurEntry = calc_entryes[i];
-                            oUnionMarker = oCurEntry.calcMarkerUnion;
-                            oLineMarker = oUnionMarker.lineMarker;
-                            oMarker = oUnionMarker.marker;
-
-                            if(oLineMarker){
-                                oLineMarker.localX = fCurPosX + distance_to_text;
-                                if(oLineMarker.pen){
-                                    if(AscFormat.isRealNumber(oLineMarker.pen.w)){
-                                        fPenWidth = oLineMarker.pen.w/36000.0;
-                                    }
-                                    else{
-                                        fPenWidth = 12700.0/36000.0;
-                                    }
-                                }
-                                else{
-                                    fPenWidth = 0.0;
-                                }
-                                oLineMarker.localY = Math.max(0.0, fLegendHeight/2.0 - fPenWidth/2.0);
-                                if(oMarker){
-                                    oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
-                                    oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
-                                }
-                            }
-                            else{
-                                if(oMarker){
-                                    oMarker.localX = fCurPosX + distance_to_text;
-                                    oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
-                                }
-                            }
-                            oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
-                            oCurEntry.localY = Math.max(0, fLegendHeight/2.0 - aHeights[i]/2.0);
+                            this.layoutLegendEntry(oCurEntry, fCurPosX + distance_to_text, Math.max(0, fLegendHeight/2.0 - aHeights[i]/2.0), distance_to_text);
+                            // oUnionMarker = oCurEntry.calcMarkerUnion;
+                            // oLineMarker = oUnionMarker.lineMarker;
+                            // oMarker = oUnionMarker.marker;
+                            //
+                            // if(oLineMarker){
+                            //     oLineMarker.localX = fCurPosX + distance_to_text;
+                            //     if(oLineMarker.pen){
+                            //         if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                            //             fPenWidth = oLineMarker.pen.w/36000.0;
+                            //         }
+                            //         else{
+                            //             fPenWidth = 12700.0/36000.0;
+                            //         }
+                            //     }
+                            //     else{
+                            //         fPenWidth = 0.0;
+                            //     }
+                            //     oLineMarker.localY = Math.max(0.0, fLegendHeight/2.0 - fPenWidth/2.0);
+                            //     if(oMarker){
+                            //         oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
+                            //         oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
+                            //     }
+                            // }
+                            // else{
+                            //     if(oMarker){
+                            //         oMarker.localX = fCurPosX + distance_to_text;
+                            //         oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
+                            //     }
+                            // }
+                            // oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
+                            // oCurEntry.localY = Math.max(0, fLegendHeight/2.0 - aHeights[i]/2.0);
                             fCurPosX += distance_to_text + fMarkerWidth + distance_to_text + aWidths[i];
                         }
 
@@ -10286,36 +10388,37 @@ CChartSpace.prototype.hitInTextRect = function()
                             for(j = 0; j < nColsCount && (i*nColsCount + j) < calc_entryes.length; ++j){
                                 var nEntryIndex = i*nColsCount + j;
                                 oCurEntry = calc_entryes[nEntryIndex];
-                                oUnionMarker = oCurEntry.calcMarkerUnion;
-                                oLineMarker = oUnionMarker.lineMarker;
-                                oMarker = oUnionMarker.marker;
-                                if(oLineMarker){
-                                    oLineMarker.localX = fCurPosX + distance_to_text;
-                                    if(oLineMarker.pen){
-                                        if(AscFormat.isRealNumber(oLineMarker.pen.w)){
-                                            fPenWidth = oLineMarker.pen.w/36000.0;
-                                        }
-                                        else{
-                                            fPenWidth = 12700.0/36000.0;
-                                        }
-                                    }
-                                    else{
-                                        fPenWidth = 0.0;
-                                    }
-                                    oLineMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - fPenWidth/2.0);
-                                    if(oMarker){
-                                        oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
-                                        oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - marker_size/2.0);
-                                    }
-                                }
-                                else{
-                                    if(oMarker){
-                                        oMarker.localX = fCurPosX + distance_to_text;
-                                        oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0  - marker_size/2.0);
-                                    }
-                                }
-                                oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
-                                oCurEntry.localY = Math.max(0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - aHeights[nEntryIndex]/2.0);
+                                // oUnionMarker = oCurEntry.calcMarkerUnion;
+                                // oLineMarker = oUnionMarker.lineMarker;
+                                // oMarker = oUnionMarker.marker;
+                                // if(oLineMarker){
+                                //     oLineMarker.localX = fCurPosX + distance_to_text;
+                                //     if(oLineMarker.pen){
+                                //         if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                                //             fPenWidth = oLineMarker.pen.w/36000.0;
+                                //         }
+                                //         else{
+                                //             fPenWidth = 12700.0/36000.0;
+                                //         }
+                                //     }
+                                //     else{
+                                //         fPenWidth = 0.0;
+                                //     }
+                                //     oLineMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - fPenWidth/2.0);
+                                //     if(oMarker){
+                                //         oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
+                                //         oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - marker_size/2.0);
+                                //     }
+                                // }
+                                // else{
+                                //     if(oMarker){
+                                //         oMarker.localX = fCurPosX + distance_to_text;
+                                //         oMarker.localY = Math.max(0.0, fCurPosY + Math.max.apply(Math, aHeights)/2.0  - marker_size/2.0);
+                                //     }
+                                // }
+                                this.layoutLegendEntry(oCurEntry, fCurPosX + distance_to_text, Math.max(0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - aHeights[nEntryIndex]/2.0), distance_to_text);
+                                // oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
+                                // oCurEntry.localY = Math.max(0, fCurPosY + Math.max.apply(Math, aHeights)/2.0 - aHeights[nEntryIndex]/2.0);
                                 fCurPosX += (fMaxEntryWidth + fDistanceBetweenLabels);
                             }
                             fCurPosY += (Math.max.apply(Math, aHeights) + fVertDistanceBetweenLabels);
@@ -10932,149 +11035,132 @@ CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
         if(this.chart.plotArea)
         {
             fSaveChartObjectSourceFormatting(this.chart.plotArea, oCopy.chart.plotArea, oTheme, oColorMap);
-            if(oCopy.chart.plotArea.valAx)
+            var aAxes = oCopy.chart.plotArea.axId;
+            if(aAxes)
             {
-                fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx, oCopy.chart.plotArea.valAx, oTheme, oColorMap);
-                if(this.chart.plotArea.valAx.compiledLn)
+                for(var i = 0; i < aAxes.length; ++i)
                 {
-                    if(!oCopy.chart.plotArea.valAx.spPr){
-                        oCopy.chart.plotArea.valAx.setSpPr(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.valAx.spPr.setLn(this.chart.plotArea.valAx.compiledLn.createDuplicate(true));
-                }
-                if(this.chart.plotArea.valAx.compiledMajorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.valAx.majorGridlines){
-                        oCopyi.chart.plotArea.valAx.setMajorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.valAx.majorGridlines.setLn(this.chart.plotArea.valAx.compiledMajorGridLines.createDuplicate(true));
-                }
-                if(this.chart.plotArea.valAx.compiledMinorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.valAx.minorGridlines){
-                        oCopy.chart.plotArea.valAx.setMinorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.valAx.minorGridlines.setLn(this.chart.plotArea.valAx.compiledMinorGridLines.createDuplicate(true));
-                }
-                if(oCopy.chart.plotArea.valAx.title)
-                {
-                    fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx.title, oCopy.chart.plotArea.valAx.title, oTheme, oColorMap);
-                }
-            }
-            if(oCopy.chart.plotArea.catAx)
-            {
-                fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx, oCopy.chart.plotArea.catAx, oTheme, oColorMap);
-                if(this.chart.plotArea.catAx.compiledLn)
-                {
-                    if(!oCopy.chart.plotArea.catAx.spPr){
-                        oCopy.chart.plotArea.catAx.setSpPr(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.catAx.spPr.setLn(this.chart.plotArea.catAx.compiledLn.createDuplicate(true));
-                }
-                if(this.chart.plotArea.catAx.compiledMajorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.catAx.majorGridlines){
-                        oCopy.chart.plotArea.catAx.setMajorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.catAx.majorGridlines.setLn(this.chart.plotArea.catAx.compiledMajorGridLines.createDuplicate(true));
-                }
-                if(this.chart.plotArea.catAx.compiledMinorGridLines)
-                {
-                    if(!oCopy.chart.plotArea.catAx.minorGridlines){
-                        oCopy.chart.plotArea.catAx.setMinorGridlines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.catAx.minorGridlines.setLn(this.chart.plotArea.catAx.compiledMinorGridLines.createDuplicate(true));
-                }
-                if(oCopy.chart.plotArea.catAx.title)
-                {
-                    fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx.title, oCopy.chart.plotArea.catAx.title, oTheme, oColorMap);
-                }
-            }
-
-            if(this.chart.plotArea.charts[0])
-            {
-                var series = this.chart.plotArea.charts[0].series;
-                var seriesCopy = oCopy.chart.plotArea.charts[0].series;
-
-                var oDataPoint;
-                for(var i = 0; i < series.length; ++i)
-                {
-                    series[i].brush = series[i].compiledSeriesBrush;
-                    series[i].pen = series[i].compiledSeriesPen;
-                    fSaveChartObjectSourceFormatting(series[i], seriesCopy[i], oTheme, oColorMap);
-                    var pts = AscFormat.getPtsFromSeries(series[i]);
-                    var ptsCopy = AscFormat.getPtsFromSeries(seriesCopy[i]);
-                    for(var j = 0; j < pts.length; ++j)
+                    if(aAxes[i] && this.chart.plotArea.axId[i])
                     {
-                        var pt = pts[j];
-                        oDataPoint = null;
-                        if(Array.isArray(seriesCopy[i].dPt))
+                        fSaveChartObjectSourceFormatting(this.chart.plotArea.axId[i], aAxes[i], oTheme, oColorMap);
+                        if(this.chart.plotArea.axId[i].compiledLn)
                         {
-                            for(var k = 0; k < seriesCopy[i].dPt.length; ++k)
+                            if(!aAxes[i].spPr){
+                                aAxes[i].setSpPr(new AscFormat.CSpPr());
+                            }
+                            aAxes[i].spPr.setLn(this.chart.plotArea.axId[i].compiledLn.createDuplicate(true));
+                        }
+                        if(this.chart.plotArea.axId[i].compiledMajorGridLines)
+                        {
+                            if(!aAxes[i].majorGridlines){
+                                aAxes[i].setMajorGridlines(new AscFormat.CSpPr());
+                            }
+                            aAxes[i].majorGridlines.setLn(this.chart.plotArea.axId[i].compiledMajorGridLines.createDuplicate(true));
+                        }
+                        if(this.chart.plotArea.axId[i].compiledMinorGridLines)
+                        {
+                            if(!aAxes[i].minorGridlines){
+                                aAxes[i].setMinorGridlines(new AscFormat.CSpPr());
+                            }
+                            aAxes[i].minorGridlines.setLn(this.chart.plotArea.axId[i].compiledMinorGridLines.createDuplicate(true));
+                        }
+                        if(aAxes[i].title)
+                        {
+                            fSaveChartObjectSourceFormatting(this.chart.plotArea.axId[i].title, aAxes[i].title, oTheme, oColorMap);
+                        }
+                    }
+                }
+            }
+
+            for(var t = 0; t < this.chart.plotArea.charts.length; ++t)
+            {
+                if(this.chart.plotArea.charts[t])
+                {
+                    var oChartOrig = this.chart.plotArea.charts[t];
+                    var oChartCopy = oCopy.chart.plotArea.charts[t];
+                    var series = oChartOrig.series;
+                    var seriesCopy = oChartCopy.series;
+
+                    var oDataPoint;
+                    for(var i = 0; i < series.length; ++i)
+                    {
+                        series[i].brush = series[i].compiledSeriesBrush;
+                        series[i].pen = series[i].compiledSeriesPen;
+                        fSaveChartObjectSourceFormatting(series[i], seriesCopy[i], oTheme, oColorMap);
+                        var pts = AscFormat.getPtsFromSeries(series[i]);
+                        var ptsCopy = AscFormat.getPtsFromSeries(seriesCopy[i]);
+                        for(var j = 0; j < pts.length; ++j)
+                        {
+                            var pt = pts[j];
+                            oDataPoint = null;
+                            if(Array.isArray(seriesCopy[i].dPt))
                             {
-                                if(seriesCopy[i].dPt[k].idx === pts[j].idx)
+                                for(var k = 0; k < seriesCopy[i].dPt.length; ++k)
                                 {
-                                    oDataPoint = seriesCopy[i].dPt[k];
-                                    break;
+                                    if(seriesCopy[i].dPt[k].idx === pts[j].idx)
+                                    {
+                                        oDataPoint = seriesCopy[i].dPt[k];
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if(!oDataPoint)
-                        {
-                            oDataPoint = new AscFormat.CDPt();
-                            oDataPoint.setIdx(pt.idx);
-                            seriesCopy[i].addDPt(oDataPoint);
-                        }
-                        fSaveChartObjectSourceFormatting(pt, oDataPoint, oTheme, oColorMap);
-                        if(pt.compiledMarker)
-                        {
-                            var oMarker = pt.compiledMarker.createDuplicate();
-                            oDataPoint.setMarker(oMarker);
-                            fSaveChartObjectSourceFormatting(pt.compiledMarker, oMarker, oTheme, oColorMap);
+                            if(!oDataPoint)
+                            {
+                                oDataPoint = new AscFormat.CDPt();
+                                oDataPoint.setIdx(pt.idx);
+                                seriesCopy[i].addDPt(oDataPoint);
+                            }
+                            fSaveChartObjectSourceFormatting(pt, oDataPoint, oTheme, oColorMap);
+                            if(pt.compiledMarker)
+                            {
+                                var oMarker = pt.compiledMarker.createDuplicate();
+                                oDataPoint.setMarker(oMarker);
+                                fSaveChartObjectSourceFormatting(pt.compiledMarker, oMarker, oTheme, oColorMap);
+                            }
                         }
                     }
-                }
-                if(oCopy.chart.plotArea.charts[0].calculatedHiLowLines)
-                {
-                    if(!oCopy.chart.plotArea.charts[0].hiLowLines)
+                    if(oChartOrig.calculatedHiLowLines)
                     {
-                        oCopy.chart.plotArea.charts[0].setHiLowLines(new AscFormat.CSpPr());
-                    }
-                    oCopy.chart.plotArea.charts[0].hiLowLines.setLn(this.chart.plotArea.charts[0].calculatedHiLowLines.createDuplicate(true));
-                }
-                if( oCopy.chart.plotArea.charts[0].upDownBars)
-                {
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.upBarsBrush)
-                    {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.upBars)
+                        if(!oChartCopy.hiLowLines)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setUpBars(new AscFormat.CSpPr());
+                            oChartCopy.setHiLowLines(new AscFormat.CSpPr());
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.upBars.setFill(this.chart.plotArea.charts[0].upDownBars.upBarsBrush.saveSourceFormatting());
+                        oChartCopy.hiLowLines.setLn(oChartOrig.calculatedHiLowLines.createDuplicate(true));
                     }
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.upBarsPen)
+                    if( oChartOrig.upDownBars)
                     {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.upBars)
+                        if(oChartOrig.upDownBars.upBarsBrush)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setUpBars(new AscFormat.CSpPr());
+                            if(!oChartCopy.upDownBars.upBars)
+                            {
+                                oChartCopy.upDownBars.setUpBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.upBars.setFill(oChartOrig.upDownBars.upBarsBrush.saveSourceFormatting());
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.upBars.setLn(this.chart.plotArea.charts[0].upDownBars.upBarsPen.createDuplicate(true));
-                    }
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.downBarsBrush)
-                    {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.downBars)
+                        if(oChartOrig.upDownBars.upBarsPen)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setDownBars(new AscFormat.CSpPr());
+                            if(!oChartCopy.upDownBars.upBars)
+                            {
+                                oChartCopy.upDownBars.setUpBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.upBars.setLn(oChartOrig.upDownBars.upBarsPen.createDuplicate(true));
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.downBars.setFill(this.chart.plotArea.charts[0].upDownBars.downBarsBrush.saveSourceFormatting());
-                    }
-                    if(oCopy.chart.plotArea.charts[0].upDownBars.downBarsPen)
-                    {
-                        if(!oCopy.chart.plotArea.charts[0].upDownBars.downBars)
+                        if(oChartOrig.upDownBars.downBarsBrush)
                         {
-                            oCopy.chart.plotArea.charts[0].upDownBars.setDownBars(new AscFormat.CSpPr());
+                            if(!oChartCopy.upDownBars.downBars)
+                            {
+                                oChartCopy.upDownBars.setDownBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.downBars.setFill(oChartOrig.upDownBars.downBarsBrush.saveSourceFormatting());
                         }
-                        oCopy.chart.plotArea.charts[0].upDownBars.downBars.setLn(this.chart.plotArea.charts[0].upDownBars.downBarsPen.createDuplicate(true));
+                        if(oChartOrig.upDownBars.downBarsPen)
+                        {
+                            if(!oChartCopy.upDownBars.downBars)
+                            {
+                                oChartCopy.upDownBars.setDownBars(new AscFormat.CSpPr());
+                            }
+                            oChartCopy.upDownBars.downBars.setLn(oChartOrig.upDownBars.downBarsPen.createDuplicate(true));
+                        }
                     }
                 }
             }
@@ -11383,9 +11469,9 @@ CChartSpace.prototype.recalculateDLbls = function()
                     }
                     var compiled_dlb = new AscFormat.CDLbl();
                     compiled_dlb.merge(default_lbl);
-                    compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls);
-                    if(this.chart.plotArea.charts[0].dLbls)
-                        compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls.findDLblByIdx(pt.idx), false);
+                    compiled_dlb.merge(aCharts[t].dLbls);
+                    if(aCharts[t].dLbls)
+                        compiled_dlb.merge(aCharts[t].dLbls.findDLblByIdx(pt.idx), false);
                     compiled_dlb.merge(ser.dLbls);
                     if(ser.dLbls)
                         compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx));

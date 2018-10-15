@@ -39,6 +39,22 @@ var pxInPt = 0.75;
 
 function CPdfPrinter(fontManager)
 {
+    this._ppiX = 96;
+    this._ppiY = 96;
+    this._zoom = 1;
+
+    if (window.Asc && window.Asc.editor)
+    {
+        this._zoom = window.Asc.editor.asc_getZoom();
+        this._ppiX = 96;
+        this._ppiY = 96;
+    }
+
+    vector_koef = 25.4 / (this._ppiX * this._zoom);
+
+    if (AscCommon.AscBrowser.isRetina)
+        vector_koef /= AscCommon.AscBrowser.retinaPixelRatio;
+
     this.DocumentRenderer = new AscCommon.CDocumentRenderer();
     if (!window['IS_NATIVE_EDITOR']) {
 	   this.DocumentRenderer.InitPicker(fontManager);
@@ -81,11 +97,11 @@ CPdfPrinter.prototype =
     },
     getPPIX : function()
     {
-        return 72.0;
+        return this._ppiX;
     },
     getPPIY : function()
     {
-        return 72.0;
+        return this._ppiY;
     },
 
     getUnits : function()
@@ -100,7 +116,7 @@ CPdfPrinter.prototype =
 
     getZoom : function()
     {
-        return 1;
+        return this._zoom;
     },
     changeZoom : function()
     {
