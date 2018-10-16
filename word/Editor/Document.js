@@ -9952,10 +9952,6 @@ CDocument.prototype.Refresh_RecalcData = function(Data)
 			break;
 		}
 	}
-<<<<<<< HEAD
-	else if( this.CanAddComment()){
-		this.Api.sync_UpdateCommentPosition();
-	}
     window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
 	this.TrackRevisionsManager.Update_VisibleChangesPosition(this.Api);
 };
@@ -9965,8 +9961,6 @@ CDocument.prototype.Refresh_RecalcData = function(Data)
 CDocument.prototype.Update_SectionsInfo = function()
 {
 	this.SectionsInfo.Clear();
-=======
->>>>>>> 8c9b0dc12e463c7be15e253cbbc88baee317b184
 
 	if (-1 != ChangePos)
 	{
