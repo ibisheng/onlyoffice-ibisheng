@@ -464,10 +464,21 @@ CTextBody.prototype =
         return undefined;
     },
 
-    Is_HdrFtr: function()
+    IsHdrFtr: function(bReturnHdrFtr)
     {
+    	if (bReturnHdrFtr)
+    		return null;
+
         return false;
     },
+
+	IsFootnote : function(bReturnFootnote)
+	{
+		if (bReturnFootnote)
+			return null;
+
+		return false;
+	},
 
     Get_PageContentStartPos: function(pageNum)
     {
@@ -510,6 +521,14 @@ CTextBody.prototype =
     getSummaryHeight2: function()
     {
         return this.content2 ? this.content2.GetSummaryHeight() : 0;
+    },
+
+    getSummaryHeight3: function()
+    {
+        if(this.content && this.content.GetSummaryHeight_){
+            return this.content.GetSummaryHeight_();
+        }
+        return 0;
     },
 
     getCompiledBodyPr: function()
@@ -570,7 +589,7 @@ CTextBody.prototype =
         return AscFormat.ExecuteNoHistory(function(){
             var oStyles = new CStyles(false);
             var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
-            Style_Para_Def.Create_Default_Paragraph();
+            Style_Para_Def.CreateNormal();
             oStyles.Default.Paragraph = oStyles.Add( Style_Para_Def );
             return {styles: oStyles, lastId: oStyles.Default.Paragraph};
         }, this, []);

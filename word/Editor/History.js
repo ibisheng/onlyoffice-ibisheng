@@ -174,7 +174,7 @@ CHistory.prototype =
         this.UserSavedIndex = null;
         this.Points.length  = 0;
 		this.TurnOffHistory = 0;
-        this.Internal_RecalcData_Clear();
+        this.private_ClearRecalcData();
     },
 
     Can_Undo : function()
@@ -232,7 +232,7 @@ CHistory.prototype =
         
         this.Document.RemoveSelection(true);
 
-        this.Internal_RecalcData_Clear();
+        this.private_ClearRecalcData();
 
         var Point = null;
         if (undefined !== Options && null !== Options && true === Options.All)
@@ -272,6 +272,8 @@ CHistory.prototype =
             }
         }
 
+		this.private_PostProcessingRecalcData();
+
         if (null != Point)
             this.Document.SetSelectionState( Point.State );
 		
@@ -293,7 +295,7 @@ CHistory.prototype =
         
         var Point = this.Points[++this.Index];
 
-        this.Internal_RecalcData_Clear();
+        this.private_ClearRecalcData();
 
         // Выполняем все действия в прямом порядке
         for ( var Index = 0; Index < Point.Items.length; Index++ )
@@ -307,6 +309,8 @@ CHistory.prototype =
 			}
 			this.private_UpdateContentChangesOnRedo(Item);
         }
+
+        this.private_PostProcessingRecalcData();
 
         // Восстанавливаем состояние на следующую точку
         var State = null;
@@ -489,34 +493,6 @@ CHistory.prototype =
                 this.CollaborativeEditing.AddPosExtChanges(Item, _Class);
             }
 		}
-	},
-
-	Internal_RecalcData_Clear : function()
-	{
-		// NumPr здесь не обнуляем
-		var NumPr            = this.RecalculateData.NumPr;
-		this.RecalculateData = {
-			Inline   : {
-				Pos     : -1,
-				PageNum : 0
-			},
-			Flow     : [],
-			HdrFtr   : [],
-			Drawings : {
-				All       : false,
-				Map       : {},
-				ThemeInfo : null
-			},
-
-			Tables        : [],
-			NumPr         : NumPr,
-			NotesEnd      : false,
-			NotesEndPage  : 0,
-			Update        : true,
-			ChangedStyles : {},
-			ChangedNums   : {},
-			AllParagraphs : null
-		};
 	},
 
     RecalcData_Add : function(Data)
@@ -872,18 +848,19 @@ CHistory.prototype =
         }
         else if (arrChanges)
 		{
-			this.Internal_RecalcData_Clear();
+			this.private_ClearRecalcData();
 			for (var nIndex = 0, nCount = arrChanges.length; nIndex < nCount; ++nIndex)
 			{
 				var oChange = arrChanges[nIndex];
 				oChange.RefreshRecalcData();
 			}
+			this.private_PostProcessingRecalcData();
 		}
         else
         {
             if (this.Index >= 0)
             {
-                this.Internal_RecalcData_Clear();
+                this.private_ClearRecalcData();
 
                 for (var Pos = this.RecIndex + 1; Pos <= this.Index; Pos++)
                 {
@@ -899,6 +876,8 @@ CHistory.prototype =
                             Item.Class.Refresh_RecalcData(Item.Data);
                     }
                 }
+
+                this.private_PostProcessingRecalcData();
             }
         }
 
@@ -1140,7 +1119,7 @@ CHistory.prototype.GetAllParagraphsForRecalcData = function(Props)
 			var oPara = this.RecalculateData.AllParagraphs[nParaIndex];
 
 			var NumPr  = Props.NumPr;
-			var _NumPr = oPara.Numbering_Get();
+			var _NumPr = oPara.GetNumPr();
 
 			if (undefined != _NumPr && _NumPr.NumId === NumPr.NumId && (_NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl))
 				arrParagraphs.push(oPara);
@@ -1259,6 +1238,44 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 
 	return null;
 };
+CHistory.prototype.private_ClearRecalcData = function()
+{
+	// NumPr здесь не обнуляем
+	var NumPr            = this.RecalculateData.NumPr;
+	this.RecalculateData = {
+		Inline   : {
+			Pos     : -1,
+			PageNum : 0
+		},
+		Flow     : [],
+		HdrFtr   : [],
+		Drawings : {
+			All       : false,
+			Map       : {},
+			ThemeInfo : null
+		},
+
+		Tables        : [],
+		NumPr         : NumPr,
+		NotesEnd      : false,
+		NotesEndPage  : 0,
+		Update        : true,
+		ChangedStyles : {},
+		ChangedNums   : {},
+		AllParagraphs : null
+	};
+};
+/**
+ * Обработка изменений после Undo/Redo всех изменений
+ */
+CHistory.prototype.private_PostProcessingRecalcData = function()
+{
+	for (var sId in this.RecalculateData.ChangedStyles)
+	{
+		var oStyle = this.RecalculateData.ChangedStyles[sId];
+		oStyle.RecalculateRelatedParagraphs();
+	}
+};
 	/**
 	 * Получаем сколько изменений в истории уже сохранено на сервере на данный момент с учетом текущей точки в истории
 	 * @returns {number}
@@ -1296,15 +1313,9 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 
 			if (this.RecIndex >= 0)
 				this.RecIndex--;
-
-			if (null !== this.SavedIndex && this.SavedIndex >= 0)
-			{
-				this.SavedIndex--;
-
-				if (this.SavedIndex < 0)
-					this.SavedIndex = null;
-			}
 		}
+
+		this.SavedIndex = null;
 	};
 
 function CRC32()

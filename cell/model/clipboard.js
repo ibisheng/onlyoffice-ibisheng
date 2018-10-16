@@ -282,8 +282,8 @@
 				var _data = null;
 				var activeRange = ws.getSelectedRange();
 				var wb = window["Asc"]["editor"].wb;
-				
-				wb.handlers.trigger("hideSpecialPasteOptions");
+
+				window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 				
 				if(ws.getCellEditMode() === true)//text in cell
 				{
@@ -377,7 +377,7 @@
 
 				if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 				{
-					ws.model.workbook.handlers.trigger("hideSpecialPasteOptions");
+					window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 				}
 				window['AscCommon'].g_specialPasteHelper.Paste_Process_Start(doNotShowButton);
 				
@@ -1061,7 +1061,7 @@
 							{
 								if(i !== 0)
 								{
-									res += '\n';
+									res += '\r\n';
 								}
 								res += paraText;
 							}
@@ -1099,7 +1099,7 @@
 						}
 
 						if(row !== bbox.r1)
-							res += '\n';
+							res += '\r\n';
 						
 						for (var col = bbox.c1; col <= maxCol; ++col)
 						{
@@ -1187,13 +1187,15 @@
 				var tempWorkbook = new AscCommonExcel.Workbook();
 				var t = this;
 				var newFonts;
-				
+
+				History.TurnOff();
 				pptx_content_loader.Start_UseFullUrl();
-                pptx_content_loader.Reader.ClearConnectorsMaps();
+				pptx_content_loader.Reader.ClearConnectorsMaps();
 				oBinaryFileReader.Read(base64, tempWorkbook);
 				this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
 				var aPastedImages = pptx_content_loader.End_UseFullUrl();
-                pptx_content_loader.Reader.AssignConnectorsId();
+				pptx_content_loader.Reader.AssignConnectorsId();
+				History.TurnOn();
 				
 				var pasteData = null;
 				if (tempWorkbook)
@@ -1648,21 +1650,20 @@
 				var oInfo = new CSelectedElementsInfo();
 				var selectedElementsInfo = isIntoShape.GetSelectedElementsInfo(oInfo);
 				var mathObj = oInfo.Get_Math();
-				if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart && null === mathObj)
+				if(/*!window['AscCommon'].g_specialPasteHelper.specialPasteStart && */null === mathObj)
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
 					var curShape = isIntoShape.Parent.parent;
 
 					var asc_getcvt = Asc.getCvtRatio;
 					var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, worksheet._getPPIX());
-					var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, worksheet._getPPIX());
 
-					var cellsLeft = worksheet.cellsLeft * ptToPx;
-					var cellsTop = worksheet.cellsTop * ptToPx;
+					var cellsLeft = worksheet.cellsLeft;
+					var cellsTop = worksheet.cellsTop;
 
 					var cursorPos = isIntoShape.GetCursorPosXY();
-					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeft;
-					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTop;
+					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - cellsLeft;
+					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - cellsTop;
 					var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
 					var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
 					var position = {x: posX, y: posY};
@@ -1931,8 +1932,8 @@
 						ws.expandRowsOnScroll(true);
 					}
 					
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 1), 1, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 1), 1, 3);
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.getCellLeft(activeCol, 0) - ws.getCellLeft(0, 0), 0, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.getCellTop(activeRow, 0)  - ws.getCellTop(0, 0), 0, 3);
 
 					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
 					drawingObject.graphicObject.setDrawingBase(drawingObject);
@@ -2110,8 +2111,8 @@
 					AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[addImagesFromWord[i].col + activeRange.c1].left - ws.getCellLeft(0, 1), 1, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[addImagesFromWord[i].row + activeRange.r1].top  - ws.getCellTop(0, 1), 1, 3);
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.getCellLeft(addImagesFromWord[i].col + activeRange.c1) - ws.getCellLeft(0, 0), 0, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.getCellTop(addImagesFromWord[i].row + activeRange.r1) - ws.getCellTop(0, 0), 0, 3);
 					
 					xfrm.setOffX(curCol);
 					xfrm.setOffY(curRow);
@@ -2123,6 +2124,7 @@
 					drawingObject.graphicObject.setWorksheet(ws.model);
 
                     drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
+					drawingObject.graphicObject.checkExtentsByDocContent && drawingObject.graphicObject.checkExtentsByDocContent();
                     //drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 					drawingObject.graphicObject.addToDrawingObjects();
 
@@ -2638,7 +2640,7 @@
 				
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
 			    var oBinaryFileReader = new AscCommonWord.BinaryFileReader(newCDocument, openParams);
-			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
+			    var oRes = oBinaryFileReader.ReadFromString(sBase64, {excelCopyPaste: true});
 				
 				pptx_content_loader.End_UseFullUrl();
 				
@@ -2988,7 +2990,7 @@
 				worksheet._forEachCell(function(cell) {
 					if (curRow !== cell.nRow) {
 						if (-1 !== curRow) {
-							res += "\n";
+							res += '\r\n';
 						}
 						curRow = cell.nRow;
 					}
@@ -3023,7 +3025,7 @@
 							getTextFromCell(cell);
 						}
 						
-						res += "\n";
+						res += '\r\n';
 					}
 				};
 				
@@ -3036,14 +3038,14 @@
 						{
 							if(!isNAddNewLine)
 							{
-								res += "\n";
+								res += '\r\n';
 							}
 							
 							getTextFromParagraph(item);
 						}
 						else if(type_Table === item.GetType())
 						{
-							res += "\n";
+							res += '\r\n';
 							
 							getTextFromTable(item);
 						}
@@ -3352,7 +3354,7 @@
 				var documentContent = pasteData.content;
 				var t = this;
 				
-				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия Internal_GetNumInfo требует наличие этих параграфов в родителе. 
+				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия CalculateNumberingValues требует наличие этих параграфов в родителе.
 				var cDocument = documentContent && documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
 				if(cDocument && cDocument.Content && 1 === cDocument.Content.length)
 				{
@@ -3398,7 +3400,9 @@
 					var api = window["Asc"]["editor"];
 					var oImageMap = {};
 					AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+						History.TurnOff();
 						AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+						History.TurnOn();
 						t.aResult.props.oImageMap = oImageMap;
 						worksheet.setSelectionInfo('paste', {data: t.aResult});
 					}, true );
@@ -3536,13 +3540,13 @@
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
-				var oNumPr = paragraph.elem.Numbering_Get ? paragraph.elem.Numbering_Get() : null;
+				var oNumPr = paragraph.elem.GetNumPr ? paragraph.elem.GetNumPr() : null;
 				var numberingText = null;
 				var formatText;
 				if (oNumPr != null) {
-					var aNum = paragraph.elem.Parent.Numbering.Get_AbstractNum(oNumPr.NumId);
-					if (null != aNum) {
-						LvlPr = aNum.Lvl[oNumPr.Lvl];
+					var oNum = paragraph.elem.Parent.GetNumbering().GetNum(oNumPr.NumId);
+					if (oNum) {
+						LvlPr = oNum.GetLvl(oNumPr.Lvl);
 						Lvl = oNumPr.Lvl;
 					}
 
@@ -3554,7 +3558,7 @@
 
 					text += this._getAllNumberingText(Lvl, numberingText);
 
-					formatText = this._getPrParaRun(paraPr, LvlPr.TextPr);
+					formatText = this._getPrParaRun(paraPr, LvlPr.GetTextPr());
 					fontFamily = formatText.format.getName();
 					this.fontsNew[fontFamily] = 1;
 
@@ -4003,37 +4007,37 @@
 						}
 						else
 						{
-							var Numbering = paragraph.Parent.Get_Numbering();
-							var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-							var NumSuff   = NumLvl.Suff;
-							var NumJc     = NumLvl.Jc;
+							var Numbering = paragraph.Parent.GetNumbering();
+							var NumLvl    = Numbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
+							var NumSuff   = NumLvl.GetSuff();
+							var NumJc     = NumLvl.GetJc();
 							var NumTextPr = paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
 							// Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
 							// символа параграфа.
 
-							var TextPr_temp = paragraph.TextPr.Value.Copy();
+							var TextPr_temp       = paragraph.TextPr.Value.Copy();
 							TextPr_temp.Underline = undefined;
 
-							NumTextPr.Merge( TextPr_temp );
-							NumTextPr.Merge( NumLvl.TextPr );
-							
-							var oNumPr = paragraph.Numbering_Get();
+							NumTextPr.Merge(TextPr_temp);
+							NumTextPr.Merge(NumLvl.GetTextPr());
+
+							var oNumPr = paragraph.GetNumPr();
 							var LvlPr, Lvl;
-							if(oNumPr != null)
+							if (oNumPr != null)
 							{
-								var aNum = paragraph.Parent.Numbering.Get_AbstractNum( oNumPr.NumId );
-								if(null != aNum)
+								var oNum = paragraph.Parent.GetNumbering().GetNum(oNumPr.NumId);
+								if (null != oNum)
 								{
-									LvlPr = aNum.Lvl[oNumPr.Lvl];
-									Lvl = oNumPr.Lvl;
+									LvlPr = oNum.GetLvl(oNumPr.Lvl);
+									Lvl   = oNumPr.Lvl;
 								}
 							}
-							
 
-							var NumInfo = paragraph.Parent.Internal_GetNumInfo(paragraph.Id, NumPr);
-							
-							return this._getNumberingText( NumPr.Lvl, NumInfo, NumTextPr, null, LvlPr );
+
+							var NumInfo = paragraph.Parent.CalculateNumberingValues(paragraph, NumPr);
+
+							return this._getNumberingText(NumPr.Lvl, NumInfo, NumTextPr, null, LvlPr);
 						}
 					}
 				}
@@ -4080,16 +4084,16 @@
 							var CurLvl = Text[Index].Value;
 							switch( LvlPr.Format )
 							{
-								case numbering_numfmt_Bullet:
+								case Asc.c_oAscNumberingFormat.Bullet:
 								{
 									break;
 								}
 
-								case numbering_numfmt_Decimal:
+								case Asc.c_oAscNumberingFormat.Decimal:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+										var T = "" + NumInfo[CurLvl];
 										for ( var Index2 = 0; Index2 < T.length; Index2++ )
 										{
 											Char += T.charAt(Index2);
@@ -4100,11 +4104,11 @@
 									break;
 								}
 
-								case numbering_numfmt_DecimalZero:
+								case Asc.c_oAscNumberingFormat.DecimalZero:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+										var T = "" + NumInfo[CurLvl];
 
 										if ( 1 === T.length )
 										{
@@ -4128,13 +4132,13 @@
 									break;
 								}
 
-								case numbering_numfmt_LowerLetter:
-								case numbering_numfmt_UpperLetter:
+								case Asc.c_oAscNumberingFormat.LowerLetter:
+								case Asc.c_oAscNumberingFormat.UpperLetter:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
 										// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
-										var Num = LvlPr.Start - 1 + NumInfo[CurLvl] - 1;
+										var Num = NumInfo[CurLvl];
 
 										var Count = (Num - Num % 26) / 26;
 										var Ost   = Num % 26;
@@ -4142,7 +4146,7 @@
 										var T = "";
 
 										var Letter;
-										if ( numbering_numfmt_LowerLetter === LvlPr.Format )
+										if ( Asc.c_oAscNumberingFormat.LowerLetter === LvlPr.Format )
 											Letter = String.fromCharCode( Ost + 97 );
 										else
 											Letter = String.fromCharCode( Ost + 65 );
@@ -4160,17 +4164,17 @@
 									break;
 								}
 
-								case numbering_numfmt_LowerRoman:
-								case numbering_numfmt_UpperRoman:
+								case Asc.c_oAscNumberingFormat.LowerRoman:
+								case Asc.c_oAscNumberingFormat.UpperRoman:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
-										var Num = LvlPr.Start - 1 + NumInfo[CurLvl];
+										var Num = NumInfo[CurLvl];
 
 										// Переводим число Num в римскую систему исчисления
 										var Rims;
 
-										if ( numbering_numfmt_LowerRoman === LvlPr.Format )
+										if ( Asc.c_oAscNumberingFormat.LowerRoman === LvlPr.Format )
 											Rims = [  'm', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 										else
 											Rims = [  'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];

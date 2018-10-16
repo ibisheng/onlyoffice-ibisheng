@@ -2037,6 +2037,25 @@ CUniColor.prototype =
             return _ret;
         }
 
+        if(this.Mods && unicolor.Mods)
+        {
+            var aMods = this.Mods.Mods;
+            var aMods2 = unicolor.Mods.Mods;
+            if(aMods.length === aMods2.length)
+            {
+                for (var i = 0; i < aMods.length; ++i)
+                {
+                    if(aMods2[i].name !== aMods[i].name || aMods2[i].val !== aMods[i].val)
+                    {
+                        break;
+                    }
+                }
+                if(i === aMods.length)
+                {
+                    _ret.Mods = this.Mods.createDuplicate();
+                }
+            }
+        }
         switch(this.color.type)
         {
             case c_oAscColor.COLOR_TYPE_NONE:
@@ -4169,6 +4188,10 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     if(!shapeProp1.bFromImage || !shapeProp2.bFromImage)
     {
         _result_shape_prop.bFromImage = false;
+    }
+    else
+    {
+        _result_shape_prop.bFromImage = true;
     }
     if(shapeProp1.locked || shapeProp2.locked)
     {
@@ -9543,6 +9566,12 @@ function CreateAscFill(unifill)
                 ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
                 ret.fill.PathType = 0;
             }
+            else
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+                ret.fill.LinearAngle = 0;
+                ret.fill.LinearScale = false;
+            }
 
             break;
         }
@@ -9754,8 +9783,11 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                     var _angle = _fill.LinearAngle;
                     var _scale = _fill.LinearScale;
 
-                    if (!ret.fill.lin)
+                    if (!ret.fill.lin){
                         ret.fill.lin = new GradLin();
+                        ret.fill.lin.angle = 0;
+                        ret.fill.lin.scale = false;
+                    }
 
                     if (undefined != _angle)
                         ret.fill.lin.angle = _angle;
@@ -10234,7 +10266,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
 
     function builder_CreateChart(nW, nH, sType, aCatNames, aSeriesNames, aSeries, nStyleIndex){
-        var settings = new AscCommon.asc_ChartSettings();
+        var settings = new Asc.asc_ChartSettings();
         switch (sType)
         {
             case "bar" :

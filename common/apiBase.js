@@ -184,6 +184,8 @@
 
         this.openFileCryptBinary = null;
 
+        this.copyOutEnabled = (config['copyoutenabled'] !== false);
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw =
 			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -340,7 +342,7 @@
 	};
 	baseEditorsApi.prototype.isCopyOutEnabled                = function()
 	{
-		return true;
+		return this.copyOutEnabled;
 	};
 	// target pos
 	baseEditorsApi.prototype.asc_LockTargetUpdate		     = function(isLock)
@@ -399,6 +401,27 @@
 	};
 	baseEditorsApi.prototype.getViewMode                     = function()
 	{
+		return this.isViewMode;
+	};
+	baseEditorsApi.prototype.canEdit                         = function()
+	{
+		return !this.isViewMode && this.restrictions === Asc.c_oAscRestrictionType.None;
+	};
+	baseEditorsApi.prototype.isRestrictionForms              = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlyForms);
+	};
+	baseEditorsApi.prototype.isRestrictionComments           = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+	};
+	baseEditorsApi.prototype.isRestrictionSignatures         = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+	};
+	baseEditorsApi.prototype.isRestrictionView               = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.View);
 	};
 	baseEditorsApi.prototype.isLongAction                    = function()
 	{
@@ -1319,6 +1342,13 @@
 			}
 			this.onEndLoadFile(null);
 		}
+
+		// for crypt mode (end waiting all system plugins)
+        if (this.asc_initAdvancedOptions_params)
+        {
+        	window["asc_initAdvancedOptions"].apply(window, this.asc_initAdvancedOptions_params);
+            delete this.asc_initAdvancedOptions_params;
+        }
 	};
 	baseEditorsApi.prototype.onEndLoadFile = function(result)
 	{
@@ -1481,6 +1511,11 @@
 	};
 
 	// plugins
+	baseEditorsApi.prototype._checkLicenseApiFunctions   = function()
+	{
+		return this.licenseResult && true === this.licenseResult['plugins'];
+	};
+
 	baseEditorsApi.prototype.asc_pluginsRegister   = function(basePath, plugins)
 	{
 		if (null != this.pluginsManager)
@@ -1879,6 +1914,12 @@
 			return window["AscDesktopEditor"]["IsSignaturesSupport"]();
 		return false;
 	};
+    baseEditorsApi.prototype.asc_isProtectionSupport = function()
+    {
+        if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsProtectionSupport"])
+            return window["AscDesktopEditor"]["IsProtectionSupport"]();
+        return false;
+    };
 
 	baseEditorsApi.prototype.asc_gotoSignature = function(guid)
 	{

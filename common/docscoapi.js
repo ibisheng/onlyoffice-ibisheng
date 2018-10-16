@@ -835,10 +835,10 @@
   };
 
   DocsCoApi.prototype._reSaveChanges = function() {
-    this.saveChanges(this.arrayChanges, this.currentIndex);
+    this.saveChanges(this.arrayChanges, this.currentIndex, undefined, undefined, true);
   };
 
-  DocsCoApi.prototype.saveChanges = function(arrayChanges, currentIndex, deleteIndex, excelAdditionalInfo) {
+  DocsCoApi.prototype.saveChanges = function(arrayChanges, currentIndex, deleteIndex, excelAdditionalInfo, reSave) {
     if (null === currentIndex) {
       this.deleteIndex = deleteIndex;
       if (null != this.deleteIndex && -1 !== this.deleteIndex) {
@@ -874,7 +874,7 @@
       'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
       'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
       'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null,
-        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks});
+        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks, 'reSave': reSave});
   };
 
   DocsCoApi.prototype.unLockDocument = function(isSave, deleteIndex) {
@@ -1077,14 +1077,14 @@
             if (this._locks[blockTmp] && 1 !== this._locks[blockTmp].state /*asked for it*/) {
               //Exists
               //Check lock state
-              changed = !(this._locks[blockTmp].state === (lock["sessionId"] === this._id ? 2 : 3) && this._locks[blockTmp]["user"] === lock["user"] && this._locks[blockTmp]["time"] === lock["time"] && this._locks[blockTmp]["block"] === blockTmp);
+              changed = !(this._locks[blockTmp].state === (lock["user"] === this._userId ? 2 : 3) && this._locks[blockTmp]["user"] === lock["user"] && this._locks[blockTmp]["time"] === lock["time"] && this._locks[blockTmp]["block"] === blockTmp);
             }
 
             if (changed) {
-              this._locks[blockTmp] = {"state": lock["sessionId"] === this._id ? 2 : 3, "user": lock["user"], "time": lock["time"], "block": blockTmp, "blockValue": blockValue};//2-acquired by me!
+              this._locks[blockTmp] = {"state": lock["user"] === this._userId ? 2 : 3, "user": lock["user"], "time": lock["time"], "block": blockTmp, "blockValue": blockValue};//2-acquired by me!
             }
             if (this._lockCallbacks.hasOwnProperty(blockTmp)) {
-              if (lock["sessionId"] === this._id) {
+              if (lock["user"] === this._userId) {
                 //Do call back
                 this._lockCallbacks[blockTmp]({"lock": this._locks[blockTmp]});
               } else {
@@ -1295,7 +1295,7 @@
           if (lock !== null && lock["block"]) {
             //Find in previous
             for (i = 0; i < previousLocks.length; i++) {
-              if (previousLocks[i] === lock["block"] && lock["sessionId"] === this._id) {
+              if (previousLocks[i] === lock["block"] && lock["user"] === this._userId) {
                 //Lock is ours
                 previousLocks.remove(i);
                 break;
@@ -1745,29 +1745,29 @@
 		}
 	};
 	DocsCoApi.prototype._onServerClose = function (evt) {
-		// if (ConnectionState.SaveChanges === this._state) {
-		// 	// Мы сохраняли изменения и разорвалось соединение
-		// 	this._isReSaveAfterAuth = true;
-		// 	// Очищаем предыдущий таймер
-		// 	if (null !== this.saveCallbackErrorTimeOutId) {
-		// 		clearTimeout(this.saveCallbackErrorTimeOutId);
-		// 	}
-		// }
+		if (ConnectionState.SaveChanges === this._state) {
+			// Мы сохраняли изменения и разорвалось соединение
+			this._isReSaveAfterAuth = true;
+			// Очищаем предыдущий таймер
+			if (null !== this.saveCallbackErrorTimeOutId) {
+				clearTimeout(this.saveCallbackErrorTimeOutId);
+			}
+		}
 		this._state = ConnectionState.Reconnect;
-		// var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
-		// 	this.attemptCount >= this.maxAttemptCount);
-		// var error = null;
-		// if (bIsDisconnectAtAll) {
-		// 	this._state = ConnectionState.ClosedAll;
-		// 	error = this._getDisconnectErrorCode(evt.code);
-		// }
-		// if (this.onDisconnect) {
-		// 	this.onDisconnect(evt.reason, error);
-		// }
-		// //Try reconect
-		// if (!bIsDisconnectAtAll) {
-		// 	this._tryReconnect();
-		// }
+		var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
+			this.attemptCount >= this.maxAttemptCount);
+		var error = null;
+		if (bIsDisconnectAtAll) {
+			this._state = ConnectionState.ClosedAll;
+			error = this._getDisconnectErrorCode(evt.code);
+		}
+		if (this.onDisconnect) {
+			this.onDisconnect(evt.reason, error);
+		}
+		//Try reconect
+		if (!bIsDisconnectAtAll) {
+			this._tryReconnect();
+		}
 	};
 	DocsCoApi.prototype._reconnect = function () {
 		delete this.sockjs;

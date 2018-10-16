@@ -16627,10 +16627,14 @@ function tt_cmap13_class_rec()
 		if (isSafariAppleDevices)
 			return 0;
 
-        var data = cmap.data;
-        data.pos += 8;
-        cmap_info.language = FT_PEEK_ULONG(data);
-        data.pos -= 8;
+        try {
+            var data = cmap.data;
+            data.pos += 8;
+            cmap_info.language = FT_PEEK_ULONG(data);
+            data.pos -= 8;
+        } catch (e) {
+            console.log("warring:" + e);
+        }
         return 0;
     }
 }
@@ -36170,6 +36174,8 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
 
                     zone++;
                     zones[zone].base = dublicate_pointer(decoder.locals[idx]);
+                    if (zones[zone].base == null)
+                        return 3;
                     zones[zone].limit = (decoder.locals[idx + 1] != null) ? decoder.locals[idx + 1].pos : zones[zone].base.pos;
                     zones[zone].cursor = 0;
 

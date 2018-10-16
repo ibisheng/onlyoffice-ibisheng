@@ -125,7 +125,9 @@
 				this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
 
 				setTimeout(function(){
-					g_clipboardBase.EndFocus();
+					//вызываю CommonDiv_End, поскольку на _private_onbeforecopy всегда делается CommonDiv_Start
+					//TODO перепроверить!
+					g_clipboardBase.CommonDiv_End();
 				}, 0);
 
 				e.preventDefault();
@@ -156,7 +158,9 @@
 			if (!this.IsNeedDivOnCopy)
 			{
 				setTimeout(function(){
-					g_clipboardBase.EndFocus();
+					//вызываю CommonDiv_End, поскольку на _private_onbeforecopy всегда делается CommonDiv_Start
+					//TODO перепроверить!
+					g_clipboardBase.CommonDiv_End();
 				}, 0);
 
 				e.preventDefault();

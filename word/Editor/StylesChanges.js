@@ -65,6 +65,7 @@ AscDFH.changesFactory[AscDFH.historyitem_Style_Hidden]          = CChangesStyleH
 AscDFH.changesFactory[AscDFH.historyitem_Style_SemiHidden]      = CChangesStyleSemiHidden;
 AscDFH.changesFactory[AscDFH.historyitem_Style_UnhideWhenUsed]  = CChangesStyleUnhideWhenUsed;
 AscDFH.changesFactory[AscDFH.historyitem_Style_Link]            = CChangesStyleLink;
+AscDFH.changesFactory[AscDFH.historyitem_Style_Custom]          = CChangesStyleCustom;
 
 AscDFH.changesFactory[AscDFH.historyitem_Styles_Add]                              = CChangesStylesAdd;
 AscDFH.changesFactory[AscDFH.historyitem_Styles_Remove]                           = CChangesStylesRemove;
@@ -883,6 +884,21 @@ CChangesStyleLink.prototype.private_SetValue = function(Value)
 	this.Class.Link = Value;
 };
 
+/**
+ * @constructor
+ * @extends {CChangesStyleBaseBoolProperty}
+ */
+function CChangesStyleCustom(Class, Old, New)
+{
+	CChangesStyleBaseBoolProperty.call(this, Class, Old, New);
+}
+CChangesStyleCustom.prototype = Object.create(CChangesStyleBaseBoolProperty.prototype);
+CChangesStyleCustom.prototype.constructor = CChangesStyleCustom;
+CChangesStyleCustom.prototype.Type = AscDFH.historyitem_Style_Custom;
+CChangesStyleCustom.prototype.private_SetValue = function(Value)
+{
+	this.Class.Custom = Value;
+};
 
 /**
  * @constructor

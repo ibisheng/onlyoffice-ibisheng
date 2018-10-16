@@ -72,9 +72,7 @@
 		this.rule = rule;
 	}
 	CConditionalFormattingFormulaWrapper.prototype.onFormulaEvent = function(type, eventData) {
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
+		if (AscCommon.c_oNotifyParentType.IsDefName === type) {
 			return {bbox: this.rule.getBBox(), ranges: this.rule.ranges};
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.ws.setDirtyConditionalFormatting(new AscCommonExcel.MultiplyRange(this.rule.ranges));
@@ -133,7 +131,7 @@
 	};
 	CConditionalFormattingRule.prototype.getTimePeriod = function() {
 		var start, end;
-		var now = new Date();
+		var now = new Asc.cDate();
 		now.setUTCHours(0, 0, 0, 0);
 		switch (this.timePeriod) {
 			case AscCommonExcel.ST_TimePeriod.last7Days:

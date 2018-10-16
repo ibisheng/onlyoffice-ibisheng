@@ -321,6 +321,7 @@ CGraphicObjects.prototype =
     },
 
 	getDefaultText: DrawingObjectsController.prototype.getDefaultText,
+    canEdit: DrawingObjectsController.prototype.canEdit,
     createImage: DrawingObjectsController.prototype.createImage,
     createOleObject: DrawingObjectsController.prototype.createOleObject,
     createTextArt: DrawingObjectsController.prototype.createTextArt,
@@ -328,14 +329,6 @@ CGraphicObjects.prototype =
     getChartSpace2: DrawingObjectsController.prototype.getChartSpace2,
     CreateDocContent: DrawingObjectsController.prototype.CreateDocContent,
 
-    getAllBoundsRectOnPageForMath: function(nPageIndex)
-    {
-        if(this.graphicPages[nPageIndex])
-        {
-            return this.graphicPages[nPageIndex].getAllBoundsRectOnPageForMath();
-        }
-        return [];
-    },
 
 
     clearPreTrackObjects: function()
@@ -996,10 +989,18 @@ CGraphicObjects.prototype =
         }
     },
 
+    getCompatibilityMode: function(){
+        var ret = 0xFF;
+        if(this.document && this.document.GetCompatibilityMode){
+            ret = this.document.GetCompatibilityMode();
+        }
+        return ret;
+    },
 
 
     mergeDrawings: function(pageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables)
     {
+        var nCompatibilityMode = this.getCompatibilityMode();
         if(!this.graphicPages[pageIndex])
         {
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
@@ -1046,32 +1047,20 @@ CGraphicObjects.prototype =
         hdr_ftr_page.clear();
         for(i = 0; i < drawings.length; ++i)
         {
-            var array_type = drawings[i].getDrawingArrayType();
-            if(!drawings[i].bNoNeedToAdd && drawings[i].PageNum === pageIndex)
+
+            var cur_drawing = drawings[i];
+            if(!cur_drawing.bNoNeedToAdd && cur_drawing.PageNum === pageIndex)
             {
                 var drawing_array = null;
-                switch(array_type)
-                {
-                    case DRAWING_ARRAY_TYPE_INLINE:
-                    {
-                        drawing_array = hdr_ftr_page.inlineObjects;
-                        break;
-                    }
-                    case DRAWING_ARRAY_TYPE_BEHIND:
-                    {
-                        drawing_array  = hdr_ftr_page.behindDocObjects;
-                        break;
-                    }
-                    case DRAWING_ARRAY_TYPE_BEFORE:
-                    {
-                        drawing_array = hdr_ftr_page.beforeTextObjects;
-                        break;
-                    }
-                    case DRAWING_ARRAY_TYPE_WRAPPING:
-                    {
-                        drawing_array = hdr_ftr_page.wrappingObjects;
-                        break;
-                    }
+
+                if(cur_drawing.Is_Inline()){
+                    drawing_array = hdr_ftr_page.inlineObjects;
+                }
+                else if(cur_drawing.behindDoc === true && (cur_drawing.wrappingType === WRAPPING_TYPE_NONE ||  nCompatibilityMode < document_compatibility_mode_Word15)){
+                    drawing_array = hdr_ftr_page.behindDocObjects;
+                }
+                else{
+                    drawing_array = hdr_ftr_page.beforeTextObjects;
                 }
                 if(Array.isArray(drawing_array))
                 {
@@ -1084,13 +1073,12 @@ CGraphicObjects.prototype =
             hdr_ftr_page.flowTables.push(tables[i]);
         }
         hdr_ftr_page.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
-        hdr_ftr_page.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
         hdr_ftr_page.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
     },
 
     addFloatTable: function(table)
     {
-        var hdr_ftr = table.Table.Parent.Is_HdrFtr(true);
+        var hdr_ftr = table.Table.Parent.IsHdrFtr(true);
         if(!this.graphicPages[table.PageNum + table.PageController])
         {
             this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
@@ -1115,7 +1103,7 @@ CGraphicObjects.prototype =
         var table = g_oTableId.Get_ById(id);
         if(table)
         {
-            var hdr_ftr = table.Parent.Is_HdrFtr(true);
+            var hdr_ftr = table.Parent.IsHdrFtr(true);
             if(!hdr_ftr)
             {
                 this.graphicPages[pageIndex].removeFloatTableById(id);
@@ -1138,7 +1126,7 @@ CGraphicObjects.prototype =
         {
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         }
-        if(!documentContent.Is_HdrFtr())
+        if(!documentContent.IsHdrFtr())
             return this.graphicPages[pageIndex].getTableByXY(x, y, documentContent);
         else
             return this.graphicPages[pageIndex].hdrFtrPage.getTableByXY(x, y, documentContent);
@@ -1252,7 +1240,7 @@ CGraphicObjects.prototype =
         if(!this.graphicPages[pageIndex])
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         var arr, page, i, ret = [];
-        if(!docContent.Is_HdrFtr())
+        if(!docContent.IsHdrFtr())
         {
 
             page = this.graphicPages[pageIndex];
@@ -1261,7 +1249,7 @@ CGraphicObjects.prototype =
         {
             page = this.graphicPages[pageIndex].hdrFtrPage;
         }
-        arr = page.wrappingObjects.concat(page.behindDocObjects.concat(page.beforeTextObjects));
+        arr = page.behindDocObjects.concat(page.beforeTextObjects);
         for(i = 0; i < arr.length; ++i)
         {
             if(arr[i].parent && arr[i].parent.DocumentContent === docContent)
@@ -1282,7 +1270,7 @@ CGraphicObjects.prototype =
         }
 
         var tables, page;
-        if(!docContent.Is_HdrFtr())
+        if(!docContent.IsHdrFtr())
         {
 
             page = this.graphicPages[pageIndex];
@@ -1305,6 +1293,7 @@ CGraphicObjects.prototype =
     getTextArtPreviewManager: DrawingObjectsController.prototype.getTextArtPreviewManager,
     getEditorApi: DrawingObjectsController.prototype.getEditorApi,
     resetConnectors: DrawingObjectsController.prototype.resetConnectors,
+    checkDlblsPosition: DrawingObjectsController.prototype.checkDlblsPosition,
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {
@@ -1328,7 +1317,7 @@ CGraphicObjects.prototype =
 		if(drawing && drawing.ParaMath){
 			drawing.Convert_ToMathObject();
 		}
-        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
+        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props) || !this.document.CanEdit())
         {
             var pluginData = new Asc.CPluginData();
             pluginData.setAttribute("data", oleObject.m_sData);
@@ -1614,6 +1603,7 @@ CGraphicObjects.prototype =
                     {
                         drawing.Set_Distance(selectedObjects[i].parent.Distance.L, selectedObjects[i].parent.Distance.T, selectedObjects[i].parent.Distance.R, selectedObjects[i].parent.Distance.B);
                         drawing.Set_WrappingType(selectedObjects[i].parent.wrappingType);
+                        drawing.Set_BehindDoc(selectedObjects[i].parent.behindDoc);
                         if(selectedObjects[i].parent.wrappingPolygon && drawing.wrappingPolygon)
                         {
                             drawing.wrappingPolygon.fromOther(selectedObjects[i].parent.wrappingPolygon);
@@ -1664,7 +1654,7 @@ CGraphicObjects.prototype =
 
     resetDrawingArrays : function(pageIndex, docContent)
     {
-        var hdr_ftr = docContent.Is_HdrFtr(true);
+        var hdr_ftr = docContent.IsHdrFtr(true);
         if(!hdr_ftr)
         {
             if(isRealObject(this.graphicPages[pageIndex]))
@@ -1794,89 +1784,21 @@ CGraphicObjects.prototype =
             if(parent_para)
             {
                 ParaPr = parent_para.Get_CompiledPr2(true).ParaPr;
-                if(ParaPr)
+                if (ParaPr)
                 {
-
-
                     var NumType    = -1;
                     var NumSubType = -1;
-                    if ( !(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId) )
+
+                    var oNumPr = parent_para.GetNumPr();
+                    if (oNumPr && oNumPr.IsValid())
                     {
-                        var Numb = this.document.Numbering.Get_AbstractNum( ParaPr.NumPr.NumId );
-
-                        if ( undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl] )
+                    	var oNum = this.document.GetNumbering().GetNum(oNumPr.NumId);
+                        if (oNum && oNum.GetLvl(oNumPr.Lvl))
                         {
-                            var Lvl = Numb.Lvl[ParaPr.NumPr.Lvl];
-                            var NumFormat = Lvl.Format;
-                            var NumText   = Lvl.LvlText;
+                            var oInfo = oNum.GetLvl(oNumPr.Lvl).GetPresetType();
 
-                            if ( numbering_numfmt_Bullet === NumFormat )
-                            {
-                                NumType    = 0;
-                                NumSubType = 0;
-
-                                var TextLen = NumText.length;
-                                if ( 1 === TextLen && numbering_lvltext_Text === NumText[0].Type )
-                                {
-                                    var NumVal = NumText[0].Value.charCodeAt(0);
-
-                                    if ( 0x00B7 === NumVal )
-                                        NumSubType = 1;
-                                    else if ( 0x006F === NumVal )
-                                        NumSubType = 2;
-                                    else if ( 0x00A7 === NumVal )
-                                        NumSubType = 3;
-                                    else if ( 0x0076 === NumVal )
-                                        NumSubType = 4;
-                                    else if ( 0x00D8 === NumVal )
-                                        NumSubType = 5;
-                                    else if ( 0x00FC === NumVal )
-                                        NumSubType = 6;
-                                    else if ( 0x00A8 === NumVal )
-                                        NumSubType = 7;
-                                }
-                            }
-                            else
-                            {
-                                NumType    = 1;
-                                NumSubType = 0;
-
-                                var TextLen = NumText.length;
-                                if ( 2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type )
-                                {
-                                    var NumVal2 = NumText[1].Value;
-
-                                    if ( numbering_numfmt_Decimal === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 1;
-                                        else if ( ")" === NumVal2 )
-                                            NumSubType = 2;
-                                    }
-                                    else if ( numbering_numfmt_UpperRoman === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 3;
-                                    }
-                                    else if ( numbering_numfmt_UpperLetter === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 4;
-                                    }
-                                    else if ( numbering_numfmt_LowerLetter === NumFormat )
-                                    {
-                                        if ( ")" === NumVal2 )
-                                            NumSubType = 5;
-                                        else if ( "." === NumVal2 )
-                                            NumSubType = 6;
-                                    }
-                                    else if ( numbering_numfmt_LowerRoman === NumFormat )
-                                    {
-                                        if ( "." === NumVal2 )
-                                            NumSubType = 7;
-                                    }
-                                }
-                            }
+                            NumType    = oInfo.Type;
+                            NumSubType = oInfo.SubType;
                         }
                     }
 
@@ -2104,7 +2026,7 @@ CGraphicObjects.prototype =
         {
             graphic_page = this.graphicPages[pageIndex];
         }
-        return graphic_page? graphic_page.behindDocObjects.concat(graphic_page.wrappingObjects.concat(graphic_page.inlineObjects.concat(graphic_page.beforeTextObjects))) : [];
+        return graphic_page? graphic_page.behindDocObjects.concat(graphic_page.inlineObjects.concat(graphic_page.beforeTextObjects)) : [];
     },
 
     selectNextObject: DrawingObjectsController.prototype.selectNextObject,
@@ -2359,20 +2281,10 @@ CGraphicObjects.prototype =
         }
     },
 
-    drawWrappingObjects: function(pageIndex, graphics)
-    {
-        if(this.graphicPages[pageIndex])
-        {
-            graphics.shapePageIndex = pageIndex;
-            this.graphicPages[pageIndex].drawWrappingObjects(graphics);
-            graphics.shapePageIndex = null;
-        }
-    },
-
-    drawWrappingObjectsInContent: function(pageIndex, graphics, content)
+    drawBehindObjectsByContent: function(pageIndex, graphics, content)
     {
         var page;
-        if(content.Is_HdrFtr())
+        if(content.IsHdrFtr())
         {
             page = this.getHdrFtrObjectsByPageIndex(pageIndex);
         }
@@ -2380,7 +2292,21 @@ CGraphicObjects.prototype =
         {
             page = this.graphicPages[pageIndex];
         }
-        page && page.drawWrappingObjectsByContent(graphics, content)
+        page && page.drawBehindObjectsByContent(graphics, content)
+    },
+
+    drawBeforeObjectsByContent: function(pageIndex, graphics, content)
+    {
+        var page;
+        if(content.IsHdrFtr())
+        {
+            page = this.getHdrFtrObjectsByPageIndex(pageIndex);
+        }
+        else
+        {
+            page = this.graphicPages[pageIndex];
+        }
+        page && page.drawBeforeObjectsByContent(graphics, content)
     },
 
 
@@ -2416,20 +2342,6 @@ CGraphicObjects.prototype =
         graphics.shapePageIndex = null;
     },
 
-    drawWrappingObjectsHdrFtr: function(pageIndex, graphics)
-    {
-        graphics.shapePageIndex = pageIndex;
-        var hdr_footer_objects = this.getHdrFtrObjectsByPageIndex(pageIndex);
-        if(hdr_footer_objects != null)
-        {
-            var wrap_arr = hdr_footer_objects.wrappingObjects;
-            for(var i = 0; i < wrap_arr.length; ++i)
-            {
-                wrap_arr[i].draw(graphics);
-            }
-        }
-        graphics.shapePageIndex = null;
-    },
 
     drawBeforeObjectsHdrFtr: function(pageIndex, graphics)
     {
@@ -2539,7 +2451,7 @@ CGraphicObjects.prototype =
 
     addObjectOnPage: function(pageIndex, object)
     {
-        var hdr_ftr = object.parent.DocumentContent.Is_HdrFtr(true);
+        var hdr_ftr = object.parent.DocumentContent.IsHdrFtr(true);
         if(!hdr_ftr)
         {
             if(!this.graphicPages[pageIndex])
@@ -2740,6 +2652,7 @@ CGraphicObjects.prototype =
                     sp.setParent(drawing);
                     drawing.Set_DrawingType(drawing_Anchor);
                     drawing.Set_WrappingType(cur_group.parent.wrappingType);
+                    drawing.Set_BehindDoc(cur_group.parent.behindDoc);
                     drawing.CheckWH();
                     sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(sp.rot + cur_group.rot));
                     sp.spPr.xfrm.setOffX(0);
@@ -3232,12 +3145,16 @@ CGraphicObjects.prototype =
     {
         if(this.canChangeWrapPolygon())
         {
-            if(this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_THROUGH && this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_TIGHT)
+            var bNeedBehindDoc = this.getCompatibilityMode() < document_compatibility_mode_Word15;
+            if(this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_THROUGH
+                || this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_TIGHT
+            || this.selectedObjects[0].parent.behindDoc !== bNeedBehindDoc)
             {
                 if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : AscCommon.changestype_2_Element_and_Type , Element : this.selectedObjects[0].parent.Get_ParentParagraph(), CheckType : AscCommon.changestype_Paragraph_Content} ))
                 {
                     History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsChangeWrapPolygon);
                     this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);
+                    this.selectedObjects[0].parent.Set_BehindDoc(bNeedBehindDoc);
                     this.selectedObjects[0].parent.Check_WrapPolygon();
                     this.document.Recalculate();
                     this.document.Document_UpdateInterfaceState();
@@ -3255,31 +3172,15 @@ CGraphicObjects.prototype =
         var object = g_oTableId.Get_ById(id);
         if(isRealObject(object))
         {
-            var hdr_ftr = object.DocumentContent.Is_HdrFtr(true);
+            var hdr_ftr = object.DocumentContent.IsHdrFtr(true);
             var page = !hdr_ftr ? this.graphicPages[pageIndex] : null;
             if(isRealObject(page))
             {
-                var array_type = object.getDrawingArrayType();
-                page.delObjectById(id, array_type);
+                page.delObjectById(id);
             }
         }
     },
 
-    removeFromAllHdrFtrPages: function(id, drawingType)
-    {
-        for(var i = 0; i < this.graphicPages.length; ++i)
-        {
-            this.removeFromHdrFrtPage(i, id, drawingType);
-        }
-    },
-
-    removeFromHdrFrtPage: function(pageIndex, id, drawingType)
-    {
-        if(this.graphicPages[pageIndex] && this.graphicPages[pageIndex].hdrFtrPage)
-        {
-            this.graphicPages[pageIndex].hdrFtrPage.delObjectById(id, drawingType);
-        }
-    },
 
     Remove_ById: function(id)
     {
@@ -3296,7 +3197,7 @@ CGraphicObjects.prototype =
         var obj = g_oTableId.Get_ById(id), nPageIndex = pageIndex;
         if(obj && obj.GraphicObj)
         {
-            if(obj.DocumentContent && obj.DocumentContent.Is_HdrFtr())
+            if(obj.DocumentContent && obj.DocumentContent.IsHdrFtr())
             {
                 if(obj.DocumentContent.Get_StartPage_Absolute() !== obj.PageNum)
                 {
@@ -3373,8 +3274,8 @@ CGraphicObjects.prototype =
             var graphic_page = this.graphicPages[pageIndex];
             var hdr_ftr_page = this.getHdrFtrObjectsByPageIndex(pageIndex);
 
-            var graphic_array = graphic_page.beforeTextObjects.concat(graphic_page.wrappingObjects).concat(graphic_page.inlineObjects).concat(graphic_page.behindDocObjects);
-            graphic_array = graphic_array.concat(hdr_ftr_page.beforeTextObjects).concat(hdr_ftr_page.wrappingObjects).concat(hdr_ftr_page.inlineObjects).concat(hdr_ftr_page.behindDocObjects);
+            var graphic_array = graphic_page.beforeTextObjects.concat(graphic_page.inlineObjects).concat(graphic_page.behindDocObjects);
+            graphic_array = graphic_array.concat(hdr_ftr_page.beforeTextObjects).concat(hdr_ftr_page.inlineObjects).concat(hdr_ftr_page.behindDocObjects);
             for(var i = 0; i < graphic_array.length; ++i)
             {
                 if(graphic_array[i].getAllRasterImages)
@@ -3391,9 +3292,9 @@ CGraphicObjects.prototype =
     addNewParagraph: DrawingObjectsController.prototype.addNewParagraph,
 
 
-    paragraphClearFormatting: function()
+    paragraphClearFormatting: function(isClearParaPr, isClearTextPr)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [isClearParaPr, isClearTextPr], CTable.prototype.ClearParagraphFormatting);
     },
 
     applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,
@@ -3494,11 +3395,6 @@ CGraphicObjects.prototype =
                 return oRes;
             }
             oRes = this.getLeftTopSelectedFromArray(oDrawingPage.inlineObjects, pageIndex);
-            if(oRes.bSelected)
-            {
-                return oRes;
-            }
-            oRes = this.getLeftTopSelectedFromArray(oDrawingPage.wrappingObjects, pageIndex);
             if(oRes.bSelected)
             {
                 return oRes;

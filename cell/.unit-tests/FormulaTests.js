@@ -32,8 +32,10 @@
 
 $( function () {
 
+	var cDate = Asc.cDate;
+
     function toFixed( n ) {
-        return n//.toFixed( AscCommonExcel.cExcelSignificantDigits ) - 0;
+        return n;//.toFixed( AscCommonExcel.cExcelSignificantDigits ) - 0;
     }
 
     function difBetween( a, b ) {
@@ -161,7 +163,7 @@ $( function () {
                 return Math.abs( GetDiffDate360( date1, month1, year1, date2, month2, year2, true ) ) / 360;
             case 1:
                 var yc = /*Math.abs*/( year2 - year1 ),
-                    sd = year1 > year2 ? new Date(d2) : new Date(d1),
+                    sd = year1 > year2 ? new cDate(d2) : new cDate(d1),
                     yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = /*Math.abs*/( d2 - d1 );
                 for ( var i = 0; i < yc; i++ ) {
                     sd.addYears( 1 );
@@ -210,7 +212,7 @@ $( function () {
 
     function _getcoupdays( settl, matur, frequency, basis ) {
         _lcl_GetCouppcd( settl, matur, frequency );
-        var n = new Date( matur )
+        var n = new cDate( matur );
         n.addMonths( 12 / frequency );
         return _diffDate( matur, n, basis );
     }
@@ -225,7 +227,7 @@ $( function () {
             d1 = n;
         }
 
-        var nRet,pOptDaysIn1stYear
+        var nRet,pOptDaysIn1stYear;
 
         var nD1 = d1.getDate(),
             nM1 = d1.getMonth(),
@@ -239,7 +241,7 @@ $( function () {
             case 0:			// 0=USA (NASD) 30/360
             case 4:			// 4=Europe 30/360
             {
-                var bLeap = d1.isLeapYear()
+                var bLeap = d1.isLeapYear();
                 var nDays, nMonths/*, nYears*/;
 
                 nMonths = nM2 - nM1;
@@ -273,9 +275,9 @@ $( function () {
 
     function _getprice( nSettle, nMat, fRate, fYield, fRedemp, nFreq, nBase ){
 
-        var fdays = AscCommonExcel.getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase ),
-            fdaybs = AscCommonExcel.getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase ),
-            fnum = AscCommonExcel.getcoupnum( new Date(nSettle), (nMat), nFreq, nBase ),
+        var fdays = AscCommonExcel.getcoupdays( new cDate(nSettle), new cDate(nMat), nFreq, nBase ),
+            fdaybs = AscCommonExcel.getcoupdaybs( new cDate(nSettle), new cDate(nMat), nFreq, nBase ),
+            fnum = AscCommonExcel.getcoupnum( new cDate(nSettle), (nMat), nFreq, nBase ),
             fdaysnc = ( fdays - fdaybs ) / fdays,
             fT1 = 100 * fRate / nFreq,
             fT2 = 1 + fYield / nFreq,
@@ -371,7 +373,7 @@ $( function () {
 
         basis = ( basis !== undefined ? basis : 0 );
 
-        var n = new Date(maturity);
+        var n = new cDate(maturity);
         _lcl_GetCouppcd( settlement, n, frequency );
         var nMonths = (maturity.getFullYear() - n.getFullYear()) * 12 + maturity.getMonth() - n.getMonth();
         return nMonths * frequency / 12 ;
@@ -379,9 +381,9 @@ $( function () {
     }
 
     function _duration( settlement, maturity, coupon, yld, frequency, basis ){
-        var dbc = AscCommonExcel.getcoupdaybs(new Date( settlement ),new Date( maturity ),frequency,basis),
-            coupD = AscCommonExcel.getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
-            numCoup = AscCommonExcel.getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
+        var dbc = AscCommonExcel.getcoupdaybs(new cDate( settlement ),new cDate( maturity ),frequency,basis),
+            coupD = AscCommonExcel.getcoupdays(new cDate( settlement ),new cDate( maturity ),frequency,basis),
+            numCoup = AscCommonExcel.getcoupnum(new cDate( settlement ),new cDate( maturity ),frequency);
 
         if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
             return "#NUM!";
@@ -790,6 +792,25 @@ $( function () {
 		oParser = new parserFormula( 'SECH("test")', "A1", ws );
 		ok( oParser.parse(), 'SECH("test")' );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!", 'SECH("test")' );
+	} );
+
+	test( "Test: \"SECOND\"", function () {
+
+		ws.getRange2( "A202" ).setValue( "12:45:03 PM" );
+		ws.getRange2( "A203" ).setValue( "4:48:18 PM" );
+		ws.getRange2( "A204" ).setValue( "4:48 PM" );
+
+		oParser = new parserFormula( "SECOND(A202)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "SECOND(A203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "SECOND(A204)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 	} );
 
 	test( "Test: \"FLOOR.PRECISE\"", function () {
@@ -1852,7 +1873,7 @@ $( function () {
     test( "Test: MONTH #3", function () {
         oParser = new parserFormula( "MONTH(NOW())", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), new Date().getUTCMonth() + 1 );
+        strictEqual( oParser.calculate().getValue(), new cDate().getUTCMonth() + 1 );
     } );
 
     test( "Test: \"10-3\"", function () {
@@ -2296,7 +2317,7 @@ $( function () {
         tmp.setValue( "3-Mar" );
         oParser = new parserFormula( "DATEVALUE(A7)", "A2", ws );
         ok( oParser.parse() );
-        var d = new Date();
+        var d = new cDate();
         d.setUTCMonth(2);
         d.setUTCDate(3);
         strictEqual( oParser.calculate().getValue(), d.getExcelDate() );
@@ -2586,6 +2607,13 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 30 );
 
+		oParser = new parserFormula( "SUMIFS(D:D,E:E,$H2)", "A11", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( "SUMIFS(C:D,E:E,$H2)", "A11", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
     } );
 
 	test( "Test: \"MAXIFS\"", function () {
@@ -2768,6 +2796,49 @@ $( function () {
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 43010);
 
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),1,{\"5-1-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43222);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),2,{\"5-1-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43224);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),3,{\"5-1-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43227);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),1,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43224);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,30),3,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43228);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),1,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43220);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),2,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43224);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),3,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43227);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),-1,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43217);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),-2,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43216);
+
+		oParser = new parserFormula("WORKDAY(DATE(2018,4,29),0,{\"5-1-2018\", \"5-2-2018\",\"5-3-2018\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43219);
 	});
 
 	test( "Test: \"WORKDAY.INTL\"", function () {
@@ -3100,6 +3171,11 @@ $( function () {
         ws.getRange2( "P45" ).setValue( "10" );
         ws.getRange2( "P46" ).setValue( "11" );
         ws.getRange2( "P47" ).setValue( "12" );
+		ws.getRange2( "P48" ).setValue( "" );
+		ws.getRange2( "P49" ).setValue( "" );
+		ws.getRange2( "N48" ).setValue( "0.456" );
+		ws.getRange2( "O48" ).setValue( "0.123212" );
+
         oParser = new parserFormula( "SUMPRODUCT(N44:N47,O44:O47,P44:P47)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 780 );
@@ -3111,6 +3187,30 @@ $( function () {
 		oParser = new parserFormula( "SUMPRODUCT(SUM(N44:N47*O44:O47))", "A2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 70 );
+
+		oParser = new parserFormula( "SUMPRODUCT({1,2,TRUE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT({1,2,FALSE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT({TRUE,TRUE,FALSE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48, P44:P47)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48:P49)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 
 		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:N47*O44:O47))", "A2", ws );
 		ok( oParser.parse() );
@@ -3128,6 +3228,58 @@ $( function () {
 		ok( oParser.parse() );
 		ok( oParser.assemble() == "SUM(SUMPRODUCT(N44:O47))" );
 		strictEqual( oParser.calculate().getValue(), 36 );
+
+		oParser = new parserFormula( "SUMPRODUCT(YEAR(N45:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 11400 );
+
+		oParser = new parserFormula( "SUMPRODUCT(MONTH(N45:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT(DAY(N45:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "SUMPRODUCT(HOUR(N45:P48))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 12 );
+
+		oParser = new parserFormula( "SUMPRODUCT(MINUTE(N45:P48))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 113 );
+
+		oParser = new parserFormula( "SUMPRODUCT(SECOND(N45:P48))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 64 );
+
+		oParser = new parserFormula( "SUMPRODUCT(DAY(N44:P49))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 78 );
+
+		oParser = new parserFormula( "SUMPRODUCT(MONTH(N44:P49))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "SUMPRODUCT(YEAR(N44:P49))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 34200 );
+
+		oParser = new parserFormula( "SUMPRODUCT(({1,2,3})*({TRUE,TRUE,TRUE}))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT(({1,2,3})*({TRUE;TRUE;TRUE;TRUE}))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 24 );
+
+		oParser = new parserFormula( "SUMPRODUCT({TRUE,TRUE,FALSE})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( "SUMPRODUCT({1,2,3,3,TRUE})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 9 );
     } );
 
     test( "Test: \"SINH\"", function () {
@@ -3356,7 +3508,43 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -3.14 );
 
-    } );
+		oParser = new parserFormula( "TRUNC(8.9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 8 );
+
+		oParser = new parserFormula( "TRUNC(-8.9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), -8 );
+
+		oParser = new parserFormula( "TRUNC(0.45)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+
+		oParser = new parserFormula( "TRUNC(43214)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 43214 );
+
+		oParser = new parserFormula( "TRUNC(43214, 10)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 43214 );
+
+		oParser = new parserFormula( "TRUNC(43214, -2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 43200 );
+
+		oParser = new parserFormula( "TRUNC(43214, -10)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( "TRUNC(34123.123, -2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 34100 );
+
+		oParser = new parserFormula( "TRUNC(123.23423,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 123.2 );
+	} );
 
     test( "Test: \"MULTINOMIAL\"", function () {
         oParser = new parserFormula( "MULTINOMIAL(2,3,4)", "A1", ws );
@@ -4121,6 +4309,29 @@ $( function () {
 		wb.dependencyFormulas.lockRecal();
 	} );
 
+	test( "Test: \"COUNTBLANK\"", function () {
+
+		ws.getRange2( "A22" ).setValue( "6" );
+		ws.getRange2( "A23" ).setValue( "" );
+		ws.getRange2( "A24" ).setValue( "4" );
+
+		ws.getRange2( "B22" ).setValue( "" );
+		ws.getRange2( "B23" ).setValue( "27" );
+		ws.getRange2( "B24" ).setValue( "34" );
+
+		oParser = new parserFormula( "COUNTBLANK(A22:B24)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTBLANK(A22)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( "COUNTBLANK(A23)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+	} );
+
     test( "Test: \"COVAR\"", function () {
 
         oParser = new parserFormula( "COVAR({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,6.7})", "A1", ws );
@@ -4652,6 +4863,10 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "=1+1" );
 
+		oParser = new parserFormula( "FORMULATEXT(#REF!)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#REF!" );
+
 		wb.dependencyFormulas.lockRecal();
 	} );
 
@@ -4803,6 +5018,25 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue() - 0, 0.5);
 
+	} );
+
+	test( "Test: \"HOUR\"", function () {
+
+		ws.getRange2( "A202" ).setValue( "0.75" );
+		ws.getRange2( "A203" ).setValue( "7/18/2011 7:45" );
+		ws.getRange2( "A204" ).setValue( "4/21/2012" );
+
+		oParser = new parserFormula( "HOUR(A202)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "HOUR(A203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 7 );
+
+		oParser = new parserFormula( "HOUR(A204)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 	} );
 
     test( "Test: \"INTERCEPT\"", function () {
@@ -6266,6 +6500,22 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "#REF!" );
 
+		oParser = new parserFormula( "INDEX(A651:C651,1,3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 11 );
+
+		oParser = new parserFormula( "INDEX(A651:C651,1,2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 6 );
+
+		oParser = new parserFormula( "INDEX(A651:C651,0,1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 1 );
+
+		oParser = new parserFormula( "INDEX(A651:C651,1,1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().getValue(), 1 );
+
     } );
 
     test( "Test: \"OFFSET\"", function () {
@@ -6294,6 +6544,74 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().toString(), "B1" );
 
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -1, 1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -1, -1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0,,)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, 1,)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -2, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A2:B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, -1, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A3:B3" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, 0, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "#REF!" );
+
+		oParser = new parserFormula( "OFFSET(B3, 0, 0, 2, 0)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "#REF!" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, 2, 2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "C3:D4" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, 3, 3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "C3:E5" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 2, 2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "E5:F6" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4,2,2,3,3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "E5:G7" );
+
+		oParser = new parserFormula( "OFFSET(C3:E6, 0, 0, 3, 3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "C3:E5" );
+
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, -2, -2)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B2:C3" );
+
+		oParser = new parserFormula( "OFFSET(C3:D4, 0, 0, -3, -3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A1:C3" );
+
+		oParser = new parserFormula( "OFFSET(C3:E6, 0, 0, -3, -3)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "A1:C3" );
+
+		oParser = new parserFormula( "OFFSET(F10:M17, 0, 0, -7,-5)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "B4:F10" );
     } );
 
     /*
@@ -6836,7 +7154,7 @@ $( function () {
 
         oParser = new parserFormula( "DISC(DATE(2007,1,25),DATE(2007,6,15),97.975,100,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), disc( new Date(2007,0,25),new Date(2007,5,15),97.975,100,1 ) );
+        strictEqual( oParser.calculate().getValue(), disc( new cDate(2007,0,25),new cDate(2007,5,15),97.975,100,1 ) );
 
     } );
 
@@ -6915,7 +7233,7 @@ $( function () {
 
         oParser = new parserFormula( "RECEIVED(DATE(2008,2,15),DATE(2008,5,15),1000000,0.0575,2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), received( new Date(2008,1,15),new Date(2008,4,15),1000000,0.0575,2 ) );
+        strictEqual( oParser.calculate().getValue(), received( new cDate(2008,1,15),new cDate(2008,4,15),1000000,0.0575,2 ) );
 
     } );
 
@@ -7056,7 +7374,7 @@ $( function () {
 
         oParser = new parserFormula( "INTRATE(DATE(2008,2,15),DATE(2008,5,15),1000000,1014420,2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), intrate( new Date(2008,1,15),new Date(2008,4,15),1000000,1014420,2 ) );
+        strictEqual( oParser.calculate().getValue(), intrate( new cDate(2008,1,15),new cDate(2008,4,15),1000000,1014420,2 ) );
 
     } );
 
@@ -7064,7 +7382,7 @@ $( function () {
 
         function tbilleq( settlement, maturity, discount ){
 
-            maturity = Date.prototype.getDateFromExcel(maturity.getExcelDate() + 1);
+            maturity = cDate.prototype.getDateFromExcel(maturity.getExcelDate() + 1);
 
             var d1 = settlement, d2 = maturity;
             var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
@@ -7081,7 +7399,7 @@ $( function () {
 
         oParser = new parserFormula( "TBILLEQ(DATE(2008,3,31),DATE(2008,6,1),0.0914)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), tbilleq( new Date(Date.UTC(2008,2,31)), new Date(Date.UTC(2008,5,1)), 0.0914 ) );
+        strictEqual( oParser.calculate().getValue(), tbilleq( new cDate(Date.UTC(2008,2,31)), new cDate(Date.UTC(2008,5,1)), 0.0914 ) );
 
     } );
 
@@ -7089,7 +7407,7 @@ $( function () {
 
         function tbillprice( settlement, maturity, discount ){
 
-            maturity = Date.prototype.getDateFromExcel(maturity.getExcelDate() + 1)
+            maturity = cDate.prototype.getDateFromExcel(maturity.getExcelDate() + 1)
 
             var d1 = settlement
             var d2 = maturity
@@ -7105,7 +7423,7 @@ $( function () {
 
         oParser = new parserFormula( "TBILLPRICE(DATE(2008,3,31),DATE(2008,6,1),0.09)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), tbillprice( new Date(Date.UTC(2008,2,31)), new Date(Date.UTC(2008,5,1)), 0.09 ) );
+        strictEqual( oParser.calculate().getValue(), tbillprice( new cDate(Date.UTC(2008,2,31)), new cDate(Date.UTC(2008,5,1)), 0.09 ) );
 
     } );
 
@@ -7129,7 +7447,7 @@ $( function () {
 
         oParser = new parserFormula( "TBILLYIELD(DATE(2008,3,31),DATE(2008,6,1),98.45)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), tbillyield( new Date(2008,2,31), new Date(2008,5,1), 98.45 ) );
+        strictEqual( oParser.calculate().getValue(), tbillyield( new cDate(2008,2,31), new cDate(2008,5,1), 98.45 ) );
 
     } );
 
@@ -7149,7 +7467,7 @@ $( function () {
 
         oParser = new parserFormula( "COUPDAYBS(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupdaybs( new Date(2007,0,25), new Date(2008,10,15), 2 ) );
+        strictEqual( oParser.calculate().getValue(), coupdaybs( new cDate(2007,0,25), new cDate(2008,10,15), 2 ) );
 
     } );
 
@@ -7165,11 +7483,11 @@ $( function () {
 
         oParser = new parserFormula( "COUPDAYS(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupdays( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), coupdays( new cDate(2007,0,25), new cDate(2008,10,15), 2, 1 ) );
 
         oParser = new parserFormula( "COUPDAYS(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupdays( new Date(2007,0,25), new Date(2008,10,15), 2 ) );
+        strictEqual( oParser.calculate().getValue(), coupdays( new cDate(2007,0,25), new cDate(2008,10,15), 2 ) );
 
     } );
 
@@ -7185,7 +7503,7 @@ $( function () {
                 return _diffDate( settlement, maturity, basis );
             }
 
-            return _getcoupdays( new Date( settlement ), new Date( maturity ), frequency, basis ) - _getcoupdaybs( new Date( settlement ), new Date( maturity ), frequency, basis );
+            return _getcoupdays( new cDate( settlement ), new cDate( maturity ), frequency, basis ) - _getcoupdaybs( new cDate( settlement ), new cDate( maturity ), frequency, basis );
 
         }
 
@@ -7195,7 +7513,7 @@ $( function () {
 
         oParser = new parserFormula( "COUPDAYSNC(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupdaysnc( new Date(2007,0,25), new Date(2008,10,15), 2 ) );
+        strictEqual( oParser.calculate().getValue(), coupdaysnc( new cDate(2007,0,25), new cDate(2008,10,15), 2 ) );
 
     } );
 
@@ -7213,7 +7531,7 @@ $( function () {
 
         oParser = new parserFormula( "COUPNCD(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupncd( new Date(Date.UTC(2007,0,25)), new Date(Date.UTC(2008,10,15)), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), coupncd( new cDate(Date.UTC(2007,0,25)), new cDate(Date.UTC(2008,10,15)), 2, 1 ) );
 
     } );
 
@@ -7221,7 +7539,7 @@ $( function () {
 
         oParser = new parserFormula( "COUPNUM(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _coupnum( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), _coupnum( new cDate(2007,0,25), new cDate(2008,10,15), 2, 1 ) );
 
     } );
 
@@ -7238,7 +7556,7 @@ $( function () {
 
         oParser = new parserFormula( "COUPPCD(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), couppcd( new Date(Date.UTC(2007,0,25)), new Date(Date.UTC(2008,10,15)), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), couppcd( new cDate(Date.UTC(2007,0,25)), new cDate(Date.UTC(2008,10,15)), 2, 1 ) );
 
     } );
 
@@ -7338,7 +7656,7 @@ $( function () {
 
 		oParser = new parserFormula( 'CONVERT(1, "lbm", "kg")', "A2", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.4535923 );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.4535924 );
 
 		oParser = new parserFormula( 'CONVERT(1, "lbm", "mg")', "A2", ws );
 		ok( oParser.parse() );
@@ -7354,7 +7672,7 @@ $( function () {
 
         oParser = new parserFormula( "PRICE(DATE(2008,2,15),DATE(2017,11,15),0.0575,0.065,100,2,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _getprice( new Date( Date.UTC(2008, 1, 15 )), new Date( Date.UTC(2017, 10, 15 )), 0.0575, 0.065, 100, 2, 0 ) );
+        strictEqual( oParser.calculate().getValue(), _getprice( new cDate( Date.UTC(2008, 1, 15 )), new cDate( Date.UTC(2017, 10, 15 )), 0.0575, 0.065, 100, 2, 0 ) );
 
     } );
 
@@ -7366,7 +7684,7 @@ $( function () {
 
         oParser = new parserFormula( "PRICEDISC(DATE(2008,2,16),DATE(2008,3,1),0.0525,100,2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), pricedisc( new Date(2008,1,16), new Date(2008,2,1),0.0525,100,2 ) );
+        strictEqual( oParser.calculate().getValue(), pricedisc( new cDate(2008,1,16), new cDate(2008,2,1),0.0525,100,2 ) );
 
     } );
 
@@ -7374,9 +7692,9 @@ $( function () {
 
         function pricemat( settl, matur, iss, rate, yld, basis ) {
 
-            var fIssMat = _yearFrac( new Date(iss), new Date(matur), basis );
-            var fIssSet = _yearFrac( new Date(iss), new Date(settl), basis );
-            var fSetMat = _yearFrac( new Date(settl), new Date(matur), basis );
+            var fIssMat = _yearFrac( new cDate(iss), new cDate(matur), basis );
+            var fIssSet = _yearFrac( new cDate(iss), new cDate(settl), basis );
+            var fSetMat = _yearFrac( new cDate(settl), new cDate(matur), basis );
 
             var res = 1.0 + fIssMat * rate;
             res /= 1.0 + fSetMat * yld;
@@ -7388,7 +7706,7 @@ $( function () {
 
         oParser = new parserFormula( "PRICEMAT(DATE(2008,2,15),DATE(2008,4,13),DATE(2007,11,11),0.061,0.061,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), pricemat( new Date(2008,1,15),new Date(2008,3,13),new Date(2007,10,11),0.061,0.061,0 ) );
+        strictEqual( oParser.calculate().getValue(), pricemat( new cDate(2008,1,15),new cDate(2008,3,13),new cDate(2007,10,11),0.061,0.061,0 ) );
 
     } );
 
@@ -7396,7 +7714,7 @@ $( function () {
 
         oParser = new parserFormula( "YIELD(DATE(2008,2,15),DATE(2016,11,15),0.0575,95.04287,100,2,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _getYield( new Date(Date.UTC(2008,1,15)), new Date(Date.UTC(2016,10,15)),0.0575,95.04287,100,2,0 ) );
+        strictEqual( oParser.calculate().getValue(), _getYield( new cDate(Date.UTC(2008,1,15)), new cDate(Date.UTC(2016,10,15)),0.0575,95.04287,100,2,0 ) );
 
     } );
 
@@ -7412,7 +7730,7 @@ $( function () {
 
         oParser = new parserFormula( "YIELDDISC(DATE(2008,2,16),DATE(2008,3,1),99.795,100,2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), yielddisc( new Date( 2008, 1, 16 ), new Date( 2008, 2, 1 ), 99.795, 100, 2 ) );
+        strictEqual( oParser.calculate().getValue(), yielddisc( new cDate( 2008, 1, 16 ), new cDate( 2008, 2, 1 ), 99.795, 100, 2 ) );
 
     } );
 
@@ -7420,7 +7738,7 @@ $( function () {
 
         oParser = new parserFormula( "YIELDMAT(DATE(2008,3,15),DATE(2008,11,3),DATE(2007,11,8),0.0625,100.0123,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _getyieldmat( new Date( 2008, 2, 15 ), new Date( 2008, 10, 3 ), new Date( 2007, 10, 8 ), 0.0625, 100.0123, 0 ) );
+        strictEqual( oParser.calculate().getValue(), _getyieldmat( new cDate( 2008, 2, 15 ), new cDate( 2008, 10, 3 ), new cDate( 2007, 10, 8 ), 0.0625, 100.0123, 0 ) );
 
     } );
 
@@ -7441,7 +7759,7 @@ $( function () {
 
         oParser = new parserFormula( "ODDLPRICE(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),0.0785,0.0625,100,2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), oddlprice( new Date(Date.UTC(2008,10,11)), new Date(Date.UTC(2021,2,1)), new Date(Date.UTC(2008,9,15)), 0.0785, 0.0625, 100, 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), oddlprice( new cDate(Date.UTC(2008,10,11)), new cDate(Date.UTC(2021,2,1)), new cDate(Date.UTC(2008,9,15)), 0.0785, 0.0625, 100, 2, 1 ) );
 
     } );
 
@@ -7463,7 +7781,7 @@ $( function () {
 
         oParser = new parserFormula( "ODDLYIELD(DATE(2008,11,11),DATE(2021,3,1),DATE(2008,10,15),0.0575,84.5,100,2,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), oddlyield( new Date(2008,10,11), new Date(2021,2,1), new Date(2008,9,15), 0.0575, 84.5, 100, 2, 0 ) );
+        strictEqual( oParser.calculate().getValue(), oddlyield( new cDate(2008,10,11), new cDate(2021,2,1), new cDate(2008,9,15), 0.0575, 84.5, 100, 2, 0 ) );
 
     } );
 
@@ -7471,15 +7789,15 @@ $( function () {
 
         oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),0.08,0.09,2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _duration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), 0.08, 0.09, 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), _duration( new cDate(Date.UTC(2008,0,1)), new cDate(Date.UTC(2016,0,1)), 0.08, 0.09, 2, 1 ) );
 
         oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),-0.08,0.09,2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _duration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), -0.08, 0.09, 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), _duration( new cDate(Date.UTC(2008,0,1)), new cDate(Date.UTC(2016,0,1)), -0.08, 0.09, 2, 1 ) );
 
         oParser = new parserFormula( "DURATION(DATE(2008,1,1),DATE(2016,1,1),-0.08,0.09,5,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), _duration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), -0.08, 0.09, 5, 1 ) );
+        strictEqual( oParser.calculate().getValue(), _duration( new cDate(Date.UTC(2008,0,1)), new cDate(Date.UTC(2016,0,1)), -0.08, 0.09, 5, 1 ) );
 
     } );
 
@@ -7493,7 +7811,7 @@ $( function () {
 
         oParser = new parserFormula( "MDURATION(DATE(2008,1,1),DATE(2016,1,1),0.08,0.09,2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), mduration( new Date(Date.UTC(2008,0,1)), new Date(Date.UTC(2016,0,1)), 0.08, 0.09, 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), mduration( new cDate(Date.UTC(2008,0,1)), new cDate(Date.UTC(2016,0,1)), 0.08, 0.09, 2, 1 ) );
 
     } );
 
@@ -9402,6 +9720,10 @@ $( function () {
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 1);
 
+		oParser = new parserFormula('COLUMN()+COLUMN()', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 2);
+
 	});
 
 	test( "Test: \"ROW\"", function () {
@@ -9417,6 +9739,10 @@ $( function () {
 		oParser = new parserFormula('ROW()', "AA2", ws);
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 1);
+
+		oParser = new parserFormula('ROW()+ROW()', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 2);
 
 	});
 
@@ -9493,6 +9819,25 @@ $( function () {
 		oParser = new parserFormula( "MIDB(A101,20,5)", "A2", ws );
 		ok( oParser.parse(), "MIDB(A101,20,5)" );
 		strictEqual( oParser.calculate().getValue(), "", "MIDB(A101,20,5))");
+	} );
+
+	test( "Test: \"MINUTE\"", function () {
+
+		ws.getRange2( "A202" ).setValue( "12:45:00 PM" );
+		ws.getRange2( "A203" ).setValue( "7/18/2011 7:45" );
+		ws.getRange2( "A204" ).setValue( "4/21/2012" );
+
+		oParser = new parserFormula( "MINUTE(A202)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 45 );
+
+		oParser = new parserFormula( "MINUTE(A203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 45 );
+
+		oParser = new parserFormula( "MINUTE(A204)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 	} );
 
 	test( "Test: \"FIND\"", function () {

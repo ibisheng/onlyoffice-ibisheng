@@ -489,6 +489,14 @@ CFieldInstructionHYPERLINK.prototype.GetValue = function()
 CFieldInstructionHYPERLINK.prototype.SetVisited = function(isVisited)
 {
 };
+/**
+ * Проверяем является ли данная ссылка ссылкой в начало документа
+ * @returns {boolean}
+ */
+CFieldInstructionHYPERLINK.prototype.IsTopOfDocument = function()
+{
+	return (this.GetBookmarkName() === "_top");
+};
 
 
 /**

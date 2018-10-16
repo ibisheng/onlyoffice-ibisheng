@@ -38,10 +38,10 @@
 	 */
 	function (window, undefined) {
 		// Import
-		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
 		var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 		var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 		var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
+		var AscBrowser = AscCommon.AscBrowser;
 
 		var c_oAscSelectionType = Asc.c_oAscSelectionType;
 
@@ -76,6 +76,8 @@
 			newLines: 2  // пересчитываем новые строки
 
 		};
+
+		var sizePxinPt = 72 / 96;
 
 		function applyFunction(callback) {
 			if (kFunctionL === typeof callback) {
@@ -171,6 +173,23 @@
 			return Math.abs(num) < 10 ? 1 : 1 + calcDecades(floor(num * 0.1));
 		}
 
+		function convertPtToPx(value) {
+			value = value / sizePxinPt;
+			value = value | value;
+			if (AscBrowser.isRetina) {
+				value = AscBrowser.convertToRetinaValue(value, true);
+			}
+			return value;
+		}
+		function convertPxToPt(value) {
+			value = value * sizePxinPt;
+			if (AscBrowser.isRetina) {
+				value = AscBrowser.convertToRetinaValue(value);
+			}
+			return value;
+		}
+
+
 		// Определяет времени работы функции
 		function profileTime(fn/*[, arguments]*/) {
 			var start, end, arg = [], i;
@@ -242,11 +261,6 @@
 			RRAC: 2,	// Relative row; absolute column
 			R: 3			// Relative
 		};
-
-		function CRangeOffset(offsetCol, offsetRow) {
-			this.offsetCol = offsetCol;
-			this.offsetRow = offsetRow;
-		}
 
 		/**
 		 * Rectangle region of cells
@@ -323,6 +337,14 @@
 		Range.prototype.isEqualAll = function (range) {
 			return this.isEqual(range) && this.refType1 === range.refType1 && this.refType2 === range.refType2;
 		};
+		Range.prototype.isEqualWithOffsetRow = function (range, offsetRow) {
+			return this.c1 === range.c1 && this.c2 === range.c2 &&
+				this.isAbsC1() === range.isAbsC1() && this.isAbsC2() === range.isAbsC2() &&
+				this.isAbsR1() === range.isAbsR1() && this.isAbsR2() === range.isAbsR2() &&
+				(((this.isAbsR1() ? this.r1 === range.r1 : this.r1 + offsetRow === range.r1) &&
+				(this.isAbsR2() ? this.r2 === range.r2 : this.r2 + offsetRow === range.r2)) ||
+				(this.r1 === 0 && this.r2 === gc_nMaxRow0 && this.r1 === range.r1 && this.r2 === range.r2));
+		};
 
 		Range.prototype.contains = function (c, r) {
 			return this.c1 <= c && c <= this.c2 && this.r1 <= r && r <= this.r2;
@@ -375,8 +397,8 @@
 		};
 
 		Range.prototype.isIntersectForShift = function(range, offset) {
-			var isHor = offset && offset.offsetCol;
-			var isDelete = offset && (offset.offsetCol < 0 || offset.offsetRow < 0);
+			var isHor = offset && offset.col;
+			var isDelete = offset && (offset.col < 0 || offset.row < 0);
 			if (isHor) {
 				if (this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2) {
 					return (this.c1 < range.c1 || (!isDelete && this.c1 === range.c1 && this.c2 === range.c1)) ?
@@ -399,8 +421,37 @@
 			return c_oAscShiftType.None;
 		};
 
+		Range.prototype.difference = function(range) {
+			var res = [];
+			var intersect;
+			if (this.r1 > 0) {
+				intersect = new Range(0, 0, gc_nMaxCol0, this.r1 - 1).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.c1 > 0) {
+				intersect = new Range(0, this.r1, this.c1 - 1, this.r2).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.c2 < gc_nMaxCol0) {
+				intersect = new Range(this.c2 + 1, this.r1, gc_nMaxCol0, this.r2).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.r2 < gc_nMaxRow0) {
+				intersect = new Range(0, this.r2 + 1, gc_nMaxCol0, gc_nMaxRow0).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			return res;
+		};
 		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
-			var isHor = offset && 0 != offset.offsetCol;
+			var isHor = offset && 0 != offset.col;
 			if (isHor) {
 				return this.r1 <= row && row <= this.r2 && this.c1 <= col;
 			} else {
@@ -410,14 +461,14 @@
 
 		Range.prototype.forShift = function(bbox, offset, bUndo) {
 			var isNoDelete = true;
-			var isHor = 0 != offset.offsetCol;
-			var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+			var isHor = 0 != offset.col;
+			var toDelete = offset.col < 0 || offset.row < 0;
 
 			if (isHor) {
 				if (toDelete) {
 					if (this.c1 < bbox.c1) {
 						if (this.c2 <= bbox.c2) {
-							this.setOffsetLast({offsetCol: -(this.c2 - bbox.c1 + 1), offsetRow: 0});
+							this.setOffsetLast(new AscCommon.CellBase(0, -(this.c2 - bbox.c1 + 1)));
 						} else {
 							this.setOffsetLast(offset);
 						}
@@ -429,13 +480,13 @@
 								if (topIn && bottomIn) {
 									isNoDelete = false;
 								} else if (topIn) {
-									this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+									this.setOffsetFirst(new AscCommon.CellBase(bbox.r2 - this.r1 + 1, 0));
 								} else if (bottomIn) {
-									this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+									this.setOffsetLast(new AscCommon.CellBase(bbox.r1 - this.r2 - 1, 0));
 								}
 							}
 						} else {
-							this.setOffsetFirst({offsetCol: bbox.c1 - this.c1, offsetRow: 0});
+							this.setOffsetFirst(new AscCommon.CellBase(0, bbox.c1 - this.c1));
 							this.setOffsetLast(offset);
 						}
 					} else {
@@ -452,7 +503,7 @@
 				if (toDelete) {
 					if (this.r1 < bbox.r1) {
 						if (this.r2 <= bbox.r2) {
-							this.setOffsetLast({offsetCol: 0, offsetRow: -(this.r2 - bbox.r1 + 1)});
+							this.setOffsetLast(new AscCommon.CellBase(-(this.r2 - bbox.r1 + 1), 0));
 						} else {
 							this.setOffsetLast(offset);
 						}
@@ -464,13 +515,13 @@
 								if (leftIn && rightIn) {
 									isNoDelete = false;
 								} else if (leftIn) {
-									this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+									this.setOffsetFirst(new AscCommon.CellBase(0, bbox.c2 - this.c1 + 1));
 								} else if (rightIn) {
-									this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+									this.setOffsetLast(new AscCommon.CellBase(0, bbox.c1 - this.c2 - 1));
 								}
 							}
 						} else {
-							this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r1 - this.r1});
+							this.setOffsetFirst(new AscCommon.CellBase(bbox.r1 - this.r1, 0));
 							this.setOffsetLast(offset);
 						}
 					} else {
@@ -489,6 +540,10 @@
 
 		Range.prototype.isOneCell = function () {
 			return this.r1 === this.r2 && this.c1 === this.c2;
+		};
+
+		Range.prototype.isOnTheEdge = function (c, r) {
+			return this.r1 === r || this.r2 === r || this.c1 === c || this.c2 === c;
 		};
 
 		Range.prototype.union = function (range) {
@@ -513,21 +568,21 @@
 		};
 		Range.prototype.setOffsetWithAbs = function(offset, opt_canResize, opt_circle) {
 			var temp;
-			var offsetRow = offset.offsetRow;
-			var offsetCol = offset.offsetCol;
-			//todo offset A1048576:A1 (offsetRow = 1 -> A1:A2; offsetRow = -1 -> A1048575:A1048576)
+			var row = offset.row;
+			var col = offset.col;
+			//todo offset A1048576:A1 (row = 1 -> A1:A2; row = -1 -> A1048575:A1048576)
 			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
-				//full sheet is 1:1048576 but offsetRow is valid for it
-				offsetRow = 0;
+				//full sheet is 1:1048576 but row is valid for it
+				row = 0;
 			} else if (0 === this.c1 && gc_nMaxCol0 === this.c2) {
-				offsetCol = 0;
+				col = 0;
 			}
 			var isAbsRow1 = this.isAbsRow(this.refType1);
 			var isAbsCol1 = this.isAbsCol(this.refType1);
 			var isAbsRow2 = this.isAbsRow(this.refType2);
 			var isAbsCol2 = this.isAbsCol(this.refType2);
 			if (!isAbsRow1) {
-				this.r1 += offsetRow;
+				this.r1 += row;
 				if (this.r1 < 0) {
 					if (opt_circle) {
 						this.r1 += gc_nMaxRow0 + 1;
@@ -548,7 +603,7 @@
 				}
 			}
 			if (!isAbsCol1) {
-				this.c1 += offsetCol;
+				this.c1 += col;
 				if (this.c1 < 0) {
 					if (opt_circle) {
 						this.c1 += gc_nMaxCol0 + 1;
@@ -569,7 +624,7 @@
 				}
 			}
 			if (!isAbsRow2) {
-				this.r2 += offsetRow;
+				this.r2 += row;
 				if (this.r2 < 0) {
 					if (opt_circle) {
 						this.r2 += gc_nMaxRow0 + 1;
@@ -590,7 +645,7 @@
 				}
 			}
 			if (!isAbsCol2) {
-				this.c2 += offsetCol;
+				this.c2 += col;
 				if (this.c2 < 0) {
 					if (opt_circle) {
 						this.c2 += gc_nMaxCol0 + 1;
@@ -634,8 +689,8 @@
 			return true;
 		};
 		Range.prototype.setOffset = function (offset) {
-			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 ||
-				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0) {
+			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.row != 0 ||
+				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.col != 0) {
 				return;
 			}
 			this.setOffsetFirst(offset);
@@ -643,14 +698,14 @@
 		};
 
 		Range.prototype.setOffsetFirst = function (offset) {
-			this.c1 += offset.offsetCol;
+			this.c1 += offset.col;
 			if (this.c1 < 0) {
 				this.c1 = 0;
 			}
 			if (this.c1 > gc_nMaxCol0) {
 				this.c1 = gc_nMaxCol0;
 			}
-			this.r1 += offset.offsetRow;
+			this.r1 += offset.row;
 			if (this.r1 < 0) {
 				this.r1 = 0;
 			}
@@ -660,14 +715,14 @@
 		};
 
 		Range.prototype.setOffsetLast = function (offset) {
-			this.c2 += offset.offsetCol;
+			this.c2 += offset.col;
 			if (this.c2 < 0) {
 				this.c2 = 0;
 			}
 			if (this.c2 > gc_nMaxCol0) {
 				this.c2 = gc_nMaxCol0;
 			}
-			this.r2 += offset.offsetRow;
+			this.r2 += offset.row;
 			if (this.r2 < 0) {
 				this.r2 = 0;
 			}
@@ -832,6 +887,42 @@
 			return res;
 		};
 
+		Range.prototype.getSharedRange = function (sharedRef, c, r) {
+			var isAbsR1 = this.isAbsR1();
+			var isAbsC1 = this.isAbsC1();
+			var isAbsR2 = this.isAbsR2();
+			var isAbsC2 = this.isAbsC2();
+			if(this.r1 === 0 && this.r2 === gc_nMaxRow0){
+				isAbsR1 = isAbsR2 = true;
+			}
+			if(this.c1 === 0 && this.c2 === gc_nMaxCol0){
+				isAbsC1 = isAbsC2 = true;
+			}
+			var r1 = isAbsR2 ? sharedRef.r1 : Math.max(sharedRef.r2 + (r - this.r2), sharedRef.r1);
+			var c1 = isAbsC2 ? sharedRef.c1 : Math.max(sharedRef.c2 + (c - this.c2), sharedRef.c1);
+			var r2 = isAbsR1 ? sharedRef.r2 : Math.min(sharedRef.r1 + (r - this.r1), sharedRef.r2);
+			var c2 = isAbsC1 ? sharedRef.c2 : Math.min(sharedRef.c1 + (c - this.c1), sharedRef.c2);
+			return new Range(c1, r1, c2, r2);
+		};
+		Range.prototype.getSharedRangeBbox = function(ref, base) {
+			var res = this.clone();
+			var shiftBase;
+			var offset = new AscCommon.CellBase(ref.r1 - base.nRow, ref.c1 - base.nCol);
+			if (!offset.isEmpty()) {
+				shiftBase = this.clone();
+				shiftBase.setOffsetWithAbs(offset, false, false);
+			}
+			offset.row = ref.r2 - base.nRow;
+			offset.col = ref.c2 - base.nCol;
+			res.setOffsetWithAbs(offset, false, false);
+			res.union2(shiftBase ? shiftBase : this);
+			return res;
+		};
+		Range.prototype.getSharedIntersect = function(sharedRef, bbox) {
+			var leftTop = this.getSharedRange(sharedRef, bbox.c1, bbox.r1);
+			var rightBottom = this.getSharedRange(sharedRef, bbox.c2, bbox.r2);
+			return leftTop.union(rightBottom);
+		};
 		Range.prototype.setAbs = function (absRow1, absCol1, absRow2, absCol2) {
 			this.refType1 = (absRow1 ? 0 : 2) + (absCol1 ? 0 : 1);
 			this.refType2 = (absRow2 ? 0 : 2) + (absCol2 ? 0 : 1);
@@ -920,7 +1011,8 @@
 
 		SelectionRange.prototype.clean = function () {
 			this.ranges = [new Range(0, 0, 0, 0)];
-			this.activeCellId = -1;
+			this.activeCellId = 0;
+			this.activeCell.clean();
 		};
 		SelectionRange.prototype.contains = function (c, r) {
 			return this.ranges.some(function (item) {
@@ -966,8 +1058,7 @@
 			return true;
 		};
 		SelectionRange.prototype.addRange = function () {
-			this.ranges.push(new Range(0, 0, 0, 0));
-			this.activeCellId = -1;
+			this.activeCellId = this.ranges.push(new Range(0, 0, 0, 0)) - 1;
 			this.activeCell.clean();
 		};
 		SelectionRange.prototype.assign2 = function (range) {
@@ -1024,17 +1115,17 @@
 			}
 			return result;
 		};
-		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
-			var done, curRange, mc;
+		SelectionRange.prototype.offsetCell = function (dr, dc, changeRange, fCheckSize) {
+			var done, curRange, mc, incompleate;
 			// Check one cell
 			if (1 === this.ranges.length) {
 				curRange = this.ranges[this.activeCellId];
 				if (curRange.isOneCell()) {
-					return false;
+					return 0;
 				} else {
 					mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
 					if (mc && curRange.isEqual(mc)) {
-						return false;
+						return 0;
 					}
 				}
 			}
@@ -1068,6 +1159,11 @@
 					}
 
 					if (!curRange.contains2(this.activeCell)) {
+						if (!changeRange) {
+							this.activeCell.row = lastRow;
+							this.activeCell.col = lastCol;
+							return -1;
+						}
 						if (0 < dc || 0 < dr) {
 							this.activeCellId += 1;
 							this.activeCellId = (this.ranges.length > this.activeCellId) ? this.activeCellId : 0;
@@ -1089,20 +1185,21 @@
 				mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
 
 				if (mc) {
-					if (dc > 0 && (this.activeCell.col > mc.c1 || this.activeCell.row !== mc.r1)) {
+					incompleate = !curRange.containsRange(mc);
+					if (dc > 0 && (incompleate || this.activeCell.col > mc.c1 || this.activeCell.row !== mc.r1)) {
 						// Движение слева направо
 						this.activeCell.col = mc.c2 + 1;
 						done = false;
-					} else if (dc < 0 && (this.activeCell.col < mc.c2 || this.activeCell.row !== mc.r1)) {
+					} else if (dc < 0 && (incompleate || this.activeCell.col < mc.c2 || this.activeCell.row !== mc.r1)) {
 						// Движение справа налево
 						this.activeCell.col = mc.c1 - 1;
 						done = false;
 					}
-					if (dr > 0 && (this.activeCell.row > mc.r1 || this.activeCell.col !== mc.c1)) {
+					if (dr > 0 && (incompleate || this.activeCell.row > mc.r1 || this.activeCell.col !== mc.c1)) {
 						// Движение сверху вниз
 						this.activeCell.row = mc.r2 + 1;
 						done = false;
-					} else if (dr < 0 && (this.activeCell.row < mc.r2 || this.activeCell.col !== mc.c1)) {
+					} else if (dr < 0 && (incompleate || this.activeCell.row < mc.r2 || this.activeCell.col !== mc.c1)) {
 						// Движение снизу вверх
 						this.activeCell.row = mc.r1 - 1;
 						done = false;
@@ -1125,14 +1222,30 @@
 					done = false;
 				}
 
+				if (!done) {
+					continue;
+				}
+
 				break;
 			}
-			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col)
+			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col) ? 1 : -1;
 		};
 		SelectionRange.prototype.setCell = function (r, c) {
+			var res = false;
 			this.activeCell.row = r;
 			this.activeCell.col = c;
 			this.update();
+
+			// Check active cell in merge cell (bug 36708)
+			var mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
+			if (this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col)) {
+				res = -1 === this.offsetCell(1, 0, false, function () {return false;});
+				if (res) {
+					this.activeCell.row = mc.r1;
+					this.activeCell.col = mc.c1;
+				}
+			}
+			return res;
 		};
 		SelectionRange.prototype.getLast = function () {
 			return this.ranges[this.ranges.length - 1];
@@ -1709,6 +1822,9 @@
 				// Для resize
 				this.sizeCCOrPt = obj.sizeCCOrPt;
 				this.sizePx = obj.sizePx;
+
+				//Filter
+				this.filter = obj.filter;
 			}
 
 			return this;
@@ -1724,7 +1840,8 @@
 			asc_getUserId: function () { return this.userId; },
 			asc_getLockedObjectType: function () { return this.lockedObjectType; },
 			asc_getSizeCCOrPt: function () { return this.sizeCCOrPt; },
-			asc_getSizePx: function () { return this.sizePx; }
+			asc_getSizePx: function () { return this.sizePx; },
+			asc_getFilter: function () { return this.filter; }
 		};
 
 		// Гиперссылка
@@ -1770,103 +1887,7 @@
 			asc_setText: function (val) { this.text = val; }
 		};
 
-		/** @constructor */
-		function asc_CPageMargins (obj) {
-			if (obj) {
-				this.left = obj.left;
-				this.right = obj.right;
-				this.top = obj.top;
-				this.bottom = obj.bottom;
-			}
-
-			return this;
-		}
-		asc_CPageMargins.prototype.init = function () {
-			if (null == this.left)
-				this.left = c_oAscPrintDefaultSettings.PageLeftField;
-			if (null == this.top)
-				this.top = c_oAscPrintDefaultSettings.PageTopField;
-			if (null == this.right)
-				this.right = c_oAscPrintDefaultSettings.PageRightField;
-			if (null == this.bottom)
-				this.bottom = c_oAscPrintDefaultSettings.PageBottomField;
-		};
-		asc_CPageMargins.prototype.asc_getLeft = function () { return this.left; };
-		asc_CPageMargins.prototype.asc_getRight = function () { return this.right; };
-		asc_CPageMargins.prototype.asc_getTop = function () { return this.top; };
-		asc_CPageMargins.prototype.asc_getBottom = function () { return this.bottom; };
-		asc_CPageMargins.prototype.asc_setLeft = function (val) { this.left = val; };
-		asc_CPageMargins.prototype.asc_setRight = function (val) { this.right = val; };
-		asc_CPageMargins.prototype.asc_setTop = function (val) { this.top = val; };
-		asc_CPageMargins.prototype.asc_setBottom = function (val) { this.bottom = val; };
-		/** @constructor */
-		function asc_CPageSetup () {
-			this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
-			this.width = c_oAscPrintDefaultSettings.PageWidth;
-			this.height = c_oAscPrintDefaultSettings.PageHeight;
-
-			this.fitToWidth = false; //ToDo can be a number
-			this.fitToHeight = false; //ToDo can be a number
-
-			// ToDo
-			this.blackAndWhite = false;
-			this.cellComments = 0; // none ST_CellComments
-			this.copies = 1;
-			this.draft = false;
-			this.errors = 0; // displayed ST_PrintError
-			this.firstPageNumber = -1;
-			this.pageOrder = 0; // downThenOver ST_PageOrder
-			this.scale = 100;
-			this.useFirstPageNumber = false;
-			this.usePrinterDefaults = true;
-
-			return this;
-		}
-		asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
-		asc_CPageSetup.prototype.asc_getWidth = function () { return this.width; };
-		asc_CPageSetup.prototype.asc_getHeight = function () { return this.height; };
-		asc_CPageSetup.prototype.asc_setOrientation = function (val) { this.orientation = val; };
-		asc_CPageSetup.prototype.asc_setWidth = function (val) { this.width = val; };
-		asc_CPageSetup.prototype.asc_setHeight = function (val) { this.height = val; };
-		asc_CPageSetup.prototype.asc_getFitToWidth = function () { return this.fitToWidth; };
-		asc_CPageSetup.prototype.asc_getFitToHeight = function () { return this.fitToHeight; };
-		asc_CPageSetup.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
-		asc_CPageSetup.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
-
-		/** @constructor */
-		function asc_CPageOptions (obj) {
-			if (obj) {
-				this.pageMargins = obj.pageMargins;
-				this.pageSetup = obj.pageSetup;
-				this.gridLines = obj.gridLines;
-				this.headings = obj.headings;
-			}
-
-			return this;
-		}
-		asc_CPageOptions.prototype.init = function () {
-			if (!this.pageMargins)
-				this.pageMargins = new asc_CPageMargins();
-			this.pageMargins.init();
-
-			if (!this.pageSetup)
-				this.pageSetup = new asc_CPageSetup();
-
-			if (null == this.gridLines)
-				this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
-			if (null == this.headings)
-				this.headings = c_oAscPrintDefaultSettings.PageHeadings;
-		};
-		asc_CPageOptions.prototype.asc_getPageMargins = function () { return this.pageMargins; };
-		asc_CPageOptions.prototype.asc_getPageSetup = function () { return this.pageSetup; };
-		asc_CPageOptions.prototype.asc_getGridLines = function () { return this.gridLines; };
-		asc_CPageOptions.prototype.asc_getHeadings = function () { return this.headings; };
-		asc_CPageOptions.prototype.asc_setPageMargins = function (val) { this.pageMargins = val; };
-		asc_CPageOptions.prototype.asc_setPageSetup = function (val) { this.pageSetup = val; };
-		asc_CPageOptions.prototype.asc_setGridLines = function (val) { this.gridLines = val; };
-		asc_CPageOptions.prototype.asc_setHeadings = function (val) { this.headings = val; };
-
-		function CPagePrint () {
+		function CPagePrint() {
 			this.pageWidth = 0;
 			this.pageHeight = 0;
 
@@ -1877,10 +1898,8 @@
 
 			this.pageRange = null;
 
-			this.leftFieldInPt = 0;
-			this.topFieldInPt = 0;
-			this.rightFieldInPt = 0;
-			this.bottomFieldInPt = 0;
+			this.leftFieldInPx = 0;
+			this.topFieldInPx = 0;
 
 			this.pageGridLines = false;
 			this.pageHeadings = false;
@@ -1888,7 +1907,7 @@
 			this.indexWorksheet = -1;
 
 			this.startOffset = 0;
-			this.startOffsetPt = 0;
+			this.startOffsetPx = 0;
 
 			return this;
 		}
@@ -1902,12 +1921,16 @@
 		function asc_CAdjustPrint () {
 			// Вид печати
 			this.printType = Asc.c_oAscPrintType.ActiveSheets;
+			this.pageOptionsMap = null;
+
 			// ToDo сюда же start и end page index
 
 			return this;
 		}
 		asc_CAdjustPrint.prototype.asc_getPrintType = function () { return this.printType; };
 		asc_CAdjustPrint.prototype.asc_setPrintType = function (val) { this.printType = val; };
+		asc_CAdjustPrint.prototype.asc_getPageOptionsMap = function () { return this.pageOptionsMap; };
+		asc_CAdjustPrint.prototype.asc_setPageOptionsMap = function (val) { this.pageOptionsMap = val; };
 
 		/** @constructor */
 		function asc_CLockInfo () {
@@ -2437,6 +2460,7 @@
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].c_oAscShiftType = c_oAscShiftType;
 		window["AscCommonExcel"].recalcType = recalcType;
+		window["AscCommonExcel"].sizePxinPt = sizePxinPt;
 		window["AscCommonExcel"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
@@ -2448,6 +2472,8 @@
 		window["Asc"].ceil = ceil;
 		window["Asc"].incDecFonSize = incDecFonSize;
 		window["AscCommonExcel"].calcDecades = calcDecades;
+		window["AscCommonExcel"].convertPtToPx = convertPtToPx;
+		window["AscCommonExcel"].convertPxToPt = convertPxToPt;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].profileTime = profileTime;
 		window["AscCommonExcel"].getMatchingBorder = getMatchingBorder;
@@ -2459,7 +2485,6 @@
 		window["Asc"].getEndValueRange = getEndValueRange;
 
 		window["AscCommonExcel"].referenceType = referenceType;
-		window["AscCommonExcel"].CRangeOffset = CRangeOffset;
 		window["Asc"].Range = Range;
 		window["AscCommonExcel"].Range3D = Range3D;
 		window["AscCommonExcel"].SelectionRange = SelectionRange;
@@ -2485,6 +2510,7 @@
 		prot["asc_getLockedObjectType"] = prot.asc_getLockedObjectType;
 		prot["asc_getSizeCCOrPt"] = prot.asc_getSizeCCOrPt;
 		prot["asc_getSizePx"] = prot.asc_getSizePx;
+		prot["asc_getFilter"] = prot.asc_getFilter;
 
 		window["Asc"]["asc_CHyperlink"] = window["Asc"].asc_CHyperlink = asc_CHyperlink;
 		prot = asc_CHyperlink.prototype;
@@ -2503,41 +2529,6 @@
 		prot["asc_setRange"] = prot.asc_setRange;
 		prot["asc_setText"] = prot.asc_setText;
 
-		window["Asc"]["asc_CPageMargins"] = window["Asc"].asc_CPageMargins = asc_CPageMargins;
-		prot = asc_CPageMargins.prototype;
-		prot["asc_getLeft"] = prot.asc_getLeft;
-		prot["asc_getRight"] = prot.asc_getRight;
-		prot["asc_getTop"] = prot.asc_getTop;
-		prot["asc_getBottom"] = prot.asc_getBottom;
-		prot["asc_setLeft"] = prot.asc_setLeft;
-		prot["asc_setRight"] = prot.asc_setRight;
-		prot["asc_setTop"] = prot.asc_setTop;
-		prot["asc_setBottom"] = prot.asc_setBottom;
-
-		window["Asc"]["asc_CPageSetup"] = window["Asc"].asc_CPageSetup = asc_CPageSetup;
-		prot = asc_CPageSetup.prototype;
-		prot["asc_getOrientation"] = prot.asc_getOrientation;
-		prot["asc_getWidth"] = prot.asc_getWidth;
-		prot["asc_getHeight"] = prot.asc_getHeight;
-		prot["asc_setOrientation"] = prot.asc_setOrientation;
-		prot["asc_setWidth"] = prot.asc_setWidth;
-		prot["asc_setHeight"] = prot.asc_setHeight;
-		prot["asc_getFitToWidth"] = prot.asc_getFitToWidth;
-		prot["asc_getFitToHeight"] = prot.asc_getFitToHeight;
-		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
-		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
-
-		window["Asc"]["asc_CPageOptions"] = window["Asc"].asc_CPageOptions = asc_CPageOptions;
-		prot = asc_CPageOptions.prototype;
-		prot["asc_getPageMargins"] = prot.asc_getPageMargins;
-		prot["asc_getPageSetup"] = prot.asc_getPageSetup;
-		prot["asc_getGridLines"] = prot.asc_getGridLines;
-		prot["asc_getHeadings"] = prot.asc_getHeadings;
-		prot["asc_setPageMargins"] = prot.asc_setPageMargins;
-		prot["asc_setPageSetup"] = prot.asc_setPageSetup;
-		prot["asc_setGridLines"] = prot.asc_setGridLines;
-		prot["asc_setHeadings"] = prot.asc_setHeadings;
-
 		window["AscCommonExcel"].CPagePrint = CPagePrint;
 		window["AscCommonExcel"].CPrintPagesData = CPrintPagesData;
 
@@ -2545,6 +2536,8 @@
 		prot = asc_CAdjustPrint.prototype;
 		prot["asc_getPrintType"] = prot.asc_getPrintType;
 		prot["asc_setPrintType"] = prot.asc_setPrintType;
+		prot["asc_getPageOptionsMap"] = prot.asc_getPageOptionsMap;
+		prot["asc_setPageOptionsMap"] = prot.asc_setPageOptionsMap;
 
 		window["AscCommonExcel"].asc_CLockInfo = asc_CLockInfo;
 

@@ -1475,9 +1475,9 @@ CDLbl.prototype =
 
     getStyles: function()
     {
+        if(this.lastStyleObject)
+            return this.lastStyleObject;
         return AscFormat.ExecuteNoHistory(function(){
-            if(this.lastStyleObject)
-                return this.lastStyleObject;
             var styles = new CStyles(false);
             var style = new CStyle("dataLblStyle", null, null, null, true);
             var text_pr = new CTextPr();
@@ -1685,7 +1685,21 @@ CDLbl.prototype =
     getDefaultTextForTxBody: function()
     {
         var compiled_string = "";
-        var separator = typeof this.separator === "string" ? this.separator +" " : "\n";
+        var separator;
+        if(typeof this.separator === "string"){
+            separator = this.separator + " ";
+        }
+        else if(this.series.getObjectType() === AscDFH.historyitem_type_PieSeries){
+            if(this.showPercent && this.showCatName && !this.showSerName && !this.showVal){
+                separator = "\n";
+            }
+            else{
+                separator = ", "
+            }
+        }
+        else{
+            separator = ", "
+        }
         if(this.showSerName)
         {
             compiled_string += this.series.getSeriesName();
@@ -2401,6 +2415,54 @@ CPlotArea.prototype =
         return c;
     },
 
+
+    getSeriesWithSmallestIndexForAxis: function(oAxis){
+        var aCharts = this.charts;
+        var oRet = null;
+        var oChart, aSeries;
+        for(var i = 0; i < aCharts.length; ++i){
+            oChart = aCharts[i];
+            var aAxes = aCharts[i].axId;
+            if(!aAxes){
+                continue;
+            }
+            for(var j = 0; j < aAxes.length; ++j){
+                if(aAxes[j] === oAxis){
+                    aSeries = oChart.series;
+                    for(var k = 0; k < aSeries.length; ++k){
+                        if(oRet === null
+                            || aSeries[k].cat && !oRet.cat
+                            || aSeries[k].idx < oRet.idx && aSeries[k].cat && oRet.cat){
+                            oRet = aSeries[k];
+                        }
+                    }
+                }
+            }
+        }
+        return oRet;
+    },
+
+    getChartsForAxis: function(oAxis){
+        var aCharts = this.charts;
+        var oRet = null;
+        var oChart, aSeries;
+        var aRet = []
+        for(var i = 0; i < aCharts.length; ++i){
+            oChart = aCharts[i];
+            var aAxes = aCharts[i].axId;
+            if(!aAxes){
+                continue;
+            }
+            for(var j = 0; j < aAxes.length; ++j){
+                if(aAxes[j] === oAxis){
+                    aRet.push(oChart);
+                    break;
+                }
+            }
+        }
+        return aRet;
+    },
+
     Write_ToBinary2: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -2526,37 +2588,35 @@ CPlotArea.prototype =
 
     getHorizontalAxis: function()
     {
-        var axis_by_types  = this.getAxisByTypes();
-        for(var i = 0; i < axis_by_types.valAx.length; ++i)
+        if(this.charts[0])
         {
-            if(axis_by_types.valAx[i].axPos === AX_POS_B || axis_by_types.valAx[i].axPos === AX_POS_T)
-                return axis_by_types.valAx[i];
-        }
-
-        for(var i = 0; i < axis_by_types.catAx.length; ++i)
-        {
-            if(axis_by_types.catAx[i].axPos === AX_POS_B || axis_by_types.catAx[i].axPos === AX_POS_T)
-                return axis_by_types.catAx[i];
+            var aAxes = this.charts[0].axId;
+            if(aAxes)
+            {
+                for(var i = 0; i < aAxes.length; ++i)
+                {
+                    if(aAxes[i].axPos === AX_POS_B || aAxes[i].axPos === AX_POS_T)
+                        return aAxes[i];
+                }
+            }
         }
         return null;
-
-
     },
 
 
     getVerticalAxis: function()
     {
-        var axis_by_types  = this.getAxisByTypes();
-        for(var i = 0; i < axis_by_types.valAx.length; ++i)
+        if(this.charts[0])
         {
-            if(axis_by_types.valAx[i].axPos === AX_POS_L || axis_by_types.valAx[i].axPos === AX_POS_R)
-                return axis_by_types.valAx[i];
-        }
-
-        for(var i = 0; i < axis_by_types.catAx.length; ++i)
-        {
-            if(axis_by_types.catAx[i].axPos === AX_POS_L || axis_by_types.catAx[i].axPos === AX_POS_R)
-                return axis_by_types.catAx[i];
+            var aAxes = this.charts[0].axId;
+            if(aAxes)
+            {
+                for(var i = 0; i < aAxes.length; ++i)
+                {
+                    if(aAxes[i].axPos === AX_POS_L || aAxes[i].axPos === AX_POS_R)
+                        return aAxes[i];
+                }
+            }
         }
         return null;
     },
@@ -5018,6 +5078,7 @@ CValAx.prototype =
         }
         c.setAxPos(this.axPos);
         c.setCrossBetween(this.crossBetween);
+        c.setCrosses(this.crosses);
         c.setCrossesAt(this.crossesAt);
         c.setDelete(this.bDelete);
         if(this.dispUnits)
@@ -12155,7 +12216,7 @@ CTitle.prototype =
                 if(bDocument && para_drawing instanceof ParaDrawing)
                 {
 
-                    var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
+                    var hdr_ftr = para_drawing.DocumentContent.IsHdrFtr(true);
                     if(hdr_ftr)
                     {
                         hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
@@ -12422,6 +12483,13 @@ CTitle.prototype =
 
     getDefaultTextForTxBody: function()
     {
+        var oStrCache = AscFormat.getStringPointsFromCat(this.tx);
+        if(oStrCache){
+            var oPoint = oStrCache.getPtByIndex(0);
+            if(oPoint && oPoint.val){
+                return oPoint.val;
+            }
+        }
         var key = 'Axis Title';
         if(this.parent)
         {
@@ -12508,14 +12576,15 @@ CTitle.prototype =
                 this.recalculateTransform();
                 this.recalcInfo.recalcTransform = false;
             }
+            if(this.recalcInfo.recalculateGeometry)
+            {
+                this.recalculateGeometry && this.recalculateGeometry();
+                this.recalcInfo.recalculateGeometry = false;
+            }
             if(this.recalcInfo.recalcTransformText)
             {
                 this.recalculateTransformText();
                 this.recalcInfo.recalcTransformText = false;
-            }
-            if(this.recalcInfo.recalculateGeometry){
-                this.recalculateGeometry && this.recalculateGeometry();
-                this.recalcInfo.recalculateGeometry = false;
             }
             if(this.chart)
             {
@@ -13543,7 +13612,7 @@ function CValAxisLabels(chart, axis)
     this.extY = null;
     this.transform = new CMatrix();
     this.localTransform = new CMatrix();
-    this.arrLabels = [];
+    this.aLabels = [];
     this.chart = chart;
     this.posX = null;
     this.posY = null;
@@ -13555,11 +13624,11 @@ CValAxisLabels.prototype =
     recalculateExtX: function()
     {
         var max_ext_x = 0;
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i].extX > max_ext_x)
+            if(this.aLabels[i].extX > max_ext_x)
             {
-                max_ext_x = this.arrLabels[i].extX;
+                max_ext_x = this.aLabels[i].extX;
             }
         }
         this.extX = max_ext_x;
@@ -13579,10 +13648,10 @@ CValAxisLabels.prototype =
 
     getMinWidth: function()
     {
-        var max_min_width = this.arrLabels[0].txBody.content.RecalculateMinMaxContentWidth().Min;
-        for(var i = 1; i < this.arrLabels.length; ++i)
+        var max_min_width = this.aLabels[0].txBody.content.RecalculateMinMaxContentWidth().Min;
+        for(var i = 1; i < this.aLabels.length; ++i)
         {
-            var t = this.arrLabels[i].txBody.content.RecalculateMinMaxContentWidth().Min;
+            var t = this.aLabels[i].txBody.content.RecalculateMinMaxContentWidth().Min;
             if(t > max_min_width)
                 max_min_width = t;
         }
@@ -13606,10 +13675,10 @@ CValAxisLabels.prototype =
             //g.ds();
             //g.SetIntegerGrid(true);
         }
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
-                this.arrLabels[i].draw(g);
+            if(this.aLabels[i])
+                this.aLabels[i].draw(g);
         }
     },
 
@@ -13617,11 +13686,11 @@ CValAxisLabels.prototype =
     {
         this.x = x;
         this.y = y;
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
+            if(this.aLabels[i])
             {
-                var lbl = this.arrLabels[i];
+                var lbl = this.aLabels[i];
                 lbl.setPosition(lbl.relPosX + x, lbl.relPosY + y);
             }
         }
@@ -13634,10 +13703,10 @@ CValAxisLabels.prototype =
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, x, y);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
-                this.arrLabels[i].updatePosition(x, y);
+            if(this.aLabels[i])
+                this.aLabels[i].updatePosition(x, y);
         }
     },
 
@@ -13646,10 +13715,10 @@ CValAxisLabels.prototype =
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
-                this.arrLabels[i].checkShapeChildTransform(t);
+            if(this.aLabels[i])
+                this.aLabels[i].checkShapeChildTransform(t);
         }
     }
 
@@ -13812,10 +13881,6 @@ CUnionMarker.prototype =
     {
         this.lineMarker && this.lineMarker.draw(g);
         this.marker && this.marker.draw(g);
-    },
-
-    setWidth: function(w)
-    {
     }
 };
 

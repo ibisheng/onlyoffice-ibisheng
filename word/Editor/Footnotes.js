@@ -1058,15 +1058,15 @@ CFootnotesController.prototype.GotoPrevFootnote = function()
 		this.private_SetCurrentFootnoteNoSelection(oPrevFootnote);
 	}
 };
-CFootnotesController.prototype.GetNumberingInfo = function(ParaId, NumPr, oFootnote)
+CFootnotesController.prototype.GetNumberingInfo = function(oPara, oNumPr, oFootnote)
 {
 	var arrFootnotes     = this.LogicDocument.Get_FootnotesList(null, oFootnote);
-	var oNumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+	var oNumberingEngine = new CDocumentNumberingInfoEngine(oPara, oNumPr, this.Get_Numbering());
 	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
 	{
-		arrFootnotes[nIndex].GetNumberingInfo(oNumberingEngine, ParaId, NumPr);
+		arrFootnotes[nIndex].GetNumberingInfo(oNumberingEngine, oPara, oNumPr);
 	}
-	return oNumberingEngine.Get_NumInfo();
+	return oNumberingEngine.GetNumInfo();
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
@@ -1406,12 +1406,12 @@ CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
 	if (null !== this.CurFootnote)
 		this.CurFootnote.AddInlineTable(Cols, Rows);
 };
-CFootnotesController.prototype.ClearParagraphFormatting = function()
+CFootnotesController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.ClearParagraphFormatting();
+		oFootnote.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 	}
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
@@ -2260,14 +2260,6 @@ CFootnotesController.prototype.SetParagraphIndent = function(Ind)
 		oFootnote.SetParagraphIndent(Ind);
 	}
 };
-CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	for (var sId in this.Selection.Footnotes)
-	{
-		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.SetParagraphNumbering(NumInfo);
-	}
-};
 CFootnotesController.prototype.SetParagraphShd = function(Shd)
 {
 	for (var sId in this.Selection.Footnotes)
@@ -2620,6 +2612,13 @@ CFootnotesController.prototype.PasteFormatting = function(TextPr, ParaPr)
 CFootnotesController.prototype.IsSelectionUse = function()
 {
 	return this.Selection.Use;
+};
+CFootnotesController.prototype.IsNumberingSelection = function()
+{
+	if (this.CurFootnote)
+		return this.CurFootnote.IsNumberingSelection();
+
+	return false;
 };
 CFootnotesController.prototype.IsTextSelectionUse = function()
 {
@@ -3245,6 +3244,11 @@ CFootnotesController.prototype.GetStyleFromFormatting = function()
 		return this.CurFootnote.GetStyleFromFormatting();
 
 	return null;
+};
+CFootnotesController.prototype.GetSimilarNumbering = function(oEngine)
+{
+	if (this.CurFootnote)
+		this.CurFootnote.GetSimilarNumbering(oEngine);
 };
 
 

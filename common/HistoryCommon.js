@@ -1061,6 +1061,36 @@
 			case AscDFH.historydescription_Document_DistributeTableCells:
 				sString = "Document_DistributeTableCells";
 				break;
+			case AscDFH.historydescription_Document_RemoveBookmark:
+				sString = "Document_RemoveBookmark";
+				break;
+			case AscDFH.historydescription_Document_ContinueNumbering:
+				sString = "Document_ContinueNumbering";
+				break;
+			case AscDFH.historydescription_Document_RestartNumbering:
+				sString = "Document_RestartNumbering";
+				break;
+			case AscDFH.historydescription_Document_AutomaticListAsType:
+				sString = "Document_AutomaticListAsType";
+				break;
+			case AscDFH.historydescription_Document_CreateNum:
+				sString = "Document_CreateNum";
+				break;
+			case AscDFH.historydescription_Document_ChangeNumLvl:
+				sString = "Document_ChangeNumLvl";
+				break;
+			case AscDFH.historydescription_Document_AutoCorrectSmartQuotes:
+				sString = "Document_AutoCorrectSmartQuotes";
+				break;
+			case AscDFH.historydescription_Document_AutoCorrectHyphensWithDash:
+				sString = "Document_AutoCorrectHyphensWithDash";
+				break;
+			case AscDFH.historydescription_Document_SetGlobalSdtHighlightColor:
+				sString = "Document_SetGlobalSdtHighlightColor";
+				break;
+			case AscDFH.historydescription_Document_SetGlobalSdtShowHighlight:
+				sString = "Document_SetGlobalSdtShowHighlight";
+				break;
 
 		}
 		return sString;
@@ -1155,6 +1185,7 @@
 	window['AscDFH'].historyitem_type_SdtPr            = 60 << 16;
 	window['AscDFH'].historyitem_type_InlineLevelSdt   = 61 << 16;
 	window['AscDFH'].historyitem_type_ParaBookmark     = 62 << 16;
+	window['AscDFH'].historyitem_type_Num              = 63 << 16;
 
 	window['AscDFH'].historyitem_type_CommonShape            = 1000 << 16; // Этот класс добавлен для элементов, у которых нет конкретного класса
 
@@ -1314,6 +1345,7 @@
 	window['AscDFH'].historyitem_Document_EvenAndOddHeaders = window['AscDFH'].historyitem_type_Document | 4;
 	window['AscDFH'].historyitem_Document_DefaultLanguage   = window['AscDFH'].historyitem_type_Document | 5;
 	window['AscDFH'].historyitem_Document_MathSettings      = window['AscDFH'].historyitem_type_Document | 6;
+	window['AscDFH'].historyitem_Document_SdtGlobalSettings = window['AscDFH'].historyitem_type_Document | 7;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе Paragraph
 	//------------------------------------------------------------------------------------------------------------------
@@ -1354,6 +1386,7 @@
 	window['AscDFH'].historyitem_Paragraph_PrChange                  = window['AscDFH'].historyitem_type_Paragraph | 35;
 	window['AscDFH'].historyitem_Paragraph_PrReviewInfo              = window['AscDFH'].historyitem_type_Paragraph | 36;
 	window['AscDFH'].historyitem_Paragraph_OutlineLvl                = window['AscDFH'].historyitem_type_Paragraph | 37;
+	window['AscDFH'].historyitem_Paragraph_DefaultTabSize            = window['AscDFH'].historyitem_type_Paragraph | 38;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaTextPr
 	//------------------------------------------------------------------------------------------------------------------
@@ -1465,6 +1498,7 @@
 	window['AscDFH'].historyitem_TableCell_Pr            = window['AscDFH'].historyitem_type_TableCell | 11;
 	window['AscDFH'].historyitem_TableCell_TextDirection = window['AscDFH'].historyitem_type_TableCell | 12;
 	window['AscDFH'].historyitem_TableCell_NoWrap        = window['AscDFH'].historyitem_type_TableCell | 13;
+	window['AscDFH'].historyitem_TableCell_HMerge        = window['AscDFH'].historyitem_type_TableCell | 14;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CDocumentContent
 	//------------------------------------------------------------------------------------------------------------------
@@ -1476,6 +1510,13 @@
 	window['AscDFH'].historyitem_AbstractNum_LvlChange    = window['AscDFH'].historyitem_type_AbstractNum | 1;
 	window['AscDFH'].historyitem_AbstractNum_TextPrChange = window['AscDFH'].historyitem_type_AbstractNum | 2;
 	window['AscDFH'].historyitem_AbstractNum_ParaPrChange = window['AscDFH'].historyitem_type_AbstractNum | 3;
+	window['AscDFH'].historyitem_AbstractNum_StyleLink    = window['AscDFH'].historyitem_type_AbstractNum | 4;
+	window['AscDFH'].historyitem_AbstractNum_NumStyleLink = window['AscDFH'].historyitem_type_AbstractNum | 5;
+	//------------------------------------------------------------------------------------------------------------------
+	// Типы изменений в классе CNum
+	//------------------------------------------------------------------------------------------------------------------
+	window['AscDFH'].historyitem_Num_LvlOverrideChange = window['AscDFH'].historyitem_type_Num | 1;
+	window['AscDFH'].historyitem_Num_AbstractNum       = window['AscDFH'].historyitem_type_Num | 2;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе СComment
 	//------------------------------------------------------------------------------------------------------------------
@@ -1526,6 +1567,7 @@
 	window['AscDFH'].historyitem_Style_SemiHidden      = window['AscDFH'].historyitem_type_Style | 108;
 	window['AscDFH'].historyitem_Style_UnhideWhenUsed  = window['AscDFH'].historyitem_type_Style | 109;
 	window['AscDFH'].historyitem_Style_Link            = window['AscDFH'].historyitem_type_Style | 110;
+	window['AscDFH'].historyitem_Style_Custom          = window['AscDFH'].historyitem_type_Style | 111;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CStyles
 	//------------------------------------------------------------------------------------------------------------------
@@ -1721,6 +1763,8 @@
 	window['AscDFH'].historyitem_SdtPr_Label      = window['AscDFH'].historyitem_type_SdtPr | 4;
 	window['AscDFH'].historyitem_SdtPr_Lock       = window['AscDFH'].historyitem_type_SdtPr | 5;
 	window['AscDFH'].historyitem_SdtPr_DocPartObj = window['AscDFH'].historyitem_type_SdtPr | 6;
+	window['AscDFH'].historyitem_SdtPr_Appearance = window['AscDFH'].historyitem_type_SdtPr | 7;
+	window['AscDFH'].historyitem_SdtPr_Color      = window['AscDFH'].historyitem_type_SdtPr | 8;
 	//------------------------------------------------------------------------------------------------------------------
 	// Графические классы общего назначение (без привязки к конкретному классу)
 	//------------------------------------------------------------------------------------------------------------------
@@ -3000,6 +3044,17 @@
 	window['AscDFH'].historydescription_Document_UpdateTableOfContents              = 0x014f;
 	window['AscDFH'].historydescription_Document_SectionStartPage                   = 0x0150;
 	window['AscDFH'].historydescription_Document_DistributeTableCells               = 0x0151;
+	window['AscDFH'].historydescription_Document_RemoveBookmark                     = 0x0152;
+	window['AscDFH'].historydescription_Document_ContinueNumbering                  = 0x0153;
+	window['AscDFH'].historydescription_Document_RestartNumbering                   = 0x0154;
+	window['AscDFH'].historydescription_Document_AutomaticListAsType                = 0x0155;
+	window['AscDFH'].historydescription_Document_CreateNum                          = 0x0156;
+	window['AscDFH'].historydescription_Document_ChangeNumLvl                       = 0x0157;
+	window['AscDFH'].historydescription_Document_AutoCorrectSmartQuotes             = 0x0158;
+	window['AscDFH'].historydescription_Document_AutoCorrectHyphensWithDash         = 0x0159;
+	window['AscDFH'].historydescription_Document_SetGlobalSdtHighlightColor         = 0x015a;
+	window['AscDFH'].historydescription_Document_SetGlobalSdtShowHighlight          = 0x015b;
+
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3299,6 +3354,27 @@
 	{
 		// TODO: Сюда надо бы перенести работу с ContentChanges
 		return true;
+	};
+	CChangesBaseContentChange.prototype.GetMinPos = function()
+	{
+		var nPos = null;
+		if (this.UseArray)
+		{
+			for (var nIndex = 0, nCount = this.PosArray.length; nIndex < nCount; ++nIndex)
+			{
+				if (null === nPos || nPos > this.PosArray[nIndex])
+					nPos = this.PosArray[nIndex];
+			}
+
+			if (null === nPos)
+				nPos = 0;
+		}
+		else
+		{
+			nPos = this.Pos;
+		}
+
+		return nPos;
 	};
 	window['AscDFH'].CChangesBaseContentChange = CChangesBaseContentChange;
 	/**

@@ -344,11 +344,11 @@ CGraphicFrame.prototype.paragraphFormatPaste= function(CopyTextPr, CopyParaPr, B
 
 };
 
-CGraphicFrame.prototype.ClearParagraphFormatting= function()
+CGraphicFrame.prototype.ClearParagraphFormatting= function(isClearParaPr, isClearTextPr)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.ClearParagraphFormatting();
+            this.graphicObject.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -661,10 +661,19 @@ CGraphicFrame.prototype.Get_PageLimits  = function(PageIndex)
 
 CGraphicFrame.prototype.getParentObjects = CShape.prototype.getParentObjects;
 
-CGraphicFrame.prototype.Is_HdrFtr = function(bool)
-    {
-        if(bool) return null;
-        return false;
+CGraphicFrame.prototype.IsHdrFtr = function(bool)
+{
+	if (bool)
+		return null;
+
+	return false;
+};
+CGraphicFrame.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if (bReturnFootnote)
+		return null;
+
+	return false;
 };
 
 	CGraphicFrame.prototype.IsTableCellContent = function(isReturnCell)
@@ -701,13 +710,12 @@ CGraphicFrame.prototype.selectionSetStart = function(e, x, y, slideIndex)
             {
                 if(this.graphicObject.IsTableBorder( tx, ty, 0))
                 {
-                    if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
+                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) !== false)
                     {
-                        History.Create_NewPoint(AscDFH.historydescription_Presentation_TableBorder);
+                        return;
                     }
                     else
                     {
-                        return;
                     }
                 }
             }

@@ -310,7 +310,7 @@ CChartSpace.prototype.recalculateChart = function()
 {
     if(this.chartObj == null)
         this.chartObj =  new AscFormat.CChartsDrawer();
-    this.chartObj.reCalculate(this);
+    this.chartObj.recalculate(this);
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
@@ -446,14 +446,6 @@ CChartSpace.prototype.recalculate = function()
         }
 
 
-        var b_recalc_legend = false;
-        if(this.recalcInfo.recalculateLegend)
-        {
-            this.recalculateLegend();
-            this.recalcInfo.recalculateLegend = false;
-            b_recalc_legend = true;
-        }
-
         var b_recalc_labels = false;
         if(this.recalcInfo.recalculateAxisLabels)
         {
@@ -462,14 +454,26 @@ CChartSpace.prototype.recalculate = function()
             b_recalc_labels = true;
         }
 
-        if(this.recalcInfo.recalculateAxisVal)
+        var b_recalc_legend = false;
+        if(this.recalcInfo.recalculateLegend)
         {
-            bCheckLabels = true;
-
-            this.recalculateAxis();
-            this.recalcInfo.recalculateAxisVal = false;
+            this.recalculateLegend();
+            this.recalcInfo.recalculateLegend = false;
+            b_recalc_legend = true;
         }
 
+        if(this.recalcInfo.recalculateAxisVal)
+        {
+            if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
+                //old variant
+                this.recalculateAxis();
+            }
+            else{
+                this.recalculateAxes();
+            }
+            this.recalcInfo.recalculateAxisVal = false;
+            bCheckLabels = true;
+        }
 
 
         if(this.recalcInfo.recalculatePenBrush)
@@ -599,6 +603,20 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
             Cell.Content_DrawSelectionOnPage(Cell_PageRel);
             break;
         }
+    }
+};
+
+CTable.prototype.Internal_UpdateFlowPosition = function(X, Y)
+{
+    this.X_origin = 0.0;
+
+    this.X = 0.0;
+    this.Y = 0.0;
+    var oGraphicFrame = this.Parent;
+    if (oGraphicFrame.spPr && oGraphicFrame.spPr.xfrm && oGraphicFrame.spPr.xfrm.isNotNull()) {
+        var xfrm = oGraphicFrame.spPr.xfrm;
+        xfrm.setOffX(xfrm.offX + X);
+        xfrm.setOffY(xfrm.offY + Y);
     }
 };
 

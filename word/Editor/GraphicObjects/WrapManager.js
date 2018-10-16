@@ -640,18 +640,18 @@ CWrapPolygon.prototype =
             if(AscFormat.isRealNumber(drawing.rot)){
                 if(AscFormat.checkNormalRotate(drawing.rot))
                 {
-                    W = drawing.parent.Extent.W;
-                    H = drawing.parent.Extent.H;
+                    W = drawing.extX;
+                    H = drawing.extY;
                 }
                 else
                 {
-                    W = drawing.parent.Extent.H;
-                    H = drawing.parent.Extent.W;
+                    W = drawing.extY;
+                    H = drawing.extX;
                 }
             }
             else{
-                W = drawing.parent.Extent.W;
-                H = drawing.parent.Extent.H;
+                W = drawing.parent.extX;
+                H = drawing.parent.extY;
             }
             var xc = drawing.localTransform.TransformPointX(drawing.extX / 2, drawing.extY / 2);
             var yc = drawing.localTransform.TransformPointY(drawing.extX / 2, drawing.extY / 2);
@@ -799,22 +799,47 @@ function CPolygonPoint()
 function CWrapManager(graphicPage)
 {
     this.graphicPage = graphicPage;
-    this.arrGraphicObjects = graphicPage.wrappingObjects;
+
 }
 
 CWrapManager.prototype =
 {
     checkRanges: function(x0, y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, hdrFtrRa, docContent, bMathWrap)
     {
-        var arrGraphicObjects = this.arrGraphicObjects;
-        var objects_count = arrGraphicObjects.length;
         var arr_intervals = [];
 
+        var index;
         if(docContent == null)
         {
-            for(var index = 0; index < objects_count; ++index)
+
+            var aDrawings = this.graphicPage.behindDocObjects;
+            for(var index = 0; index < aDrawings.length; ++index)
             {
-                arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals, bMathWrap);
+                var oParaDrawing = aDrawings[index].parent;
+                if(oParaDrawing.IsLayoutInCell())
+                {
+                    var oTableCell = oParaDrawing.DocumentContent.IsTableCellContent(true);
+                    if(oTableCell !== docContent)
+                    {
+                        continue;
+                    }
+                }
+                aDrawings[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals, bMathWrap);
+            }
+
+            aDrawings = this.graphicPage.beforeTextObjects;
+            for(var index = 0; index < aDrawings.length; ++index)
+            {
+                var oParaDrawing = aDrawings[index].parent;
+                if(oParaDrawing.IsLayoutInCell())
+                {
+                    var oTableCell = oParaDrawing.DocumentContent.IsTableCellContent(true);
+                    if(oTableCell !== docContent)
+                    {
+                        continue;
+                    }
+                }
+                aDrawings[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals, bMathWrap);
             }
             var arrFlowTables = this.graphicPage.flowTables;
             for(index = 0; index < arrFlowTables.length; ++index)
@@ -824,13 +849,57 @@ CWrapManager.prototype =
         }
         else
         {
-            if(!docContent.Is_HdrFtr())
+            if(!docContent.IsHdrFtr())
             {
-                for(index = 0; index < objects_count; ++index)
+
+                var aDrawings = this.graphicPage.behindDocObjects;
+                for(index = 0; index < aDrawings.length; ++index)
                 {
-                    if(arrGraphicObjects[index].parent && arrGraphicObjects[index].parent.DocumentContent === docContent)
+                    var oParaDrawing = aDrawings[index].parent;
+                    if(oParaDrawing)
                     {
-                        arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
+
+                        if(oParaDrawing && oParaDrawing.DocumentContent)
+                        {
+                            if(oParaDrawing.IsLayoutInCell())
+                            {
+                                var oTableCell1 = docContent.IsTableCellContent(true);
+                                var oTableCell2 = oParaDrawing.DocumentContent.IsTableCellContent(true);
+                                if(oTableCell1 !== oTableCell2)
+                                {
+                                    continue;
+                                }
+                            }
+                            if(oParaDrawing.DocumentContent === docContent)
+                            {
+                                aDrawings[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
+                            }
+                        }
+                    }
+                }
+                aDrawings = this.graphicPage.beforeTextObjects;
+                for(index = 0; index < aDrawings.length; ++index)
+                {
+                    var oParaDrawing = aDrawings[index].parent;
+                    if(oParaDrawing)
+                    {
+
+                        if(oParaDrawing && oParaDrawing.DocumentContent)
+                        {
+                            if(oParaDrawing.IsLayoutInCell())
+                            {
+                                var oTableCell1 = docContent.IsTableCellContent(true);
+                                var oTableCell2 = oParaDrawing.DocumentContent.IsTableCellContent(true);
+                                if(oTableCell1 !== oTableCell2)
+                                {
+                                    continue;
+                                }
+                            }
+                            if(oParaDrawing.DocumentContent === docContent)
+                            {
+                                aDrawings[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
+                            }
+                        }
                     }
                 }
                 arrFlowTables = this.graphicPage.flowTables;
@@ -850,12 +919,20 @@ CWrapManager.prototype =
                 var hdr_footer_objects = this.graphicPage.graphicObjects.getHdrFtrObjectsByPageIndex(pageIndex);
                 if(hdr_footer_objects != null)
                 {
-                    arrGraphicObjects = hdr_footer_objects.wrappingObjects;
-                    for(index = 0; index < arrGraphicObjects.length; ++index)
+                    var aDrawings = hdr_footer_objects.behindDocObjects;
+                    for(index = 0; index < aDrawings.length; ++index)
                     {
-                        if(arrGraphicObjects[index].parent && arrGraphicObjects[index].parent.DocumentContent === docContent)
+                        if(aDrawings[index].parent && aDrawings[index].parent.DocumentContent === docContent)
                         {
-                            arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
+                            aDrawings[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
+                        }
+                    }
+                    aDrawings = hdr_footer_objects.beforeTextObjects;
+                    for(index = 0; index < aDrawings.length; ++index)
+                    {
+                        if(aDrawings[index].parent && aDrawings[index].parent.DocumentContent === docContent)
+                        {
+                            aDrawings[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
                         }
                     }
                     arrFlowTables = hdr_footer_objects.flowTables;

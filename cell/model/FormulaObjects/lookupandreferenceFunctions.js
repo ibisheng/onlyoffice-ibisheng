@@ -337,6 +337,10 @@ function (window, undefined) {
 	cFORMULATEXT.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
+		if (cElementType.error === arg0.type) {
+			return arg0;
+		}
+
 		var res = null;
 		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
@@ -439,7 +443,7 @@ function (window, undefined) {
 			var ws = arg0.getWS(), bbox = arg0.getBBox0();
 
 			if (bbox.r1 === bbox.r2) {/*одна строка*/
-				res = new Asc.Range(bbox.c1 + arg1 - 1, bbox.r1, bbox.c1 + arg1 - 1, bbox.r1);
+				res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1, bbox.c1 + arg2 - 1, bbox.r1);
 				res = new cRef(res.getName(), ws);
 			} else {
 				if (0 === arg1 && arg2 > 0) {
@@ -449,8 +453,9 @@ function (window, undefined) {
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 -
-							1)
+						var diffArg1 = arg1 === 0 ? 0 : 1;
+						var diffArg2 = arg2 === 0 ? 0 : 1;
+						res = new Asc.Range(bbox.c1 + arg2 - diffArg2, bbox.r1 + arg1 - diffArg1, bbox.c1 + arg2 - diffArg2, bbox.r1 + arg1 - diffArg1);
 						res = new cRef(res.getName(), ws);
 					}
 				}
@@ -811,8 +816,8 @@ function (window, undefined) {
 		}
 
 		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber();
-		var arg3 = 3 < arg.length ? arg[3].tocNumber() : new cNumber(-1);
-		var arg4 = 5 === arg.length ? arg[4].tocNumber() : new cNumber(-1);
+		var arg3 = 3 < arg.length ? (cElementType.empty === arg[3].type ? new cNumber(1) : arg[3].tocNumber()) : new cNumber(-1);
+		var arg4 = 4 < arg.length ? (cElementType.empty === arg[4].type ? new cNumber(1) : arg[4].tocNumber()) : new cNumber(-1);
 
 		var argError;
 		if (argError = this._checkErrorArg([arg0, arg1, arg2, arg3, arg4])) {
@@ -824,12 +829,9 @@ function (window, undefined) {
 		arg3 = arg3.getValue();
 		arg4 = arg4.getValue();
 
-
-		if (arg3 < 0) {
-			arg3 = 1;
-		}
-		if (arg4 < 0) {
-			arg4 = 1;
+		if (arg3 == 0 || arg4 == 0)
+		{
+			return new cError(cErrorType.bad_reference);
 		}
 
 		var res;
@@ -839,10 +841,45 @@ function (window, undefined) {
 			if (box) {
 				box = box.clone(true);
 
-				box.r2 = box.r1 + arg1 + arg3 - 1;
-				box.c2 = box.c1 + arg2 + arg4 - 1;
-				box.r1 = box.r1 + arg1;
+				//в документации написано, что в отрицательных значений в 4 и 5 аргументах быть не может
+				//но на деле ms рассчитывает такие формулы
+				//сделал аналогично
+
 				box.c1 = box.c1 + arg2;
+				box.r1 = box.r1 + arg1;
+				box.c2 = box.c2 + arg2;
+				box.r2 = box.r2 + arg1;
+				if(cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
+					if (arg.length > 3) {
+						if(arg4 < 0) {
+							box.c1 = box.c1 + arg4 + 1;
+						} else {
+							box.c2 = box.c1 + arg4 - 1;
+						}
+
+						if(arg3 < 0) {
+							box.r1 = box.r1 + arg3 + 1;
+						} else {
+							box.r2 = box.r1 + arg3 - 1;
+						}
+					}
+				} else {
+					if (arg.length > 3) {
+						if(arg4 < 0) {
+							box.c1 = box.c1 + arg4 + 1;
+							box.c2 = box.c1 - arg4 - 1;
+						} else {
+							box.c2 = box.c1 + arg4 - 1;
+						}
+
+						if(arg3 < 0) {
+							box.r1 = box.r1 + arg3 + 1;
+							box.r2 = box.r1 - arg3 - 1;
+						} else {
+							box.r2 = box.r1 + arg3 - 1;
+						}
+					}
+				}
 
 				if (!validBBOX(box)) {
 					return new cError(cErrorType.bad_reference);

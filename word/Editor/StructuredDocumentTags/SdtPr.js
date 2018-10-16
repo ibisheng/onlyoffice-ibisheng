@@ -50,17 +50,22 @@ function CSdtPr()
 		Category : undefined,
 		Unique   : undefined
 	};
+
+	this.Appearance = Asc.c_oAscSdtAppearance.Frame;
+	this.Color      = undefined;
 }
 
 CSdtPr.prototype.Copy = function()
 {
 	var oPr = new CSdtPr();
 
-	oPr.Alias = this.Alias;
-	oPr.Id    = this.Id;
-	oPr.Tag   = this.Tag;
-	oPr.Label = this.Label;
-	oPr.Lock  = this.Lock;
+	oPr.Alias      = this.Alias;
+	oPr.Id         = this.Id;
+	oPr.Tag        = this.Tag;
+	oPr.Label      = this.Label;
+	oPr.Lock       = this.Lock;
+	oPr.Appearance = this.Appearance;
+	oPr.Color      = (this.Color ? this.Color.Copy() : undefined);
 
 	return oPr;
 };
@@ -118,6 +123,18 @@ CSdtPr.prototype.Write_ToBinary = function(Writer)
 		Flags |= 128;
 	}
 
+	if (undefined !== this.Appearance)
+	{
+		Writer.WriteLong(this.Appearance);
+		Flags |= 256;
+	}
+
+	if (undefined !== this.Color)
+	{
+		this.Color.WriteToBinary();
+		Flags |= 512;
+	}
+
 
 	var EndPos = Writer.GetCurPosition();
 	Writer.Seek( StartPos );
@@ -151,6 +168,15 @@ CSdtPr.prototype.Read_FromBinary = function(Reader)
 
 	if (Flags & 128)
 		this.DocPartObj.Category = Reader.GetString2();
+
+	if (Flags & 256)
+		this.Appearance = Reader.GetLong();
+
+	if (Flags & 512)
+	{
+		this.Color = new CDocumentColor();
+		this.Color.ReadFromBinary(oReader);
+	}
 };
 CSdtPr.prototype.IsBuiltInDocPart = function()
 {
@@ -168,6 +194,9 @@ function CContentControlPr(nType)
 	this.Lock       = undefined;
 	this.InternalId = undefined;
 	this.CCType     = undefined !== nType ? nType : c_oAscSdtLevelType.Inline;
+
+	this.Appearance = Asc.c_oAscSdtAppearance.Frame;
+	this.Color      = undefined;
 }
 CContentControlPr.prototype.get_Id = function()
 {
@@ -209,6 +238,75 @@ CContentControlPr.prototype.put_Alias = function(sAlias)
 {
 	this.Alias = sAlias;
 };
+CContentControlPr.prototype.get_Appearance = function()
+{
+	return this.Appearance;
+};
+CContentControlPr.prototype.put_Appearance = function(nAppearance)
+{
+	this.Appearance = nAppearance;
+};
+CContentControlPr.prototype.get_Color = function()
+{
+	if (!this.Color)
+		return null;
+
+	return new Asc.asc_CColor(this.Color.r, this.Color.g, this.Color.b);
+};
+CContentControlPr.prototype.put_Color = function(r, g, b)
+{
+	if (undefined === r || null === r)
+		this.Color = undefined;
+	else
+		this.Color = new CDocumentColor(r, g, b);
+};
+
+/**
+ * Класс с глобальными настройками для всех контейнеров
+ * @constructor
+ */
+function CSdtGlobalSettings()
+{
+	this.Color         = new AscCommonWord.CDocumentColor(220, 220, 220);
+	this.ShowHighlight = false;
+}
+/**
+ * Проверяем все ли параметры выставлены по умолчанию
+ * @returns {boolean}
+ */
+CSdtGlobalSettings.prototype.IsDefault = function()
+{
+	if (!this.Color
+		|| 220 !== this.Color.r
+		|| 220 !== this.Color.g
+		|| 220 !== this.Color.b
+		|| false !== this.ShowHighlight)
+		return false;
+
+	return true;
+};
+CSdtGlobalSettings.prototype.Copy = function()
+{
+	var oSettings = new CSdtGlobalSettings();
+
+	oSettings.Color         = this.Color.Copy();
+	oSettings.ShowHighlight = this.ShowHighlight;
+
+	return oSettings;
+};
+CSdtGlobalSettings.prototype.Write_ToBinary = function(oWriter)
+{
+	// CDocumentColor : Color
+	// Bool           : ShowHighlight
+
+	this.Color.WriteToBinary(oWriter);
+	oWriter.WriteBool(this.ShowHighlight);
+};
+CSdtGlobalSettings.prototype.Read_FromBinary = function(oReader)
+{
+	this.Color.ReadFromBinary(oReader);
+	this.ShowHighlight = oReader.GetBool();
+};
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord']        = window['AscCommonWord'] || {};
@@ -229,4 +327,7 @@ CContentControlPr.prototype['get_InternalId']         = CContentControlPr.protot
 CContentControlPr.prototype['get_ContentControlType'] = CContentControlPr.prototype.get_ContentControlType;
 CContentControlPr.prototype['get_Alias']              = CContentControlPr.prototype.get_Alias;
 CContentControlPr.prototype['put_Alias']              = CContentControlPr.prototype.put_Alias;
-
+CContentControlPr.prototype['get_Appearance']         = CContentControlPr.prototype.get_Appearance;
+CContentControlPr.prototype['put_Appearance']         = CContentControlPr.prototype.put_Appearance;
+CContentControlPr.prototype['get_Color']              = CContentControlPr.prototype.get_Color;
+CContentControlPr.prototype['put_Color']              = CContentControlPr.prototype.put_Color;

@@ -50,7 +50,7 @@
         this.fonts_streams = [];
 
         // теперь вся информация о всех возможных шрифтах. Они во всех редакторах должны быть одни и те же
-        this.fontFilesPath = "/editor/sdkjs/common/nutrition/";
+        this.fontFilesPath = "/editor/nutrition/";
         this.fontFiles = AscFonts.g_font_files;
         this.fontInfos = AscFonts.g_font_infos;
         this.map_font_index = AscFonts.g_map_font_index;

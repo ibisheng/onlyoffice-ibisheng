@@ -2555,7 +2555,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
         default_style.ParaPr.Spacing.Line = 1;
         default_style.ParaPr.Spacing.Before = 0;
         default_style.ParaPr.Spacing.After = 0;
-        default_style.ParaPr.DefaultTabSize = 25.4;
+        default_style.ParaPr.DefaultTab = 25.4;
         default_style.ParaPr.Align = AscCommon.align_Center;
         if(parent_objects.theme)
         {
@@ -2661,10 +2661,11 @@ CShape.prototype.recalculateTextStyles = function (level) {
             hierarchy_styles.splice(0, 0, ownStyle);
         }
         var shape_text_style;
-        if (isRealObject(this.style) && isRealObject(this.style.fontRef)) {
+        var compiled_style = this.getCompiledStyle && this.getCompiledStyle();
+        if (isRealObject(compiled_style) && isRealObject(compiled_style.fontRef)) {
             shape_text_style = new CStyle("shapeTextStyle", null, null, null, true);
             var first_name;
-            if (this.style.fontRef.idx === AscFormat.fntStyleInd_major)
+            if (compiled_style.fontRef.idx === AscFormat.fntStyleInd_major)
                 first_name = "+mj-";
             else
                 first_name = "+mn-";
@@ -2674,10 +2675,10 @@ CShape.prototype.recalculateTextStyles = function (level) {
             shape_text_style.TextPr.RFonts.CS = {Name: first_name + "cs", Index: -1};
             shape_text_style.TextPr.RFonts.HAnsi = {Name: first_name + "lt", Index: -1};
 
-            if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) {
+            if (compiled_style.fontRef.Color != null && compiled_style.fontRef.Color.color != null) {
                 var unifill = new AscFormat.CUniFill();
                 unifill.fill = new AscFormat.CSolidFill();
-                unifill.fill.color = this.style.fontRef.Color;
+                unifill.fill.color = compiled_style.fontRef.Color;
                 shape_text_style.TextPr.Unifill = unifill;
             }
         }
@@ -2773,6 +2774,17 @@ CShape.prototype.recalculateBrush = function () {
     this.brush.merge(this.getCompiledFill());
     this.brush.transparent = this.getCompiledTransparent();
     this.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+    if(this.bWordShape){
+        if(this.brush.fill && this.brush.fill.type === Asc.c_oAscFill.FILL_TYPE_GRAD){
+            var oGradFill = this.brush.fill;
+            if(!oGradFill.lin && !oGradFill.path){
+                var oLin = new AscFormat.GradLin();
+                oLin.setScale(false);
+                oLin.setAngle(5400000);
+                oGradFill.setLin(oLin);
+            }
+        }
+    }
 };
 
 CShape.prototype.recalculatePen = function () {
@@ -2864,16 +2876,17 @@ CShape.prototype.isEmptyPlaceholder = function () {
 CShape.prototype.changeSize = function (kw, kh) {
     if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull()) {
         var xfrm = this.spPr.xfrm;
-        if(this.getNoChangeAspect()){
-            var k = Math.min(kw, kh);
-            var oldXC = xfrm.offX + xfrm.extX/2.0;
-            var oldYC = xfrm.offY + xfrm.extY/2.0;
-            xfrm.setExtX(xfrm.extX * k);
-            xfrm.setExtY(xfrm.extY * k);
-            xfrm.setOffX(oldXC * kw - xfrm.extX/2.0);
-            xfrm.setOffY(oldYC * kh - xfrm.extY/2.0);
-        }
-        else{
+        // if(this.getNoChangeAspect()){
+        //     var k = Math.min(kw, kh);
+        //     var oldXC = xfrm.offX + xfrm.extX/2.0;
+        //     var oldYC = xfrm.offY + xfrm.extY/2.0;
+        //     xfrm.setExtX(xfrm.extX * k);
+        //     xfrm.setExtY(xfrm.extY * k);
+        //     xfrm.setOffX(oldXC * kw - xfrm.extX/2.0);
+        //     xfrm.setOffY(oldYC * kh - xfrm.extY/2.0);
+        // }
+        // else
+            {
 
             xfrm.setOffX(xfrm.offX * kw);
             xfrm.setOffY(xfrm.offY * kh);
@@ -3014,6 +3027,14 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     {
                         this.x = 0;
                         this.y = 0;
+
+                        if(oParaDrawing.Extent && AscFormat.isRealNumber(oParaDrawing.Extent.W) && AscFormat.isRealNumber(oParaDrawing.Extent.H))
+                        {
+                            this.x = 0;
+                            this.y = 0;
+                            this.extX = oParaDrawing.Extent.W;
+                            this.extY = oParaDrawing.Extent.H;
+                        }
                         if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)
                         {
                             this.m_oSectPr = null;
@@ -4310,9 +4331,10 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
 
     var _transform = transform ? transform : this.transform;
     var _transform_text = transformText ? transformText : this.transformText;
+    var geometry = this.calcGeometry || this.spPr && this.spPr.geometry;
     if (graphics.IsSlideBoundsCheckerType === true) {
         graphics.transform3(_transform);
-        if (!this.spPr || null == this.spPr.geometry || this.spPr.geometry.pathLst.length === 0 || (this.spPr.geometry.pathLst.length === 1 && this.spPr.geometry.pathLst[0].ArrPathCommandInfo.length === 0) || !graphics.IsShapeNeedBounds(this.spPr.geometry.preset)) {
+        if (!this.spPr || null == geometry || geometry.pathLst.length === 0 || (geometry.pathLst.length === 1 && geometry.pathLst[0].ArrPathCommandInfo.length === 0) || !graphics.IsShapeNeedBounds(geometry.preset)) {
             graphics._s();
             graphics._m(0, 0);
             graphics._l(this.extX, 0);
@@ -4321,7 +4343,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             graphics._e();
         }
         else {
-            this.spPr.geometry.check_bounds(graphics);
+            geometry.check_bounds(graphics);
         }
 
         if (this.txBody) {
@@ -4362,20 +4384,24 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);
         }
     }
-    if (this.spPr && this.spPr.geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill)) {
+    if (geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill)) {
         graphics.SetIntegerGrid(false);
         graphics.transform3(_transform, false);
 
         var shape_drawer = new AscCommon.CShapeDrawer();
-        shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
-        shape_drawer.draw(this.spPr.geometry);
+        shape_drawer.fromShape2(this, graphics, geometry);
+        shape_drawer.draw(geometry);
     }
     if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true  && !AscCommon.IsShapeToImageConverter)
     {
         var drawingObjects = this.getDrawingObjectsController();
         if (typeof editor !== "undefined" && editor && graphics.m_oContext !== undefined && graphics.m_oContext !== null && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
         {
-            if (global_MatrixTransformer.IsIdentity2(_transform))
+            var angle = _transform.GetRotation();
+            if (AscFormat.fApproxEqual(angle, 0.0, 0.0) ||
+                AscFormat.fApproxEqual(angle, 90.0, 0.0) ||
+                AscFormat.fApproxEqual(angle, 180.0, 0.0) ||
+                AscFormat.fApproxEqual(angle, 270.0, 0.0))
             {
                 graphics.transform3(_transform, false);
                 var tr = graphics.m_oFullTransform;
@@ -4386,11 +4412,15 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
                 var _r = tr.TransformPointX(this.extX, this.extY);
                 var _b = tr.TransformPointY(this.extX, this.extY);
 
+                var __x = Math.min(_x, _r);
+                var __y = Math.min(_y, _b);
+                var __r = Math.max(_x, _r);
+                var __b = Math.max(_y, _b);
                 graphics.m_oContext.lineWidth = 1;
                 graphics.p_color(127, 127, 127, 255);
 
                 graphics._s();
-                editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(graphics.m_oContext, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2, true);
+                editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(graphics.m_oContext, __x >> 0, __y >> 0, __r >> 0, __b >> 0, 2, 2, true);
                 graphics._s();
             }
             else {
@@ -4598,6 +4628,35 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
     graphics.reset();
 };
 
+    CShape.prototype.recalculateGeometry = function()
+    {
+        this.calcGeometry = null;
+        if(isRealObject(this.spPr && this.spPr.geometry)){
+            this.calcGeometry = this.spPr.geometry;
+        }
+        else{
+            if(this.getHierarchy){
+                var hierarchy = this.getHierarchy();
+                for(var i = 0; i < hierarchy.length; ++i){
+                    if(hierarchy[i] && hierarchy[i].spPr && hierarchy[i].spPr.geometry){
+                        var _g = hierarchy[i].spPr.geometry;
+                        this.calcGeometry = AscFormat.ExecuteNoHistory(function(){
+                            var _r = _g.createDuplicate();
+                            _r.setParent(this);
+                            return _r;
+                        }, this, []);
+                        break;
+                    }
+                }
+            }
+        }
+        if(isRealObject(this.calcGeometry))
+        {
+            var transform = this.getTransform();
+            this.calcGeometry.Recalculate(transform.extX, transform.extY);
+        }
+    };
+
 CShape.prototype.getRotateAngle = function (x, y) {
     var transform = this.getTransformMatrix();
     var rotate_distance = this.convertPixToMM(AscCommon.TRACK_DISTANCE_ROTATE);
@@ -4791,6 +4850,12 @@ CShape.prototype.getAllRasterImages = function(images)
             return false;
         }
         this.checkContentByCallback(oContent, fCallback);
+    }
+};
+CShape.prototype.getAllDocContents = function(aDocContents)
+{
+    if(this.textBoxContent){
+        aDocContents.push(this.textBoxContent);
     }
 };
 
@@ -5767,6 +5832,7 @@ function getParaDrawing(oDrawing)
 function checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, oTempParent)
 {
     var i, j;
+    var checkSPs = [].concat( oTempParent.cSld.spTree );
     for(i = 0; i < oEndContent.Drawings.length; ++i)
     {
         var shape = oEndContent.Drawings[i].Drawing;
@@ -5798,6 +5864,28 @@ function checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, oTempPar
                 }
             }
             shape.parent = oOldParent;
+        }
+        else if( shape.spPr && shape.spPr.xfrm ){
+            //check paste object position
+            var changed = false;
+            for( var k=0; k< checkSPs.length; k++ ){
+                var oSp = checkSPs[k];
+                var srcSp = shape.spPr
+                if( Math.abs(srcSp.xfrm.offX - oSp.x)<0.01 &&
+                    Math.abs(srcSp.xfrm.offY - oSp.y)<0.01 && 
+                    Math.abs(srcSp.xfrm.extX - oSp.extX )<0.01 &&
+                    Math.abs(srcSp.xfrm.extY - oSp.extY )<0.01
+                ){ 
+                    srcSp.xfrm.offX = shape.x = oSp.x + 10;
+                    srcSp.xfrm.offY = shape.y = oSp.y + 10;
+                    srcSp.xfrm.extX = shape.extX = oSp.extX;
+                    srcSp.xfrm.extY= shape.extY = oSp.extY;
+                    changed = true;
+                }
+            }
+            if( changed ){
+                checkSPs.push( shape );
+            }
         }
     }
 }

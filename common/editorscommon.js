@@ -245,7 +245,7 @@
 		for (var i = 0; i < AscCommon.c_oAscEncodings.length; ++i)
 		{
 			var encoding = AscCommon.c_oAscEncodings[i];
-			var newElem = {'codepage': encoding[0], 'name': encoding[3]};
+			var newElem = {'codepage': encoding[0], 'lcid': encoding[1], 'name': encoding[3]};
 			res.push(newElem);
 		}
 		return res;
@@ -390,7 +390,7 @@
 		this.value = function(param)
 		{
 			var _map = this.map;
-			if (window["AscDesktopEditor"] && AscCommon.AscBrowser.isRetina)
+			if ((window["AscDesktopEditor"] && !AscCommon.AscBrowser.isMacOs) && AscCommon.AscBrowser.isRetina)
 				_map = this.mapRetina;
 
 			return _map[param] ? _map[param] : param;
@@ -1159,7 +1159,7 @@
 		var t = cBoolLocal.t = local['t'].toUpperCase();
 		var f = cBoolLocal.f = local['f'].toUpperCase();
 
-		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),]|$)", "i");
+		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),}]|$)", "i");
 	}
 
 	function build_rx_error(local)
@@ -1295,6 +1295,7 @@
 		switch (format)
 		{
 			case c_oAscFileType.PDF:
+			case c_oAscFileType.PDFA:
 				return 'pdf';
 				break;
 			case c_oAscFileType.HTML:
@@ -2429,10 +2430,13 @@
 		var sDataRange = dataRange, sheetModel;
 		if (Asc.c_oAscSelectionDialogType.Chart === dialogType)
 		{
-			dataRange = parserHelp.parse3DRef(dataRange);
-			if (dataRange)
+			if(dataRange)
 			{
-				sheetModel = model.getWorksheetByName(dataRange.sheet);
+				dataRange = parserHelp.parse3DRef(dataRange);
+				if (dataRange)
+				{
+					sheetModel = model.getWorksheetByName(dataRange.sheet);
+				}
 			}
 			if (null === dataRange || !sheetModel)
 				return Asc.c_oAscError.ID.DataRangeError;
@@ -2467,7 +2471,7 @@
 
 				if (Asc.c_oAscChartTypeSettings.stock === chartType)
 				{
-					var chartSettings = new AscCommon.asc_ChartSettings();
+					var chartSettings = new Asc.asc_ChartSettings();
 					chartSettings.putType(Asc.c_oAscChartTypeSettings.stock);
 					chartSettings.putRange(sDataRange);
 					chartSettings.putInColumns(!isRows);
@@ -2611,7 +2615,7 @@
 	function asc_ajax(obj)
 	{
 		var url                                       = "", type                            = "GET",
-			async                                     = true, data                        = null, dataType = "text/xml",
+			async                                     = true, data                        = null, dataType,
 			error = null, success = null, httpRequest = null,
 			contentType                               = "application/x-www-form-urlencoded",
 			responseType = '',
@@ -2658,7 +2662,7 @@
 				if (window.XMLHttpRequest)
 				{ // Mozilla, Safari, ...
 					httpRequest = new XMLHttpRequest();
-					if (httpRequest.overrideMimeType)
+					if (httpRequest.overrideMimeType && dataType)
 					{
 						httpRequest.overrideMimeType(dataType);
 					}
@@ -3052,6 +3056,74 @@
 		return (((mm * 20 * 72 / 25.4) + 0.5) | 0);
 	}
 
+	/**
+	 * Конвертируем число из римской системы исчисления в обычное десятичное число
+	 * @param sRoman {string}
+	 * @returns {number}
+	 */
+	function RomanToInt(sRoman)
+	{
+		sRoman = sRoman.toUpperCase();
+		if (sRoman < 1)
+		{
+			return 0;
+		}
+		else if (!/^M*(?:D?C{0,3}|C[MD])(?:L?X{0,3}|X[CL])(?:V?I{0,3}|I[XV])$/i.test(sRoman))
+		{
+			return NaN;
+		}
+
+		var chars  = {
+			"M"  : 1000,
+			"CM" : 900,
+			"D"  : 500,
+			"CD" : 400,
+			"C"  : 100,
+			"XC" : 90,
+			"L"  : 50,
+			"XL" : 40,
+			"X"  : 10,
+			"IX" : 9,
+			"V"  : 5,
+			"IV" : 4,
+			"I"  : 1
+		};
+		var arabic = 0;
+		sRoman.replace(/[MDLV]|C[MD]?|X[CL]?|I[XV]?/g, function(i)
+		{
+			arabic += chars[i];
+		});
+
+		return arabic;
+	}
+
+	/**
+	 * Конвертируем нумерацию {a b ... z aa bb ... zz aaa bbb ... zzz ...} в число
+	 * @param sLetters
+	 * @constructor
+	 */
+	function LatinNumberingToInt(sLetters)
+	{
+		sLetters = sLetters.toUpperCase();
+
+		if (sLetters.length <= 0)
+			return NaN;
+
+		var nLen = sLetters.length;
+
+		var nFirstCharCode = sLetters.charCodeAt(0);
+		if (65 > nFirstCharCode || nFirstCharCode > 90)
+			return NaN;
+
+		for (var nPos = 1; nPos < nLen; ++nPos)
+		{
+			if (sLetters.charCodeAt(nPos) !== nFirstCharCode)
+				return NaN;
+		}
+
+		return (nFirstCharCode - 64) + 26 * (nLen - 1);
+	}
+
 	var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
 
 	function getUserColorById(userId, userName, isDark, isNumericValue)
@@ -3168,7 +3240,7 @@
 		}
 		else
 		{
-			loadScript('/editor/sdkjs/' + sdkName + '/sdk-all.js', callback);
+			loadScript('/editor/sdkjs/' + sdkName + '/engine.js', callback);
 		}
 	}
 
@@ -3562,6 +3634,9 @@
 
         this.isNeedCrypt = function()
 		{
+			if (!window.g_asc_plugins)
+				return false;
+
             if (!window.g_asc_plugins.isRunnedEncryption())
                 return false;
 
@@ -4062,6 +4137,8 @@
 	window["AscCommon"].CorrectMMToTwips = CorrectMMToTwips;
 	window["AscCommon"].TwipsToMM = TwipsToMM;
 	window["AscCommon"].MMToTwips = MMToTwips;
+	window["AscCommon"].RomanToInt = RomanToInt;
+	window["AscCommon"].LatinNumberingToInt = LatinNumberingToInt;
 
 	window["AscCommon"].loadSdk = loadSdk;
 	window["AscCommon"].getAltGr = getAltGr;
@@ -4096,16 +4173,28 @@
 	window["AscCommon"].translateManager = new CTranslateManager();
 })(window);
 
-// ONLYPASS
 window["asc_initAdvancedOptions"] = function(_code, _file_hash, _docInfo)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
-    if ((_code == 90 || _code == 91) && AscCommon.EncryptionWorker.isNeedCrypt() && !window.checkPasswordFromPlugin)
+    if (_code == 90 || _code == 91)
     {
-    	window.checkPasswordFromPlugin = true;
-        window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash, "docinfo" : _docInfo });
-        return;
+    	if (window["AscDesktopEditor"] && (0 !== window["AscDesktopEditor"]["CryptoMode"]) && !_editor.isLoadFullApi)
+		{
+            // ждем инициализации
+            _editor.asc_initAdvancedOptions_params = [];
+            _editor.asc_initAdvancedOptions_params.push(_code);
+            _editor.asc_initAdvancedOptions_params.push(_file_hash);
+            _editor.asc_initAdvancedOptions_params.push(_docInfo);
+            return;
+        }
+
+    	if (AscCommon.EncryptionWorker.isNeedCrypt() && !window.checkPasswordFromPlugin)
+    	{
+            window.checkPasswordFromPlugin = true;
+            window.g_asc_plugins.sendToEncryption({ "type": "getPasswordByFile", "hash": _file_hash, "docinfo": _docInfo });
+            return;
+        }
     }
 
     window.checkPasswordFromPlugin = false;
@@ -4197,7 +4286,7 @@ window["asc_IsNeedBuildCryptedFile"] = function()
         }
     }
 
-    window["AscDesktopEditor"]["js_message"]("IsNeedBuildCryptedFile", "" + _returnValue);
+    window["AscDesktopEditor"]["execCommand"]("encrypt:isneedbuild", "" + _returnValue);
     return _returnValue;
 };
 

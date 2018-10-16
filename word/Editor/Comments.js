@@ -221,6 +221,10 @@ CCommentData.prototype.GetUserName = function()
 {
 	return this.m_sUserName;
 };
+CCommentData.prototype.SetUserName = function(sUserName)
+{
+	this.m_sUserName = sUserName;
+};
 CCommentData.prototype.GetDateTime = function()
 {
 	var nTime = parseInt(this.m_sTime);
@@ -240,6 +244,10 @@ CCommentData.prototype.GetReply = function(nIndex)
 CCommentData.prototype.GetText = function()
 {
 	return this.Get_Text();
+};
+CCommentData.prototype.SetText = function(sText)
+{
+	this.m_sText = sText;
 };
 CCommentData.prototype.GetQuoteText = function()
 {

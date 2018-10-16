@@ -30,7 +30,7 @@ SDKJS_FILES += word/sdk-all.js
 SDKJS_FILES += cell/sdk-all.js
 SDKJS_FILES += slide/sdk-all.js
 
-.PHONY: all
+.PHONY: all desktop
 
 all: $(WEBAPPS)
 
@@ -45,6 +45,9 @@ $(WEBAPPS_FILES): $(NODE_MODULES) $(SDKJS_FILES)
 $(SDKJS_FILES): $(NODE_MODULES)
 	cd build && \
 		$(GRUNT_ENV) $(GRUNT) build_$(@D) $(GRUNT_FLAGS)
+
+desktop: GRUNT_FLAGS += --desktop=true
+desktop: all
 	
 clean:
 	rm -f $(WEBAPPS_FILES) $(SDKJS_FILES)
