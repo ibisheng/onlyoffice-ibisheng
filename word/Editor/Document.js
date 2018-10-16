@@ -9952,9 +9952,6 @@ CDocument.prototype.Refresh_RecalcData = function(Data)
 			break;
 		}
 	}
-	else if( this.CanAddComment()){
-		this.Api.sync_UpdateCommentPosition();
-	}
     window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
 	this.TrackRevisionsManager.Update_VisibleChangesPosition(this.Api);
 };
