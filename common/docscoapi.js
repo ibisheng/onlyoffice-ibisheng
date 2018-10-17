@@ -1625,9 +1625,10 @@
 			//при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
 			// sockjs = this.sockjs = new (AscCommon.getSockJs())(this.sockjs_url, null,
 			// 	{'transports': ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
-
+            sockjs.opened = false;
 			sockjs.onopen = function () {
 				t._onServerOpen();
+                sockjs.opened=true;
 			};
 			sockjs.onmessage = function (dataObject) {
 				t._onServerMessage(dataObject);
@@ -1745,29 +1746,29 @@
 		}
 	};
 	DocsCoApi.prototype._onServerClose = function (evt) {
-		// if (ConnectionState.SaveChanges === this._state) {
-		// 	// Мы сохраняли изменения и разорвалось соединение
-		// 	this._isReSaveAfterAuth = true;
-		// 	// Очищаем предыдущий таймер
-		// 	if (null !== this.saveCallbackErrorTimeOutId) {
-		// 		clearTimeout(this.saveCallbackErrorTimeOutId);
-		// 	}
-		// }
+		if (ConnectionState.SaveChanges === this._state) {
+			// Мы сохраняли изменения и разорвалось соединение
+			this._isReSaveAfterAuth = true;
+			// Очищаем предыдущий таймер
+			if (null !== this.saveCallbackErrorTimeOutId) {
+				clearTimeout(this.saveCallbackErrorTimeOutId);
+			}
+		}
 		this._state = ConnectionState.Reconnect;
-		// var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
-		// 	this.attemptCount >= this.maxAttemptCount);
-		// var error = null;
-		// if (bIsDisconnectAtAll) {
-		// 	this._state = ConnectionState.ClosedAll;
-		// 	error = this._getDisconnectErrorCode(evt.code);
-		// }
-		// if (this.onDisconnect) {
-		// 	this.onDisconnect(evt.reason, error);
-		// }
-		// //Try reconect
-		// if (!bIsDisconnectAtAll) {
-		// 	this._tryReconnect();
-		// }
+		var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
+			this.attemptCount >= this.maxAttemptCount);
+		var error = null;
+		if (bIsDisconnectAtAll) {
+			this._state = ConnectionState.ClosedAll;
+			error = this._getDisconnectErrorCode(evt.code);
+		}
+		if (this.onDisconnect) {
+			this.onDisconnect(evt.reason, error);
+		}
+		//Try reconect
+		if (!bIsDisconnectAtAll) {
+			this._tryReconnect();
+		}
 	};
 	DocsCoApi.prototype._reconnect = function () {
 		delete this.sockjs;
