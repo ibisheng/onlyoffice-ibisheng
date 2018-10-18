@@ -1747,29 +1747,29 @@
 		}
 	};
 	DocsCoApi.prototype._onServerClose = function (evt) {
-		if (ConnectionState.SaveChanges === this._state) {
-			// Мы сохраняли изменения и разорвалось соединение
-			this._isReSaveAfterAuth = true;
-			// Очищаем предыдущий таймер
-			if (null !== this.saveCallbackErrorTimeOutId) {
-				clearTimeout(this.saveCallbackErrorTimeOutId);
-			}
-		}
+		// if (ConnectionState.SaveChanges === this._state) {
+		// 	// Мы сохраняли изменения и разорвалось соединение
+		// 	this._isReSaveAfterAuth = true;
+		// 	// Очищаем предыдущий таймер
+		// 	if (null !== this.saveCallbackErrorTimeOutId) {
+		// 		clearTimeout(this.saveCallbackErrorTimeOutId);
+		// 	}
+		// }
 		this._state = ConnectionState.Reconnect;
-		var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
-			this.attemptCount >= this.maxAttemptCount);
-		var error = null;
-		if (bIsDisconnectAtAll) {
-			this._state = ConnectionState.ClosedAll;
-			error = this._getDisconnectErrorCode(evt.code);
-		}
-		if (this.onDisconnect) {
-			this.onDisconnect(evt.reason, error);
-		}
-		//Try reconect
-		if (!bIsDisconnectAtAll) {
-			this._tryReconnect();
-		}
+		// var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
+		// 	this.attemptCount >= this.maxAttemptCount);
+		// var error = null;
+		// if (bIsDisconnectAtAll) {
+		// 	this._state = ConnectionState.ClosedAll;
+		// 	error = this._getDisconnectErrorCode(evt.code);
+		// }
+		// if (this.onDisconnect) {
+		// 	this.onDisconnect(evt.reason, error);
+		// }
+		// //Try reconect
+		// if (!bIsDisconnectAtAll) {
+		// 	this._tryReconnect();
+		// }
 	};
 	DocsCoApi.prototype._reconnect = function () {
 		delete this.sockjs;
