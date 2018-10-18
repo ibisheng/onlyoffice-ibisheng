@@ -9951,9 +9951,15 @@ CDocument.prototype.Refresh_RecalcData = function(Data)
 			ChangePos = 0;
 			break;
 		}
+    }
+    
+	if (-1 != ChangePos)
+	{
+		this.History.RecalcData_Add({
+			Type : AscDFH.historyitem_recalctype_Inline,
+			Data : {Pos : ChangePos, PageNum : 0}
+		});
 	}
-    window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
-	this.TrackRevisionsManager.Update_VisibleChangesPosition(this.Api);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с секциями
