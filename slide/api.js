@@ -584,7 +584,7 @@
 
         // Spell Checking
         this.SpellCheckApi      = new AscCommon.CSpellCheckApi();
-        this.isSpellCheckEnable = true;
+        this.isSpellCheckEnable = false;
 
 
         this.DocumentUrl     = "";

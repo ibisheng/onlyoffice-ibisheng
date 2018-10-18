@@ -766,7 +766,7 @@
 
 		// Spell Checking
 		this.SpellCheckApi      = new AscCommon.CSpellCheckApi();
-		this.isSpellCheckEnable = true;
+		this.isSpellCheckEnable = false;
 
 		// это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
 		this.isOnlyReaderMode = false;
