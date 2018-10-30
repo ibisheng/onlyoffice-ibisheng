@@ -541,7 +541,7 @@
                 if(_url.indexOf(".zip")>0){
                     window["getMediaSrc"](_url,oImage)
                 }else{
-                    if(_url.indexOf("http")>-1 && _url.indexOf(location.host)<0){
+                    if(_url.indexOf("http")>-1 && _url.indexOf(location["host"])<0){
                         _image.crossOrigin = "Anonymous"
                     }
                     _image.src = _url;
