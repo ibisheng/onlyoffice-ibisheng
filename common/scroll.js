@@ -1478,7 +1478,7 @@ function _HEXTORGB_( colorHEX ) {
 	 * @constructor
 	 */
 	function ScrollSettings() {
-		this.showArrows = true;
+		this.showArrows = false;
 		this.screenW = -1;
 		this.screenH = -1;
 		this.screenAddH = 0;
@@ -1494,10 +1494,10 @@ function _HEXTORGB_( colorHEX ) {
 		this.scrollPagePercent = 1. / 8;
 		this.arrowDim = 13;
 		this.marginScroller = 4;
-		this.scrollerColor = "#f1f1f1";
-		this.scrollerColorOver = "#cfcfcf";
-		this.scrollerColorLayerOver = "#cfcfcf";
-		this.scrollerColorActive = "#ADADAD";
+		this.scrollerColor = "#c3c3c3";
+		this.scrollerColorOver = "#7d7d7d";
+		this.scrollerColorLayerOver = "#7d7d7d";
+		this.scrollerColorActive = "#7d7d7d";
 		this.scrollBackgroundColor = "#f4f4f4";
 		this.scrollBackgroundColorHover = "#f4f4f4";
 		this.scrollBackgroundColorActive = "#f4f4f4";
@@ -1524,7 +1524,7 @@ function _HEXTORGB_( colorHEX ) {
 		this.piperColorHover = "#f1f1f1";
 		this.arrowSizeW = 13;
 		this.arrowSizeH = 13;
-		this.cornerRadius = 0;
+		this.cornerRadius = 4;
 		this.slimScroll = false;
 		this.alwaysVisible = false;
 		this.isNeedInvertOnActive = false;
@@ -1645,7 +1645,7 @@ function _HEXTORGB_( colorHEX ) {
 				i = ( i % k === 0 ) ? i + k : i
 			}
 
-			ctx_piperImg.putImageData( _data, 0, 0 );
+			// ctx_piperImg.putImageData( _data, 0, 0 );
 
 			ctx_piperImg = this.piperImgHor[index].getContext( '2d' );
 
@@ -1660,7 +1660,7 @@ function _HEXTORGB_( colorHEX ) {
 				i = ( i % 4 === 0 && i % 52 !== 0 ) ? i + 4 : i
 			}
 
-			ctx_piperImg.putImageData( _data, 0, 0 )
+			// ctx_piperImg.putImageData( _data, 0, 0 )
 
 			r = _HEXTORGB_( this.settings.piperColorHover );
 			g = r.G;
@@ -2147,7 +2147,7 @@ function _HEXTORGB_( colorHEX ) {
 	ScrollObject.prototype.roundRect = function ( x, y, width, height, radius ) {
 		if ( typeof radius === "undefined" ) {
 			radius = 1;
-		}
+        }
 		this.context.beginPath();
 		this.context.moveTo( x + radius, y );
 		this.context.lineTo( x + width - radius, y );
@@ -2410,7 +2410,6 @@ function _HEXTORGB_( colorHEX ) {
 		}
 
 		function drawScroller() {
-
 			that.context.beginPath();
 
 			if ( that.isVerticalScroll ) {

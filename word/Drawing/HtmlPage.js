@@ -211,7 +211,7 @@ function CEditorPage(api)
 	this.NoneRepaintPages = false;
 
 	this.m_bIsScroll    = false;
-	this.ScrollsWidthPx = 14;
+	this.ScrollsWidthPx = 10;
 
 	this.m_oHorRuler = new CHorRuler();
 	this.m_oVerRuler = new CVerRuler();
@@ -427,9 +427,9 @@ function CEditorPage(api)
 		// --------------------------------------------------------------------------
 
 		// main content -------------------------------------------------------------
-		this.m_oMainContent = CreateControlContainer("id_main");
+        this.m_oMainContent = CreateControlContainer("id_main");
 		if (!this.m_oApi.isMobileVersion)
-			this.m_oMainContent.Bounds.SetParams(0, 0, scrollWidthMm, 0, false, true, true, true, -1, -1);
+			this.m_oMainContent.Bounds.SetParams(0, 0, (this.ScrollsWidthPx + 2) * g_dKoef_pix_to_mm, 0, false, true, true, true, -1, -1);
 		else
 			this.m_oMainContent.Bounds.SetParams(0, 0, 0, 0, false, true, true, true, -1, -1);
 		this.m_oMainContent.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
@@ -2872,7 +2872,7 @@ function CEditorPage(api)
 			this.m_oScrollHor.HtmlElement.style.display = 'block';
 
 			this.m_oPanelRight.Bounds.B  = this.ScrollsWidthPx * g_dKoef_pix_to_mm;
-			this.m_oMainContent.Bounds.B = this.ScrollsWidthPx * g_dKoef_pix_to_mm;
+			this.m_oMainContent.Bounds.B = (this.ScrollsWidthPx + 2) * g_dKoef_pix_to_mm;
 		}
 		else
 		{

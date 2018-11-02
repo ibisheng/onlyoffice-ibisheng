@@ -9,8 +9,8 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	right: 14px;
-	bottom: 14px;
+	right: 12px;
+	bottom: 12px;
     overflow: hidden;
 }
 
@@ -36,9 +36,9 @@
 #ws-v-scrollbar {
 	position: absolute;
 	right: 0;
-	width: 14px;
+	width: 10px;
 	top: 0px;
-	bottom: 14px;
+	bottom: 10px;
 	overflow: hidden;
 	z-index: 10;
     background-color: #f1f1f1;
@@ -51,9 +51,9 @@
 #ws-h-scrollbar {
 	position: absolute;
 	bottom: 0;
-	height: 14px;
+	height: 10px;
 	left: 0px;
-	right: 14px;
+	right: 10px;
 	overflow: hidden;
 	z-index: 10;
     background-color: #f1f1f1;
@@ -67,8 +67,8 @@
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	width: 14px;
-	height: 14px;
+	width: 10px;
+	height: 10px;
 	background-color: #F4F4F4;
 	border: 0;
 	z-index: 10;
