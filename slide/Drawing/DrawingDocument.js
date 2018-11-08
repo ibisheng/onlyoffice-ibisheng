@@ -4368,7 +4368,7 @@ function CThumbnailsManager()
 			settings.showArrows = false;
 			settings.screenW = word_control.m_oThumbnails.HtmlElement.width;
 			settings.screenH = word_control.m_oThumbnails.HtmlElement.height;
-			settings.cornerRadius = 1;
+			settings.cornerRadius = 4;
 			settings.slimScroll = true;
 			settings.scrollBackgroundColor = GlobalSkin.BackgroundColorThumbnails;
 			settings.scrollBackgroundColorHover = GlobalSkin.BackgroundColorThumbnails;
