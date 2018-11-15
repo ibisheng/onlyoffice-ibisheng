@@ -588,6 +588,11 @@ CImageShape.prototype.draw = function(graphics, transform)
     if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
         return;
     }
+    // added by lencil
+    if (this.nvPicPr.cNvPr.isHidden) {
+        return;
+    }
+    // end added by lencil
     if(graphics.updatedRect)
     {
         var rect = graphics.updatedRect;
