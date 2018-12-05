@@ -90,7 +90,7 @@
 		this.documentPathname      = window.location.pathname; // for presentation theme url
 
 		// Переменная отвечает, получили ли мы ответ с сервера совместного редактирования
-		this.ServerIdWaitComplete = false;
+		this.ServerIdWaitComplete = true;
 
 		// Long action
 		this.IsLongActionCurrent       = 0;

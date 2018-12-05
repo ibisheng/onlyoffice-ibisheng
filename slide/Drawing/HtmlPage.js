@@ -448,7 +448,7 @@ function CEditorPage(api)
 
 		this.m_oBody = CreateControlContainer(this.Name);
 
-		this.Splitter1Pos    = 67.5;
+		this.Splitter1Pos    = window['bishengPPTSplitter1Pos'] || 67.5;
 		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 11 : 0;
 
 		this.OldSplitter1Pos = this.Splitter1Pos;

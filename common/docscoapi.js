@@ -1615,6 +1615,10 @@
   };
 
 	DocsCoApi.prototype._initSocksJs = function () {
+        if (window["Global"] && window["Global"].isOfficeViewer) {
+            return;
+        }
+
 		var t = this;
 		var sockjs = this.sockjs = window["socketJS"];
 		if (window['IS_NATIVE_EDITOR']) {
