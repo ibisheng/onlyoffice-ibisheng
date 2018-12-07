@@ -213,7 +213,8 @@ WaterMarkState.prototype =
         var pageIndex = this.options.pageIndex;
         var sText = this.options.text;
         var sFontName2 = undefined;
-		var nFontSize2 = this.options.extY;
+        var nFontSize2 = this.options.extY;
+        var bDiagonal = this.options.bDiagonal;
 
         this.preset = "rect";//todo:
         History.Create_NewPoint(AscDFH.historydescription_Document_AddNewShape);
@@ -239,12 +240,58 @@ WaterMarkState.prototype =
 		var oTextPr = new CTextPr();
         oTextPr.FontSize = 1;
         oTextPr.FontSizeCS=1;
-		oTextPr.RFonts.Ascii = sFontName2;
+        var fontFamily = this.options.fontFamily||"SimSun";
+        oTextPr.FontFamily = {Name: fontFamily, Index: -1};
+        oTextPr.Color =   AscCommon.CreateAscColorCustom(237, 125, 49 );
 		// oTextPr.TextFill = oTextFill2;
 		oContent.Set_ApplyToAll(true);
 		oContent.AddToParagraph(new ParaTextPr(oTextPr));
 		oContent.SetParagraphAlign(AscCommon.align_Center);
-		oContent.Set_ApplyToAll(false);
+        oContent.Set_ApplyToAll(false);
+        
+        var oSpPr = shape.spPr;
+        oSpPr.setFill(AscFormat.CreateNoFillUniFill());
+        oSpPr.setLn(AscFormat.CreateNoFillLine());
+
+        var oXfrm = new AscFormat.CXfrm();
+		oXfrm.setOffX(0);
+		oXfrm.setOffY(0);
+
+
+		var fHeight = 45;
+		var fWidth;
+		if(bDiagonal !== false){
+			fWidth = this.options.extX+10;
+			oXfrm.setRot(7*Math.PI/4);
+		}
+		else{
+			fWidth = this.options.extX;
+		}
+
+		oXfrm.setExtX(fWidth);
+		oXfrm.setExtY(fHeight);
+        oSpPr.setXfrm(oXfrm);
+
+        var oBodyPr = shape.getBodyPr().createDuplicate();
+		oBodyPr.rot = 0;
+		oBodyPr.spcFirstLastPara = false;
+		oBodyPr.vertOverflow = AscFormat.nOTOwerflow;
+		oBodyPr.horzOverflow = AscFormat.nOTOwerflow;
+		oBodyPr.vert = AscFormat.nVertTThorz;
+		oBodyPr.lIns = 2.54;
+		oBodyPr.tIns = 1.27;
+		oBodyPr.rIns = 2.54;
+		oBodyPr.bIns = 1.27;
+		oBodyPr.numCol = 1;
+		oBodyPr.spcCol = 0;
+		oBodyPr.rtlCol = 0;
+		oBodyPr.fromWordArt = false;
+		oBodyPr.anchor = 4;
+		oBodyPr.anchorCtr = false;
+		oBodyPr.forceAA = false;
+		oBodyPr.compatLnSpc = true;
+		oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry("textPlain");}, this, []);
+		shape.setBodyPr(oBodyPr);
         //
 
         var drawing = new ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);

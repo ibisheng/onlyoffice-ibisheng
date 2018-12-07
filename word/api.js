@@ -6954,7 +6954,7 @@ background-repeat: no-repeat;\
 			_sectionPr.X ,
 			_sectionPr.Y + _sectionPr.YLimit / 2 - 36,
 			_sectionPr.XLimit,
-			72, {});
+		    options|{});
 	};
 
 

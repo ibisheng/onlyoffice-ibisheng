@@ -1208,15 +1208,15 @@ CGraphicObjects.prototype =
             this.document.Set_DocPosType(oldPosType);
         }
         else{
-            this.changeCurrentState(new AscFormat.WaterMarkState(this, {
+            this.changeCurrentState(new AscFormat.WaterMarkState(this, Object.assign({
                 text: sText,
                 x: dX,
                 y: dY,
                 extX: dExtX,
                 extY: dExtY,
                 pageIndex: nPageIndex
-            }));
-            this.curState.insert();
+            }, options)));
+            this.curState.insert( options );
         }
        
         this.document.Document_UpdateInterfaceState();
