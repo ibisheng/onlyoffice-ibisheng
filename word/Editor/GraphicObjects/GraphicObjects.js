@@ -1177,7 +1177,52 @@ CGraphicObjects.prototype =
     {
         this.applyDrawingProps(props);
     },
-
+    /**
+     * for insert bookmark
+     * author: wang xu ming
+     * @param {*} sPreset 
+     * @param {*} nPageIndex 
+     * @param {*} dX 
+     * @param {*} dY 
+     * @param {*} dExtX 
+     * @param {*} dExtY 
+     */
+    insertWaterMark: function(sText, nPageIndex, dX, dY, dExtX, dExtY, options ){
+        var CurHdrFtr = this.document.HdrFtr.CurHdrFtr;
+        if( !CurHdrFtr ){
+            let oldPosType = this.document.Get_DocPosType();
+            this.document.HdrFtr.CreateHeader( nPageIndex );
+            this.document.Set_DocPosType(oldPosType);
+        }
+        if( false ){
+            //for debug
+            let oldPosType = this.document.Get_DocPosType();
+            this.document.Set_DocPosType(docpostype_HdrFtr);
+            this.changeCurrentState(new AscFormat.StartAddNewShape(this, sPreset));
+            this.OnMouseDown({}, dX, dY, nPageIndex);
+            if(AscFormat.isRealNumber(dExtX) && AscFormat.isRealNumber(dExtY))
+            {
+                this.OnMouseMove({IsLocked: true}, dX + dExtX, dY + dExtY, nPageIndex)
+            }
+            this.OnMouseUp({}, dX, dY, nPageIndex);
+            this.document.Set_DocPosType(oldPosType);
+        }
+        else{
+            this.changeCurrentState(new AscFormat.WaterMarkState(this, {
+                text: sText,
+                x: dX,
+                y: dY,
+                extX: dExtX,
+                extY: dExtY,
+                pageIndex: nPageIndex
+            }));
+            this.curState.insert();
+        }
+       
+        this.document.Document_UpdateInterfaceState();
+        this.document.Document_UpdateRulersState();
+        this.document.Document_UpdateSelectionState();
+    },
 
     addShapeOnPage: function(sPreset, nPageIndex, dX, dY, dExtX, dExtY)
     {
@@ -1195,6 +1240,9 @@ CGraphicObjects.prototype =
                 this.document.Selection.Start = true;
 
                 var CurHdrFtr = this.document.HdrFtr.CurHdrFtr;
+                if( !CurHdrFtr ){
+
+                }
                 var DocContent = CurHdrFtr.Content;
 
                 DocContent.Set_DocPosType(docpostype_DrawingObjects);

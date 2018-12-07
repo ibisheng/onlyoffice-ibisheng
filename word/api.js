@@ -6924,7 +6924,7 @@ background-repeat: no-repeat;\
 			return;
 
 		var _pageNum = this.GetCurrentVisiblePage();
-		// получаем размеры страницы
+		// get the page size
 		var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
 
 		var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
@@ -6935,6 +6935,28 @@ background-repeat: no-repeat;\
 			_min,
 			_min);
 	};
+	/**
+	 * test code for insert watermark
+	 * wang xu ming
+	 */
+	asc_docs_api.prototype.InsertWaterMark = function( text, options )
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+
+		var _pageNum = this.GetCurrentVisiblePage();
+		// get the page size
+		var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+
+		var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
+
+		this.WordControl.m_oLogicDocument.DrawingObjects.insertWaterMark(text, _pageNum,
+			_sectionPr.X ,
+			_sectionPr.Y + _sectionPr.YLimit / 2 - 36,
+			_sectionPr.XLimit,
+			72, {});
+	};
+
 
 	asc_docs_api.prototype.AddTextArt = function(nStyle)
 	{

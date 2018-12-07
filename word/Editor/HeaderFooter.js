@@ -2148,7 +2148,7 @@ CHeaderFooterController.prototype =
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent, bActivate)
     {
 		var TempHdrFtr = null;
-		// Если мы попадаем в заселекченную автофигуру, пусть она даже выходит за пределы
+		// If we get into a populated autoshape, even if it goes beyond
 		if (true === this.LogicDocument.DrawingObjects.pointInSelectedObject(X, Y, PageIndex)
 			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Header) && true === TempHdrFtr.Is_PointInFlowTable(X, Y))
 			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Footer) && true === TempHdrFtr.Is_PointInFlowTable(X, Y)))
@@ -2172,8 +2172,8 @@ CHeaderFooterController.prototype =
 
         var OldPage = this.CurPage;
 
-        // Сначала проверяем, не попали ли мы в контент документа. Если да, тогда надо
-        // активировать работу с самим документом (просто вернуть false здесь)
+        // First, we check if we are in the content of the document. If yes, then it is necessary
+        // activate work with the document itself (just return false here)
 
         var PageMetrics = this.LogicDocument.Get_PageContentStartPos( PageIndex );
         
@@ -2181,7 +2181,7 @@ CHeaderFooterController.prototype =
             !( Y <= PageMetrics.Y      || ( null !== ( TempHdrFtr = this.Pages[PageIndex].Header ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) ) &&
             !( Y >= PageMetrics.YLimit || ( null !== ( TempHdrFtr = this.Pages[PageIndex].Footer ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) ) )
         {
-            // Убираем селект, если он был
+            // We clean select if it was
             if ( null != this.CurHdrFtr )
             {
                 this.CurHdrFtr.RemoveSelection();
@@ -2195,15 +2195,15 @@ CHeaderFooterController.prototype =
 
         var HdrFtr = null;
 
-        // Проверяем попали ли мы в колонтитул, если он есть. Если мы попали в
-        // область колонтитула, а его там нет, тогда добавим новый колонтитул.
+        // Check if we hit the footer, if there is one. If we hit the
+        // footer area, but it is not there, then add a new footer.
         if ( Y <= PageMetrics.Y || ( null !== ( TempHdrFtr = this.Pages[PageIndex].Header ) && true === TempHdrFtr.Is_PointInDrawingObjects( X, Y ) ) || true === editor.isStartAddShape )
         {
             if ( null === this.Pages[PageIndex].Header )
             {
                 if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
-                    // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
+                    // Change the old editing mode to return to the document editing mode when undo / redo
                     this.LogicDocument.Set_DocPosType(docpostype_Content);
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
                     this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
@@ -2286,6 +2286,34 @@ CHeaderFooterController.prototype =
         }
 
         return true;
+    },
+
+    CreateHeader: function( PageIndex ){
+        var HdrFtr = null;
+        
+        if ( null === this.Pages[PageIndex].Header )
+        {
+            // if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
+            {
+                // Change the old editing mode to return to the document editing mode when undo / redo
+                this.LogicDocument.Set_DocPosType(docpostype_Content);
+                History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
+                this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
+                this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
+
+                if (this.CurHdrFtr)
+                    this.CurHdrFtr.RemoveSelection();
+
+                this.CurHdrFtr = HdrFtr;
+
+                this.LogicDocument.Recalculate();
+            }
+            // else
+            //    return false;
+        }
+        else
+            HdrFtr = this.Pages[PageIndex].Header;
+        return HdrFtr;
     },
 
     Selection_SetEnd : function(X, Y, PageIndex, MouseEvent)

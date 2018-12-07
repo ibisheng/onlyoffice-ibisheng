@@ -154,7 +154,7 @@ StartAddNewShape.prototype =
                 drawing.Set_XYForAdd(shape.x, shape.y, nearest_pos, this.pageIndex);
                 drawing.Add_ToDocument(nearest_pos, false);
                 this.drawingObjects.resetSelection();
-                shape.select(this.drawingObjects, this.pageIndex);
+                // shape.select(this.drawingObjects, this.pageIndex);
                 this.drawingObjects.document.Recalculate();
                 if(this.preset === "textRect")
                 {
@@ -175,6 +175,108 @@ StartAddNewShape.prototype =
         editor.sync_EndAddShape();
     }
 };
+/*
+WaterMark function
+autor: wang xu ming
+*/
+function WaterMarkState( drawingObjects, options ){
+    this.drawingObjects = drawingObjects;
+    this.options = options;
+    this.bStart = false;
+}
+
+WaterMarkState.prototype =
+{
+    onMouseDown: function(e, x, y, pageIndex)
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+            return {objectId: null, bMarker: true};
+
+        if(this.bStart){
+            this.onMouseUp(e, x, y, pageIndex);
+            this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
+        }
+
+        this.pageIndex = pageIndex;
+        this.drawingObjects.arrPreTrackObjects.length = 0;
+        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.bStart = true;
+        this.drawingObjects.swapTrackObjects();
+        return true;
+    },
+
+    insert: function(){
+        var x = this.options.x;
+        var y = this.options.y;
+        var tx = x + this.options.extX;
+        var ty = y + this.options.extY;
+        var pageIndex = this.options.pageIndex;
+        var sText = this.options.text;
+        var sFontName2 = undefined;
+		var nFontSize2 = this.options.extY;
+
+        this.preset = "rect";//todo:
+        History.Create_NewPoint(AscDFH.historydescription_Document_AddNewShape);
+        var document = this.drawingObjects.document;
+
+        var oldPosType = document.Get_DocPosType();
+        document.Set_DocPosType(docpostype_HdrFtr);
+        //....
+        this.onMouseDown( {}, x, y , pageIndex );
+        //mouse over 
+        this.drawingObjects.arrTrackObjects[0].track({IsLocked: true}, tx, ty);
+        this.drawingObjects.updateOverlay();
+        //mouse up
+        var bounds = this.drawingObjects.arrTrackObjects[0].getBounds();
+        var shape = this.drawingObjects.arrTrackObjects[0].getShape(true, this.drawingObjects.drawingDocument);
+
+        //
+        var sText2 = ((typeof (sText) === "string") && (sText.length > 0)) ? sText : "WATERMARK";
+        shape.createTextBoxContent();
+        
+        var oContent = shape.getDocContent();
+		AscFormat.AddToContentFromString(oContent, sText2);
+		var oTextPr = new CTextPr();
+        oTextPr.FontSize = 1;
+        oTextPr.FontSizeCS=1;
+		oTextPr.RFonts.Ascii = sFontName2;
+		// oTextPr.TextFill = oTextFill2;
+		oContent.Set_ApplyToAll(true);
+		oContent.AddToParagraph(new ParaTextPr(oTextPr));
+		oContent.SetParagraphAlign(AscCommon.align_Center);
+		oContent.Set_ApplyToAll(false);
+        //
+
+        var drawing = new ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
+        var nearest_pos = this.drawingObjects.document.Get_NearestPos(pageIndex, bounds.min_x, bounds.min_y, true, drawing);
+        if(nearest_pos )// && false === this.drawingObjects.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type : AscCommon.changestype_2_Element_and_Type , Element : nearest_pos.Paragraph, CheckType : AscCommon.changestype_Paragraph_Content} ))
+        {
+            drawing.Set_DrawingType(drawing_Anchor);
+            drawing.Set_GraphicObject(shape);
+            shape.setParent(drawing);
+            drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            drawing.Set_Distance( 3.2,  0,  3.2, 0 );
+            nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
+            nearest_pos.Page = this.pageIndex;
+
+            drawing.Set_XYForAdd(shape.x, shape.y, nearest_pos, this.pageIndex);
+            drawing.Add_ToDocument(nearest_pos, false);
+            this.drawingObjects.resetSelection();
+            this.drawingObjects.document.Recalculate();
+        }
+        else
+        {
+            this.drawingObjects.document.Document_Undo();
+        }
+        this.drawingObjects.clearTrackObjects();
+        this.drawingObjects.updateOverlay();
+
+        document.Set_DocPosType(oldPosType);
+        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        editor.sync_StartAddShapeCallback( false );
+        editor.sync_EndAddShape();
+    }
+}
 
 
 function NullState(drawingObjects)
@@ -2436,6 +2538,7 @@ window['AscFormat'] = window['AscFormat'] || {};
 window['AscFormat'].MOVE_DELTA = MOVE_DELTA;
 window['AscFormat'].SNAP_DISTANCE = SNAP_DISTANCE;
 window['AscFormat'].StartAddNewShape = StartAddNewShape;
+window['AscFormat'].WaterMarkState = WaterMarkState;
 window['AscFormat'].NullState = NullState;
 window['AscFormat'].PreChangeAdjState = PreChangeAdjState;
 window['AscFormat'].PreMoveInlineObject = PreMoveInlineObject;
