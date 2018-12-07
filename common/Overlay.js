@@ -859,7 +859,7 @@ CAutoshapeTrack.prototype =
     /*************************************************************************/
     DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate, isNoMove)
     {
-        if (window["Global"] && window["Global"].isOfficeViewer) {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
             return;
         }
         
@@ -2003,7 +2003,7 @@ CAutoshapeTrack.prototype =
 
     DrawTrackSelectShapes : function(x, y, w, h)
     {
-        if (window["Global"] && window["Global"].isOfficeViewer) {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
             return;
         }
 
@@ -2261,7 +2261,7 @@ CAutoshapeTrack.prototype =
 
     DrawAdjustment : function(matrix, x, y, bTextWarp)
     {
-        if (window["Global"] && window["Global"].isOfficeViewer) {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
             return;
         }
 

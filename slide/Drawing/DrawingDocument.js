@@ -950,7 +950,7 @@ function CDrawingDocument()
 
     this.UpdateTargetFromPaint = false;
     this.NeedTarget            = true;
-    if (window["Global"] && window["Global"].isOfficeViewer) {
+    if (window["Global"] && window["Global"]["isOfficeViewer"]) {
         this.NeedTarget = false;
     }
 	this.TextMatrix            = null;
@@ -2143,7 +2143,7 @@ function CDrawingDocument()
 	}
 	this.TargetShow      = function()
 	{
-        if (window["Global"] && window["Global"].isOfficeViewer) {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
             return;
         }
 

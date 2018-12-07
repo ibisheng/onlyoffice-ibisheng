@@ -47,6 +47,8 @@
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
     this._CoAuthoringApi = new DocsCoApi();
+    window["bisheng_CoAuthoringApi"] = this._CoAuthoringApi;
+    window["bisheng_onServerMessage"] = this._CoAuthoringApi._onServerMessage;
     this._onlineWork = false;
 
     if (options) {
@@ -1615,7 +1617,7 @@
   };
 
 	DocsCoApi.prototype._initSocksJs = function () {
-        if (window["Global"] && window["Global"].isOfficeViewer) {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
             return;
         }
 

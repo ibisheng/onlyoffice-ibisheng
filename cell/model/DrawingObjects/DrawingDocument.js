@@ -1365,7 +1365,7 @@ function CDrawingDocument(drawingObjects)
     this.UpdateTargetFromPaint = false;
     this.UpdateTargetCheck = false;
     this.NeedTarget = true;
-    if (window["Global"] && window["Global"].isOfficeViewer) {
+    if (window["Global"] && window["Global"]["isOfficeViewer"]) {
         this.NeedTarget = false;
     }
     this.TextMatrix = null;
@@ -2598,7 +2598,7 @@ function CDrawingDocument(drawingObjects)
 
     this.TargetShow = function()
     {
-        if (window["Global"] && window["Global"].isOfficeViewer) {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
             return;
         }
 
