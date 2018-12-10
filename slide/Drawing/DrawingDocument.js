@@ -948,8 +948,11 @@ function CDrawingDocument()
 	this.m_oDocRenderer         = null;
 	this.m_bOldShowMarks        = false;
 
-	this.UpdateTargetFromPaint = false;
-	this.NeedTarget            = true;
+    this.UpdateTargetFromPaint = false;
+    this.NeedTarget            = true;
+    if (window["Global"] && window["Global"]["isOfficeViewer"]) {
+        this.NeedTarget = false;
+    }
 	this.TextMatrix            = null;
 	this.TargetShowFlag        = false;
 	this.TargetShowNeedFlag    = false;
@@ -2140,6 +2143,10 @@ function CDrawingDocument()
 	}
 	this.TargetShow      = function()
 	{
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
+            return;
+        }
+
 		this.TargetShowNeedFlag = true;
 	}
 	this.CheckTargetShow = function()

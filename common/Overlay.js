@@ -859,6 +859,10 @@ CAutoshapeTrack.prototype =
     /*************************************************************************/
     DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate, isNoMove)
     {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
+            return;
+        }
+        
 		if (true === isNoMove)
 			return;
 
@@ -1999,6 +2003,10 @@ CAutoshapeTrack.prototype =
 
     DrawTrackSelectShapes : function(x, y, w, h)
     {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
+            return;
+        }
+
         var overlay = this.m_oOverlay;
         overlay.Show();
 
@@ -2253,6 +2261,10 @@ CAutoshapeTrack.prototype =
 
     DrawAdjustment : function(matrix, x, y, bTextWarp)
     {
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
+            return;
+        }
+
         var overlay = this.m_oOverlay;
         this.CurrentPageInfo = overlay.m_oHtmlPage.GetDrawingPageInfo(this.PageIndex);
 

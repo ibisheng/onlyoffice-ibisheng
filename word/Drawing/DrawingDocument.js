@@ -2695,6 +2695,10 @@ function CDrawingDocument()
 
 	this.showTarget = function (isShow)
 	{
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
+            isShow = false;
+        }
+
 		if (this.TargetHtmlElementBlock)
 			this.TargetHtmlElement.style.display = isShow ? "display" : "none";
 		else
