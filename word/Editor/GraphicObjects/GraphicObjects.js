@@ -1194,6 +1194,10 @@ CGraphicObjects.prototype =
             this.document.HdrFtr.CreateHeader( nPageIndex );
             this.document.Set_DocPosType(oldPosType);
         }
+        if( this.watermarkObj){
+            //remove object
+            this.watermarkObj.parent.Remove_FromDocument(false);
+        }
         if( false ){
             //for debug
             let oldPosType = this.document.Get_DocPosType();
@@ -1216,12 +1220,21 @@ CGraphicObjects.prototype =
                 extY: dExtY,
                 pageIndex: nPageIndex
             }, options)));
-            this.curState.insert( options );
+            // AscFormat.ExecuteNoHistory(function(){return this.curState.insert(options);}, this, []);
+            this.watermarkObj =  this.curState.insert( options );
         }
        
         this.document.Document_UpdateInterfaceState();
         this.document.Document_UpdateRulersState();
         this.document.Document_UpdateSelectionState();
+    },
+
+    removeWaterMark: function(){
+        if( this.watermarkObj){
+            this.watermarkObj.parent.Remove_FromDocument(false);
+            this.resetSelection();
+            this.document.Recalculate();
+        }
     },
 
     addShapeOnPage: function(sPreset, nPageIndex, dX, dY, dExtX, dExtY)

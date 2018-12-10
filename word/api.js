@@ -1965,7 +1965,11 @@ background-repeat: no-repeat;\
 				return;
 			}
 		}
+		this.InsertWaterMark({"history": true });
 		this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print : DownloadType.None);
+		this.RemoveWaterMark();
+		// History.RemoveLastPoint();
+		// History.RemoveLastPoint();
 	};
 	asc_docs_api.prototype._print         = function(actionType, downloadType)
 	{
@@ -6957,6 +6961,13 @@ background-repeat: no-repeat;\
 		    options|{});
 	};
 
+	asc_docs_api.prototype.RemoveWaterMark = function()
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+		this.WordControl.m_oLogicDocument.DrawingObjects.removeWaterMark();
+	};
+
 
 	asc_docs_api.prototype.AddTextArt = function(nStyle)
 	{
@@ -9688,6 +9699,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['sync_MarkerFormatCallback']                 = asc_docs_api.prototype.sync_MarkerFormatCallback;
 	asc_docs_api.prototype['StartAddShape']                             = asc_docs_api.prototype.StartAddShape;
 	asc_docs_api.prototype['AddShapeOnCurrentPage']                     = asc_docs_api.prototype.AddShapeOnCurrentPage;
+	asc_docs_api.prototype['AddTextArt']                                = asc_docs_api.prototype.AddTextArt;
+	asc_docs_api.prototype['InsertWaterMark']                           = asc_docs_api.prototype.InsertWaterMark;
+	asc_docs_api.prototype['RemoveWaterMark']                           = asc_docs_api.prototype.RemoveWaterMark;
 	asc_docs_api.prototype['AddTextArt']                                = asc_docs_api.prototype.AddTextArt;
 	asc_docs_api.prototype['sync_StartAddShapeCallback']                = asc_docs_api.prototype.sync_StartAddShapeCallback;
 	asc_docs_api.prototype['CanGroup']                                  = asc_docs_api.prototype.CanGroup;

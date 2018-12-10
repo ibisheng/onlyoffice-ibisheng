@@ -212,11 +212,9 @@ WaterMarkState.prototype =
         var ty = y + this.options.extY;
         var pageIndex = this.options.pageIndex;
         var sText = this.options.text;
-        var sFontName2 = undefined;
-        var nFontSize2 = this.options.extY;
         var bDiagonal = this.options.bDiagonal;
 
-        this.preset = "rect";//todo:
+        this.preset = "rect";
         History.Create_NewPoint(AscDFH.historydescription_Document_AddNewShape);
         var document = this.drawingObjects.document;
 
@@ -296,7 +294,7 @@ WaterMarkState.prototype =
 
         var drawing = new ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
         var nearest_pos = this.drawingObjects.document.Get_NearestPos(pageIndex, bounds.min_x, bounds.min_y, true, drawing);
-        if(nearest_pos )// && false === this.drawingObjects.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type : AscCommon.changestype_2_Element_and_Type , Element : nearest_pos.Paragraph, CheckType : AscCommon.changestype_Paragraph_Content} ))
+        if(nearest_pos )
         {
             drawing.Set_DrawingType(drawing_Anchor);
             drawing.Set_GraphicObject(shape);
@@ -322,6 +320,9 @@ WaterMarkState.prototype =
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
         editor.sync_StartAddShapeCallback( false );
         editor.sync_EndAddShape();
+        if( !this.options.history)
+            History.RemoveLastPoint();
+        return shape;
     }
 }
 

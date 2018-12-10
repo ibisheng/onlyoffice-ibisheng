@@ -37,14 +37,14 @@
 function CHistory(Document)
 {
     this.Index      = -1;
-    this.SavedIndex = null;        // Номер точки отката, на которой произошло последнее сохранение
-    this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
-    this.RecIndex   = -1;          // Номер точки, на которой произошел последний пересчет
-    this.Points     = [];          // Точки истории, в каждой хранится массив с изменениями после текущей точки
+    this.SavedIndex = null;        // The number of the rollback point where the last save occurred.
+    this.ForceSave  = false;       // Need to save, it happens when we have a point SavedIndex is shifted due to the union of points, and we do Undo
+    this.RecIndex   = -1;          // The number of the point where the last recalculation occurred
+    this.Points     = [];          // History points, each array is stored with changes after the current point
     this.Document   = Document;
     this.Api                  = null;
     this.CollaborativeEditing = null;
-    this.CanNotAddChanges = false; // флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
+    this.CanNotAddChanges = false; //flag to track the errors of adding changes without a dot: Create_NewPoint-> Add-> Save_Changes-> Add
 	this.CollectChanges   = false;
 
 	this.RecalculateData =
@@ -68,16 +68,16 @@ function CHistory(Document)
 	};
 
 	this.TurnOffHistory = 0;
-    this.MinorChanges   = false; // Данный параметр нужен, чтобы определить влияют ли добавленные изменения на пересчет
+    this.MinorChanges   = false; // This parameter is needed to determine whether the added changes affect the recalculation.
 
     this.BinaryWriter = new AscCommon.CMemory();
 
     this.FileCheckSum = 0;
     this.FileSize     = 0;
 
-    // Параметры для специального сохранения для локальной версии редактора
+    // Parameters for special save for the local version of the editor
     this.UserSaveMode   = false;
-    this.UserSavedIndex = null;  // Номер точки, на которой произошло последнее сохранение пользователем (не автосохранение)
+    this.UserSavedIndex = null;  //The number of the point at which the last user save occurred (not autosave)
 
 	this.StoredData = [];
 }
@@ -113,8 +113,8 @@ CHistory.prototype =
 		var Point = this.Points[PointIndex];
 		if (Point)
 		{
-			// Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
-			// первое изменение с описанием.
+			// Check the first change. If it is of the right type, then we delete it. Add a specific
+			// first change with description.
 			var Class = AscCommon.g_oTableId;
 
 			if (Point.Items.length > 0)
@@ -222,11 +222,11 @@ CHistory.prototype =
     {
         this.CheckUnionLastPoints();
 
-        // Проверяем можно ли сделать Undo
+        // Check whether you can make Undo
         if (true !== this.Can_Undo())
             return null;
 
-        // Запоминаем самое последнее состояние документа для Redo
+        // Remember the latest document status for Redo
         if ( this.Index === this.Points.length - 1 )
             this.LastState = this.Document.GetSelectionState();
         
@@ -241,7 +241,7 @@ CHistory.prototype =
             {
                 Point = this.Points[this.Index--];
 
-                // Откатываем все действия в обратном порядке (относительно их выполенения)
+                //Roll back all actions in the reverse order (regarding their execution)
                 for (var Index = Point.Items.length - 1; Index >= 0; Index--)
                 {
                     var Item = Point.Items[Index];
@@ -259,7 +259,7 @@ CHistory.prototype =
         {
             Point = this.Points[this.Index--];
 
-            // Откатываем все действия в обратном порядке (относительно их выполенения)
+            // Roll back all actions in the reverse order (regarding their execution)
             for (var Index = Point.Items.length - 1; Index >= 0; Index--)
             {
                 var Item = Point.Items[Index];
@@ -287,7 +287,7 @@ CHistory.prototype =
 
     Redo : function()
     {
-        // Проверяем можно ли сделать Redo
+        // Check if Redo can be made
         if ( true != this.Can_Redo() )
             return null;
 
@@ -297,7 +297,7 @@ CHistory.prototype =
 
         this.private_ClearRecalcData();
 
-        // Выполняем все действия в прямом порядке
+        // Perform all actions in direct order.
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
@@ -312,7 +312,7 @@ CHistory.prototype =
 
         this.private_PostProcessingRecalcData();
 
-        // Восстанавливаем состояние на следующую точку
+        //Restoring the state to the next point
         var State = null;
         if ( this.Index === this.Points.length - 1 )
             State = this.LastState;
@@ -351,17 +351,17 @@ CHistory.prototype =
         var Items = [];
         var Time  = new Date().getTime();
 
-        // Создаем новую точку
+        // Create a new point
         this.Points[++this.Index] =
         {
-            State      : State, // Текущее состояние документа (курсор, селект)
-            Items      : Items, // Массив изменений, начиная с текущего момента
-            Time       : Time,  // Текущее время
-            Additional : {},    // Дополнительная информация
+            State      : State, // The current state of the document (cursor, select)
+            Items      : Items, // An array of changes from now
+            Time       : Time,  // Current time
+            Additional : {},    // Additional Information
             Description: Description
         };
 
-        // Удаляем ненужные точки
+        // Remove unnecessary points
         this.Points.length = this.Index + 1;
 		
 		if(!window['AscCommon'].g_specialPasteHelper.pasteStart)
@@ -371,8 +371,8 @@ CHistory.prototype =
     },
 
 	/**
-	 * Специальная функция, для создания точки, чтобы отловить все изменения, которые происходят. После использования
-	 * данная точка ДОЛЖНА быть удалена через функцию Remove_LastPoint.
+	 * Special function, to create a point to catch all the changes that occur. After use
+	 * This point MUST be removed via the Remove_LastPoint function.
 	 */
 	CreateNewPointForCollectChanges : function()
 	{
@@ -425,13 +425,13 @@ CHistory.prototype =
 
     Clear_Redo : function()
     {
-        // Удаляем ненужные точки
+        // Remove unnecessary points
         this.Points.length = this.Index + 1;
     },
 
-    // Регистрируем новое изменение:
-    // Class - объект, в котором оно произошло
-    // Data  - сами изменения
+    // Register the new change:
+    // Class - the object in which it occurred
+    // Data - the changes themselves...
 	Add : function(_Class, Data)
 	{
 		if (0 !== this.TurnOffHistory || this.Index < 0)
@@ -439,8 +439,8 @@ CHistory.prototype =
 
 		this._CheckCanNotAddChanges();
 
-		// Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
-		// пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
+		// A cap in case we have during the creation of a single point in history, after several changes goes
+		// recalculation, then changes are added again and recalculation starts again, etc.
 		if (this.RecIndex >= this.Index)
 			this.RecIndex = this.Index - 1;
 
@@ -638,7 +638,7 @@ CHistory.prototype =
 
     OnEnd_GetRecalcData : function()
     {
-        // Пересчитываем таблицы
+        // Recalculate the table
         for (var TableId in this.RecalculateData.Tables)
         {
             var Table = AscCommon.g_oTableId.Get_ById(TableId);
@@ -651,8 +651,8 @@ CHistory.prototype =
             }
         }
 
-        // Делаем это, чтобы пересчитались ячейки таблиц, в которых есть заданная нумерация. Но нам не нужно менять
-        // начальную точку пересчета здесь, т.к. начальная точка уже рассчитана правильно.
+        // Do this to recalculate the cells of the tables that have the specified numbering. But we do not need to change
+        // The starting point of the conversion is here, because The starting point is already calculated correctly.   
         this.RecalculateData.Update = false;
         for (var NumId in this.RecalculateData.NumPr)
         {
@@ -676,12 +676,12 @@ CHistory.prototype =
 
 	CheckUnionLastPoints : function()
     {
-        // Не объединяем точки в истории, когда отключается пересчет.
-        // TODO: Неправильно изменяется RecalcIndex
+        // Do not combine points in history when scaling is disabled.
+        // TODO: RecalcIndex Changes Incorrectly
         if (true !== this.Document.Is_OnRecalculate())
             return false;
 
-        // Не объединяем точки истории, если на предыдущей точке произошло сохранение
+        // Do not merge points of history, if the previous point was saved
         if (this.Points.length < 2
             || (true !== this.Is_UserSaveMode() && null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)
             || (true === this.Is_UserSaveMode() && null !== this.UserSavedIndex && this.UserSavedIndex >= this.Points.length - 2))
@@ -690,7 +690,7 @@ CHistory.prototype =
         var Point1 = this.Points[this.Points.length - 2];
         var Point2 = this.Points[this.Points.length - 1];
 
-        // Не объединяем слова больше 63 элементов
+        // Do not combine words greater than 63 elements
         if (Point1.Items.length > 63 && AscDFH.historydescription_Document_AddLetterUnion === Point1.Description)
             return false;
 
@@ -706,7 +706,7 @@ CHistory.prototype =
         if ((AscDFH.historydescription_Document_CompositeInput === Point1.Description || AscDFH.historydescription_Document_CompositeInputReplace === Point1.Description)
             && AscDFH.historydescription_Document_CompositeInputReplace === Point2.Description)
         {
-            // Ничего не делаем. Эта ветка означает, что эти две точки можно объединить
+            // Do nothing. This branch means that these two points can be combined
             NewDescription = AscDFH.historydescription_Document_CompositeInput;
         }
         else
@@ -864,10 +864,10 @@ CHistory.prototype =
 
                 for (var Pos = this.RecIndex + 1; Pos <= this.Index; Pos++)
                 {
-                    // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+                    // We read the changes starting from the last point and see what needs to be recounted.
                     var Point = this.Points[Pos];
 
-                    // Выполняем все действия в прямом порядке
+                    // Perform all actions in direct order.
                     for (var Index = 0; Index < Point.Items.length; Index++)
                     {
                         var Item = Point.Items[Index];
@@ -905,7 +905,7 @@ CHistory.prototype =
         }
         else if (this.Index >= 0)
         {
-            // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+            //We read the changes starting from the last point and see what needs to be recounted.
             var Point = this.Points[this.Index];
 
             Count = Point.Items.length;
@@ -918,7 +918,7 @@ CHistory.prototype =
         if (Items.length > 0)
         {
             var Class = Items[0].Class;
-            // Смотрим, чтобы класс, в котором произошли все изменения был один и тот же
+            // We look for the class in which all the changes were made to be the same
             for (var Index = 1; Index < Count; Index++)
             {
                 var Item = Items[Index];
@@ -1177,7 +1177,7 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 	}
 	else if (this.Index >= 0)
 	{
-		// Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+		// We read the changes starting from the last point and see what needs to be recounted.
 		var Point = this.Points[this.Index];
 
 		Count = Point.Items.length;
@@ -1189,8 +1189,8 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 
 	if (Items.length > 0)
 	{
-		// Смотрим, чтобы параграф, в котором происходили все изменения был один и тот же. Если есть изменение,
-		// которое не возвращает параграф, значит возвращаем null.
+		// See that the paragraph in which all the changes took place was the same. If there is a change,
+        // which does not return a paragraph, then we return null.
 
 		var Para = null;
 		for (var Index = 0; Index < Count; Index++)
@@ -1219,8 +1219,8 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 				return null;
 		}
 
-		// Все изменения сделаны в одном параграфе, нам осталось проверить, что каждое из этих изменений
-		// влияет только на данный параграф.
+	    // All changes are made in one paragraph, we are left to check that each of these changes
+        // affects only this paragraph.
 		for (var Index = 0; Index < Count; Index++)
 		{
 			var Item  = Items[Index];
@@ -1240,7 +1240,7 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 };
 CHistory.prototype.private_ClearRecalcData = function()
 {
-	// NumPr здесь не обнуляем
+	// NumPr is not reset here.
 	var NumPr            = this.RecalculateData.NumPr;
 	this.RecalculateData = {
 		Inline   : {
@@ -1266,7 +1266,7 @@ CHistory.prototype.private_ClearRecalcData = function()
 	};
 };
 /**
- * Обработка изменений после Undo/Redo всех изменений
+ * Processing changes after undo / redo of all changes
  */
 CHistory.prototype.private_PostProcessingRecalcData = function()
 {
@@ -1277,7 +1277,7 @@ CHistory.prototype.private_PostProcessingRecalcData = function()
 	}
 };
 	/**
-	 * Получаем сколько изменений в истории уже сохранено на сервере на данный момент с учетом текущей точки в истории
+	 * We get how many changes in the history have already been saved on the server at the moment, taking into account the current point in the history
 	 * @returns {number}
 	 */
 	CHistory.prototype.GetDeleteIndex = function()
@@ -1294,7 +1294,7 @@ CHistory.prototype.private_PostProcessingRecalcData = function()
 		return nSum;
 	};
 	/**
-	 * Удаляем изменения из истории, которые сохранены на сервере. Это происходит при подключении второго пользователя
+	 * Delete the changes from the history that are stored on the server. This happens when a second user is connected.
 	 */
 	CHistory.prototype.RemovePointsByDeleteIndex = function()
 	{

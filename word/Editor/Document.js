@@ -2182,7 +2182,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
     var ChangeIndex = 0;
     var MainChange  = false;
 
-    // Получаем данные об произошедших изменениях
+    // We receive data on the changes
     var RecalcData = History.Get_RecalcData(_RecalcData);
 
     History.Reset_RecalcIndex();
