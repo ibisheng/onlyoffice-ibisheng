@@ -1947,7 +1947,7 @@ background-repeat: no-repeat;\
 	/*----------------------------------------------------------------*/
 	/*functions for working with clipboard, document*/
 	/*TODO: Print,Undo,Redo,Copy,Cut,Paste,Share,Save,DownloadAs,ReturnToDocuments(вернуться на предыдущую страницу) & callbacks for these functions*/
-	asc_docs_api.prototype.asc_Print      = function(bIsDownloadEvent)
+	asc_docs_api.prototype.asc_Print      = function(bIsDownloadEvent, withWaterMark, options)
 	{
 		if (window["AscDesktopEditor"])
 		{
@@ -1964,12 +1964,19 @@ background-repeat: no-repeat;\
 				window["AscDesktopEditor"]["Print"]();
 				return;
 			}
-		}
-		this.InsertWaterMark({"history": true });
-		this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print : DownloadType.None);
-		this.RemoveWaterMark();
-		// History.RemoveLastPoint();
-		// History.RemoveLastPoint();
+        }
+
+        if (withWaterMark) {
+		    this.InsertWaterMark({"history": true });
+        }
+
+        this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print : DownloadType.None);
+        
+        if (withWaterMark) {
+            this.RemoveWaterMark();
+            // History.RemoveLastPoint();
+            // History.RemoveLastPoint();
+        }
 	};
 	asc_docs_api.prototype._print         = function(actionType, downloadType)
 	{

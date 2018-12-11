@@ -367,7 +367,9 @@ var editor;
       this.asc_insertWaterMark( options.text, options );
     }
     this._asc_downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, {downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None});
-    this.asc_removeWaterMark();
+    if ( withWaterMark ) {
+        this.asc_removeWaterMark();
+    }
   };
 
   spreadsheet_api.prototype.asc_Copy = function() {
