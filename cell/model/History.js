@@ -951,6 +951,11 @@ CHistory.prototype.GetSerializeArray = function()
 		}
 	};
 
+	CHistory.prototype.RemoveLastPoint = function(){
+		this.Index--;
+		this.Points.length = this.Index + 1;
+	};
+
 	//------------------------------------------------------------export--------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['AscCommon'].CHistory = CHistory;

@@ -353,7 +353,7 @@ var editor;
 		return true;
     };
 
-  spreadsheet_api.prototype.asc_Print = function(adjustPrint, bIsDownloadEvent) {
+  spreadsheet_api.prototype.asc_Print = function(adjustPrint, bIsDownloadEvent, withWaterMark, options) {
     if (window["AscDesktopEditor"]) {
       window.AscDesktopEditor_PrintData = adjustPrint;
       window["AscDesktopEditor"]["Print"]();
@@ -361,7 +361,13 @@ var editor;
     }
 
     this.adjustPrint = adjustPrint ? adjustPrint : new Asc.asc_CAdjustPrint();
+    if( withWaterMark ){
+      options = options || {};
+      options.save = true;
+      this.asc_insertWaterMark( options.text, options );
+    }
     this._asc_downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, {downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None});
+    this.asc_removeWaterMark();
   };
 
   spreadsheet_api.prototype.asc_Copy = function() {
@@ -2482,14 +2488,35 @@ var editor;
   };
 
 
-    spreadsheet_api.prototype.asc_addShapeOnSheet = function(sPreset) {
-        if(this.wb){
-          var ws = this.wb.getWorksheet();
-          if(ws && ws.objectRender){
-            ws.objectRender.addShapeOnSheet(sPreset);
-          }
+  spreadsheet_api.prototype.asc_addShapeOnSheet = function(sPreset) {
+      if(this.wb){
+        var ws = this.wb.getWorksheet();
+        if(ws && ws.objectRender){
+          ws.objectRender.addShapeOnSheet(sPreset);
         }
-    };
+      }
+  };
+
+  spreadsheet_api.prototype.asc_insertWaterMark = function(text, options ){
+    //todo:
+    if(this.wb){
+      var ws = this.wb.getWorksheet();
+      if(ws && ws.objectRender){
+          ws.objectRender.fillWaterMarks(text,options||{});
+      }
+    }
+  }
+
+  spreadsheet_api.prototype.asc_removeWaterMark = function(){
+    //todo:
+    if(this.wb){
+      var ws = this.wb.getWorksheet();
+      if(ws && ws.objectRender){
+          ws.objectRender.removeWaterMarks();
+      }
+    }
+  }
+
 
   spreadsheet_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
   {
@@ -3628,6 +3655,8 @@ var editor;
   prot["asc_startAddShape"] = prot.asc_startAddShape;
   prot["asc_endAddShape"] = prot.asc_endAddShape;
   prot["asc_addShapeOnSheet"] = prot.asc_addShapeOnSheet;
+  prot["asc_insertWaterMark"] = prot.asc_insertWaterMark;
+  prot["asc_removeWaterMark"] = prot.asc_removeWaterMark
   prot["asc_isAddAutoshape"] = prot.asc_isAddAutoshape;
   prot["asc_canAddShapeHyperlink"] = prot.asc_canAddShapeHyperlink;
   prot["asc_canGroupGraphicsObjects"] = prot.asc_canGroupGraphicsObjects;
