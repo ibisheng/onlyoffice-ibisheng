@@ -673,7 +673,15 @@
 			return;
 		}
         var mimeType = AscCommon.getExtentionByFormat(rdata["outputformat"])
-        window["session"]["downloadAs"](rdata["savetype"],rdata["saveindex"],mimeType,
+
+        var downloadAsFuncCaller = window["session"];
+        var downloadAsFunc = window["session"] && window["session"]["downloadAs"];
+        if (window["Global"] && window["Global"]["isOfficeViewer"]) {
+            downloadAsFuncCaller = window['bishengView'];
+            downloadAsFunc = window['bishengView'] && window['bishengView']['downloadAs'];
+        }
+        
+        downloadAsFunc.call(downloadAsFuncCaller, rdata["savetype"],rdata["saveindex"],mimeType,
             dataContainer.part || dataContainer.data,
             function(err,res){
                 if(err){
