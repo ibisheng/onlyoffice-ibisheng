@@ -4350,8 +4350,6 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 var lastX = 0;
                 var old =last.x + last.w;
                 for( var k=0; k< arry.length; k++ ){
-                    console.log( arry[k].x);
-                    console.log( arry[k].x + arry[k].w );
                     if( arry[k].x < lastX ){
                         arry[k].x = lastX;
                     }
@@ -4370,8 +4368,6 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 var lastY = 0;
                 var old =last.y +  last.h;
                 for( var k=0; k< arry.length; k++ ){
-                    console.log( arry[k].x);
-                    console.log( arry[k].x + arry[k].w );
                     if( arry[k].y < lastY ){
                         arry[k].y = lastY;
                     }

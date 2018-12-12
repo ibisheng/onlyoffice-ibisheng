@@ -7447,6 +7447,116 @@ CPresentation.prototype =
         }
     },
 
+    InsertWaterMark: function( sText, options)
+    {
+        options = options ||{};
+        var _slidesCount = this.Slides.length;
+        var posX = 0;
+        var posY = 80;
+        var bDiagonal = ( options.bDiagonal===false ? false: true );
+
+        History.Create_NewPoint(AscDFH.historydescription_CommonStatesAddNewShape);
+        this.waterMarks = [];
+        for (var _sldIdx = 0; _sldIdx < _slidesCount; _sldIdx++)
+        {
+            var oDrawingObjects = this.Slides[_sldIdx].graphicObjects;
+            oDrawingObjects.startTrackNewShape("rect");
+            oDrawingObjects.onMouseDown({},0,0);
+
+            var track =  oDrawingObjects.arrTrackObjects[0];
+            track.track({}, 280, 60);
+            var shape = track.getShape(false, oDrawingObjects.getDrawingDocument(), oDrawingObjects.drawingObjects);
+            //fill watermark attributes
+            var sText2 = ((typeof (sText) === "string") && (sText.length > 0)) ? sText : "WATERMARK";
+            shape.setTxBody(AscFormat.CreateTextBodyFromString(sText2, oDrawingObjects.getDrawingDocument(), shape));
+            var oContent = shape.getDocContent();
+            var oTextPr = new CTextPr();
+            oTextPr.FontSize = 1;
+            oTextPr.FontSizeCS=1;
+            var fontFamily = options.fontFamily||"SimSun";
+            oTextPr.FontFamily = {Name: fontFamily, Index: -1};
+            oTextPr.Color = AscCommon.CreateAscColorCustom(237, 125, 49 );
+            oContent.Set_ApplyToAll(true);
+            oContent.AddToParagraph(new ParaTextPr(oTextPr));
+            oContent.SetParagraphAlign(AscCommon.align_Center);
+            oContent.Set_ApplyToAll(false);
+
+            var oSpPr = shape.spPr;
+            oSpPr.setFill(AscFormat.CreateNoFillUniFill());
+            oSpPr.setLn(AscFormat.CreateNoFillLine());
+            var oXfrm = new AscFormat.CXfrm();
+
+            var fHeight = 45;
+            var fWidth = this.Slides[_sldIdx].Width;
+            var pageHeight = this.Slides[_sldIdx].Height;
+
+            posY = (pageHeight-45)/2;
+            oXfrm.setOffX(posX);
+            oXfrm.setOffY(posY);
+            
+           
+            if(bDiagonal !== false){
+                fWidth += 10;
+                var angle = Math.PI*2- Math.atan( (pageHeight-20)/fWidth);
+                oXfrm.setRot(angle);
+            }
+    
+            oXfrm.setExtX(fWidth);
+            oXfrm.setExtY(fHeight);
+            oSpPr.setXfrm(oXfrm);
+            //
+            var oBodyPr = new AscFormat.CBodyPr();
+            oBodyPr.rot = 0;
+            oBodyPr.spcFirstLastPara = false;
+            oBodyPr.vertOverflow = AscFormat.nOTOwerflow;
+            oBodyPr.horzOverflow = AscFormat.nOTOwerflow;
+            oBodyPr.vert = AscFormat.nVertTThorz;
+            oBodyPr.lIns = 2.54;
+            oBodyPr.tIns = 1.27;
+            oBodyPr.rIns = 2.54;
+            oBodyPr.bIns = 1.27;
+            oBodyPr.numCol = 1;
+            oBodyPr.spcCol = 0;
+            oBodyPr.rtlCol = 0;
+            oBodyPr.fromWordArt = false;
+            oBodyPr.anchor = 4;
+            oBodyPr.anchorCtr = false;
+            oBodyPr.forceAA = false;
+            oBodyPr.compatLnSpc = true;
+            oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry("textPlain");}, this, []);
+            oBodyPr.textFit = new AscFormat.CTextFit();
+            oBodyPr.textFit.type = AscFormat.text_fit_Auto;
+            shape.txBody.setBodyPr(oBodyPr);
+            //
+            shape.setParent(oDrawingObjects.drawingObjects);
+            shape.setRecalculateInfo();
+            shape.addToDrawingObjects(undefined, AscCommon.c_oAscCellAnchorType.cellanchorTwoCell);
+            shape.checkDrawingBaseCoords();
+            oDrawingObjects.startRecalculate();
+
+            oDrawingObjects.clearTrackObjects();
+            oDrawingObjects.changeCurrentState(new  AscFormat.NullState(oDrawingObjects));
+
+            this.waterMarks.push( shape );
+        }
+        if( !options.save){
+            History.RemoveLastPoint();
+        }
+    },
+
+    RemoveWaterMarks: function(){
+        if( this.waterMarks){
+            this.waterMarks.forEach( item=>{
+                var oDrawingObjects = item.getDrawingObjectsController();
+                item.deleteDrawingBase(true);
+                if(item.setBDeleted){
+                    item.setBDeleted(true);
+                }
+                oDrawingObjects.startRecalculate();
+            });
+            this.waterMarks =[];
+        }
+    },
 
 	AddTextArt: function(nStyle)
     {
@@ -7463,7 +7573,7 @@ CPresentation.prototype =
                 if( oDrawingObjects.arrTrackObjects.length > 0)
                 {
                     oDrawingObjects.clearTrackObjects();
-                    oDrawingObjects.updateOverlay();
+                    oDrawingObjects.updateOverlay(); 
                 }
                 editor.sync_EndAddShape();
             }

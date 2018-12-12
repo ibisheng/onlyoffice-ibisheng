@@ -3969,6 +3969,14 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.asc_insertWaterMark = function( text, options ){
+		this.WordControl.m_oLogicDocument.InsertWaterMark(text,options);
+	};
+
+	asc_docs_api.prototype.asc_removeWaterMark = function()
+    {
+		this.WordControl.m_oLogicDocument.RemoveWaterMarks();
+    };
 
 	asc_docs_api.prototype.canGroup = function()
 	{

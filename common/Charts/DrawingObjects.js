@@ -1782,7 +1782,16 @@ function DrawingObjects() {
                 oTextPr.FontSizeCS=1;
                 var fontFamily = options.fontFamily||"SimSun";
                 oTextPr.FontFamily = {Name: fontFamily, Index: -1};
-                oTextPr.Color =   AscCommon.CreateAscColorCustom(237, 125, 49 );
+                // var color = new  Asc.asc_CColor();
+                // color.type = Asc.c_oAscColor.COLOR_TYPE_SCHEME;
+                // color.r = 237;
+                // color.g = 125;
+                // color.b = 49;
+                // color.a = 0;
+                // color.id = 1;
+                // color.Auto =false;
+
+                oTextPr.Color = AscCommon.CreateAscColorCustom(237, 125, 49 );
                 oContent.Set_ApplyToAll(true);
                 oContent.AddToParagraph(new ParaTextPr(oTextPr));
                 oContent.SetParagraphAlign(AscCommon.align_Center);

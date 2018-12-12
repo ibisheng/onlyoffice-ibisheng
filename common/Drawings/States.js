@@ -131,6 +131,7 @@ StartAddNewShape.prototype =
             }
             var oThis = this;
             var track =  oThis.drawingObjects.arrTrackObjects[0];
+            this.bMoved = true;
             if(!this.bMoved && this instanceof StartAddNewShape)
             {
                 var ext_x, ext_y;
@@ -151,7 +152,7 @@ StartAddNewShape.prototype =
                 {
                     ext_y = ext_x;
                 }
-                this.onMouseMove({IsLocked: true}, this.startX + ext_x, this.startY + ext_y);
+                this.onMouseMove({IsLocked: true}, this.startX + 180, this.startY + 180);
             }
             var callback = function(bLock){
 
