@@ -7475,7 +7475,16 @@ CPresentation.prototype =
             oTextPr.FontSizeCS=1;
             var fontFamily = options.fontFamily||"SimSun";
             oTextPr.FontFamily = {Name: fontFamily, Index: -1};
-            oTextPr.Color = AscCommon.CreateAscColorCustom(237, 125, 49 );
+            var unicolor = new  AscFormat.CUniColor();
+            unicolor.setMods(new AscFormat.CColorModifiers());
+            unicolor.setColor(new AscFormat.CSchemeColor());
+            unicolor.color.setId(1);
+            unicolor.RGBA.R = 237;
+            unicolor.RGBA.G = 125;
+            unicolor.RGBA.B = 49;
+            unicolor.RGBA.A = 100;
+            oTextPr.Unifill =  AscFormat.CreateUniFillByUniColorCopy( unicolor );
+            
             oContent.Set_ApplyToAll(true);
             oContent.AddToParagraph(new ParaTextPr(oTextPr));
             oContent.SetParagraphAlign(AscCommon.align_Center);

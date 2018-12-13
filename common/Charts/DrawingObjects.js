@@ -1790,7 +1790,6 @@ function DrawingObjects() {
                 unicolor.RGBA.G = 125;
                 unicolor.RGBA.B = 49;
                 unicolor.RGBA.A = 100;
-                // oTextPr.Color = AscCommon.CreateAscColorCustom(237, 125, 49 );
                 oTextPr.Unifill =  AscFormat.CreateUniFillByUniColorCopy( unicolor );
                 oContent.Set_ApplyToAll(true);
                 oContent.AddToParagraph(new ParaTextPr(oTextPr));
