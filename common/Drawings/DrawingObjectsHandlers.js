@@ -180,6 +180,11 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
     for(var i = drawingArr.length-1; i > -1; --i)
     {
         drawing = drawingArr[i];
+
+        if (drawing.bsWatermark) {
+            continue;
+        }
+
         switch(drawing.getObjectType())
         {
             case AscDFH.historyitem_type_Shape:
