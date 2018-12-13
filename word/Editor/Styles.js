@@ -5212,7 +5212,7 @@ CDocumentBorder.prototype =
         else
             Border.Color.Set(this.Color.r, this.Color.g, this.Color.b);
 
-        if(undefined === this.Unifill)
+        if(undefined === this.Unifill || null === this.Unifill)
             Border.Unifill = undefined;
         else
             Border.Unifill = this.Unifill.createDuplicate();
