@@ -3943,10 +3943,10 @@ CShape.prototype.select = function (drawingObjectsController, pageIndex)
     this.selected = true;
     this.selectStartPage = pageIndex;
     var content = this.getDocContent && this.getDocContent();
-    if( content ){
-        console.log( content );
-    }
-    console.log(this.spPr);
+    // if( content ){
+    //     console.log( content );
+    // }
+    // console.log(this.spPr);
     
     if(content)
         content.Set_StartPage(pageIndex);

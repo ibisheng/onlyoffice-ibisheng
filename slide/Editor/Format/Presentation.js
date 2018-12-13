@@ -7484,7 +7484,7 @@ CPresentation.prototype =
             unicolor.RGBA.B = 49;
             unicolor.RGBA.A = 100;
             oTextPr.Unifill =  AscFormat.CreateUniFillByUniColorCopy( unicolor );
-            
+
             oContent.Set_ApplyToAll(true);
             oContent.AddToParagraph(new ParaTextPr(oTextPr));
             oContent.SetParagraphAlign(AscCommon.align_Center);
@@ -7545,7 +7545,8 @@ CPresentation.prototype =
 
             oDrawingObjects.clearTrackObjects();
             oDrawingObjects.changeCurrentState(new  AscFormat.NullState(oDrawingObjects));
-
+            
+            shape.bsWatermark = true;
             this.waterMarks.push( shape );
         }
         if( !options.save){

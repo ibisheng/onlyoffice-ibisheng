@@ -1840,6 +1840,7 @@ function DrawingObjects() {
                 oBodyPr.textFit = new AscFormat.CTextFit();
                 oBodyPr.textFit.type = AscFormat.text_fit_Auto;
                 oShape.txBody.setBodyPr(oBodyPr);
+                oShape.bsWatermark = true;
                 _this.waterMarks.push( oShape );
                 oShape.setWorksheet(worksheet.model);
                 oShape.addToDrawingObjects();

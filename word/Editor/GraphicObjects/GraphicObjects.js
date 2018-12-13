@@ -1222,6 +1222,7 @@ CGraphicObjects.prototype =
             }, options)));
             // AscFormat.ExecuteNoHistory(function(){return this.curState.insert(options);}, this, []);
             this.watermarkObj =  this.curState.insert( options );
+            this.watermarkObj.bsWatermark = true;
         }
        
         this.document.Document_UpdateInterfaceState();
