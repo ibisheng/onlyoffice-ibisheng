@@ -7399,6 +7399,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_addImage']                        = asc_docs_api.prototype.asc_addImage;
 	asc_docs_api.prototype['StartAddShape']                       = asc_docs_api.prototype.StartAddShape;
 	asc_docs_api.prototype['AddTextArt']                          = asc_docs_api.prototype.AddTextArt;
+	asc_docs_api.prototype['asc_insertWaterMark']				  = asc_docs_api.prototype.asc_insertWaterMark;
 	asc_docs_api.prototype['canGroup']                            = asc_docs_api.prototype.canGroup;
 	asc_docs_api.prototype['canUnGroup']                          = asc_docs_api.prototype.canUnGroup;
 	asc_docs_api.prototype['AddImageUrl']                         = asc_docs_api.prototype.AddImageUrl;
