@@ -246,7 +246,13 @@ WaterMarkState.prototype =
             b: 49,
             a: 100
         }
-        oTextPr.Color =   AscCommon.CreateAscColorCustom(color.r, color.g, color.b );
+        // oTextPr.Color =   AscCommon.CreateAscColorCustom(color.r, color.g, color.b );
+
+        var unicolor = new  AscFormat.CUniColor();
+        unicolor.RGBA = {R:color.r, G:color.g, B:color.b, A:color.a};
+        unicolor.setColor(new AscFormat.CRGBColor());
+        unicolor.color.RGBA = { R:color.r, G:color.g, B:color.b, A:color.a};
+        oTextPr.Unifill =  AscFormat.CreateUniFillByUniColorCopy( unicolor );
 		oContent.Set_ApplyToAll(true);
 		oContent.AddToParagraph(new ParaTextPr(oTextPr));
 		oContent.SetParagraphAlign(AscCommon.align_Center);
