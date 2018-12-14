@@ -6965,7 +6965,8 @@ background-repeat: no-repeat;\
 			_sectionPr.X ,
 			_sectionPr.Y + _sectionPr.YLimit / 2 - 36,
 			_sectionPr.XLimit,
-		    options|{});
+			_sectionPr.YLimit,
+		    options||{});
 	};
 
 	asc_docs_api.prototype.RemoveWaterMark = function()

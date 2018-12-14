@@ -240,8 +240,13 @@ WaterMarkState.prototype =
         oTextPr.FontSizeCS=1;
         var fontFamily = this.options.fontFamily||"SimSun";
         oTextPr.FontFamily = {Name: fontFamily, Index: -1};
-        oTextPr.Color =   AscCommon.CreateAscColorCustom(237, 125, 49 );
-		// oTextPr.TextFill = oTextFill2;
+        var color = this.options.color || {
+            r: 237,
+            g: 125,
+            b: 49,
+            a: 100
+        }
+        oTextPr.Color =   AscCommon.CreateAscColorCustom(color.r, color.g, color.b );
 		oContent.Set_ApplyToAll(true);
 		oContent.AddToParagraph(new ParaTextPr(oTextPr));
 		oContent.SetParagraphAlign(AscCommon.align_Center);

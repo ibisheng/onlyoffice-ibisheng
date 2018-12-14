@@ -7476,13 +7476,15 @@ CPresentation.prototype =
             var fontFamily = options.fontFamily||"SimSun";
             oTextPr.FontFamily = {Name: fontFamily, Index: -1};
             var unicolor = new  AscFormat.CUniColor();
-            unicolor.setMods(new AscFormat.CColorModifiers());
-            unicolor.setColor(new AscFormat.CSchemeColor());
-            unicolor.color.setId(1);
-            unicolor.RGBA.R = 237;
-            unicolor.RGBA.G = 125;
-            unicolor.RGBA.B = 49;
-            unicolor.RGBA.A = 100;
+            var color = options.color || {
+                r: 237,
+                g: 125,
+                b: 49,
+                a: 100
+            }
+            unicolor.RGBA = {R:color.r, G:color.g, B:color.b, A:color.a};
+            unicolor.setColor(new AscFormat.CRGBColor());
+            unicolor.color.RGBA = { R:color.r, G:color.g, B:color.b, A:color.a};
             oTextPr.Unifill =  AscFormat.CreateUniFillByUniColorCopy( unicolor );
 
             oContent.Set_ApplyToAll(true);
