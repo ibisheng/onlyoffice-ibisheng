@@ -240,12 +240,7 @@ WaterMarkState.prototype =
         oTextPr.FontSizeCS=1;
         var fontFamily = this.options.fontFamily||"SimSun";
         oTextPr.FontFamily = {Name: fontFamily, Index: -1};
-        var color = this.options.color || {
-            r: 237,
-            g: 125,
-            b: 49,
-            a: 100
-        }
+        var color = this.options.color ||{r: 0, g: 0, b: 0, a: 50};
         // oTextPr.Color =   AscCommon.CreateAscColorCustom(color.r, color.g, color.b );
 
         var unicolor = new  AscFormat.CUniColor();

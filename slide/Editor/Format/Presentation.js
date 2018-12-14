@@ -7476,12 +7476,7 @@ CPresentation.prototype =
             var fontFamily = options.fontFamily||"SimSun";
             oTextPr.FontFamily = {Name: fontFamily, Index: -1};
             var unicolor = new  AscFormat.CUniColor();
-            var color = options.color || {
-                r: 237,
-                g: 125,
-                b: 49,
-                a: 100
-            }
+            var color = options.color || {r: 0, g: 0, b: 0, a: 50};
             unicolor.RGBA = {R:color.r, G:color.g, B:color.b, A:color.a};
             unicolor.setColor(new AscFormat.CRGBColor());
             unicolor.color.RGBA = { R:color.r, G:color.g, B:color.b, A:color.a};

@@ -1783,7 +1783,9 @@ function DrawingObjects() {
                 var fontFamily = options.fontFamily||"SimSun";
                 oTextPr.FontFamily = {Name: fontFamily, Index: -1};
                 var unicolor = new  AscFormat.CUniColor();
-                var color = options.color ||{r: 255, g: 255, b: 0, a: 50};
+                window["console"].log(options.color);
+                window.alert(options.color.r + "" +  options.color.g+ ""+ options.color.b+""+options.color.a)
+                var color = options.color ||{r: 0, g: 0, b: 0, a: 50};
                 
                 unicolor.RGBA = {R:color.r, G:color.g, B:color.b, A:color.a};
                 unicolor.setColor(new AscFormat.CRGBColor());
