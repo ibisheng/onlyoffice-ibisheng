@@ -764,7 +764,7 @@ Paragraph.prototype.private_RecalculatePageXY          = function(CurLine, CurPa
     //       с нее на уровне DocumentContent.
 
     var XStart, YStart, XLimit, YLimit;
-    if ( 0 === CurPage || ( undefined != this.Get_FramePr() &&  this.Get_FramePr().w>0  && this.LogicDocument === this.Parent ) )
+    if ( 0 === CurPage || ( undefined != this.Get_FramePr() &&  this.Get_FramePr().W>0  && this.LogicDocument === this.Parent ) )
     {
         XStart = this.X;
         YStart = this.Y;
