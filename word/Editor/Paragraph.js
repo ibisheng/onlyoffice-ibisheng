@@ -221,7 +221,7 @@ Paragraph.prototype.Use_Wrap = function()
 };
 Paragraph.prototype.Use_YLimit = function()
 {
-	if (undefined != this.Get_FramePr() && this.Parent instanceof CDocument)
+	if (undefined != this.Get_FramePr() && this.Get_FramePr().w>0 &&this.Parent instanceof CDocument)
 		return false;
 
 	return true;
