@@ -911,8 +911,7 @@
   };
 
   DocsCoApi.prototype.versionHistory = function(data) {
-    // this._send({'type': 'versionHistory', 'cmd': data});
-    window['Common']['NotificationCenter']['trigger']('requestHistoryEditorBin', {'type': 'versionHistory', 'cmd': data});
+    this._send({'type': 'versionHistory', 'cmd': data});
   };
 
 	DocsCoApi.prototype.forceSave = function() {

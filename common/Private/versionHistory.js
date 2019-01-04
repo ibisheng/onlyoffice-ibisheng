@@ -40,6 +40,7 @@
   function asc_CVersionHistory(newObj) {
     this.docId = null;
     this.url = null;
+    this.bin = null;
     this.urlChanges = null;
     this.currentChangeId = -1;
     this.newChangeId = -1;
@@ -55,10 +56,11 @@
   }
 
   asc_CVersionHistory.prototype.update = function(newObj) {
-    var bUpdate = (this.docId !== newObj.docId || this.url !== newObj.url || this.urlChanges !== newObj.urlChanges || this.currentChangeId > newObj.currentChangeId);
+    var bUpdate = (this.docId !== newObj.docId || this.url !== newObj.url || this.bin !== newObj.bin || this.urlChanges !== newObj.urlChanges || this.currentChangeId > newObj.currentChangeId);
     if (bUpdate) {
       this.docId = newObj.docId;
       this.url = newObj.url;
+      this.bin = newObj.bin;
       this.urlChanges = newObj.urlChanges;
       this.currentChangeId = -1;
       this.changes = null;
@@ -85,6 +87,9 @@
   asc_CVersionHistory.prototype.asc_setUrl = function(val) {
     this.url = val;
   };
+  asc_CVersionHistory.prototype.asc_setBin = function(val) {
+    this.bin = val;
+  };
   asc_CVersionHistory.prototype.asc_setUrlChanges = function(val) {
     this.urlChanges = val;
   };
@@ -108,6 +113,7 @@
   prot = asc_CVersionHistory.prototype;
   prot["asc_setDocId"] = prot.asc_setDocId;
   prot["asc_setUrl"] = prot.asc_setUrl;
+  prot["asc_setBin"] = prot.asc_setBin;
   prot["asc_setUrlChanges"] = prot.asc_setUrlChanges;
   prot["asc_setCurrentChangeId"] = prot.asc_setCurrentChangeId;
   prot["asc_setArrColors"] = prot.asc_setArrColors;

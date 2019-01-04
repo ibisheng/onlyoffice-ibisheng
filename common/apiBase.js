@@ -512,7 +512,15 @@
 			}
 		}
 		if (versionHistory) {
-			this.CoAuthoringApi.versionHistory(rData);
+            // this.CoAuthoringApi.versionHistory(rData);
+            window["bisheng_onServerMessage"].call(window["bisheng_CoAuthoringApi"], {
+                "type": "documentOpen",
+                "data": {
+                    "type": "open",
+                    "status": "ok",
+                    "data": versionHistory.bin
+                }
+            });
 		} else {
 			this.CoAuthoringApi.auth(this.getViewMode(), rData);
 		}
