@@ -7643,6 +7643,9 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 	{
+        if (window["Global"] && window["Global"]["isVersionViewer"]) {
+            return;
+        }
 		if (!this.WordControl || !this.WordControl.m_oLogicDocument)
 			return;
 		if (AscCommon.CollaborativeEditing){

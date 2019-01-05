@@ -138,7 +138,9 @@ AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
   }
   // ToDo должно быть все общее
   if (bUpdate) {
-    this.asc_CloseFile();
+    if (!window["Global"] || !window["Global"]["isVersionViewer"]) {
+        this.asc_CloseFile();
+    }
 
     this.DocInfo.put_Id(this.VersionHistory.docId);
     this.DocInfo.put_Url(this.VersionHistory.url);
