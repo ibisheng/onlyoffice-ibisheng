@@ -66,7 +66,7 @@
       this.indexUser = val['indexUser'];
       this.color = window['AscCommon'].getUserColorById(this.idOriginal, this.userName, false, true);
       this.view = val['view'];
-      this.avatar = val["avatar"];
+      this.avatar = window["getUserAvatar"](val);
     }
   };
   asc_CUser.prototype.asc_getId = function() {
