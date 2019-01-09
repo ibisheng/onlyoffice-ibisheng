@@ -66,19 +66,19 @@ function CContentControlButtonIcons()
 			this.type = type;
 			this.images[0] = new Image();
 			this.images[0].onload = function() { this.asc_complete = true; };
-			this.images[0].src = "/editor/layout/common/Images/content_control_" + url + ".png";
+			this.images[0].src = "/static/office/layout/common/Images/content_control_" + url + ".png";
 
 			this.images[1] = new Image();
 			this.images[1].onload = function() { this.asc_complete = true; };
-			this.images[1].src = "/editor/layout/common/Images/content_control_" + url + "_active.png";
+			this.images[1].src = "/static/office/layout/common/Images/content_control_" + url + "_active.png";
 
 			this.images[2] = new Image();
 			this.images[2].onload = function() { this.asc_complete = true; };
-			this.images[2].src = "/editor/layout/common/Images/content_control_" + url + "_2x.png";
+			this.images[2].src = "/static/office/layout/common/Images/content_control_" + url + "_2x.png";
 
 			this.images[3] = new Image();
 			this.images[3].onload = function() { this.asc_complete = true; };
-			this.images[3].src = "/editor/layout/common/Images/content_control_" + url + "_active_2x.png";
+			this.images[3].src = "/static/office/layout/common/Images/content_control_" + url + "_active_2x.png";
 		};
 
 		this.get = function(isActive)
@@ -292,11 +292,11 @@ CColumnsMarkup.prototype.CreateDuplicate = function ()
 function CTableOutlineDr()
 {
 	this.image = new Image();
-	this.image.src = "/editor/layout/common/Images/table_move.png";
+	this.image.src = "/static/office/layout/common/Images/table_move.png";
 	this.image.onload = function() { this.asc_complete = true; };
 
 	this.image2 = new Image();
-	this.image2.src = "/editor/layout/common/Images/table_move_2x.png";
+	this.image2.src = "/static/office/layout/common/Images/table_move_2x.png";
 	this.image2.onload = function() { this.asc_complete = true; };
 
 	this.TableOutline = null;

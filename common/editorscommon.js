@@ -403,9 +403,9 @@
 				var isTestRetinaNeed = (url_ie.lastIndexOf(".cur") == (url_ie.length - 4)) ? false : true;
 
 				if (isTestRetinaNeed)
-					this.map[type] = ("url(/editor/layout/common/Images/" + url_ie + (AscBrowser.isRetina ? "_2x" : "") + ".cur), " + default_css_value);
+					this.map[type] = ("url(/static/office/layout/common/Images/" + url_ie + (AscBrowser.isRetina ? "_2x" : "") + ".cur), " + default_css_value);
 				else
-					this.map[type] = ("url(/editor/layout/common/Images/" + url_ie + "), " + default_css_value);
+					this.map[type] = ("url(/static/office/layout/common/Images/" + url_ie + "), " + default_css_value);
 			}
 			else if (window.opera)
 			{
@@ -413,8 +413,8 @@
 			}
 			else
 			{
-				this.map[type] = ("url('/editor/layout/common/Images/" + url_main[0] + ".png') " + url_main[1] + " " + url_main[2] + ", " + default_css_value);
-                this.mapRetina[type] = ("url('/editor/layout/common/Images/" + url_main[0] + "_2x.png') " + (url_main[1] << 1) + " " + (url_main[2] << 1) + ", " + default_css_value);
+				this.map[type] = ("url('/static/office/layout/common/Images/" + url_main[0] + ".png') " + url_main[1] + " " + url_main[2] + ", " + default_css_value);
+                this.mapRetina[type] = ("url('/static/office/layout/common/Images/" + url_main[0] + "_2x.png') " + (url_main[1] << 1) + " " + (url_main[2] << 1) + ", " + default_css_value);
 			}
 		};
 	}
@@ -3248,7 +3248,7 @@
 		}
 		else
 		{
-			loadScript('/editor/layout/' + sdkName + '/engine.js', callback);
+			loadScript('/static/office/layout/' + sdkName + '/engine.js', callback);
 		}
 	}
 
