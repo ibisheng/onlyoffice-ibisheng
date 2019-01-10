@@ -139,7 +139,7 @@
 
 	var oZipImages = null;
 	var sDownloadServiceLocalUrl = "../../../../downloadas";
-	var sUploadServiceLocalUrl = "/upload/images";
+	var sUploadServiceLocalUrl = "/apps/office/upload/images";
 	var sUploadServiceLocalUrlOld = "../../../../uploadold";
 	var sSaveFileLocalUrl = "../../../../savefile";
 	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
