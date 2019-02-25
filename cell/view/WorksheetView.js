@@ -1400,6 +1400,7 @@
             i = this.cols.length;
             x = this.cols[i - 1].left + this.cols[i - 1].width;
         }
+        if( l < 26 ) l = 26;
         for (; ((AscCommonExcel.recalcType.recalc !== type) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i < gc_nMaxCol; ++i) {
 			hiddenW += this._calcColWidth(x, i);
             x += this.cols[i].width;
