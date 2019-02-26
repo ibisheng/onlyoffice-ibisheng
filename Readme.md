@@ -2,11 +2,17 @@
 
 [毕升文档](https://ibisheng.cn)| 多人协同编辑 | 在线Office| onlyOffice
 
-毕升文档在线文件服务部分的Office在线编辑预览使用优秀的开源项目onlyOffice，根据开源协议我们将毕升修改过的sdkjs进行开源。
+毕升文档在线文件服务部分的Office在线编辑预览使用优秀的开源项目onlyOffice，根据开源协议我们将毕升修改过的sdkjs进行开源。毕升文档在线文件服务部分在编辑和预览Office时集成了onlyOffice。我们在集成onlyOffice主要是使用了sdkjs部分代码，并且根据毕升文档的优化要求做了相应的调整。相对于原来的onlyOffice，毕升文档的在线Office部分主要区别有：
 
-## ![logo](https://public-bisheng.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档解决方案](https://ibisheng.cn/apps/blog/free/)
+1. 抛弃了only Office的原来的UI，整体UI重新设计实现
+2. 抛弃了原来only Office开源部分的服务器实现，使用golang 和node js重新了实现Office在线编辑时的服务器逻辑以适应毕升文档分布式部署以及毕升文档在线文件服务整体设计的要求。
+3. 文件的底层存储也抛弃了原来only Office的方案，按照毕升文档在线文件服务的设计，全部采用s3 api的存储。 本地部署时可以使用minio来实现s3服务，也可以使用其他兼容s3 api的存储服务商。目前全面兼容s3 api的服务商有：aws对象存储，阿里云 oss服务，青云对象存储服务,开源ceph存储等。另外对于 七牛以及ucloud 等国内云服务商的存储API不完全兼容 s3 标准API，目前还不能使用。毕升文档将在今后增加对这些存储的支持。另外也欢迎有兴趣的开发者加入我们开发相应的API以支持更多存储方式
+4. 与开源版的only office相比，毕升文档在线Office部分主要增加了文件加水印预览以及文件的版本对比功能。
+5. 按照毕升文档在线文件服务的设计，部署上是分布式的。可以自由扩充结点。对于需要自由扩充结点的用户[请联系我们](https://ibisheng.cn/apps/blog/business/)
 
-onlyoffice 的开源部署目前存在很多问题以及限制，部署上也有诸多问题，为了方便大家使用，毕升文档提供了Office在线编辑的[免费解决方案](https://ibisheng.cn/apps/blog/free/)。和源开源方案相比，毕升文档提供了一个完整的drive系统提供线管理，组织结构权限，分享，团队协作等，文件的全文检索等功能；同时线文件服务除了集成了only Office实现Office的在线编辑处理之外，还实现了Office的带水印预览，pdf，视频，音频文件的预览以及实现了100多种文本文件带语法高亮的预览 。毕升文档的底层存储全部采用s3存储，可以采用minio在本地服务商存储也可以轻松使用aliyun的oss存储，数据更安全。
+## ![logo](https://public-bisheng.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档免费解决方案](https://ibisheng.cn/apps/blog/free/)
+
+onlyoffice 的开源部署目前存在很多问题以及限制，部署上也有诸多问题，为了方便大家使用，毕升文档提供了Office在线编辑的[免费解决方案](https://ibisheng.cn/apps/blog/free/)。和源开源方案相比，毕升文档提供了一个完整的drive系统提供线管理，组织结构权限，分享，团队协作等，文件的全文检索等功能；同时线文件服务除了集成了only Office实现Office的在线编辑处理之外，还实现了Office的带水印预览，pdf，视频，音频文件的预览以及实现了100多种文本文件带语法高亮的预览 。
 
 ![毕升文档](https://public-bisheng.oss-cn-zhangjiakou.aliyuncs.com/resource/ibisheng.png)
 
