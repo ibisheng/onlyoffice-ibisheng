@@ -12,7 +12,7 @@
 
 ## ![logo](https://public-bisheng.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档免费解决方案](https://ibisheng.cn/apps/blog/free/)
 
-onlyoffice 的开源部署目前存在很多问题以及限制，部署上也有诸多问题，为了方便大家使用，毕升文档提供了Office在线编辑的[免费解决方案](https://ibisheng.cn/apps/blog/free/)。和源开源方案相比，毕升文档提供了一个完整的drive系统提供线管理，组织结构权限，分享，团队协作等，文件的全文检索等功能；同时线文件服务除了集成了only Office实现Office的在线编辑处理之外，还实现了Office的带水印预览，pdf，视频，音频文件的预览以及实现了100多种文本文件带语法高亮的预览 。
+onlyoffice 的开源部署目前存在很多问题以及限制，部署上也有诸多问题，为了方便大家使用，毕升文档提供了Office在线编辑的[免费解决方案](https://ibisheng.cn/apps/blog/free/)。和源开源方案相比，毕升文档提供了一个完整的drive系统提供线管理，组织结构权限，分享，团队协作等，文件的全文检索等功能；同时线文件服务除了集成了only Office实现Office的在线编辑处理之外，还实现了Office的带水印预览，pdf，视频，音频文件的预览以及实现了100多种文本文件带语法高亮的预览 。免费部署请参考[毕升文档免费部署](https://ibisheng.cn/apps/blog/free/)
 
 ![毕升文档](https://public-bisheng.oss-cn-zhangjiakou.aliyuncs.com/resource/ibisheng.png)
 
