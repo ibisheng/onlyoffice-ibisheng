@@ -1,6 +1,12 @@
-# onlyoffice ibisheng  
+# onlyoffice 毕升文档  
 
 [毕升文档](https://ibisheng.cn)| 多人协同编辑 | 在线Office| onlyOffice
+
+#### 毕升文档公网免费使用地址： https://ibisheng.cn
+
+#### 毕升文档免费部署文档：https://ibisheng.cn/apps/blog/free/
+
+#### 毕升文档免费部署脚本地址：https://gitee.com/ibisheng/deploy.git 
 
 毕升文档在线文件服务部分的Office在线编辑预览使用优秀的开源项目onlyOffice，根据开源协议我们将毕升修改过的sdkjs进行开源。毕升文档在线文件服务部分在编辑和预览Office时集成了onlyOffice。我们在集成onlyOffice主要是使用了sdkjs部分代码，并且根据毕升文档的优化要求做了相应的调整。相对于原来的onlyOffice，毕升文档的在线Office部分主要区别有：
 
@@ -10,7 +16,7 @@
 4. 与开源版的only office相比，毕升文档在线Office部分主要增加了文件加水印预览以及文件的版本对比功能。
 5. 按照毕升文档在线文件服务的设计，部署上是分布式的。可以自由扩充结点。
 
-**<u>毕升文档基础安装包永久免费，不设置用户数限制。具体如下：</u>**
+## **<u>毕升文档基础安装包永久免费，不设置用户数限制。具体如下：</u>**
 
 1. 毕升文档基础安装包永久免费，单机版不设置用户数和并发数限制。
 
