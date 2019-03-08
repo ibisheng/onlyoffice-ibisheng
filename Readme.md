@@ -20,10 +20,7 @@
 
 1. 毕升文档基础安装包永久免费，单机版不设置用户数和并发数限制。
 
-2. 使用标准API的在线编辑器安装包永久免费。
-
-3. 安装包免费升级。
-4. 基础安装包功能与官网上线产品功能相同。
+2. 基础安装包功能与官网上线产品功能相同。
 
 ## ![logo](https://public-bisheng.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档免费解决方案](https://ibisheng.cn/apps/blog/free/)
 
