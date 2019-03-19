@@ -1967,7 +1967,7 @@ background-repeat: no-repeat;\
         }
 
         if (withWaterMark) {
-		    this.InsertWaterMark('毕升文档', {"history": true });
+		    this.InsertWaterMark('毕升文档', {"history": false });
         }
 
         this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print : DownloadType.None);
@@ -2432,7 +2432,7 @@ background-repeat: no-repeat;\
         var bPdf = c_oAscFileType.PDF == typeFile || c_oAscFileType.PDFA == typeFile;
 
         if (bPdf && withWaterMark) {
-            this.InsertWaterMark('毕升文档', {"history": true });
+            this.InsertWaterMark('毕升文档', {"history": false });
         }
 
         this._downloadAs("save", typeFile, actionType, options, null);
