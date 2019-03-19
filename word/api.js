@@ -1967,7 +1967,7 @@ background-repeat: no-repeat;\
         }
 
         if (withWaterMark) {
-		    this.InsertWaterMark({"history": true });
+		    this.InsertWaterMark('毕升文档', {"history": true });
         }
 
         this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print : DownloadType.None);

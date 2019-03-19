@@ -76,8 +76,10 @@
     var color;
     this.newChangeId = (null == this.newChangeId) ? (this.changes.length - 1) : this.newChangeId;
     for (var i = this.currentChangeId + 1; i <= this.newChangeId && i < this.changes.length; ++i) {
-      color = this.colors[i];
-      editor._coAuthoringSetChanges(this.changes[i], i !== this.newChangeId ? null : (color ? new CDocumentColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF) : new CDocumentColor(191, 255, 199)));
+    //   color = this.colors[i];
+    //   editor._coAuthoringSetChanges(this.changes[i], i !== this.newChangeId ? null : (color ? new CDocumentColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF) : new CDocumentColor(191, 255, 199)));
+    color = this.colors[i] || this.colors[0];
+    editor._coAuthoringSetChanges(this.changes[i], (color ? new CDocumentColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF) : new CDocumentColor(191, 255, 199)));
     }
     this.currentChangeId = this.newChangeId;
   };
