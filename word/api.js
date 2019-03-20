@@ -1967,7 +1967,7 @@ background-repeat: no-repeat;\
         }
 
         if (withWaterMark) {
-		    this.InsertWaterMark('毕升文档', {"history": true });
+		    this.InsertWaterMark('毕升文档', {"history": false });
         }
 
         this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print : DownloadType.None);
@@ -2424,11 +2424,22 @@ background-repeat: no-repeat;\
 		};
 		sendCommand(this, null, rData);
 	};
-	asc_docs_api.prototype.asc_DownloadAs     = function(typeFile, bIsDownloadEvent)
+	asc_docs_api.prototype.asc_DownloadAs     = function(typeFile, bIsDownloadEvent, _, withWaterMark)
 	{//передаем число соответствующее своему формату.
 		var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
-		var options    = {downloadType : bIsDownloadEvent ? DownloadType.Download : DownloadType.None};
-		this._downloadAs("save", typeFile, actionType, options, null);
+        var options    = {downloadType : bIsDownloadEvent ? DownloadType.Download : DownloadType.None};
+        
+        var bPdf = c_oAscFileType.PDF == typeFile || c_oAscFileType.PDFA == typeFile;
+
+        if (bPdf && withWaterMark) {
+            this.InsertWaterMark('毕升文档', {"history": false });
+        }
+
+        this._downloadAs("save", typeFile, actionType, options, null);
+        
+        if (bPdf && withWaterMark) {
+            this.RemoveWaterMark();
+        }
 	};
 	asc_docs_api.prototype.Resize             = function()
 	{

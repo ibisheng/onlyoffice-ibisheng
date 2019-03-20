@@ -1716,7 +1716,7 @@ background-repeat: no-repeat;\
 	/*----------------------------------------------------------------*/
 	/*functions for working with clipboard, document*/
 	/*TODO: Print,Undo,Redo,Copy,Cut,Paste,Share,Save,DownloadAs,ReturnToDocuments(вернуться на предыдущую страницу) & callbacks for these functions*/
-	asc_docs_api.prototype.asc_Print      = function(bIsDownloadEvent)
+	asc_docs_api.prototype.asc_Print      = function(bIsDownloadEvent, withWaterMark)
 	{
 
 		if (window["AscDesktopEditor"])
@@ -1724,8 +1724,19 @@ background-repeat: no-repeat;\
 			window["AscDesktopEditor"]["Print"]();
 			return;
 		}
-		var options = {downloadType : bIsDownloadEvent ? DownloadType.Print : DownloadType.None};
-		this._downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, options);
+        var options = {downloadType : bIsDownloadEvent ? DownloadType.Print : DownloadType.None};
+        
+        if (withWaterMark) {
+		    this.asc_insertWaterMark('毕升文档', {"history": false });
+        }
+
+        this._downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, options);
+        
+        if (withWaterMark) {
+            this.asc_removeWaterMark();
+            // History.RemoveLastPoint();
+            // History.RemoveLastPoint();
+        }
 	};
 	asc_docs_api.prototype.Undo           = function()
 	{
@@ -2110,10 +2121,21 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype._haveOtherChanges = function () {
 		return AscCommon.CollaborativeEditing.Have_OtherChanges();
 	};
-	asc_docs_api.prototype.asc_DownloadAs               = function(typeFile, bIsDownloadEvent)
+	asc_docs_api.prototype.asc_DownloadAs               = function(typeFile, bIsDownloadEvent, _, withWaterMark)
 	{//передаем число соответствующее своему формату.
-		var options = {downloadType : bIsDownloadEvent ? DownloadType.Download : DownloadType.None};
-		this._downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, options);
+        var options = {downloadType : bIsDownloadEvent ? DownloadType.Download : DownloadType.None};
+        
+        var bPdf = c_oAscFileType.PDF === typeFile || c_oAscFileType.PDFA === typeFile;
+        
+        if (bPdf && withWaterMark) {
+            this.asc_insertWaterMark('毕升文档', {"history": false });
+        }
+
+        this._downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, options);
+        
+        if (bPdf && withWaterMark) {
+            this.asc_removeWaterMark('毕升文档', {"history": false });
+        }
 	};
 	asc_docs_api.prototype.Resize                       = function()
 	{
