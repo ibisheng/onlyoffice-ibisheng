@@ -317,10 +317,20 @@ var editor;
       return;
     }
 
-    if (c_oAscFileType.PDF === typeFile || c_oAscFileType.PDFA === typeFile) {
+    var bPdf = c_oAscFileType.PDF === typeFile || c_oAscFileType.PDFA === typeFile;
+
+    if (bPdf) {
       this.adjustPrint = adjustPrint ? adjustPrint : new Asc.asc_CAdjustPrint();
     }
+    if (bPdf && withWaterMark) {
+        this.asc_insertWaterMark('毕升文档', {"history": false });
+    }
+
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
+
+    if (bPdf && withWaterMark) {
+        this.asc_removeWaterMark('毕升文档', {"history": false });
+    }
   };
 	spreadsheet_api.prototype._saveCheck = function() {
 		return !this.isChartEditor && c_oAscAdvancedOptionsAction.None === this.advancedOptionsAction &&
