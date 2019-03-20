@@ -2424,7 +2424,7 @@ background-repeat: no-repeat;\
 		};
 		sendCommand(this, null, rData);
 	};
-	asc_docs_api.prototype.asc_DownloadAs     = function(typeFile, bIsDownloadEvent, withWaterMark)
+	asc_docs_api.prototype.asc_DownloadAs     = function(typeFile, bIsDownloadEvent, _, withWaterMark)
 	{//передаем число соответствующее своему формату.
 		var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
         var options    = {downloadType : bIsDownloadEvent ? DownloadType.Download : DownloadType.None};

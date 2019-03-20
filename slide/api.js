@@ -2110,7 +2110,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype._haveOtherChanges = function () {
 		return AscCommon.CollaborativeEditing.Have_OtherChanges();
 	};
-	asc_docs_api.prototype.asc_DownloadAs               = function(typeFile, bIsDownloadEvent)
+	asc_docs_api.prototype.asc_DownloadAs               = function(typeFile, bIsDownloadEvent, _, withWaterMark)
 	{//передаем число соответствующее своему формату.
 		var options = {downloadType : bIsDownloadEvent ? DownloadType.Download : DownloadType.None};
 		this._downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, options);
