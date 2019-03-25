@@ -1188,16 +1188,6 @@ CGraphicObjects.prototype =
      * @param {*} dExtY 
      */
     insertWaterMark: function(sText, nPageIndex, dX, dY, dExtX, dExtY, options ){
-        var CurHdrFtr = this.document.HdrFtr.CurHdrFtr;
-        if( !CurHdrFtr ){
-            let oldPosType = this.document.Get_DocPosType();
-            this.document.HdrFtr.CreateHeader( nPageIndex );
-            this.document.Set_DocPosType(oldPosType);
-        }
-        if( this.watermarkObj){
-            //remove object
-            this.watermarkObj.parent.Remove_FromDocument(false);
-        }
         if( false ){
             //for debug
             let oldPosType = this.document.Get_DocPosType();
@@ -1212,6 +1202,15 @@ CGraphicObjects.prototype =
             this.document.Set_DocPosType(oldPosType);
         }
         else{
+            this.watermarkObjs =  this.watermarkObjs||{};
+            let oldPosType = this.document.Get_DocPosType();
+            let header = this.document.HdrFtr.CreateHeader( nPageIndex );
+            if( this.watermarkObjs[header.Id ]){
+                return;
+            }
+
+            this.document.Set_DocPosType(oldPosType);
+
             this.changeCurrentState(new AscFormat.WaterMarkState(this, Object.assign({
                 text: sText,
                 x: dX,
@@ -1221,8 +1220,9 @@ CGraphicObjects.prototype =
                 pageIndex: nPageIndex
             }, options)));
             // AscFormat.ExecuteNoHistory(function(){return this.curState.insert(options);}, this, []);
-            this.watermarkObj =  this.curState.insert( options );
-            this.watermarkObj.bsWatermark = true;
+            var watermarkObj =  this.curState.insert( options );
+            watermarkObj.bsWatermark = true;
+            this.watermarkObjs[header.Id] = watermarkObj;
         }
        
         this.document.Document_UpdateInterfaceState();
@@ -1231,10 +1231,16 @@ CGraphicObjects.prototype =
     },
 
     removeWaterMark: function(){
-        if( this.watermarkObj){
-            this.watermarkObj.parent.Remove_FromDocument(false);
+        if( this.watermarkObjs){
+            //remove object
+            for( var key in this.watermarkObjs){
+                var item = this.watermarkObjs[key];
+                item.parent.Remove_FromDocument(false);
+                item.setBDeleted(true);
+            }
             this.resetSelection();
             this.document.Recalculate();
+            this.watermarkObjs = null;
         }
     },
 

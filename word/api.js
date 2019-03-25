@@ -6955,18 +6955,23 @@ background-repeat: no-repeat;\
 		if (!this.WordControl.m_oLogicDocument)
 			return;
 
-		var _pageNum = this.GetCurrentVisiblePage();
-		// get the page size
-		var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
-
-		var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
-
-		this.WordControl.m_oLogicDocument.DrawingObjects.insertWaterMark(text, _pageNum,
-			_sectionPr.X ,
-			_sectionPr.Y + _sectionPr.YLimit / 2 - 36,
-			_sectionPr.XLimit,
-			_sectionPr.YLimit,
-		    options||{});
+		var pagescount = this.getCountPages();
+		if( this.WordControl.m_oLogicDocument.DrawingObjects.watermarkObjs ){
+			this.RemoveWaterMark();
+			return;
+		}
+	
+		for( var _pageNum=0; _pageNum< pagescount; _pageNum++ ){
+			// get the page size
+			var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+			this.WordControl.m_oLogicDocument.DrawingObjects.insertWaterMark(text, _pageNum,
+				_sectionPr.X ,
+				_sectionPr.Y + _sectionPr.YLimit / 2 - 36,
+				_sectionPr.XLimit,
+				_sectionPr.YLimit,
+				options||{});
+		}
+		
 	};
 
 	asc_docs_api.prototype.RemoveWaterMark = function()
