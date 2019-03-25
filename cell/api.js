@@ -312,15 +312,25 @@ var editor;
     AscCommonExcel.g_oUndoRedoLayout = new AscCommonExcel.UndoRedoRedoLayout(wbModel);
   };
 
-  spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent, adjustPrint) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
+  spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent, adjustPrint, withWaterMark) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
     if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction) {
       return;
     }
 
-    if (c_oAscFileType.PDF === typeFile || c_oAscFileType.PDFA === typeFile) {
+    var bPdf = c_oAscFileType.PDF === typeFile || c_oAscFileType.PDFA === typeFile;
+
+    if (bPdf) {
       this.adjustPrint = adjustPrint ? adjustPrint : new Asc.asc_CAdjustPrint();
     }
+    if (bPdf && withWaterMark) {
+        this.asc_insertWaterMark('毕升文档', {"history": false });
+    }
+
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
+
+    if (bPdf && withWaterMark) {
+        this.asc_removeWaterMark('毕升文档', {"history": false });
+    }
   };
 	spreadsheet_api.prototype._saveCheck = function() {
 		return !this.isChartEditor && c_oAscAdvancedOptionsAction.None === this.advancedOptionsAction &&

@@ -593,7 +593,8 @@
 	};
 	baseEditorsApi.prototype.forceSave = function()
 	{
-		return this.CoAuthoringApi.forceSave();
+        this.CoAuthoringApi.forceSave();
+        return false;
 	};
 	baseEditorsApi.prototype.asc_setIsForceSaveOnUserSave = function(val)
 	{
