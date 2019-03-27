@@ -2311,8 +2311,7 @@ CHeaderFooterController.prototype =
             // else
             //    return false;
         }
-        else
-            HdrFtr = this.Pages[PageIndex].Header;
+        HdrFtr = this.Pages[PageIndex].Header;
         return HdrFtr;
     },
 
