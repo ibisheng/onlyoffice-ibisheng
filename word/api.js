@@ -6966,7 +6966,7 @@ background-repeat: no-repeat;\
 		if (!this.WordControl.m_oLogicDocument)
 			return;
 
-		var pagescount = this.getCountPages();
+		var pagescount = this.WordControl.m_oLogicDocument.Pages.length;
 		if( this.WordControl.m_oLogicDocument.DrawingObjects.watermarkObjs ){
 			this.RemoveWaterMark();
 			return;
