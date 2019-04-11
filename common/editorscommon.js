@@ -142,7 +142,7 @@
 	var sUploadServiceLocalUrl = "/apps/editor/upload/images";
 	var sUploadServiceLocalUrlOld = "../../../../uploadold";
 	var sSaveFileLocalUrl = "../../../../savefile";
-	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
+	var nMaxRequestLength = 10485760;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
 	function getSockJs()
 	{
