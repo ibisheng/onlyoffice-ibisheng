@@ -242,15 +242,15 @@
 			};
 			this.HtmlArea["onkeypress"] = function(e)
 			{
-			    if (oThis.IsDisableKeyPress == true)
-			    {
-			        // macOS Sierra send keypress before copy event
-			        oThis.IsDisableKeyPress = false;
-			        var cmdButton = (e.ctrlKey || e.metaKey) ? true : false;
-			        if (cmdButton)
-                        return;
-			    }
-				return oThis.onKeyPress(e);
+			    // if (oThis.IsDisableKeyPress == true)
+			    // {
+			    //     // macOS Sierra send keypress before copy event
+			    //     oThis.IsDisableKeyPress = false;
+			    //     var cmdButton = (e.ctrlKey || e.metaKey) ? true : false;
+			    //     if (cmdButton)
+                //         return;
+			    // }
+				// return oThis.onKeyPress(e);
 			};
 			this.HtmlArea["onkeyup"]    = function(e)
 			{
