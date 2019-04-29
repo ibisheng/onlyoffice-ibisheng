@@ -2,9 +2,9 @@
 
 [毕升文档](https://bishengoffice.com)| 多人协同编辑 | 在线Office| onlyOffice
 
-#### 毕升文档公网免费使用地址： https://ibisheng.cn
+#### 毕升文档公网免费使用地址： https://bishengoffice.com
 
-#### 毕升文档免费部署文档：https://ibisheng.cn/apps/blog/free/
+#### 毕升文档免费部署文档：https://bishengoffice.com/apps/blog/free/
 
 #### 毕升文档免费部署脚本地址：https://gitee.com/ibisheng/deploy.git
 
@@ -24,7 +24,7 @@
 
 2. 基础安装包功能与官网上线产品功能相同。
 
-## ![logo](https://bisheng-public.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档免费解决方案](https://ibisheng.cn/apps/blog/free/)
+## ![logo](https://bisheng-public.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档免费解决方案](https://bishengoffice.com/apps/blog/free/)
 
 onlyoffice 的开源部署目前存在很多问题以及限制，部署上也有诸多问题，为了方便大家使用，毕升文档提供了Office在线编辑的[免费解决方案](https://bishengoffice.com/apps/blog/free/)。和源开源方案相比，毕升文档提供了一个完整的drive系统提供线管理，组织结构权限，分享，团队协作等，文件的全文检索等功能；同时线文件服务除了集成了only Office实现Office的在线编辑处理之外，还实现了Office的带水印预览，pdf，视频，音频文件的预览以及实现了100多种文本文件带语法高亮的预览 。免费部署请参考[毕升文档免费部署](https://bishengoffice.com/apps/blog/free/)
 
@@ -72,7 +72,7 @@ Onlyoffie的毕升文档免费解决方案还提供了一个强大的drive，实
 
 ## 联系方式
 
-如果你想了解我们，可以打开链接：https://ibisheng.cn/apps/blog/posts/aboutus.html
+如果你想了解我们，可以打开链接：https://bishengoffice.com/apps/blog/posts/aboutus.html
 
 如果你喜欢我们欢迎加入毕升文档交流群。
 
