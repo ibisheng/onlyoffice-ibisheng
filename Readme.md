@@ -19,7 +19,7 @@
 
 ## **<u>毕升文档基础安装包永久免费，不设置用户数限制。具体如下：</u>**
 
-## ![logo](https://public-bisheng.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档免费解决方案](https://bishengoffice.com/apps/blog/free/)
+## ![logo](https://bisheng-public.oss-cn-zhangjiakou.aliyuncs.com/resource/favicon.ico)[only Office 毕升文档免费解决方案](https://bishengoffice.com/apps/blog/free/)
 1. 毕升文档基础安装包永久免费，单机版不设置用户数和并发数限制。
 
 2. 基础安装包功能与官网上线产品功能相同。
