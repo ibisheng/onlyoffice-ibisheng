@@ -74,9 +74,7 @@ Onlyoffie的毕升文档免费解决方案还提供了一个强大的drive，实
 
 如果你想了解我们，可以打开链接：https://bishengoffice.com/apps/blog/posts/aboutus.html
 
-如果你喜欢我们欢迎加入毕升文档交流群。
-
-<a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=9139c206ed47bb0fdf7e1f5468c447f0e9193354204659b1591477c0f70472da"><img border="0" src="https://bisheng-public.oss-cn-zhangjiakou.aliyuncs.com/resource/%E6%AF%95%E5%8D%87%E6%96%87%E6%A1%A3%E4%BA%A4%E6%B5%81%E7%BE%A4%E7%BE%A4%E4%BA%8C%E7%BB%B4%E7%A0%81.png" alt="毕升文档交流群" title="毕升文档交流群"></a>
+你可以通过毕升Office官方QQ [420819940](tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=420819940&website=www.oicqzone.com) 以及 微信号 bishengoffice，或者电话 18613320502联系我们
 
 也可以在微信中搜索毕升Office文档小程序
 
