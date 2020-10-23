@@ -74,13 +74,7 @@ Onlyoffie的毕升文档免费解决方案还提供了一个强大的drive，实
 
 如果你想了解我们，可以打开链接：https://bishengoffice.com/apps/blog/posts/aboutus.html
 
-你可以通过如下方式联系我们：
-
-毕升Office官方QQ：  [420819940](tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=420819940&website=www.oicqzone.com) ；
-
-毕升Office官方微信号：  bishengoffice；
-
-电话： 18613320502
+销售以及商务咨询：[联系我们](https://bishengoffice.com/apps/blog/posts/aboutus.html)
 
 也可以在微信中搜索毕升Office文档小程序
 
